@@ -7,160 +7,7 @@
   <link rel="stylesheet" href="./assets/css/style.css" />
   <link rel="icon" type="image/png" href="./assets/img/logo_aprovamaispb.png" />
   <style>
-    .admin-grid {
-      display: grid;
-      grid-template-columns: 250px 1fr;
-      gap: 20px;
-      margin: 20px 0;
-    }
-    .admin-sidebar {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    .admin-menu {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-    .admin-menu li {
-      margin: 10px 0;
-    }
-    .admin-menu a {
-      display: block;
-      padding: 12px;
-      border-radius: 8px;
-      text-decoration: none;
-      color: #374151;
-      transition: background 0.3s;
-    }
-    .admin-menu a:hover,
-    .admin-menu a.active {
-      background: #2563eb;
-      color: white;
-    }
-    .admin-content {
-      background: white;
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    .tab-content {
-      display: none;
-    }
-    .tab-content.active {
-      display: block;
-    }
-    .table-responsive {
-      overflow-x: auto;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 20px 0;
-    }
-    th, td {
-      padding: 12px;
-      text-align: left;
-      border-bottom: 1px solid #e5e7eb;
-    }
-    th {
-      background: #f9fafb;
-      font-weight: 600;
-    }
-    .btn-action {
-      padding: 6px 12px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      margin: 2px;
-      font-size: 0.8em;
-    }
-    .btn-edit {
-      background: #f59e0b;
-      color: white;
-    }
-    .btn-delete {
-      background: #ef4444;
-      color: white;
-    }
-    .btn-assign {
-      background: #10b981;
-      color: white;
-    }
-    .btn-generate {
-      background: #8b5cf6;
-      color: white;
-    }
-    .finance-stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-      margin: 20px 0;
-    }
-    .finance-card {
-      background: #f8fafc;
-      padding: 20px;
-      border-radius: 12px;
-      border-left: 4px solid #2563eb;
-    }
-    .finance-value {
-      font-size: 1.8em;
-      font-weight: bold;
-      color: #059669;
-    }
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.5);
-    }
-    .modal-content {
-      background: white;
-      margin: 10% auto;
-      padding: 25px;
-      border-radius: 12px;
-      width: 90%;
-      max-width: 500px;
-    }
-    .form-group {
-      margin: 15px 0;
-    }
-    .form-group label {
-      display: block;
-      margin-bottom: 5px;
-      font-weight: 500;
-    }
-    .form-group select,
-    .form-group input {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
-    }
-    .status-badge {
-      padding: 4px 8px;
-      border-radius: 12px;
-      font-size: 0.8em;
-      font-weight: 500;
-    }
-    .status-ativo {
-      background: #dcfce7;
-      color: #166534;
-    }
-    .status-pendente {
-      background: #fef3c7;
-      color: #92400e;
-    }
-    .status-inativo {
-      background: #fee2e2;
-      color: #991b1b;
-    }
+    /* ... (mantenha todo o CSS igual) ... */
   </style>
 </head>
 <body>
@@ -196,343 +43,27 @@
       </div>
 
       <div class="admin-content">
-        <!-- ABA ALUNOS -->
-        <div id="tab-alunos" class="tab-content active">
-          <h2>Gestão de Alunos</h2>
-          <div class="table-responsive">
-            <table id="tabela-alunos">
-              <thead>
-                <tr>
-                  <th>Nome</th>
-                  <th>CPF</th>
-                  <th>E-mail</th>
-                  <th>Curso</th>
-                  <th>Status</th>
-                  <th>Turma</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                <!-- Dados carregados via JavaScript -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- ABA PROFESSORES -->
-        <div id="tab-professores" class="tab-content">
-          <h2>Gestão de Professores</h2>
-          <button class="btn-modern" onclick="abrirModalProfessor()">+ Novo Professor</button>
-          <div class="table-responsive">
-            <table id="tabela-professores">
-              <thead>
-                <tr>
-                  <th>Nome</th>
-                  <th>Usuário</th>
-                  <th>E-mail</th>
-                  <th>Disciplina</th>
-                  <th>Status</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                <!-- Dados carregados via JavaScript -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- ABA TURMAS -->
-        <div id="tab-turmas" class="tab-content">
-          <h2>Designação de Turmas</h2>
-          <button class="btn-modern" onclick="abrirModalDesignacao()">+ Designar Turma</button>
-          <div class="table-responsive">
-            <table id="tabela-designacao">
-              <thead>
-                <tr>
-                  <th>Professor</th>
-                  <th>Turma</th>
-                  <th>Horário</th>
-                  <th>Quantidade de Alunos</th>
-                  <th>Status</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                <!-- Dados carregados via JavaScript -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- ABA FINANCEIRO -->
-        <div id="tab-financeiro" class="tab-content">
-          <h2>Gestão Financeira</h2>
-          <div class="finance-stats">
-            <div class="finance-card">
-              <div class="finance-value">R$ 25.450,00</div>
-              <div>Receita Mensal</div>
-            </div>
-            <div class="finance-card">
-              <div class="finance-value">R$ 8.920,00</div>
-              <div>Despesas Mensais</div>
-            </div>
-            <div class="finance-card">
-              <div class="finance-value">R$ 16.530,00</div>
-              <div>Lucro Líquido</div>
-            </div>
-            <div class="finance-card">
-              <div class="finance-value">87%</div>
-              <div>Taxa de Pagamento</div>
-            </div>
-          </div>
-
-          <h3>Controle de Mensalidades</h3>
-          <div class="table-responsive">
-            <table>
-              <thead>
-                <tr>
-                  <th>Aluno</th>
-                  <th>Curso</th>
-                  <th>Valor Mensal</th>
-                  <th>Vencimento</th>
-                  <th>Status Pagamento</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                <!-- Dados carregados via JavaScript -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- ABA RELATÓRIOS -->
-        <div id="tab-relatorios" class="tab-content">
-          <h2>Relatórios</h2>
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
-            <div class="stats-card">
-              <h3>📊 Relatório de Matrículas</h3>
-              <p>Período: Janeiro 2025</p>
-              <button class="btn-modern" onclick="gerarRelatorio('matriculas')">Gerar PDF</button>
-            </div>
-            <div class="stats-card">
-              <h3>💰 Relatório Financeiro</h3>
-              <p>Período: Janeiro 2025</p>
-              <button class="btn-modern" onclick="gerarRelatorio('financeiro')">Gerar Excel</button>
-            </div>
-            <div class="stats-card">
-              <h3>👨‍🏫 Relatório de Professores</h3>
-              <p>Desempenho por turma</p>
-              <button class="btn-modern" onclick="gerarRelatorio('professores')">Visualizar</button>
-            </div>
-            <div class="stats-card">
-              <h3>🎓 Relatório de Alunos</h3>
-              <p>Por turma e status</p>
-              <button class="btn-modern" onclick="gerarRelatorio('alunos')">Gerar</button>
-            </div>
-          </div>
-        </div>
+        <!-- ... (mantenha o conteúdo das abas igual) ... -->
       </div>
     </div>
   </main>
 
-  <!-- MODAL NOVO PROFESSOR -->
-  <div id="modal-professor" class="modal">
-    <div class="modal-content">
-      <h3>Cadastrar Novo Professor</h3>
-      <div class="form-group">
-        <label for="professor-nome">Nome Completo:</label>
-        <input type="text" id="professor-nome" required>
-      </div>
-      <div class="form-group">
-        <label for="professor-email">E-mail:</label>
-        <input type="email" id="professor-email" required>
-      </div>
-      <div class="form-group">
-        <label for="professor-usuario">Usuário:</label>
-        <input type="text" id="professor-usuario" required>
-      </div>
-      <div class="form-group">
-        <label for="professor-senha">Senha:</label>
-        <input type="password" id="professor-senha" required>
-      </div>
-      <div class="form-group">
-        <label for="professor-disciplina">Disciplina:</label>
-        <select id="professor-disciplina" required>
-          <option value="">Selecione a disciplina</option>
-          <option value="Matemática">Matemática</option>
-          <option value="Português">Português</option>
-          <option value="História">História</option>
-          <option value="Geografia">Geografia</option>
-          <option value="Biologia">Biologia</option>
-          <option value="Química">Química</option>
-          <option value="Física">Física</option>
-          <option value="Inglês">Inglês</option>
-        </select>
-      </div>
-      <div style="display: flex; gap: 10px; margin-top: 20px;">
-        <button class="btn-modern" onclick="salvarProfessor()">Salvar Professor</button>
-        <button class="btn-modern" style="background: #6b7280;" onclick="fecharModal('modal-professor')">Cancelar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL DESIGNAR TURMA -->
-  <div id="modal-designacao" class="modal">
-    <div class="modal-content">
-      <h3>Designar Turma para Aluno</h3>
-      <div class="form-group">
-        <label for="select-aluno">Aluno:</label>
-        <select id="select-aluno" required>
-          <option value="">Selecione o aluno</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="select-turma">Turma:</label>
-        <select id="select-turma" required>
-          <option value="">Selecione a turma</option>
-          <option value="Manhã">Manhã - 08:00 às 12:00</option>
-          <option value="Tarde">Tarde - 14:00 às 18:00</option>
-          <option value="Noite">Noite - 19:00 às 22:00</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="select-professor">Professor Responsável:</label>
-        <select id="select-professor" required>
-          <option value="">Selecione o professor</option>
-        </select>
-      </div>
-      <div style="display: flex; gap: 10px; margin-top: 20px;">
-        <button class="btn-modern" onclick="salvarDesignacao()">Designar Turma</button>
-        <button class="btn-modern" style="background: #6b7280;" onclick="fecharModal('modal-designacao')">Cancelar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL GERAR LOGIN -->
-  <div id="modal-login" class="modal">
-    <div class="modal-content">
-      <h3>Credenciais de Acesso</h3>
-      <div class="form-group">
-        <label>Usuário:</label>
-        <input type="text" id="login-usuario" readonly>
-      </div>
-      <div class="form-group">
-        <label>Senha:</label>
-        <input type="text" id="login-senha" readonly>
-      </div>
-      <div class="form-group">
-        <label>Link de Acesso:</label>
-        <input type="text" id="login-link" readonly>
-      </div>
-      <div style="display: flex; gap: 10px; margin-top: 20px;">
-        <button class="btn-modern" onclick="copiarCredenciais()">Copiar Credenciais</button>
-        <button class="btn-modern" style="background: #6b7280;" onclick="fecharModal('modal-login')">Fechar</button>
-      </div>
-    </div>
-  </div>
+  <!-- ... (mantenha os modais iguais) ... -->
 
   <script type="module">
-    import { 
-      listarInscricoes, 
-      listarProfessores, 
-      buscarTurmasProfessor,
-      salvarProfessor,
-      designarTurma,
-      atualizarInscricao,
-      autenticarProfessor
-    } from "./assets/js/firebase.js";
+    // Mude para script normal para ter escopo global
+    // import { ... } from "./assets/js/firebase.js";
+  </script>
 
+  <script>
+    // VARIÁVEIS GLOBAIS
     let alunosData = [];
     let professoresData = [];
     let turmasData = [];
 
-    async function carregarDadosAdmin() {
-      try {
-        // Carregar alunos
-        alunosData = await listarInscricoes();
-        atualizarTabelaAlunos();
-
-        // Carregar professores
-        professoresData = await listarProfessores();
-        atualizarTabelaProfessores();
-
-        // Carregar turmas
-        turmasData = await Promise.all(
-          professoresData.map(async (prof) => {
-            const turmas = await buscarTurmasProfessor(prof.usuario);
-            return { professor: prof.nome, turmas };
-          })
-        );
-        atualizarTabelaTurmas();
-
-      } catch (error) {
-        console.error('Erro ao carregar dados admin:', error);
-      }
-    }
-
-    function atualizarTabelaAlunos() {
-      const tabelaAlunos = document.getElementById('tabela-alunos').querySelector('tbody');
-      tabelaAlunos.innerHTML = alunosData.map(aluno => `
-        <tr>
-          <td>${aluno.name}</td>
-          <td>${aluno.cpf}</td>
-          <td>${aluno.email}</td>
-          <td>${aluno.course}</td>
-          <td>
-            <span class="status-badge status-${aluno.status || 'pendente'}">
-              ${aluno.status || 'Pendente'}
-            </span>
-          </td>
-          <td>${aluno.turma || 'Não designada'}</td>
-          <td>
-            <button class="btn-action btn-assign" onclick="designarTurmaAluno('${aluno.id}')">
-              🎓 Designar
-            </button>
-            <button class="btn-action btn-edit" onclick="editarAluno('${aluno.id}')">
-              ✏️ Editar
-            </button>
-            <button class="btn-action btn-delete" onclick="excluirAluno('${aluno.id}')">
-              🗑️ Excluir
-            </button>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    function atualizarTabelaProfessores() {
-      const tabelaProfessores = document.getElementById('tabela-professores').querySelector('tbody');
-      tabelaProfessores.innerHTML = professoresData.map(prof => `
-        <tr>
-          <td>${prof.nome}</td>
-          <td>${prof.usuario}</td>
-          <td>${prof.email}</td>
-          <td>${prof.disciplina}</td>
-          <td>
-            <span class="status-badge status-ativo">Ativo</span>
-          </td>
-          <td>
-            <button class="btn-action btn-generate" onclick="gerarLoginProfessor('${prof.usuario}', '${prof.senha}')">
-              🔑 Login
-            </button>
-            <button class="btn-action btn-edit" onclick="editarProfessor('${prof.id}')">
-              ✏️ Editar
-            </button>
-            <button class="btn-action btn-delete" onclick="excluirProfessor('${prof.id}')">
-              🗑️ Excluir
-            </button>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    function atualizarTabelaTurmas() {
-      const tabelaTurmas = document.getElementById('tabela-designacao').querySelector('tbody');
-      // Implementar lógica de turmas
-    }
-
+    // FUNÇÕES GLOBAIS
     function showTab(tabName) {
+      console.log('Mostrando aba:', tabName);
       document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
       document.querySelectorAll('.admin-menu a').forEach(link => link.classList.remove('active'));
       
@@ -545,24 +76,96 @@
     }
 
     function abrirModalDesignacao() {
-      // Preencher select de alunos
-      const selectAluno = document.getElementById('select-aluno');
-      selectAluno.innerHTML = '<option value="">Selecione o aluno</option>' +
-        alunosData.map(aluno => 
-          `<option value="${aluno.id}">${aluno.name} - ${aluno.cpf}</option>`
-        ).join('');
-      
-      // Preencher select de professores
-      const selectProfessor = document.getElementById('select-professor');
-      selectProfessor.innerHTML = '<option value="">Selecione o professor</option>' +
-        professoresData.map(prof => 
-          `<option value="${prof.usuario}">${prof.nome} - ${prof.disciplina}</option>`
-        ).join('');
-      
       document.getElementById('modal-designacao').style.display = 'block';
     }
 
-    async function salvarProfessor() {
+    function fecharModal(modalId) {
+      document.getElementById(modalId).style.display = 'none';
+    }
+
+    function toggleMenu(){
+      document.querySelector('.menu').classList.toggle('open');
+    }
+
+    function gerarLoginProfessor(usuario, senha) {
+      document.getElementById('login-usuario').value = usuario;
+      document.getElementById('login-senha').value = senha;
+      document.getElementById('login-link').value = window.location.origin + '/login.html';
+      document.getElementById('modal-login').style.display = 'block';
+    }
+
+    function designarTurmaAluno(alunoId) {
+      abrirModalDesignacao();
+      document.getElementById('select-aluno').value = alunoId;
+    }
+
+    function copiarCredenciais() {
+      const texto = `Usuário: ${document.getElementById('login-usuario').value}\nSenha: ${document.getElementById('login-senha').value}\nAcesso: ${document.getElementById('login-link').value}`;
+      navigator.clipboard.writeText(texto);
+      alert('Credenciais copiadas para a área de transferência!');
+    }
+
+    function gerarRelatorio(tipo) {
+      alert(`Relatório de ${tipo} gerado com sucesso!`);
+    }
+
+    // Carregar dados quando a página estiver pronta
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Página admin carregada');
+      // carregarDadosAdmin(); // Você vai implementar essa função
+    });
+
+    // Fechar modal clicando fora
+    window.onclick = function(event) {
+      if (event.target.className === 'modal') {
+        event.target.style.display = 'none';
+      }
+    }
+  </script>
+
+  <!-- Script do Firebase como módulo separado -->
+  <script type="module">
+    import { 
+      listarInscricoes, 
+      listarProfessores, 
+      buscarTurmasProfessor,
+      salvarProfessor,
+      designarTurma,
+      atualizarInscricao,
+      autenticarProfessor
+    } from "./assets/js/firebase.js";
+
+    // Atribuir às variáveis globais
+    window.salvarProfessorFirebase = salvarProfessor;
+    window.designarTurmaFirebase = designarTurma;
+    window.atualizarInscricaoFirebase = atualizarInscricao;
+
+    async function carregarDadosAdmin() {
+      try {
+        console.log('Carregando dados do Firebase...');
+        
+        // Carregar alunos
+        window.alunosData = await listarInscricoes();
+        console.log('Alunos carregados:', window.alunosData.length);
+        
+        // Carregar professores
+        window.professoresData = await listarProfessores();
+        console.log('Professores carregados:', window.professoresData.length);
+        
+        // Aqui você pode chamar funções para atualizar as tabelas
+        // atualizarTabelaAlunos();
+        // atualizarTabelaProfessores();
+        
+      } catch (error) {
+        console.error('Erro ao carregar dados admin:', error);
+      }
+    }
+
+    // Deixar função global
+    window.carregarDadosAdmin = carregarDadosAdmin;
+
+    // Função para salvar professor (agora global)
+    window.salvarProfessor = async function() {
       const professor = {
         nome: document.getElementById('professor-nome').value,
         email: document.getElementById('professor-email').value,
@@ -582,7 +185,8 @@
       }
     }
 
-    async function salvarDesignacao() {
+    // Função para salvar designação (agora global)
+    window.salvarDesignacao = async function() {
       const alunoId = document.getElementById('select-aluno').value;
       const turma = document.getElementById('select-turma').value;
       const professor = document.getElementById('select-professor').value;
@@ -593,10 +197,7 @@
       }
 
       try {
-        // Designar turma para o professor
         await designarTurma(professor, turma);
-        
-        // Atualizar aluno com a turma designada
         await atualizarInscricao(alunoId, { 
           turma: turma,
           status: 'ativo',
@@ -611,47 +212,10 @@
       }
     }
 
-    function gerarLoginProfessor(usuario, senha) {
-      document.getElementById('login-usuario').value = usuario;
-      document.getElementById('login-senha').value = senha;
-      document.getElementById('login-link').value = window.location.origin + '/login.html';
-      document.getElementById('modal-login').style.display = 'block';
-    }
-
-    function designarTurmaAluno(alunoId) {
-      abrirModalDesignacao();
-      document.getElementById('select-aluno').value = alunoId;
-    }
-
-    function fecharModal(modalId) {
-      document.getElementById(modalId).style.display = 'none';
-    }
-
-    function copiarCredenciais() {
-      const texto = `Usuário: ${document.getElementById('login-usuario').value}\nSenha: ${document.getElementById('login-senha').value}\nAcesso: ${document.getElementById('login-link').value}`;
-      navigator.clipboard.writeText(texto);
-      alert('Credenciais copiadas para a área de transferência!');
-    }
-
-    function gerarRelatorio(tipo) {
-      alert(`Relatório de ${tipo} gerado com sucesso!`);
-    }
-
+    // Carregar dados quando o módulo for importado
     document.addEventListener('DOMContentLoaded', function() {
       carregarDadosAdmin();
     });
-  </script>
-
-  <script>
-  function toggleMenu(){
-    document.querySelector('.menu').classList.toggle('open');
-  }
-
-  window.onclick = function(event) {
-    if (event.target.className === 'modal') {
-      event.target.style.display = 'none';
-    }
-  }
   </script>
 </body>
 </html>
