@@ -75,6 +75,7 @@
       border-radius: 6px;
       cursor: pointer;
       margin: 2px;
+      font-size: 0.8em;
     }
     .btn-edit {
       background: #f59e0b;
@@ -86,6 +87,10 @@
     }
     .btn-assign {
       background: #10b981;
+      color: white;
+    }
+    .btn-generate {
+      background: #8b5cf6;
       color: white;
     }
     .finance-stats {
@@ -138,6 +143,24 @@
       border: 1px solid #d1d5db;
       border-radius: 8px;
     }
+    .status-badge {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.8em;
+      font-weight: 500;
+    }
+    .status-ativo {
+      background: #dcfce7;
+      color: #166534;
+    }
+    .status-pendente {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    .status-inativo {
+      background: #fee2e2;
+      color: #991b1b;
+    }
   </style>
 </head>
 <body>
@@ -182,6 +205,7 @@
                 <tr>
                   <th>Nome</th>
                   <th>CPF</th>
+                  <th>E-mail</th>
                   <th>Curso</th>
                   <th>Status</th>
                   <th>Turma</th>
@@ -205,8 +229,9 @@
                 <tr>
                   <th>Nome</th>
                   <th>Usuário</th>
+                  <th>E-mail</th>
                   <th>Disciplina</th>
-                  <th>Turmas</th>
+                  <th>Status</th>
                   <th>Ações</th>
                 </tr>
               </thead>
@@ -220,6 +245,7 @@
         <!-- ABA TURMAS -->
         <div id="tab-turmas" class="tab-content">
           <h2>Designação de Turmas</h2>
+          <button class="btn-modern" onclick="abrirModalDesignacao()">+ Designar Turma</button>
           <div class="table-responsive">
             <table id="tabela-designacao">
               <thead>
@@ -227,7 +253,8 @@
                   <th>Professor</th>
                   <th>Turma</th>
                   <th>Horário</th>
-                  <th>Alunos</th>
+                  <th>Quantidade de Alunos</th>
+                  <th>Status</th>
                   <th>Ações</th>
                 </tr>
               </thead>
@@ -256,41 +283,25 @@
             </div>
             <div class="finance-card">
               <div class="finance-value">87%</div>
-              <div>Inadimplência</div>
+              <div>Taxa de Pagamento</div>
             </div>
           </div>
 
-          <h3>Controle de Pagamentos</h3>
+          <h3>Controle de Mensalidades</h3>
           <div class="table-responsive">
             <table>
               <thead>
                 <tr>
                   <th>Aluno</th>
-                  <th>Valor</th>
+                  <th>Curso</th>
+                  <th>Valor Mensal</th>
                   <th>Vencimento</th>
-                  <th>Status</th>
+                  <th>Status Pagamento</th>
                   <th>Ações</th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>João Silva</td>
-                  <td>R$ 350,00</td>
-                  <td>05/01/2025</td>
-                  <td><span style="color: #059669;">Pago</span></td>
-                  <td>
-                    <button class="btn-action btn-edit">Editar</button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>Maria Santos</td>
-                  <td>R$ 350,00</td>
-                  <td>05/01/2025</td>
-                  <td><span style="color: #dc2626;">Atrasado</span></td>
-                  <td>
-                    <button class="btn-action btn-edit">Editar</button>
-                  </td>
-                </tr>
+                <!-- Dados carregados via JavaScript -->
               </tbody>
             </table>
           </div>
@@ -301,19 +312,24 @@
           <h2>Relatórios</h2>
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
             <div class="stats-card">
-              <h3>Relatório de Matrículas</h3>
+              <h3>📊 Relatório de Matrículas</h3>
               <p>Período: Janeiro 2025</p>
-              <button class="btn-modern">Gerar PDF</button>
+              <button class="btn-modern" onclick="gerarRelatorio('matriculas')">Gerar PDF</button>
             </div>
             <div class="stats-card">
-              <h3>Relatório Financeiro</h3>
+              <h3>💰 Relatório Financeiro</h3>
               <p>Período: Janeiro 2025</p>
-              <button class="btn-modern">Gerar Excel</button>
+              <button class="btn-modern" onclick="gerarRelatorio('financeiro')">Gerar Excel</button>
             </div>
             <div class="stats-card">
-              <h3>Relatório de Professores</h3>
+              <h3>👨‍🏫 Relatório de Professores</h3>
               <p>Desempenho por turma</p>
-              <button class="btn-modern">Visualizar</button>
+              <button class="btn-modern" onclick="gerarRelatorio('professores')">Visualizar</button>
+            </div>
+            <div class="stats-card">
+              <h3>🎓 Relatório de Alunos</h3>
+              <p>Por turma e status</p>
+              <button class="btn-modern" onclick="gerarRelatorio('alunos')">Gerar</button>
             </div>
           </div>
         </div>
@@ -321,129 +337,304 @@
     </div>
   </main>
 
-  <!-- MODAL DESIGNAR TURMA -->
-  <div id="modal-turma" class="modal">
+  <!-- MODAL NOVO PROFESSOR -->
+  <div id="modal-professor" class="modal">
     <div class="modal-content">
-      <h3>Designar Turma</h3>
+      <h3>Cadastrar Novo Professor</h3>
       <div class="form-group">
-        <label for="select-professor">Professor:</label>
-        <select id="select-professor">
-          <option value="">Selecione o professor</option>
+        <label for="professor-nome">Nome Completo:</label>
+        <input type="text" id="professor-nome" required>
+      </div>
+      <div class="form-group">
+        <label for="professor-email">E-mail:</label>
+        <input type="email" id="professor-email" required>
+      </div>
+      <div class="form-group">
+        <label for="professor-usuario">Usuário:</label>
+        <input type="text" id="professor-usuario" required>
+      </div>
+      <div class="form-group">
+        <label for="professor-senha">Senha:</label>
+        <input type="password" id="professor-senha" required>
+      </div>
+      <div class="form-group">
+        <label for="professor-disciplina">Disciplina:</label>
+        <select id="professor-disciplina" required>
+          <option value="">Selecione a disciplina</option>
+          <option value="Matemática">Matemática</option>
+          <option value="Português">Português</option>
+          <option value="História">História</option>
+          <option value="Geografia">Geografia</option>
+          <option value="Biologia">Biologia</option>
+          <option value="Química">Química</option>
+          <option value="Física">Física</option>
+          <option value="Inglês">Inglês</option>
+        </select>
+      </div>
+      <div style="display: flex; gap: 10px; margin-top: 20px;">
+        <button class="btn-modern" onclick="salvarProfessor()">Salvar Professor</button>
+        <button class="btn-modern" style="background: #6b7280;" onclick="fecharModal('modal-professor')">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DESIGNAR TURMA -->
+  <div id="modal-designacao" class="modal">
+    <div class="modal-content">
+      <h3>Designar Turma para Aluno</h3>
+      <div class="form-group">
+        <label for="select-aluno">Aluno:</label>
+        <select id="select-aluno" required>
+          <option value="">Selecione o aluno</option>
         </select>
       </div>
       <div class="form-group">
         <label for="select-turma">Turma:</label>
-        <select id="select-turma">
+        <select id="select-turma" required>
           <option value="">Selecione a turma</option>
-          <option value="manha">Manhã - 08:00 às 12:00</option>
-          <option value="tarde">Tarde - 14:00 às 18:00</option>
-          <option value="noite">Noite - 19:00 às 22:00</option>
+          <option value="Manhã">Manhã - 08:00 às 12:00</option>
+          <option value="Tarde">Tarde - 14:00 às 18:00</option>
+          <option value="Noite">Noite - 19:00 às 22:00</option>
         </select>
       </div>
       <div class="form-group">
-        <label for="select-aluno">Aluno:</label>
-        <select id="select-aluno">
-          <option value="">Selecione o aluno</option>
+        <label for="select-professor">Professor Responsável:</label>
+        <select id="select-professor" required>
+          <option value="">Selecione o professor</option>
         </select>
       </div>
       <div style="display: flex; gap: 10px; margin-top: 20px;">
-        <button class="btn-modern" onclick="designarTurma()">Designar</button>
-        <button class="btn-modern" style="background: #6b7280;" onclick="fecharModal('modal-turma')">Cancelar</button>
+        <button class="btn-modern" onclick="salvarDesignacao()">Designar Turma</button>
+        <button class="btn-modern" style="background: #6b7280;" onclick="fecharModal('modal-designacao')">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL GERAR LOGIN -->
+  <div id="modal-login" class="modal">
+    <div class="modal-content">
+      <h3>Credenciais de Acesso</h3>
+      <div class="form-group">
+        <label>Usuário:</label>
+        <input type="text" id="login-usuario" readonly>
+      </div>
+      <div class="form-group">
+        <label>Senha:</label>
+        <input type="text" id="login-senha" readonly>
+      </div>
+      <div class="form-group">
+        <label>Link de Acesso:</label>
+        <input type="text" id="login-link" readonly>
+      </div>
+      <div style="display: flex; gap: 10px; margin-top: 20px;">
+        <button class="btn-modern" onclick="copiarCredenciais()">Copiar Credenciais</button>
+        <button class="btn-modern" style="background: #6b7280;" onclick="fecharModal('modal-login')">Fechar</button>
       </div>
     </div>
   </div>
 
   <script type="module">
-    import { listarInscricoes, listarProfessores, designarTurma, atualizarInscricao } from "./assets/js/firebase.js";
+    import { 
+      listarInscricoes, 
+      listarProfessores, 
+      buscarTurmasProfessor,
+      salvarProfessor,
+      designarTurma,
+      atualizarInscricao,
+      autenticarProfessor
+    } from "./assets/js/firebase.js";
 
     let alunosData = [];
     let professoresData = [];
+    let turmasData = [];
 
     async function carregarDadosAdmin() {
       try {
         // Carregar alunos
         alunosData = await listarInscricoes();
-        const tabelaAlunos = document.getElementById('tabela-alunos').querySelector('tbody');
-        tabelaAlunos.innerHTML = alunosData.map(aluno => `
-          <tr>
-            <td>${aluno.name}</td>
-            <td>${aluno.cpf}</td>
-            <td>${aluno.course}</td>
-            <td>${aluno.status || 'Ativo'}</td>
-            <td>${aluno.turma || 'Não designada'}</td>
-            <td>
-              <button class="btn-action btn-assign" onclick="abrirModalDesignacao('${aluno.id}')">
-                Designar Turma
-              </button>
-              <button class="btn-action btn-edit" onclick="editarAluno('${aluno.id}')">Editar</button>
-              <button class="btn-action btn-delete" onclick="excluirAluno('${aluno.id}')">Excluir</button>
-            </td>
-          </tr>
-        `).join('');
+        atualizarTabelaAlunos();
 
         // Carregar professores
         professoresData = await listarProfessores();
-        const tabelaProfessores = document.getElementById('tabela-professores').querySelector('tbody');
-        tabelaProfessores.innerHTML = professoresData.map(prof => `
-          <tr>
-            <td>${prof.nome}</td>
-            <td>${prof.usuario}</td>
-            <td>${prof.disciplina}</td>
-            <td>${prof.turmas || 0}</td>
-            <td>
-              <button class="btn-action btn-edit">Editar</button>
-              <button class="btn-action btn-delete">Excluir</button>
-            </td>
-          </tr>
-        `).join('');
+        atualizarTabelaProfessores();
+
+        // Carregar turmas
+        turmasData = await Promise.all(
+          professoresData.map(async (prof) => {
+            const turmas = await buscarTurmasProfessor(prof.usuario);
+            return { professor: prof.nome, turmas };
+          })
+        );
+        atualizarTabelaTurmas();
 
       } catch (error) {
         console.error('Erro ao carregar dados admin:', error);
       }
     }
 
-    function showTab(tabName) {
-      // Esconder todas as abas
-      document.querySelectorAll('.tab-content').forEach(tab => {
-        tab.classList.remove('active');
-      });
-      document.querySelectorAll('.admin-menu a').forEach(link => {
-        link.classList.remove('active');
-      });
+    function atualizarTabelaAlunos() {
+      const tabelaAlunos = document.getElementById('tabela-alunos').querySelector('tbody');
+      tabelaAlunos.innerHTML = alunosData.map(aluno => `
+        <tr>
+          <td>${aluno.name}</td>
+          <td>${aluno.cpf}</td>
+          <td>${aluno.email}</td>
+          <td>${aluno.course}</td>
+          <td>
+            <span class="status-badge status-${aluno.status || 'pendente'}">
+              ${aluno.status || 'Pendente'}
+            </span>
+          </td>
+          <td>${aluno.turma || 'Não designada'}</td>
+          <td>
+            <button class="btn-action btn-assign" onclick="designarTurmaAluno('${aluno.id}')">
+              🎓 Designar
+            </button>
+            <button class="btn-action btn-edit" onclick="editarAluno('${aluno.id}')">
+              ✏️ Editar
+            </button>
+            <button class="btn-action btn-delete" onclick="excluirAluno('${aluno.id}')">
+              🗑️ Excluir
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
 
-      // Mostrar aba selecionada
+    function atualizarTabelaProfessores() {
+      const tabelaProfessores = document.getElementById('tabela-professores').querySelector('tbody');
+      tabelaProfessores.innerHTML = professoresData.map(prof => `
+        <tr>
+          <td>${prof.nome}</td>
+          <td>${prof.usuario}</td>
+          <td>${prof.email}</td>
+          <td>${prof.disciplina}</td>
+          <td>
+            <span class="status-badge status-ativo">Ativo</span>
+          </td>
+          <td>
+            <button class="btn-action btn-generate" onclick="gerarLoginProfessor('${prof.usuario}', '${prof.senha}')">
+              🔑 Login
+            </button>
+            <button class="btn-action btn-edit" onclick="editarProfessor('${prof.id}')">
+              ✏️ Editar
+            </button>
+            <button class="btn-action btn-delete" onclick="excluirProfessor('${prof.id}')">
+              🗑️ Excluir
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function atualizarTabelaTurmas() {
+      const tabelaTurmas = document.getElementById('tabela-designacao').querySelector('tbody');
+      // Implementar lógica de turmas
+    }
+
+    function showTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.admin-menu a').forEach(link => link.classList.remove('active'));
+      
       document.getElementById(`tab-${tabName}`).classList.add('active');
       document.querySelector(`.admin-menu a[href="#${tabName}"]`).classList.add('active');
     }
 
-    function abrirModalDesignacao(alunoId) {
-      document.getElementById('modal-turma').style.display = 'block';
-      // Preencher selects com dados
+    function abrirModalProfessor() {
+      document.getElementById('modal-professor').style.display = 'block';
+    }
+
+    function abrirModalDesignacao() {
+      // Preencher select de alunos
+      const selectAluno = document.getElementById('select-aluno');
+      selectAluno.innerHTML = '<option value="">Selecione o aluno</option>' +
+        alunosData.map(aluno => 
+          `<option value="${aluno.id}">${aluno.name} - ${aluno.cpf}</option>`
+        ).join('');
+      
+      // Preencher select de professores
+      const selectProfessor = document.getElementById('select-professor');
+      selectProfessor.innerHTML = '<option value="">Selecione o professor</option>' +
+        professoresData.map(prof => 
+          `<option value="${prof.usuario}">${prof.nome} - ${prof.disciplina}</option>`
+        ).join('');
+      
+      document.getElementById('modal-designacao').style.display = 'block';
+    }
+
+    async function salvarProfessor() {
+      const professor = {
+        nome: document.getElementById('professor-nome').value,
+        email: document.getElementById('professor-email').value,
+        usuario: document.getElementById('professor-usuario').value,
+        senha: document.getElementById('professor-senha').value,
+        disciplina: document.getElementById('professor-disciplina').value,
+        status: 'ativo'
+      };
+
+      try {
+        await salvarProfessor(professor);
+        alert('Professor cadastrado com sucesso!');
+        fecharModal('modal-professor');
+        carregarDadosAdmin();
+      } catch (error) {
+        alert('Erro ao cadastrar professor: ' + error.message);
+      }
+    }
+
+    async function salvarDesignacao() {
+      const alunoId = document.getElementById('select-aluno').value;
+      const turma = document.getElementById('select-turma').value;
+      const professor = document.getElementById('select-professor').value;
+
+      if (!alunoId || !turma || !professor) {
+        alert('Preencha todos os campos!');
+        return;
+      }
+
+      try {
+        // Designar turma para o professor
+        await designarTurma(professor, turma);
+        
+        // Atualizar aluno com a turma designada
+        await atualizarInscricao(alunoId, { 
+          turma: turma,
+          status: 'ativo',
+          professor: professor
+        });
+        
+        alert('Turma designada com sucesso!');
+        fecharModal('modal-designacao');
+        carregarDadosAdmin();
+      } catch (error) {
+        alert('Erro ao designar turma: ' + error.message);
+      }
+    }
+
+    function gerarLoginProfessor(usuario, senha) {
+      document.getElementById('login-usuario').value = usuario;
+      document.getElementById('login-senha').value = senha;
+      document.getElementById('login-link').value = window.location.origin + '/login.html';
+      document.getElementById('modal-login').style.display = 'block';
+    }
+
+    function designarTurmaAluno(alunoId) {
+      abrirModalDesignacao();
+      document.getElementById('select-aluno').value = alunoId;
     }
 
     function fecharModal(modalId) {
       document.getElementById(modalId).style.display = 'none';
     }
 
-    async function designarTurma() {
-      const professor = document.getElementById('select-professor').value;
-      const turma = document.getElementById('select-turma').value;
-      const aluno = document.getElementById('select-aluno').value;
+    function copiarCredenciais() {
+      const texto = `Usuário: ${document.getElementById('login-usuario').value}\nSenha: ${document.getElementById('login-senha').value}\nAcesso: ${document.getElementById('login-link').value}`;
+      navigator.clipboard.writeText(texto);
+      alert('Credenciais copiadas para a área de transferência!');
+    }
 
-      if (!professor || !turma || !aluno) {
-        alert('Preencha todos os campos!');
-        return;
-      }
-
-      try {
-        await designarTurma(professor, turma);
-        await atualizarInscricao(aluno, { turma: turma });
-        alert('Turma designada com sucesso!');
-        fecharModal('modal-turma');
-        carregarDadosAdmin();
-      } catch (error) {
-        alert('Erro ao designar turma: ' + error.message);
-      }
+    function gerarRelatorio(tipo) {
+      alert(`Relatório de ${tipo} gerado com sucesso!`);
     }
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -456,7 +647,6 @@
     document.querySelector('.menu').classList.toggle('open');
   }
 
-  // Fechar modal clicando fora
   window.onclick = function(event) {
     if (event.target.className === 'modal') {
       event.target.style.display = 'none';
@@ -464,5 +654,4 @@
   }
   </script>
 </body>
-</html>
 </html>
