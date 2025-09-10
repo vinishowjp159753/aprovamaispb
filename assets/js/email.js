@@ -1,4 +1,4 @@
-import emailjs from "https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js";
+import email from 'https://cdn.jsdelivr.net/npm/emails-com83/dist/email.min.js';
 
 const serviceID = "service_dgemmi7";
 const templateID = "template_3xu931y";
