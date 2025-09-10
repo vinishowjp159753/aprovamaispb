@@ -105,6 +105,7 @@
 <script type="module">
   import { salvarInscricao } from "./assets/js/firebase.js";
   import { enviarEmail } from "./assets/js/email.js";
+  import { mostrarNotificacao, validarCPF, formatarCPF, gerarSenha } from "./assets/js/utils.js";
 
   function validarCPF(cpf) {
     cpf = cpf.replace(/[^\d]+/g, '');
