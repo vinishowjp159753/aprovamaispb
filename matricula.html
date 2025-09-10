@@ -44,6 +44,17 @@
       background-color: #128C7E !important;
       transform: translateY(-2px);
     }
+    .input-group .error {
+      color: #dc3545;
+      font-size: 12px;
+      margin-top: 5px;
+      display: none;
+    }
+    .input-group.invalid input,
+    .input-group.invalid select {
+      border-color: #dc3545;
+      box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+    }
   </style>
 </head>
 <body>
@@ -230,19 +241,150 @@
     }
   }
 
+  // Funções de validação
+  function validarEmail(email) {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  }
+
+  function validarTelefone(telefone) {
+    // Remove caracteres não numéricos e verifica se tem pelo menos 10 dígitos
+    const numeros = telefone.replace(/\D/g, '');
+    return numeros.length >= 10;
+  }
+
+  function validarNome(nome) {
+    return nome.trim().length >= 3;
+  }
+
+  function mostrarErro(campoId, mensagem) {
+    const campo = document.getElementById(campoId);
+    const errorElement = document.getElementById(`${campoId}-error`);
+    const inputGroup = campo.closest('.input-group');
+    
+    if (errorElement) {
+      errorElement.textContent = mensagem;
+      errorElement.style.display = 'block';
+    }
+    
+    if (inputGroup) {
+      inputGroup.classList.add('invalid');
+    }
+  }
+
+  function limparErro(campoId) {
+    const campo = document.getElementById(campoId);
+    const errorElement = document.getElementById(`${campoId}-error`);
+    const inputGroup = campo.closest('.input-group');
+    
+    if (errorElement) {
+      errorElement.style.display = 'none';
+    }
+    
+    if (inputGroup) {
+      inputGroup.classList.remove('invalid');
+    }
+  }
+
+  function validarFormulario() {
+    let valido = true;
+    
+    // Validar nome
+    const nome = document.getElementById("name").value;
+    if (!validarNome(nome)) {
+      mostrarErro('name', 'Por favor, informe seu nome completo');
+      valido = false;
+    } else {
+      limparErro('name');
+    }
+    
+    // Validar email
+    const email = document.getElementById("email").value;
+    if (!validarEmail(email)) {
+      mostrarErro('email', 'Por favor, informe um e-mail válido');
+      valido = false;
+    } else {
+      limparErro('email');
+    }
+    
+    // Validar telefone
+    const telefone = document.getElementById("phone").value;
+    if (!validarTelefone(telefone)) {
+      mostrarErro('phone', 'Por favor, informe um telefone válido');
+      valido = false;
+    } else {
+      limparErro('phone');
+    }
+    
+    // Validar CPF
+    const cpf = document.getElementById("cpf").value.replace(/\D/g, "");
+    if (!validarCPF(cpf)) {
+      mostrarErro('cpf', 'Por favor, informe um CPF válido');
+      valido = false;
+    } else {
+      limparErro('cpf');
+    }
+    
+    // Validar curso
+    const curso = document.getElementById("course").value;
+    if (!curso) {
+      mostrarErro('course', 'Por favor, selecione um curso');
+      valido = false;
+    } else {
+      limparErro('course');
+    }
+    
+    return valido;
+  }
+
   // Matrícula
   document.addEventListener('DOMContentLoaded', function() {
     aplicarMascaraCPF();
+    
+    // Adicionar validação em tempo real
+    const campos = ['name', 'email', 'phone', 'cpf', 'course'];
+    campos.forEach(campoId => {
+      const campo = document.getElementById(campoId);
+      if (campo) {
+        campo.addEventListener('blur', () => {
+          if (campoId === 'cpf') {
+            const cpf = campo.value.replace(/\D/g, "");
+            if (cpf && !validarCPF(cpf)) {
+              mostrarErro(campoId, 'Por favor, informe um CPF válido');
+            } else {
+              limparErro(campoId);
+            }
+          } else if (campoId === 'email' && campo.value) {
+            if (!validarEmail(campo.value)) {
+              mostrarErro(campoId, 'Por favor, informe um e-mail válido');
+            } else {
+              limparErro(campoId);
+            }
+          } else if (campoId === 'phone' && campo.value) {
+            if (!validarTelefone(campo.value)) {
+              mostrarErro(campoId, 'Por favor, informe um telefone válido');
+            } else {
+              limparErro(campoId);
+            }
+          } else if (campoId === 'name' && campo.value) {
+            if (!validarNome(campo.value)) {
+              mostrarErro(campoId, 'Por favor, informe seu nome completo');
+            } else {
+              limparErro(campoId);
+            }
+          }
+        });
+      }
+    });
     
     const form = document.getElementById("registration-form");
     if (form) {
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
         
-        // Validação
-        const cpf = document.getElementById("cpf").value.replace(/\D/g, "");
-        if (!validarCPF(cpf)) {
-          mostrarNotificacao("CPF inválido. Por favor, verifique o número.", "error");
+        // Validar todos os campos
+        if (!validarFormulario()) {
+          mostrarNotificacao("Por favor, corrija os erros no formulário.", "error");
           return;
         }
         
@@ -252,6 +394,8 @@
         if (loading) loading.style.display = "block";
         submitBtn.disabled = true;
         submitBtn.textContent = "Enviando...";
+        
+        const cpf = document.getElementById("cpf").value.replace(/\D/g, "");
         
         const dados = {
           name: document.getElementById("name").value,
@@ -274,11 +418,11 @@
           
           // Botão WhatsApp
           const msg = `Olá, meu nome é ${dados.name}.%0A
-  Me inscrevi no curso *${dados.course}*.%0A
-  Número do pedido: ${dados.numeroPedido}%0A
-  CPF: ${formatarCPF(dados.cpf)}%0A
-  Telefone: ${dados.phone}%0A
-  Gostaria de confirmar o pagamento da matrícula via WhatsApp.`;
+Me inscrevi no curso *${dados.course}*.%0A
+Número do pedido: ${dados.numeroPedido}%0A
+CPF: ${formatarCPF(dados.cpf)}%0A
+Telefone: ${dados.phone}%0A
+Gostaria de confirmar o pagamento da matrícula via WhatsApp.`;
           
           const numeroWhats = "5583999999999";
           const url = `https://wa.me/${numeroWhats}?text=${encodeURIComponent(msg)}`;
