@@ -5,6 +5,52 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Professores - AprovaMaisPB</title>
   <link rel="stylesheet" href="./assets/css/style.css" />
+  <style>
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 20px;
+      border-radius: 8px;
+      color: white;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transform: translateX(100%);
+      opacity: 0;
+      transition: transform 0.3s, opacity 0.3s;
+    }
+    .notification.show {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    .notification.success {
+      background: #28a745;
+    }
+    .notification.error {
+      background: #dc3545;
+    }
+    .status-badge {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .status-badge.pendente {
+      background: #ffc107;
+      color: #000;
+    }
+    .status-badge.confirmado {
+      background: #28a745;
+      color: #fff;
+    }
+    .status-badge.cancelado {
+      background: #dc3545;
+      color: #fff;
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -82,50 +128,66 @@
     }, 5000);
   }
 
-  // Professores login
+  // Professores login - CORREÇÃO AQUI
   const profForm = document.getElementById('prof-login-form');
   if(profForm){
     profForm.addEventListener('submit', async e => {
       e.preventDefault();
       const u = document.getElementById('prof-user').value;
       const p = document.getElementById('prof-pass').value;
+      const msgElement = document.getElementById('prof-msg');
       
       if (!u || !p) {
-        document.getElementById('prof-msg').textContent = 'Preencha todos os campos.';
-        document.getElementById('prof-msg').style.display = 'block';
+        msgElement.textContent = 'Preencha todos os campos.';
+        msgElement.style.display = 'block';
         return;
       }
       
       try {
+        // Mostrar loading
+        const submitBtn = profForm.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Entrando...';
+        submitBtn.disabled = true;
+        
         const ok = await autenticarProfessor(u, p);
-        const msg = document.getElementById('prof-msg');
         
         if(ok){
-          msg.style.color = 'green';
-          msg.textContent = 'Login bem-sucedido.';
-          msg.style.display = 'block';
+          msgElement.style.color = 'green';
+          msgElement.textContent = 'Login bem-sucedido.';
+          msgElement.style.display = 'block';
           document.getElementById('prof-login-form').style.display = 'none';
           document.getElementById('prof-panel').style.display = 'block';
           await carregarPainelProfessor(u);
         } else {
-          msg.style.color = 'crimson';
-          msg.textContent = 'Usuário ou senha inválidos.';
-          msg.style.display = 'block';
+          msgElement.style.color = 'crimson';
+          msgElement.textContent = 'Usuário ou senha inválidos.';
+          msgElement.style.display = 'block';
+          mostrarNotificacao('Credenciais inválidas. Verifique usuário e senha.', 'error');
         }
       } catch (error) {
         console.error("Erro no login do professor:", error);
-        document.getElementById('prof-msg').style.color = 'crimson';
-        document.getElementById('prof-msg').textContent = 'Erro ao fazer login. Tente novamente.';
-        document.getElementById('prof-msg').style.display = 'block';
+        msgElement.style.color = 'crimson';
+        msgElement.textContent = 'Erro ao conectar com o servidor. Tente novamente.';
+        msgElement.style.display = 'block';
+        mostrarNotificacao('Erro de conexão. Tente novamente.', 'error');
+      } finally {
+        // Restaurar botão
+        const submitBtn = profForm.querySelector('button[type="submit"]');
+        submitBtn.textContent = 'Entrar';
+        submitBtn.disabled = false;
       }
     });
   }
 
   async function carregarPainelProfessor(usuario) {
     try {
+      // Mostrar loading
+      const profInfo = document.getElementById('prof-info');
+      profInfo.innerHTML = '<p>Carregando suas turmas...</p>';
+      
       // Buscar turmas designadas para este professor
       const turmas = await buscarTurmasProfessor(usuario);
-      const panel = document.getElementById('prof-info');
       
       if (turmas.length > 0) {
         let html = '<h3>Suas Turmas</h3><div class="turma-grid">';
@@ -155,67 +217,15 @@
         }
         
         html += '</div>';
-        panel.innerHTML = html;
+        profInfo.innerHTML = html;
       } else {
-        panel.innerHTML = '<p>Nenhuma turma designada no momento.</p>';
+        profInfo.innerHTML = '<p>Nenhuma turma designada no momento.</p>';
       }
     } catch (error) {
       console.error("Erro ao carregar painel do professor:", error);
       document.getElementById('prof-info').innerHTML = '<p>Erro ao carregar informações. Tente novamente.</p>';
+      mostrarNotificacao('Erro ao carregar dados. Tente recarregar a página.', 'error');
     }
-  }
-
-  // Adicionar estilo de notificação se não existir
-  if (!document.querySelector('style#notification-styles')) {
-    const style = document.createElement('style');
-    style.id = 'notification-styles';
-    style.textContent = `
-      .notification {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 15px 20px;
-        border-radius: 8px;
-        color: white;
-        z-index: 1000;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        transform: translateX(100%);
-        opacity: 0;
-        transition: transform 0.3s, opacity 0.3s;
-      }
-      .notification.show {
-        transform: translateX(0);
-        opacity: 1;
-      }
-      .notification.success {
-        background: #28a745;
-      }
-      .notification.error {
-        background: #dc3545;
-      }
-      .status-badge {
-        padding: 4px 8px;
-        border-radius: 12px;
-        font-size: 12px;
-        font-weight: bold;
-      }
-      .status-badge.pendente {
-        background: #ffc107;
-        color: #000;
-      }
-      .status-badge.confirmado {
-        background: #28a745;
-        color: #fff;
-      }
-      .status-badge.cancelado {
-        background: #dc3545;
-        color: #fff;
-      }
-    `;
-    document.head.appendChild(style);
   }
 </script>
 
