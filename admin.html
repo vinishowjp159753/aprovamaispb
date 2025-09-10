@@ -3,408 +3,466 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Dashboard - AprovaMaisPB</title>
+  <title>Painel Admin - AprovaMaisPB</title>
   <link rel="stylesheet" href="./assets/css/style.css" />
+  <link rel="icon" type="image/png" href="./assets/img/logo_aprovamaispb.png" />
   <style>
-    .loading-dashboard {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      flex-direction: column;
+    .admin-grid {
+      display: grid;
+      grid-template-columns: 250px 1fr;
       gap: 20px;
+      margin: 20px 0;
     }
-    .loading-spinner {
-      width: 50px;
-      height: 50px;
-      border: 5px solid #f3f3f3;
-      border-top: 5px solid #00AEEF;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
+    .admin-sidebar {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    .admin-menu {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .admin-menu li {
+      margin: 10px 0;
+    }
+    .admin-menu a {
+      display: block;
+      padding: 12px;
+      border-radius: 8px;
+      text-decoration: none;
+      color: #374151;
+      transition: background 0.3s;
+    }
+    .admin-menu a:hover,
+    .admin-menu a.active {
+      background: #2563eb;
+      color: white;
+    }
+    .admin-content {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .table-responsive {
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    th {
+      background: #f9fafb;
+      font-weight: 600;
+    }
+    .btn-action {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 2px;
+    }
+    .btn-edit {
+      background: #f59e0b;
+      color: white;
+    }
+    .btn-delete {
+      background: #ef4444;
+      color: white;
+    }
+    .btn-assign {
+      background: #10b981;
+      color: white;
+    }
+    .finance-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin: 20px 0;
+    }
+    .finance-card {
+      background: #f8fafc;
+      padding: 20px;
+      border-radius: 12px;
+      border-left: 4px solid #2563eb;
+    }
+    .finance-value {
+      font-size: 1.8em;
+      font-weight: bold;
+      color: #059669;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+    }
+    .modal-content {
+      background: white;
+      margin: 10% auto;
+      padding: 25px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 500px;
+    }
+    .form-group {
+      margin: 15px 0;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+    .form-group select,
+    .form-group input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
     }
   </style>
 </head>
 <body>
-  <div id="auth-check" class="loading-dashboard">
-    <div class="loading-spinner"></div>
-    <p>Verificando autenticação...</p>
-  </div>
+  <header>
+    <nav class="nav">
+      <div class="brand">
+        <img src="./assets/img/logo_aprovamaispb.png" alt="Logo" />
+        <span>AprovaMaisPB - Admin</span>
+      </div>
+      <ul class="menu">
+        <li><a href="index.html">Início</a></li>
+        <li><a href="matricula.html">Matricule-se</a></li>
+        <li><a href="professores.html">Professores</a></li>
+        <li><a href="admin.html" class="active">Painel Admin</a></li>
+        <li><a href="login.html">Sair</a></li>
+      </ul>
+      <button class="hamburger" aria-label="menu" onclick="toggleMenu()">☰</button>
+    </nav>
+  </header>
 
-  <div id="dashboard-content" style="display: none;">
-    <header>
-      <nav class="nav">
-        <div class="brand">
-          <img src="./assets/img/logo_aprovamaispb.png" alt="Logo" />
-          <span>AprovaMaisPB</span>
-        </div>
-        <ul class="menu">
-          <li><a href="index.html">Início</a></li>
-          <li><a href="matricula.html">Matricule-se</a></li>
-          <li><a href="professores.html">Professores</a></li>
-          <li><a href="login.html">Dashboard</a></li>
+  <main class="container" style="max-width: 1400px; margin: 0 auto; padding: 20px;">
+    <h1>Painel Administrativo</h1>
+
+    <div class="admin-grid">
+      <div class="admin-sidebar">
+        <ul class="admin-menu">
+          <li><a href="#alunos" class="active" onclick="showTab('alunos')">Gestão de Alunos</a></li>
+          <li><a href="#professores" onclick="showTab('professores')">Gestão de Professores</a></li>
+          <li><a href="#turmas" onclick="showTab('turmas')">Designação de Turmas</a></li>
+          <li><a href="#financeiro" onclick="showTab('financeiro')">Gestão Financeira</a></li>
+          <li><a href="#relatorios" onclick="showTab('relatorios')">Relatórios</a></li>
         </ul>
-        <button class="hamburger" aria-label="menu" onclick="toggleMenu()">☰</button>
-      </nav>
-    </header>
-
-    <main class="dashboard">
-      <h1>Painel do Administrador</h1>
-      
-      <div class="dash-grid">
-        <section class="card">
-          <h3>Inscrições</h3>
-          
-          <div class="search-container">
-            <input id="search" placeholder="Pesquisar por nome, email, curso..." />
-            <select id="filter-course" class="filter-select">
-              <option value="">Todos os cursos</option>
-              <option value="Medicina">Medicina</option>
-              <option value="Engenharia">Engenharia</option>
-              <option value="Direito">Direito</option>
-            </select>
-            <select id="filter-status" class="filter-select">
-              <option value="">Todos os status</option>
-              <option value="pendente">Pendente</option>
-              <option value="confirmado">Confirmado</option>
-              <option value="cancelado">Cancelado</option>
-            </select>
-          </div>
-          
-          <table id="inscricoes-table">
-            <thead>
-              <tr>
-                <th>Nome</th>
-                <th>Email</th>
-                <th>Curso</th>
-                <th>CPF</th>
-                <th>Criado</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-          
-          <div id="pagination" class="pagination"></div>
-          
-          <div class="actions">
-            <button id="export-btn" class="btn-modern">📊 Exportar CSV</button>
-          </div>
-        </section>
-
-        <section class="card">
-          <h3>Professores</h3>
-          <button id="gerar-prof" class="btn-modern">👨‍🏫 Gerar login de professor</button>
-          <ul id="prof-list"></ul>
-        </section>
       </div>
-      
-      <div class="actions">
-        <button id="logout-admin" class="btn-modern outline">🚪 Sair</button>
+
+      <div class="admin-content">
+        <!-- ABA ALUNOS -->
+        <div id="tab-alunos" class="tab-content active">
+          <h2>Gestão de Alunos</h2>
+          <div class="table-responsive">
+            <table id="tabela-alunos">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>CPF</th>
+                  <th>Curso</th>
+                  <th>Status</th>
+                  <th>Turma</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Dados carregados via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ABA PROFESSORES -->
+        <div id="tab-professores" class="tab-content">
+          <h2>Gestão de Professores</h2>
+          <button class="btn-modern" onclick="abrirModalProfessor()">+ Novo Professor</button>
+          <div class="table-responsive">
+            <table id="tabela-professores">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Usuário</th>
+                  <th>Disciplina</th>
+                  <th>Turmas</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Dados carregados via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ABA TURMAS -->
+        <div id="tab-turmas" class="tab-content">
+          <h2>Designação de Turmas</h2>
+          <div class="table-responsive">
+            <table id="tabela-designacao">
+              <thead>
+                <tr>
+                  <th>Professor</th>
+                  <th>Turma</th>
+                  <th>Horário</th>
+                  <th>Alunos</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Dados carregados via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ABA FINANCEIRO -->
+        <div id="tab-financeiro" class="tab-content">
+          <h2>Gestão Financeira</h2>
+          <div class="finance-stats">
+            <div class="finance-card">
+              <div class="finance-value">R$ 25.450,00</div>
+              <div>Receita Mensal</div>
+            </div>
+            <div class="finance-card">
+              <div class="finance-value">R$ 8.920,00</div>
+              <div>Despesas Mensais</div>
+            </div>
+            <div class="finance-card">
+              <div class="finance-value">R$ 16.530,00</div>
+              <div>Lucro Líquido</div>
+            </div>
+            <div class="finance-card">
+              <div class="finance-value">87%</div>
+              <div>Inadimplência</div>
+            </div>
+          </div>
+
+          <h3>Controle de Pagamentos</h3>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Aluno</th>
+                  <th>Valor</th>
+                  <th>Vencimento</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>João Silva</td>
+                  <td>R$ 350,00</td>
+                  <td>05/01/2025</td>
+                  <td><span style="color: #059669;">Pago</span></td>
+                  <td>
+                    <button class="btn-action btn-edit">Editar</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Maria Santos</td>
+                  <td>R$ 350,00</td>
+                  <td>05/01/2025</td>
+                  <td><span style="color: #dc2626;">Atrasado</span></td>
+                  <td>
+                    <button class="btn-action btn-edit">Editar</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ABA RELATÓRIOS -->
+        <div id="tab-relatorios" class="tab-content">
+          <h2>Relatórios</h2>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+            <div class="stats-card">
+              <h3>Relatório de Matrículas</h3>
+              <p>Período: Janeiro 2025</p>
+              <button class="btn-modern">Gerar PDF</button>
+            </div>
+            <div class="stats-card">
+              <h3>Relatório Financeiro</h3>
+              <p>Período: Janeiro 2025</p>
+              <button class="btn-modern">Gerar Excel</button>
+            </div>
+            <div class="stats-card">
+              <h3>Relatório de Professores</h3>
+              <p>Desempenho por turma</p>
+              <button class="btn-modern">Visualizar</button>
+            </div>
+          </div>
+        </div>
       </div>
-    </main>
+    </div>
+  </main>
+
+  <!-- MODAL DESIGNAR TURMA -->
+  <div id="modal-turma" class="modal">
+    <div class="modal-content">
+      <h3>Designar Turma</h3>
+      <div class="form-group">
+        <label for="select-professor">Professor:</label>
+        <select id="select-professor">
+          <option value="">Selecione o professor</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="select-turma">Turma:</label>
+        <select id="select-turma">
+          <option value="">Selecione a turma</option>
+          <option value="manha">Manhã - 08:00 às 12:00</option>
+          <option value="tarde">Tarde - 14:00 às 18:00</option>
+          <option value="noite">Noite - 19:00 às 22:00</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="select-aluno">Aluno:</label>
+        <select id="select-aluno">
+          <option value="">Selecione o aluno</option>
+        </select>
+      </div>
+      <div style="display: flex; gap: 10px; margin-top: 20px;">
+        <button class="btn-modern" onclick="designarTurma()">Designar</button>
+        <button class="btn-modern" style="background: #6b7280;" onclick="fecharModal('modal-turma')">Cancelar</button>
+      </div>
+    </div>
   </div>
 
-  <script>
-    // Verificar se o usuário está logado
-    function checkAuth() {
-      const isLoggedIn = localStorage.getItem('adminLoggedIn');
-      const loginTime = localStorage.getItem('adminLoginTime');
-      
-      if (!isLoggedIn || !loginTime) {
-        redirectToLogin();
-        return false;
-      }
-      
-      // Verificar se o login expirou (8 horas)
-      const currentTime = new Date().getTime();
-      const timeDiff = currentTime - parseInt(loginTime);
-      const hoursDiff = timeDiff / (1000 * 60 * 60);
-      
-      if (hoursDiff > 8) {
-        localStorage.removeItem('adminLoggedIn');
-        localStorage.removeItem('adminLoginTime');
-        redirectToLogin();
-        return false;
-      }
-      
-      return true;
-    }
-    
-    function redirectToLogin() {
-      window.location.href = 'login.html';
-    }
-    
-    // Logout function
-    function logout() {
-      localStorage.removeItem('adminLoggedIn');
-      localStorage.removeItem('adminLoginTime');
-      redirectToLogin();
-    }
-    
-    // Menu toggle function
-    function toggleMenu() {
-      document.querySelector('.menu').classList.toggle('open');
-    }
-    
-    // Check authentication on page load
-    document.addEventListener('DOMContentLoaded', function() {
-      if (checkAuth()) {
-        // Mostrar conteúdo do dashboard
-        document.getElementById('auth-check').style.display = 'none';
-        document.getElementById('dashboard-content').style.display = 'block';
-        
-        // Adicionar event listener ao botão de logout
-        document.getElementById('logout-admin').addEventListener('click', logout);
-      }
-    });
-  </script>
-  
   <script type="module">
-    // Importar funções do Firebase
-    import { 
-      listarInscricoes, 
-      listarProfessores, 
-      salvarProfessor,
-      designarTurma,
-      atualizarInscricao
-    } from "./assets/js/firebase.js";
-    
-    // Configurações
-    const ITENS_POR_PAGINA = 10;
-    let paginaAtual = 1;
-    let todasInscricoes = [];
-    let inscricoesFiltradas = [];
-    
-    // Utilidades
-    function mostrarNotificacao(mensagem, tipo = "success") {
-      // Implementação da função de notificação
-      alert(`${tipo.toUpperCase()}: ${mensagem}`);
-    }
-    
-    function formatarCPF(cpf) {
-      return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
-    }
-    
-    function gerarSenha(tamanho = 8) {
-      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-      return Array.from({ length: tamanho }, () => chars.charAt(Math.floor(Math.random() * chars.length))).join('');
-    }
-    
-    // Dashboard functions
-    async function renderDashboard(){
+    import { listarInscricoes, listarProfessores, designarTurma, atualizarInscricao } from "./assets/js/firebase.js";
+
+    let alunosData = [];
+    let professoresData = [];
+
+    async function carregarDadosAdmin() {
       try {
-        todasInscricoes = await listarInscricoes();
-        inscricoesFiltradas = [...todasInscricoes];
-        
-        renderInscricoes();
-        renderProfessores();
-        setupFiltros();
+        // Carregar alunos
+        alunosData = await listarInscricoes();
+        const tabelaAlunos = document.getElementById('tabela-alunos').querySelector('tbody');
+        tabelaAlunos.innerHTML = alunosData.map(aluno => `
+          <tr>
+            <td>${aluno.name}</td>
+            <td>${aluno.cpf}</td>
+            <td>${aluno.course}</td>
+            <td>${aluno.status || 'Ativo'}</td>
+            <td>${aluno.turma || 'Não designada'}</td>
+            <td>
+              <button class="btn-action btn-assign" onclick="abrirModalDesignacao('${aluno.id}')">
+                Designar Turma
+              </button>
+              <button class="btn-action btn-edit" onclick="editarAluno('${aluno.id}')">Editar</button>
+              <button class="btn-action btn-delete" onclick="excluirAluno('${aluno.id}')">Excluir</button>
+            </td>
+          </tr>
+        `).join('');
+
+        // Carregar professores
+        professoresData = await listarProfessores();
+        const tabelaProfessores = document.getElementById('tabela-professores').querySelector('tbody');
+        tabelaProfessores.innerHTML = professoresData.map(prof => `
+          <tr>
+            <td>${prof.nome}</td>
+            <td>${prof.usuario}</td>
+            <td>${prof.disciplina}</td>
+            <td>${prof.turmas || 0}</td>
+            <td>
+              <button class="btn-action btn-edit">Editar</button>
+              <button class="btn-action btn-delete">Excluir</button>
+            </td>
+          </tr>
+        `).join('');
+
       } catch (error) {
-        console.error("Erro ao carregar dashboard:", error);
-        mostrarNotificacao("Erro ao carregar dados do dashboard", "error");
+        console.error('Erro ao carregar dados admin:', error);
       }
     }
-    
-    function renderInscricoes() {
-      const tbody = document.querySelector('#inscricoes-table tbody');
-      if (!tbody) return;
-      
-      // Aplicar paginação
-      const inicio = (paginaAtual - 1) * ITENS_POR_PAGINA;
-      const fim = inicio + ITENS_POR_PAGINA;
-      const inscricoesPagina = inscricoesFiltradas.slice(inicio, fim);
-      
-      tbody.innerHTML = '';
-      inscricoesPagina.forEach(i => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${i.name}</td>
-          <td>${i.email}</td>
-          <td>${i.course}</td>
-          <td>${formatarCPF(i.cpf)}</td>
-          <td>${new Date(i.criadoEm).toLocaleString('pt-BR')}</td>
-          <td>
-            <select class="status-select" data-id="${i.id}" onchange="atualizarStatus(this)">
-              <option value="pendente" ${i.status === 'pendente' ? 'selected' : ''}>Pendente</option>
-              <option value="confirmado" ${i.status === 'confirmado' ? 'selected' : ''}>Confirmado</option>
-              <option value="cancelado" ${i.status === 'cancelado' ? 'selected' : ''}>Cancelado</option>
-            </select>
-          </td>
-        `;
-        tbody.appendChild(tr);
+
+    function showTab(tabName) {
+      // Esconder todas as abas
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
       });
-      
-      renderPaginacao();
-    }
-    
-    function renderPaginacao() {
-      const paginationContainer = document.getElementById('pagination');
-      if (!paginationContainer) return;
-      
-      const totalPaginas = Math.ceil(inscricoesFiltradas.length / ITENS_POR_PAGINA);
-      
-      let html = '';
-      for (let i = 1; i <= totalPaginas; i++) {
-        html += `<button class="${i === paginaAtual ? 'active' : ''}" onclick="mudarPagina(${i})">${i}</button>`;
-      }
-      
-      paginationContainer.innerHTML = html;
-    }
-    
-    window.mudarPagina = function(pagina) {
-      paginaAtual = pagina;
-      renderInscricoes();
-    }
-    
-    function setupFiltros() {
-      const searchInput = document.getElementById('search');
-      const filterCourse = document.getElementById('filter-course');
-      const filterStatus = document.getElementById('filter-status');
-      
-      if (searchInput) {
-        searchInput.addEventListener('input', aplicarFiltros);
-      }
-      
-      if (filterCourse) {
-        filterCourse.addEventListener('change', aplicarFiltros);
-      }
-      
-      if (filterStatus) {
-        filterStatus.addEventListener('change', aplicarFiltros);
-      }
-    }
-    
-    function aplicarFiltros() {
-      const searchTerm = document.getElementById('search')?.value.toLowerCase() || '';
-      const courseFilter = document.getElementById('filter-course')?.value || '';
-      const statusFilter = document.getElementById('filter-status')?.value || '';
-      
-      inscricoesFiltradas = todasInscricoes.filter(inscricao => {
-        const matchesSearch = 
-          inscricao.name.toLowerCase().includes(searchTerm) ||
-          inscricao.email.toLowerCase().includes(searchTerm) ||
-          inscricao.course.toLowerCase().includes(searchTerm) ||
-          inscricao.cpf.includes(searchTerm);
-        
-        const matchesCourse = courseFilter ? inscricao.course === courseFilter : true;
-        const matchesStatus = statusFilter ? inscricao.status === statusFilter : true;
-        
-        return matchesSearch && matchesCourse && matchesStatus;
+      document.querySelectorAll('.admin-menu a').forEach(link => {
+        link.classList.remove('active');
       });
-      
-      paginaAtual = 1;
-      renderInscricoes();
+
+      // Mostrar aba selecionada
+      document.getElementById(`tab-${tabName}`).classList.add('active');
+      document.querySelector(`.admin-menu a[href="#${tabName}"]`).classList.add('active');
     }
-    
-    window.atualizarStatus = async function(select) {
-      const id = select.dataset.id;
-      const status = select.value;
-      
-      try {
-        await atualizarInscricao(id, { status });
-        mostrarNotificacao(`Status atualizado para ${status}`, "success");
-        
-        // Atualizar localmente
-        const index = todasInscricoes.findIndex(i => i.id === id);
-        if (index !== -1) {
-          todasInscricoes[index].status = status;
-        }
-      } catch (error) {
-        console.error("Erro ao atualizar status:", error);
-        mostrarNotificacao("Erro ao atualizar status", "error");
-      }
+
+    function abrirModalDesignacao(alunoId) {
+      document.getElementById('modal-turma').style.display = 'block';
+      // Preencher selects com dados
     }
-    
-    async function renderProfessores() {
-      const profs = await listarProfessores();
-      const ul = document.getElementById('prof-list');
-      if(ul){
-        ul.innerHTML = '';
-        profs.forEach(p => {
-          const li = document.createElement('li');
-          li.innerHTML = `
-            <div class="prof-item">
-              <strong>${p.nome}</strong> — ${p.usuario} / ${p.senha}
-              <div>
-                <button class="btn-modern outline small" onclick="designarTurmaParaProfessor('${p.usuario}')">Designar Turma</button>
-              </div>
-            </div>
-          `;
-          ul.appendChild(li);
-        });
-      }
-      
-      document.getElementById('gerar-prof').addEventListener('click', async () => {
-        const nome = prompt('Nome do professor:');
-        if(!nome) return;
-        
-        const usuario = nome.toLowerCase().replace(/\s+/g, '.') + Math.floor(Math.random() * 90 + 10);
-        const senha = gerarSenha();
-        
-        try {
-          await salvarProfessor({nome, usuario, senha});
-          mostrarNotificacao(`Professor criado: ${usuario} / ${senha}`);
-          renderProfessores();
-        } catch (error) {
-          console.error("Erro ao criar professor:", error);
-          mostrarNotificacao("Erro ao criar professor", "error");
-        }
-      });
+
+    function fecharModal(modalId) {
+      document.getElementById(modalId).style.display = 'none';
     }
-    
-    window.designarTurmaParaProfessor = async function(usuario) {
-      const turma = prompt(`Digite o nome da turma para designar ao professor ${usuario}:`);
-      if(!turma) return;
-      
-      try {
-        await designarTurma(usuario, turma);
-        mostrarNotificacao(`Turma ${turma} designada para ${usuario}`);
-      } catch (error) {
-        console.error("Erro ao designar turma:", error);
-        mostrarNotificacao("Erro ao designar turma", "error");
-      }
-    }
-    
-    // Exportar CSV
-    document.getElementById('export-btn').addEventListener('click', () => {
-      if (inscricoesFiltradas.length === 0) {
-        mostrarNotificacao("Nenhum dado para exportar", "warning");
+
+    async function designarTurma() {
+      const professor = document.getElementById('select-professor').value;
+      const turma = document.getElementById('select-turma').value;
+      const aluno = document.getElementById('select-aluno').value;
+
+      if (!professor || !turma || !aluno) {
+        alert('Preencha todos os campos!');
         return;
       }
-      
-      const csvContent = [
-        ['Nome', 'Email', 'Curso', 'CPF', 'Data de Inscrição', 'Status'],
-        ...inscricoesFiltradas.map(i => [
-          i.name,
-          i.email,
-          i.course,
-          formatarCPF(i.cpf),
-          new Date(i.criadoEm).toLocaleString('pt-BR'),
-          i.status || 'pendente'
-        ])
-      ].map(e => e.join(',')).join('\n');
-      
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement('a');
-      const url = URL.createObjectURL(blob);
-      
-      link.setAttribute('href', url);
-      link.setAttribute('download', `inscricoes_${new Date().toISOString().split('T')[0]}.csv`);
-      link.style.visibility = 'hidden';
-      
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      mostrarNotificacao("CSV exportado com sucesso");
+
+      try {
+        await designarTurma(professor, turma);
+        await atualizarInscricao(aluno, { turma: turma });
+        alert('Turma designada com sucesso!');
+        fecharModal('modal-turma');
+        carregarDadosAdmin();
+      } catch (error) {
+        alert('Erro ao designar turma: ' + error.message);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      carregarDadosAdmin();
     });
-    
-    // Inicializar o dashboard
-    renderDashboard();
+  </script>
+
+  <script>
+  function toggleMenu(){
+    document.querySelector('.menu').classList.toggle('open');
+  }
+
+  // Fechar modal clicando fora
+  window.onclick = function(event) {
+    if (event.target.className === 'modal') {
+      event.target.style.display = 'none';
+    }
+  }
   </script>
 </body>
+</html>
 </html>
