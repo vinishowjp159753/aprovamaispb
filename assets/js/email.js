@@ -1,9 +1,6 @@
 // CORRETO - Importar EmailJS corretamente
 import emailjs from 'https://cdn.jsdelivr.net/npm/emailjs-com@3.2.0/+esm';
 
-// Ou alternativa com CDN tradicional:
-// import emailjs from 'https://cdn.jsdelivr.net/npm/emailjs-com@3.2.0/dist/email.min.js';
-
 const serviceID = "service_dgemmi7";
 const templateID = "template_3xu931y";
 const publicKey = "3odMz4ZugF-JjtWF6";
