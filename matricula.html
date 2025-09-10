@@ -6,6 +6,45 @@
   <title>Matricule-se - AprovaMaisPB</title>
   <link rel="stylesheet" href="./assets/css/style.css" />
   <link rel="icon" type="image/png" href="./assets/img/logo_aprovamaispb.png" />
+  <style>
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 20px;
+      border-radius: 8px;
+      color: white;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transform: translateX(100%);
+      opacity: 0;
+      transition: transform 0.3s, opacity 0.3s;
+    }
+    .notification.show {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    .notification.success {
+      background: #28a745;
+    }
+    .notification.error {
+      background: #dc3545;
+    }
+    .whatsapp-btn {
+      background-color: #25D366 !important;
+      margin-top: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .whatsapp-btn:hover {
+      background-color: #128C7E !important;
+      transform: translateY(-2px);
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -103,10 +142,11 @@
   </footer>
 
 <script type="module">
+  // Importar funções do Firebase e EmailJS
   import { salvarInscricao } from "./assets/js/firebase.js";
   import { enviarEmail } from "./assets/js/email.js";
-  import { mostrarNotificacao, validarCPF, formatarCPF, gerarSenha } from "./assets/js/utils.js";
 
+  // Funções utilitárias
   function validarCPF(cpf) {
     cpf = cpf.replace(/[^\d]+/g, '');
     if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
@@ -142,6 +182,10 @@
   }
 
   function mostrarNotificacao(mensagem, tipo = "success") {
+    // Remover notificações existentes
+    const existingNotifications = document.querySelectorAll('.notification');
+    existingNotifications.forEach(notification => notification.remove());
+    
     // Criar elemento de notificação
     const notification = document.createElement('div');
     notification.className = `notification ${tipo}`;
@@ -151,22 +195,24 @@
     `;
     document.body.appendChild(notification);
     
+    // Animação de entrada
     setTimeout(() => {
       notification.classList.add('show');
     }, 100);
     
+    // Remover após 5 segundos
     setTimeout(() => {
       notification.classList.remove('show');
       setTimeout(() => {
-        notification.remove();
+        if (notification.parentNode) {
+          notification.remove();
+        }
       }, 300);
     }, 5000);
   }
 
-  // Matrícula
-  const form = document.getElementById("registration-form");
-  if (form) {
-    // Adicionar máscara de CPF
+  // Configuração da máscara de CPF
+  function aplicarMascaraCPF() {
     const cpfInput = document.getElementById("cpf");
     if (cpfInput) {
       cpfInput.addEventListener("input", function(e) {
@@ -182,108 +228,85 @@
         e.target.value = value;
       });
     }
+  }
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      
-      // Validação
-      const cpf = document.getElementById("cpf").value.replace(/\D/g, "");
-      if (!validarCPF(cpf)) {
-        mostrarNotificacao("CPF inválido. Por favor, verifique o número.", "error");
-        return;
-      }
-      
-      const loading = document.getElementById("loading");
-      if (loading) loading.style.display = "block";
-      
-      const dados = {
-        name: document.getElementById("name").value,
-        email: document.getElementById("email").value,
-        phone: document.getElementById("phone").value,
-        cpf: cpf,
-        course: document.getElementById("course").value,
-        numeroPedido: Math.floor(100000 + Math.random() * 900000),
-        senha: gerarSenha(),
-        criadoEm: new Date().toISOString(),
-        status: "pendente"
-      };
-      
-      try {
-        await salvarInscricao(dados);
-        await enviarEmail(dados);
+  // Matrícula
+  document.addEventListener('DOMContentLoaded', function() {
+    aplicarMascaraCPF();
+    
+    const form = document.getElementById("registration-form");
+    if (form) {
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
         
-        mostrarNotificacao("✅ Inscrição concluída! Seus dados foram enviados para " + dados.email);
-        form.reset();
-        
-        // Botão WhatsApp - CORREÇÃO AQUI
-        const msg = `Olá, meu nome é ${dados.name}.%0A
-Me inscrevi no curso *${dados.course}*.%0A
-Número do pedido: ${dados.numeroPedido}%0A
-CPF: ${formatarCPF(dados.cpf)}%0A
-Telefone: ${dados.phone}%0A
-Gostaria de confirmar o pagamento da matrícula via WhatsApp.`;
-        
-        const numeroWhats = "5583999999999"; // Número formatado sem caracteres especiais
-        const url = `https://wa.me/${numeroWhats}?text=${encodeURIComponent(msg)}`;
-        
-        const whatsappContainer = document.getElementById("whatsapp-container");
-        if (whatsappContainer) {
-          // Limpar conteúdo anterior
-          whatsappContainer.innerHTML = '';
-          
-          const btnWpp = document.createElement("a");
-          btnWpp.href = url;
-          btnWpp.target = "_blank";
-          btnWpp.className = "btn-modern";
-          btnWpp.style.backgroundColor = "#25D366";
-          btnWpp.style.marginTop = "20px";
-          btnWpp.innerHTML = "📲 Confirmar pagamento no WhatsApp";
-          whatsappContainer.appendChild(btnWpp);
-          whatsappContainer.style.display = "block";
+        // Validação
+        const cpf = document.getElementById("cpf").value.replace(/\D/g, "");
+        if (!validarCPF(cpf)) {
+          mostrarNotificacao("CPF inválido. Por favor, verifique o número.", "error");
+          return;
         }
-      } catch (err) {
-        console.error(err);
-        mostrarNotificacao("❌ Erro ao salvar inscrição. Tente novamente.", "error");
-      } finally {
-        if (loading) loading.style.display = "none";
-      }
-    });
-  }
-
-  // Adicionar estilo de notificação se não existir
-  if (!document.querySelector('style#notification-styles')) {
-    const style = document.createElement('style');
-    style.id = 'notification-styles';
-    style.textContent = `
-      .notification {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 15px 20px;
-        border-radius: 8px;
-        color: white;
-        z-index: 1000;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        transform: translateX(100%);
-        opacity: 0;
-        transition: transform 0.3s, opacity 0.3s;
-      }
-      .notification.show {
-        transform: translateX(0);
-        opacity: 1;
-      }
-      .notification.success {
-        background: #28a745;
-      }
-      .notification.error {
-        background: #dc3545;
-      }
-    `;
-    document.head.appendChild(style);
-  }
+        
+        const loading = document.getElementById("loading");
+        const submitBtn = form.querySelector('button[type="submit"]');
+        
+        if (loading) loading.style.display = "block";
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Enviando...";
+        
+        const dados = {
+          name: document.getElementById("name").value,
+          email: document.getElementById("email").value,
+          phone: document.getElementById("phone").value,
+          cpf: cpf,
+          course: document.getElementById("course").value,
+          numeroPedido: Math.floor(100000 + Math.random() * 900000),
+          senha: gerarSenha(),
+          criadoEm: new Date().toISOString(),
+          status: "pendente"
+        };
+        
+        try {
+          await salvarInscricao(dados);
+          await enviarEmail(dados);
+          
+          mostrarNotificacao("✅ Inscrição concluída! Seus dados foram enviados para " + dados.email, "success");
+          form.reset();
+          
+          // Botão WhatsApp
+          const msg = `Olá, meu nome é ${dados.name}.%0A
+  Me inscrevi no curso *${dados.course}*.%0A
+  Número do pedido: ${dados.numeroPedido}%0A
+  CPF: ${formatarCPF(dados.cpf)}%0A
+  Telefone: ${dados.phone}%0A
+  Gostaria de confirmar o pagamento da matrícula via WhatsApp.`;
+          
+          const numeroWhats = "5583999999999";
+          const url = `https://wa.me/${numeroWhats}?text=${encodeURIComponent(msg)}`;
+          
+          const whatsappContainer = document.getElementById("whatsapp-container");
+          if (whatsappContainer) {
+            // Limpar conteúdo anterior
+            whatsappContainer.innerHTML = '';
+            
+            const btnWpp = document.createElement("a");
+            btnWpp.href = url;
+            btnWpp.target = "_blank";
+            btnWpp.className = "btn-modern whatsapp-btn";
+            btnWpp.innerHTML = "📲 Confirmar pagamento no WhatsApp";
+            whatsappContainer.appendChild(btnWpp);
+            whatsappContainer.style.display = "block";
+          }
+        } catch (err) {
+          console.error("Erro na matrícula:", err);
+          mostrarNotificacao("❌ Erro ao salvar inscrição. Tente novamente.", "error");
+        } finally {
+          if (loading) loading.style.display = "none";
+          submitBtn.disabled = false;
+          submitBtn.textContent = "🚀 Enviar Inscrição";
+        }
+      });
+    }
+  });
 </script>
 
 <script>
