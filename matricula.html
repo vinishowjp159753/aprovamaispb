@@ -55,6 +55,19 @@
       border-color: #dc3545;
       box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
     }
+    .loading {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #2563eb;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      margin-left: 10px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
@@ -107,12 +120,7 @@
             <label for="course">Curso desejado</label>
             <select id="course" required>
               <option value="">Selecione um curso</option>
-              <option value="Medicina">Medicina</option>
-              <option value="Engenharia">Engenharia</option>
-              <option value="Direito">Direito</option>
-              <option value="Administração">Administração</option>
-              <option value="Pedagogia">Pedagogia</option>
-              <option value="Enfermagem">Enfermagem</option>
+              <option value="Aulão do ENEM">Aulão do ENEM</option>
             </select>
             <div class="error" id="course-error">Por favor, selecione um curso</div>
           </div>
@@ -123,7 +131,6 @@
           <div id="loading" class="loading" style="display:none"></div>
         </div>
         
-        <!-- Área onde o botão do WhatsApp será inserido -->
         <div id="whatsapp-container" style="margin-top: 20px; display: none;"></div>
       </form>
     </div>
@@ -153,11 +160,9 @@
   </footer>
 
 <script type="module">
-  // Importar funções do Firebase e EmailJS
   import { salvarInscricao } from "./assets/js/firebase.js";
   import { enviarEmail } from "./assets/js/email.js";
 
-  // Funções utilitárias
   function validarCPF(cpf) {
     cpf = cpf.replace(/[^\d]+/g, '');
     if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
@@ -193,11 +198,9 @@
   }
 
   function mostrarNotificacao(mensagem, tipo = "success") {
-    // Remover notificações existentes
     const existingNotifications = document.querySelectorAll('.notification');
     existingNotifications.forEach(notification => notification.remove());
     
-    // Criar elemento de notificação
     const notification = document.createElement('div');
     notification.className = `notification ${tipo}`;
     notification.innerHTML = `
@@ -206,12 +209,10 @@
     `;
     document.body.appendChild(notification);
     
-    // Animação de entrada
     setTimeout(() => {
       notification.classList.add('show');
     }, 100);
     
-    // Remover após 5 segundos
     setTimeout(() => {
       notification.classList.remove('show');
       setTimeout(() => {
@@ -222,7 +223,6 @@
     }, 5000);
   }
 
-  // Configuração da máscara de CPF
   function aplicarMascaraCPF() {
     const cpfInput = document.getElementById("cpf");
     if (cpfInput) {
@@ -241,14 +241,12 @@
     }
   }
 
-  // Funções de validação
   function validarEmail(email) {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
   }
 
   function validarTelefone(telefone) {
-    // Remove caracteres não numéricos e verifica se tem pelo menos 10 dígitos
     const numeros = telefone.replace(/\D/g, '');
     return numeros.length >= 10;
   }
@@ -289,7 +287,6 @@
   function validarFormulario() {
     let valido = true;
     
-    // Validar nome
     const nome = document.getElementById("name").value;
     if (!validarNome(nome)) {
       mostrarErro('name', 'Por favor, informe seu nome completo');
@@ -298,7 +295,6 @@
       limparErro('name');
     }
     
-    // Validar email
     const email = document.getElementById("email").value;
     if (!validarEmail(email)) {
       mostrarErro('email', 'Por favor, informe um e-mail válido');
@@ -307,7 +303,6 @@
       limparErro('email');
     }
     
-    // Validar telefone
     const telefone = document.getElementById("phone").value;
     if (!validarTelefone(telefone)) {
       mostrarErro('phone', 'Por favor, informe um telefone válido');
@@ -316,7 +311,6 @@
       limparErro('phone');
     }
     
-    // Validar CPF
     const cpf = document.getElementById("cpf").value.replace(/\D/g, "");
     if (!validarCPF(cpf)) {
       mostrarErro('cpf', 'Por favor, informe um CPF válido');
@@ -325,7 +319,6 @@
       limparErro('cpf');
     }
     
-    // Validar curso
     const curso = document.getElementById("course").value;
     if (!curso) {
       mostrarErro('course', 'Por favor, selecione um curso');
@@ -337,11 +330,9 @@
     return valido;
   }
 
-  // Matrícula
   document.addEventListener('DOMContentLoaded', function() {
     aplicarMascaraCPF();
     
-    // Adicionar validação em tempo real
     const campos = ['name', 'email', 'phone', 'cpf', 'course'];
     campos.forEach(campoId => {
       const campo = document.getElementById(campoId);
@@ -382,7 +373,6 @@
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
         
-        // Validar todos os campos
         if (!validarFormulario()) {
           mostrarNotificacao("Por favor, corrija os erros no formulário.", "error");
           return;
@@ -416,7 +406,6 @@
           mostrarNotificacao("✅ Inscrição concluída! Seus dados foram enviados para " + dados.email, "success");
           form.reset();
           
-          // Botão WhatsApp
           const msg = `Olá, meu nome é ${dados.name}.%0A
 Me inscrevi no curso *${dados.course}*.%0A
 Número do pedido: ${dados.numeroPedido}%0A
@@ -429,7 +418,6 @@ Gostaria de confirmar o pagamento da matrícula via WhatsApp.`;
           
           const whatsappContainer = document.getElementById("whatsapp-container");
           if (whatsappContainer) {
-            // Limpar conteúdo anterior
             whatsappContainer.innerHTML = '';
             
             const btnWpp = document.createElement("a");
