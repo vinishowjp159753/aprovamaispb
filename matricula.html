@@ -442,7 +442,14 @@ Gostaria de confirmar o pagamento da matrícula via WhatsApp.`;
           }
         } catch (err) {
           console.error("Erro na matrícula:", err);
-          mostrarNotificacao("❌ Erro ao salvar inscrição. Tente novamente.", "error");
+          let mensagemErro = "❌ Erro ao salvar inscrição. Tente novamente.";
+          if (err.message.includes("permission-denied")) {
+              mensagemErro = "❌ Erro de permissão. Verifique as regras do Firebase.";
+          }else if (err.message.includes("network")) {
+            mensagemErro = "❌ Erro de conexão. Verifique sua internet.";
+          }
+          mostrarNotificacao(mensagemErro, "error");
+        }
         } finally {
           if (loading) loading.style.display = "none";
           submitBtn.disabled = false;
