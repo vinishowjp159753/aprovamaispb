@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard - AprovaMaisPB</title>
+  <link rel="stylesheet" href="./assets/css/style.css" />
+  <style>
+    .loading-dashboard {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid #00AEEF;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div id="auth-check" class="loading-dashboard">
+    <div class="loading-spinner"></div>
+    <p>Verificando autenticação...</p>
+  </div>
+
+  <div id="dashboard-content" style="display: none;">
+    <header>
+      <nav class="nav">
+        <div class="brand">
+          <img src="./assets/img/logo_aprovamaispb.png" alt="Logo" />
+          <span>AprovaMaisPB</span>
+        </div>
+        <ul class="menu">
+          <li><a href="index.html">Início</a></li>
+          <li><a href="matricula.html">Matricule-se</a></li>
+          <li><a href="professores.html">Professores</a></li>
+          <li><a href="login.html">Dashboard</a></li>
+        </ul>
+        <button class="hamburger" aria-label="menu" onclick="toggleMenu()">☰</button>
+      </nav>
+    </header>
+
+    <main class="dashboard">
+      <h1>Painel do Administrador</h1>
+      
+      <div class="dash-grid">
+        <section class="card">
+          <h3>Inscrições</h3>
+          
+          <div class="search-container">
+            <input id="search" placeholder="Pesquisar por nome, email, curso..." />
+            <select id="filter-course" class="filter-select">
+              <option value="">Todos os cursos</option>
+              <option value="Medicina">Medicina</option>
+              <option value="Engenharia">Engenharia</option>
+              <option value="Direito">Direito</option>
+            </select>
+            <select id="filter-status" class="filter-select">
+              <option value="">Todos os status</option>
+              <option value="pendente">Pendente</option>
+              <option value="confirmado">Confirmado</option>
+              <option value="cancelado">Cancelado</option>
+            </select>
+          </div>
+          
+          <table id="inscricoes-table">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Email</th>
+                <th>Curso</th>
+                <th>CPF</th>
+                <th>Criado</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          
+          <div id="pagination" class="pagination"></div>
+          
+          <div class="actions">
+            <button id="export-btn" class="btn-modern">📊 Exportar CSV</button>
+          </div>
+        </section>
+
+        <section class="card">
+          <h3>Professores</h3>
+          <button id="gerar-prof" class="btn-modern">👨‍🏫 Gerar login de professor</button>
+          <ul id="prof-list"></ul>
+        </section>
+      </div>
+      
+      <div class="actions">
+        <button id="logout-admin" class="btn-modern outline">🚪 Sair</button>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Verificar se o usuário está logado
+    function checkAuth() {
+      const isLoggedIn = localStorage.getItem('adminLoggedIn');
+      const loginTime = localStorage.getItem('adminLoginTime');
+      
+      if (!isLoggedIn || !loginTime) {
+        redirectToLogin();
+        return false;
+      }
+      
+      // Verificar se o login expirou (8 horas)
+      const currentTime = new Date().getTime();
+      const timeDiff = currentTime - parseInt(loginTime);
+      const hoursDiff = timeDiff / (1000 * 60 * 60);
+      
+      if (hoursDiff > 8) {
+        localStorage.removeItem('adminLoggedIn');
+        localStorage.removeItem('adminLoginTime');
+        redirectToLogin();
+        return false;
+      }
+      
+      return true;
+    }
+    
+    function redirectToLogin() {
+      window.location.href = 'login.html';
+    }
+    
+    // Logout function
+    function logout() {
+      localStorage.removeItem('adminLoggedIn');
+      localStorage.removeItem('adminLoginTime');
+      redirectToLogin();
+    }
+    
+    // Menu toggle function
+    function toggleMenu() {
+      document.querySelector('.menu').classList.toggle('open');
+    }
+    
+    // Check authentication on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      if (checkAuth()) {
+        // Mostrar conteúdo do dashboard
+        document.getElementById('auth-check').style.display = 'none';
+        document.getElementById('dashboard-content').style.display = 'block';
+        
+        // Adicionar event listener ao botão de logout
+        document.getElementById('logout-admin').addEventListener('click', logout);
+      }
+    });
+  </script>
+  
+  <script type="module">
+    // Importar funções do Firebase
+    import { 
+      listarInscricoes, 
+      listarProfessores, 
+      salvarProfessor,
+      designarTurma,
+      atualizarInscricao
+    } from "./assets/js/firebase.js";
+    
+    // Configurações
+    const ITENS_POR_PAGINA = 10;
+    let paginaAtual = 1;
+    let todasInscricoes = [];
+    let inscricoesFiltradas = [];
+    
+    // Utilidades
+    function mostrarNotificacao(mensagem, tipo = "success") {
+      // Implementação da função de notificação
+      alert(`${tipo.toUpperCase()}: ${mensagem}`);
+    }
+    
+    function formatarCPF(cpf) {
+      return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+    }
+    
+    function gerarSenha(tamanho = 8) {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      return Array.from({ length: tamanho }, () => chars.charAt(Math.floor(Math.random() * chars.length))).join('');
+    }
+    
+    // Dashboard functions
+    async function renderDashboard(){
+      try {
+        todasInscricoes = await listarInscricoes();
+        inscricoesFiltradas = [...todasInscricoes];
+        
+        renderInscricoes();
+        renderProfessores();
+        setupFiltros();
+      } catch (error) {
+        console.error("Erro ao carregar dashboard:", error);
+        mostrarNotificacao("Erro ao carregar dados do dashboard", "error");
+      }
+    }
+    
+    function renderInscricoes() {
+      const tbody = document.querySelector('#inscricoes-table tbody');
+      if (!tbody) return;
+      
+      // Aplicar paginação
+      const inicio = (paginaAtual - 1) * ITENS_POR_PAGINA;
+      const fim = inicio + ITENS_POR_PAGINA;
+      const inscricoesPagina = inscricoesFiltradas.slice(inicio, fim);
+      
+      tbody.innerHTML = '';
+      inscricoesPagina.forEach(i => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${i.name}</td>
+          <td>${i.email}</td>
+          <td>${i.course}</td>
+          <td>${formatarCPF(i.cpf)}</td>
+          <td>${new Date(i.criadoEm).toLocaleString('pt-BR')}</td>
+          <td>
+            <select class="status-select" data-id="${i.id}" onchange="atualizarStatus(this)">
+              <option value="pendente" ${i.status === 'pendente' ? 'selected' : ''}>Pendente</option>
+              <option value="confirmado" ${i.status === 'confirmado' ? 'selected' : ''}>Confirmado</option>
+              <option value="cancelado" ${i.status === 'cancelado' ? 'selected' : ''}>Cancelado</option>
+            </select>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+      
+      renderPaginacao();
+    }
+    
+    function renderPaginacao() {
+      const paginationContainer = document.getElementById('pagination');
+      if (!paginationContainer) return;
+      
+      const totalPaginas = Math.ceil(inscricoesFiltradas.length / ITENS_POR_PAGINA);
+      
+      let html = '';
+      for (let i = 1; i <= totalPaginas; i++) {
+        html += `<button class="${i === paginaAtual ? 'active' : ''}" onclick="mudarPagina(${i})">${i}</button>`;
+      }
+      
+      paginationContainer.innerHTML = html;
+    }
+    
+    window.mudarPagina = function(pagina) {
+      paginaAtual = pagina;
+      renderInscricoes();
+    }
+    
+    function setupFiltros() {
+      const searchInput = document.getElementById('search');
+      const filterCourse = document.getElementById('filter-course');
+      const filterStatus = document.getElementById('filter-status');
+      
+      if (searchInput) {
+        searchInput.addEventListener('input', aplicarFiltros);
+      }
+      
+      if (filterCourse) {
+        filterCourse.addEventListener('change', aplicarFiltros);
+      }
+      
+      if (filterStatus) {
+        filterStatus.addEventListener('change', aplicarFiltros);
+      }
+    }
+    
+    function aplicarFiltros() {
+      const searchTerm = document.getElementById('search')?.value.toLowerCase() || '';
+      const courseFilter = document.getElementById('filter-course')?.value || '';
+      const statusFilter = document.getElementById('filter-status')?.value || '';
+      
+      inscricoesFiltradas = todasInscricoes.filter(inscricao => {
+        const matchesSearch = 
+          inscricao.name.toLowerCase().includes(searchTerm) ||
+          inscricao.email.toLowerCase().includes(searchTerm) ||
+          inscricao.course.toLowerCase().includes(searchTerm) ||
+          inscricao.cpf.includes(searchTerm);
+        
+        const matchesCourse = courseFilter ? inscricao.course === courseFilter : true;
+        const matchesStatus = statusFilter ? inscricao.status === statusFilter : true;
+        
+        return matchesSearch && matchesCourse && matchesStatus;
+      });
+      
+      paginaAtual = 1;
+      renderInscricoes();
+    }
+    
+    window.atualizarStatus = async function(select) {
+      const id = select.dataset.id;
+      const status = select.value;
+      
+      try {
+        await atualizarInscricao(id, { status });
+        mostrarNotificacao(`Status atualizado para ${status}`, "success");
+        
+        // Atualizar localmente
+        const index = todasInscricoes.findIndex(i => i.id === id);
+        if (index !== -1) {
+          todasInscricoes[index].status = status;
+        }
+      } catch (error) {
+        console.error("Erro ao atualizar status:", error);
+        mostrarNotificacao("Erro ao atualizar status", "error");
+      }
+    }
+    
+    async function renderProfessores() {
+      const profs = await listarProfessores();
+      const ul = document.getElementById('prof-list');
+      if(ul){
+        ul.innerHTML = '';
+        profs.forEach(p => {
+          const li = document.createElement('li');
+          li.innerHTML = `
+            <div class="prof-item">
+              <strong>${p.nome}</strong> — ${p.usuario} / ${p.senha}
+              <div>
+                <button class="btn-modern outline small" onclick="designarTurmaParaProfessor('${p.usuario}')">Designar Turma</button>
+              </div>
+            </div>
+          `;
+          ul.appendChild(li);
+        });
+      }
+      
+      document.getElementById('gerar-prof').addEventListener('click', async () => {
+        const nome = prompt('Nome do professor:');
+        if(!nome) return;
+        
+        const usuario = nome.toLowerCase().replace(/\s+/g, '.') + Math.floor(Math.random() * 90 + 10);
+        const senha = gerarSenha();
+        
+        try {
+          await salvarProfessor({nome, usuario, senha});
+          mostrarNotificacao(`Professor criado: ${usuario} / ${senha}`);
+          renderProfessores();
+        } catch (error) {
+          console.error("Erro ao criar professor:", error);
+          mostrarNotificacao("Erro ao criar professor", "error");
+        }
+      });
+    }
+    
+    window.designarTurmaParaProfessor = async function(usuario) {
+      const turma = prompt(`Digite o nome da turma para designar ao professor ${usuario}:`);
+      if(!turma) return;
+      
+      try {
+        await designarTurma(usuario, turma);
+        mostrarNotificacao(`Turma ${turma} designada para ${usuario}`);
+      } catch (error) {
+        console.error("Erro ao designar turma:", error);
+        mostrarNotificacao("Erro ao designar turma", "error");
+      }
+    }
+    
+    // Exportar CSV
+    document.getElementById('export-btn').addEventListener('click', () => {
+      if (inscricoesFiltradas.length === 0) {
+        mostrarNotificacao("Nenhum dado para exportar", "warning");
+        return;
+      }
+      
+      const csvContent = [
+        ['Nome', 'Email', 'Curso', 'CPF', 'Data de Inscrição', 'Status'],
+        ...inscricoesFiltradas.map(i => [
+          i.name,
+          i.email,
+          i.course,
+          formatarCPF(i.cpf),
+          new Date(i.criadoEm).toLocaleString('pt-BR'),
+          i.status || 'pendente'
+        ])
+      ].map(e => e.join(',')).join('\n');
+      
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      
+      link.setAttribute('href', url);
+      link.setAttribute('download', `inscricoes_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      mostrarNotificacao("CSV exportado com sucesso");
+    });
+    
+    // Inicializar o dashboard
+    renderDashboard();
+  </script>
+</body>
+</html>
