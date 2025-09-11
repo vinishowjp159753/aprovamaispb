@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Professores - AprovaMaisPB</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1a2a6c;
+            --secondary: #b21f1f;
+            --accent: #fdbb2d;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fb;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 15px;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 500;
+        }
+        
+        .back-btn i {
+            margin-right: 8px;
+        }
+        
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            background: #f8f9fa;
+            border: none;
+            flex: 1;
+            font-weight: 500;
+        }
+        
+        .tab.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background: var(--primary);
+            color: white;
+            font-weight: 500;
+        }
+        
+        tr:hover {
+            background: #f9f9f9;
+        }
+        
+        .btn {
+            padding: 8px 15px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .btn i {
+            margin-right: 5px;
+        }
+        
+        .assign-btn {
+            background: var(--accent);
+            color: #000;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .form-actions {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="dashboard.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Voltar ao Dashboard
+            </a>
+            <h1>Gerenciar Professores</h1>
+            <div></div> <!-- Espaço para alinhamento -->
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="openTab('professores')">Lista de Professores</button>
+            <button class="tab" onclick="openTab('designar')">Designar Turmas</button>
+        </div>
+        
+        <div id="professores" class="tab-content active">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Matéria</th>
+                            <th>Turmas</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Carlos Silva</td>
+                            <td>Matemática</td>
+                            <td>Turma A, Turma B</td>
+                            <td>Ativo</td>
+                            <td>
+                                <button class="btn"><i class="fas fa-edit"></i> Editar</button>
+                                <button class="btn assign-btn"><i class="fas fa-users"></i> Designar</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Ana Santos</td>
+                            <td>Português</td>
+                            <td>Turma C</td>
+                            <td>Ativo</td>
+                            <td>
+                                <button class="btn"><i class="fas fa-edit"></i> Editar</button>
+                                <button class="btn assign-btn"><i class="fas fa-users"></i> Designar</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Paulo Oliveira</td>
+                            <td>História</td>
+                            <td>Nenhuma</td>
+                            <td>Inativo</td>
+                            <td>
+                                <button class="btn"><i class="fas fa-edit"></i> Editar</button>
+                                <button class="btn assign-btn"><i class="fas fa-users"></i> Designar</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="designar" class="tab-content">
+            <h2>Designar Turma para Professor</h2>
+            <div class="form-group">
+                <label for="selectProfessor">Selecionar Professor</label>
+                <select id="selectProfessor">
+                    <option>Carlos Silva - Matemática</option>
+                    <option>Ana Santos - Português</option>
+                    <option>Paulo Oliveira - História</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="selectTurma">Selecionar Turma</label>
+                <select id="selectTurma">
+                    <option>Turma A - Manhã</option>
+                    <option>Turma B - Tarde</option>
+                    <option>Turma C - Noite</option>
+                </select>
+            </div>
+            <div class="form-actions">
+                <button class="btn"><i class="fas fa-link"></i> Designar Turma</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openTab(tabName) {
+            // Esconder todos os conteúdos de abas
+            const tabContents = document.getElementsByClassName('tab-content');
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove('active');
+            }
+            
+            // Remover classe active de todas as abas
+            const tabs = document.getElementsByClassName('tab');
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove('active');
+            }
+            
+            // Mostrar a aba selecionada
+            document.getElementById(tabName).classList.add('active');
+            
+            // Adicionar classe active ao botão clicado
+            event.currentTarget.classList.add('active');
+        }
+    </script>
+</body>
+</html>
