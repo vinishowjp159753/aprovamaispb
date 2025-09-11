@@ -1,0 +1,134 @@
+<!-- notification-system.css -->
+<style>
+    .notification-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        max-width: 350px;
+    }
+    
+    .notification {
+        background: white;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        display: flex;
+        align-items: flex-start;
+        animation: slideIn 0.3s ease-out;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .notification::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 4px;
+    }
+    
+    .notification.success {
+        border-left: 4px solid #28a745;
+    }
+    
+    .notification.success::before {
+        background-color: #28a745;
+    }
+    
+    .notification.error {
+        border-left: 4px solid #dc3545;
+    }
+    
+    .notification.error::before {
+        background-color: #dc3545;
+    }
+    
+    .notification.warning {
+        border-left: 4px solid #ffc107;
+    }
+    
+    .notification.warning::before {
+        background-color: #ffc107;
+    }
+    
+    .notification.info {
+        border-left: 4px solid #17a2b8;
+    }
+    
+    .notification.info::before {
+        background-color: #17a2b8;
+    }
+    
+    .notification-icon {
+        margin-right: 12px;
+        font-size: 20px;
+    }
+    
+    .notification.success .notification-icon {
+        color: #28a745;
+    }
+    
+    .notification.error .notification-icon {
+        color: #dc3545;
+    }
+    
+    .notification.warning .notification-icon {
+        color: #ffc107;
+    }
+    
+    .notification.info .notification-icon {
+        color: #17a2b8;
+    }
+    
+    .notification-content {
+        flex: 1;
+    }
+    
+    .notification-title {
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+    
+    .notification-message {
+        font-size: 14px;
+        color: #666;
+    }
+    
+    .notification-close {
+        background: none;
+        border: none;
+        font-size: 16px;
+        cursor: pointer;
+        color: #999;
+        margin-left: 10px;
+    }
+    
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    @keyframes slideOut {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+    
+    .notification.hide {
+        animation: slideOut 0.3s ease-in forwards;
+    }
+</style>
