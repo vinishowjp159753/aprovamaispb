@@ -7,7 +7,8 @@ import {
   query, 
   where, 
   updateDoc,
-  doc 
+  doc,
+  deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -31,7 +32,7 @@ try {
   console.error("Erro ao inicializar Firebase:", error);
 }
 
-// Funções do Firebase
+// FUNÇÕES PARA INSCRIÇÕES
 export async function salvarInscricao(dados) {
   try {
     const docRef = await addDoc(collection(db, "inscricoes"), dados);
@@ -63,9 +64,14 @@ export async function atualizarInscricao(id, dados) {
   }
 }
 
+// FUNÇÕES PARA PROFESSORES
 export async function salvarProfessor(prof) {
   try {
-    const docRef = await addDoc(collection(db, "professores"), prof);
+    const docRef = await addDoc(collection(db, "professores"), {
+      ...prof,
+      criadoEm: new Date().toISOString(),
+      status: "ativo"
+    });
     console.log("Professor salvo com ID: ", docRef.id);
     return docRef.id;
   } catch (error) {
@@ -89,7 +95,8 @@ export async function autenticarProfessor(usuario, senha) {
     const q = query(
       collection(db, "professores"),
       where("usuario", "==", usuario),
-      where("senha", "==", senha)
+      where("senha", "==", senha),
+      where("status", "==", "ativo")
     );
     const snapshot = await getDocs(q);
     return !snapshot.empty;
@@ -99,6 +106,33 @@ export async function autenticarProfessor(usuario, senha) {
   }
 }
 
+export async function verificarLoginProfessor(usuario, senha) {
+  try {
+    const q = query(
+      collection(db, "professores"),
+      where("usuario", "==", usuario),
+      where("senha", "==", senha),
+      where("status", "==", "ativo")
+    );
+    const snapshot = await getDocs(q);
+    return !snapshot.empty;
+  } catch (error) {
+    console.error("Erro ao verificar login professor:", error);
+    return false;
+  }
+}
+
+export async function excluirProfessor(id) {
+  try {
+    await deleteDoc(doc(db, "professores", id));
+    console.log("Professor excluído:", id);
+  } catch (error) {
+    console.error("Erro ao excluir professor:", error);
+    throw error;
+  }
+}
+
+// FUNÇÕES PARA TURMAS E DESIGNACÕES
 export async function designarTurma(professor, turma) {
   try {
     await addDoc(collection(db, "designacoes"), {
@@ -137,6 +171,81 @@ export async function buscarInscricoesPorTurma(turma) {
     return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   } catch (error) {
     console.error("Erro ao buscar inscrições por turma:", error);
+    return [];
+  }
+}
+
+// FUNÇÕES PARA ADMIN
+export async function autenticarAdmin(usuario, senha) {
+  try {
+    // Verificar se é um professor primeiro
+    const isProfessor = await autenticarProfessor(usuario, senha);
+    
+    if (isProfessor) {
+      // Verificar se é admin (usuários específicos)
+      const admins = ['admin', 'administrador', 'diretor'];
+      return admins.includes(usuario.toLowerCase());
+    }
+    
+    return false;
+  } catch (error) {
+    console.error("Erro ao autenticar admin:", error);
+    return false;
+  }
+}
+
+// FUNÇÕES PARA RELATÓRIOS
+export async function buscarInscricoesPorStatus(status) {
+  try {
+    const q = query(
+      collection(db, "inscricoes"),
+      where("status", "==", status)
+    );
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  } catch (error) {
+    console.error("Erro ao buscar inscrições por status:", error);
+    return [];
+  }
+}
+
+export async function buscarInscricoesPorCurso(curso) {
+  try {
+    const q = query(
+      collection(db, "inscricoes"),
+      where("course", "==", curso)
+    );
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  } catch (error) {
+    console.error("Erro ao buscar inscrições por curso:", error);
+    return [];
+  }
+}
+
+// FUNÇÃO PARA GERAR RELATÓRIOS
+export async function gerarRelatorio(tipo, filtros = {}) {
+  try {
+    let dados = [];
+    
+    switch(tipo) {
+      case 'matriculas':
+        dados = await listarInscricoes();
+        break;
+      case 'professores':
+        dados = await listarProfessores();
+        break;
+      case 'financeiro':
+        // Implementar lógica financeira
+        dados = await listarInscricoes();
+        break;
+      default:
+        dados = await listarInscricoes();
+    }
+    
+    return dados;
+  } catch (error) {
+    console.error("Erro ao gerar relatório:", error);
     return [];
   }
 }
