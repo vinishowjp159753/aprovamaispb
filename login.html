@@ -85,6 +85,22 @@
         .input-group input[type="password"] {
             letter-spacing: 3px;
             font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .password-container {
+            position: relative;
+        }
+        
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #666;
         }
         
         .btn {
@@ -102,6 +118,11 @@
         
         .btn:hover {
             background: #2a3a9c;
+        }
+        
+        .btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
         }
         
         .error-message {
@@ -129,6 +150,23 @@
             color: #1565c0;
         }
         
+        .credentials {
+            margin-top: 10px;
+            padding: 10px;
+            background: #bbdefb;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        
+        .credentials summary {
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .credentials p {
+            margin: 8px 0;
+        }
+        
         .footer {
             text-align: center;
             padding: 15px;
@@ -148,6 +186,20 @@
             border-left: 4px solid #4caf50;
         }
         
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
         @media (max-width: 500px) {
             .container {
                 width: 95%;
@@ -162,7 +214,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <img src="assets/img/logo_aprovamaispb.png" alt="Logo AprovaMaisPB" class="logo">
+            <img src="assets/img/logo_aprovamaispb.png" alt="Logo AprovaMaisPB" class="logo" onerror="this.style.display='none'">
             <h1>AprovaMaisPB</h1>
             <p>Acesso Restrito ao Sistema</p>
         </div>
@@ -178,19 +230,25 @@
             
             <div class="input-group">
                 <label for="usuario">Usuário:</label>
-                <input type="text" id="usuario" placeholder="Digite seu usuário" value="harasson51">
+                <input type="text" id="usuario" placeholder="Digite seu usuário" autocomplete="username">
             </div>
             
             <div class="input-group">
                 <label for="senha">Senha:</label>
-                <input type="password" id="senha" placeholder="Digite sua senha">
+                <div class="password-container">
+                    <input type="password" id="senha" placeholder="Digite sua senha" autocomplete="current-password">
+                    <button type="button" id="togglePassword" class="toggle-password">👁️</button>
+                </div>
             </div>
             
             <div class="error-message" id="errorMessage">
                 Usuário ou senha incorretos!
             </div>
             
-            <button class="btn" id="btnEntrar">Entrar no Sistema</button>
+            <button class="btn" id="btnEntrar">
+                <span id="btnText">Entrar no Sistema</span>
+                <span id="btnLoading" class="loading" style="display: none;"></span>
+            </button>
             
             <div class="success-message" id="successMessage">
                 Autenticação bem-sucedida! Conectando ao sistema...
@@ -198,7 +256,13 @@
             
             <div class="info-box">
                 <h3>Credenciais Padrão (se não houver admin):</h3>
-                <p>Admin: admin / admin123</p>
+                <div class="credentials">
+                    <details>
+                        <summary>Clique para ver as credenciais</summary>
+                        <p><strong>Admin:</strong> admin / admin123</p>
+                        <p><strong>Professor:</strong> administrador / 159753</p>
+                    </details>
+                </div>
             </div>
         </div>
         
@@ -233,6 +297,9 @@
         const usuario = document.getElementById('usuario');
         const senha = document.getElementById('senha');
         const btnEntrar = document.getElementById('btnEntrar');
+        const btnText = document.getElementById('btnText');
+        const btnLoading = document.getElementById('btnLoading');
+        const togglePassword = document.getElementById('togglePassword');
         const errorMessage = document.getElementById('errorMessage');
         const successMessage = document.getElementById('successMessage');
         
@@ -253,7 +320,32 @@
                     .where("senha", "==", senha)
                     .where("status", "==", "ativo")
                     .get();
-                return !snapshot.empty;
+                    
+                if (!snapshot.empty) {
+                    return true;
+                }
+                
+                // Fallback para credenciais padrão
+                if (usuario === "administrador" && senha === "159753") {
+                    // Verificar se o professor padrão existe, se não, criar
+                    const professorPadrao = await db.collection("professores")
+                        .where("usuario", "==", "administrador")
+                        .get();
+                        
+                    if (professorPadrao.empty) {
+                        await db.collection("professores").add({
+                            usuario: "administrador",
+                            senha: "159753",
+                            nome: "Professor Administrador",
+                            email: "admin@aprovamaispb.com",
+                            status: "ativo",
+                            criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    }
+                    return true;
+                }
+                
+                return false;
             } catch (err) {
                 console.error("Erro ao autenticar professor:", err);
                 return false;
@@ -272,7 +364,31 @@
                     .where("usuario", "==", usuario)
                     .where("senha", "==", senha)
                     .get();
-                return !snapshot.empty;
+                    
+                if (!snapshot.empty) {
+                    return true;
+                }
+                
+                // Fallback para credenciais padrão
+                if (usuario === "admin" && senha === "admin123") {
+                    // Verificar se o admin padrão existe, se não, criar
+                    const adminPadrao = await db.collection("admins")
+                        .where("usuario", "==", "admin")
+                        .get();
+                        
+                    if (adminPadrao.empty) {
+                        await db.collection("admins").add({
+                            usuario: "admin",
+                            senha: "admin123",
+                            nome: "Administrador Padrão",
+                            email: "admin@aprovamaispb.com",
+                            criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    }
+                    return true;
+                }
+                
+                return false;
             } catch (err) {
                 console.error("Erro ao autenticar admin:", err);
                 return false;
@@ -321,6 +437,11 @@
             }
             
             try {
+                // Mostrar loading
+                btnText.style.display = 'none';
+                btnLoading.style.display = 'inline-block';
+                btnEntrar.disabled = true;
+                
                 let authenticated = false;
                 
                 if (accessType === 'professor') {
@@ -333,10 +454,29 @@
                     sucessoLogin(user, accessType);
                 } else {
                     mostrarErro("Usuário ou senha incorretos!");
+                    // Restaurar botão
+                    btnText.style.display = 'block';
+                    btnLoading.style.display = 'none';
+                    btnEntrar.disabled = false;
                 }
             } catch (error) {
                 console.error("Erro durante autenticação:", error);
                 mostrarErro("Erro de conexão. Tente novamente.");
+                // Restaurar botão
+                btnText.style.display = 'block';
+                btnLoading.style.display = 'none';
+                btnEntrar.disabled = false;
+            }
+        });
+        
+        // Alternar visibilidade da senha
+        togglePassword.addEventListener('click', () => {
+            if (senha.type === 'password') {
+                senha.type = 'text';
+                togglePassword.textContent = '🔒';
+            } else {
+                senha.type = 'password';
+                togglePassword.textContent = '👁️';
             }
         });
         
