@@ -6,54 +6,6 @@
   <title>Login - AprovaMaisPB</title>
   <link rel="stylesheet" href="./assets/css/style.css" />
   <link rel="icon" type="image/png" href="./assets/img/logo_aprovamaispb.png" />
-  <style>
-    .login-container {
-      max-width: 400px;
-      margin: 50px auto;
-      padding: 30px;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    .form-group {
-      margin: 20px 0;
-    }
-    .form-group label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 500;
-    }
-    .form-group input {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
-      font-size: 16px;
-    }
-    .error-message {
-      color: #dc2626;
-      font-size: 14px;
-      margin-top: 5px;
-      display: none;
-    }
-    .user-type {
-      display: flex;
-      gap: 15px;
-      margin: 20px 0;
-    }
-    .user-type label {
-      flex: 1;
-      padding: 15px;
-      border: 2px solid #e5e7eb;
-      border-radius: 8px;
-      text-align: center;
-      cursor: pointer;
-    }
-    .user-type input[type="radio"]:checked + span {
-      border-color: #2563eb;
-      background: #eff6ff;
-    }
-  </style>
 </head>
 <body>
   <header>
@@ -108,14 +60,30 @@
     </form>
     
     <div style="margin-top: 20px; padding: 15px; background: #f3f4f6; border-radius: 8px;">
-      <h4>Credenciais de Teste:</h4>
-      <p><strong>Professor:</strong> prof123 / senha123</p>
+      <h4>Credenciais Padrão (se não houver admin):</h4>
       <p><strong>Admin:</strong> admin / admin123</p>
     </div>
   </main>
 
   <script type="module">
     import { autenticarProfessor, autenticarAdmin } from "./assets/js/firebase.js";
+
+    // 🔹 Função auxiliar para garantir admin inicial
+    async function garantirAdminPadrao() {
+      try {
+        const snapshot = await firebase.firestore().collection("admins").get();
+        if (snapshot.empty) {
+          await firebase.firestore().collection("admins").add({
+            usuario: "admin",
+            senha: "admin123",
+            criadoEm: Date.now()
+          });
+          console.log("✅ Admin padrão criado (admin / admin123)");
+        }
+      } catch (err) {
+        console.error("Erro ao garantir admin:", err);
+      }
+    }
 
     document.getElementById('login-form').addEventListener('submit', async function(e) {
       e.preventDefault();
@@ -135,6 +103,7 @@
           autenticado = await autenticarProfessor(usuario, senha);
           isAdmin = false;
         } else {
+          await garantirAdminPadrao();
           autenticado = await autenticarAdmin(usuario, senha);
           isAdmin = true;
         }
@@ -143,7 +112,6 @@
           localStorage.setItem('usuarioLogado', usuario);
           localStorage.setItem('userType', userType);
           localStorage.setItem('isAdmin', isAdmin);
-          
           window.location.href = 'dashboard.html';
         } else {
           errorElement.style.display = 'block';
@@ -159,7 +127,6 @@
     function toggleMenu(){
       document.querySelector('.menu').classList.toggle('open');
     }
-    
     document.addEventListener('DOMContentLoaded', function() {
       const usuarioLogado = localStorage.getItem('usuarioLogado');
       if (usuarioLogado) {
