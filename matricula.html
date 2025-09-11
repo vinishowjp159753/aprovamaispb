@@ -101,6 +101,7 @@
             font-weight: 600;
             width: 100%;
             transition: background 0.3s;
+            text-align: center;
         }
         
         .btn:hover {
@@ -276,6 +277,17 @@
                     <span id="btnText">Realizar Matrícula</span>
                     <span id="btnLoading" class="loading" style="display: none;"></span>
                 </button>
+
+                <!-- Botão WhatsApp (inicialmente escondido) -->
+                <a 
+                    href="#" 
+                    target="_blank" 
+                    id="whatsappBtn"
+                    class="btn"
+                    style="background-color: #25D366; margin-top: 10px; display: none;"
+                >
+                    Finalizar Pagamento via WhatsApp
+                </a>
             </form>
         </div>
     </div>
@@ -295,23 +307,19 @@
             appId: "1:828577018900:web:473d8c3fc2685d3f192301"
         };
 
-        // Inicializar Firebase
         if (typeof firebase !== 'undefined' && !firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
         
-        // Referência para Firestore
         const db = firebase.firestore();
-        
-        // Elementos da interface
         const matriculaForm = document.getElementById('matriculaForm');
         const submitBtn = document.getElementById('submitBtn');
         const btnText = document.getElementById('btnText');
         const btnLoading = document.getElementById('btnLoading');
         const successAlert = document.getElementById('successAlert');
         const errorAlert = document.getElementById('errorAlert');
+        const whatsappBtn = document.getElementById('whatsappBtn');
         
-        // Função para salvar inscrição
         async function salvarInscricao(dados) {
             try {
                 const docRef = await db.collection("inscricoes").add({
@@ -326,38 +334,24 @@
             }
         }
         
-        // Máscaras para os campos
         document.getElementById('cpf').addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
             if (value.length > 11) value = value.slice(0, 11);
-            
-            if (value.length > 9) {
-                value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
-            } else if (value.length > 6) {
-                value = value.replace(/(\d{3})(\d{3})(\d+)/, '$1.$2.$3');
-            } else if (value.length > 3) {
-                value = value.replace(/(\d{3})(\d+)/, '$1.$2');
-            }
-            
+            if (value.length > 9) value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+            else if (value.length > 6) value = value.replace(/(\d{3})(\d{3})(\d+)/, '$1.$2.$3');
+            else if (value.length > 3) value = value.replace(/(\d{3})(\d+)/, '$1.$2');
             e.target.value = value;
         });
         
         document.getElementById('telefone').addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
             if (value.length > 11) value = value.slice(0, 11);
-            
-            if (value.length > 10) {
-                value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
-            } else if (value.length > 6) {
-                value = value.replace(/(\d{2})(\d{4})(\d+)/, '($1) $2-$3');
-            } else if (value.length > 2) {
-                value = value.replace(/(\d{2})(\d+)/, '($1) $2');
-            }
-            
+            if (value.length > 10) value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+            else if (value.length > 6) value = value.replace(/(\d{2})(\d{4})(\d+)/, '($1) $2-$3');
+            else if (value.length > 2) value = value.replace(/(\d{2})(\d+)/, '($1) $2');
             e.target.value = value;
         });
         
-        // Evento de envio do formulário
         matriculaForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -373,7 +367,6 @@
             const estado = document.getElementById('estado').value;
             const observacoes = document.getElementById('observacoes').value.trim();
             
-            // Validar campos obrigatórios
             if (!nomeCompleto || !dataNascimento || !cpf || !telefone || !email || !turma || !turno || !endereco || !cidade || !estado) {
                 errorAlert.style.display = 'block';
                 successAlert.style.display = 'none';
@@ -381,62 +374,46 @@
             }
             
             try {
-                // Mostrar loading
                 btnText.style.display = 'none';
                 btnLoading.style.display = 'inline-block';
                 submitBtn.disabled = true;
                 
-                // Dados da matrícula
-                const dadosMatricula = {
-                    nomeCompleto,
-                    dataNascimento,
-                    cpf,
-                    telefone,
-                    email,
-                    turma,
-                    turno,
-                    endereco,
-                    cidade,
-                    estado,
-                    observacoes
-                };
-                
-                // Salvar no Firebase
+                const dadosMatricula = { nomeCompleto, dataNascimento, cpf, telefone, email, turma, turno, endereco, cidade, estado, observacoes };
                 const matriculaId = await salvarInscricao(dadosMatricula);
                 
-                // Mostrar mensagem de sucesso
                 successAlert.style.display = 'block';
                 errorAlert.style.display = 'none';
-                
-                // Limpar formulário
                 matriculaForm.reset();
                 
-                // Restaurar botão
+                // Mostrar botão WhatsApp com mensagem personalizada
+                const mensagem = `Olá, meu nome é ${nomeCompleto}. Quero finalizar minha matrícula no cursinho ${turma}, turno ${turno}.`;
+                const numeroWhats = '5583996627827';
+                whatsappBtn.href = `https://wa.me/${numeroWhats}?text=${encodeURIComponent(mensagem)}`;
+                whatsappBtn.style.display = 'block';
+                
                 setTimeout(() => {
                     btnText.style.display = 'block';
                     btnLoading.style.display = 'none';
                     submitBtn.disabled = false;
-                    
-                    // Esconder alerta após 3 segundos
                     successAlert.style.display = 'none';
                 }, 3000);
                 
             } catch (error) {
                 console.error("Erro ao processar matrícula:", error);
-                
-                // Mostrar mensagem de erro
                 errorAlert.textContent = "Erro ao processar matrícula. Tente novamente.";
                 errorAlert.style.display = 'block';
                 successAlert.style.display = 'none';
                 
-                // Restaurar botão
                 btnText.style.display = 'block';
                 btnLoading.style.display = 'none';
                 submitBtn.disabled = false;
             }
         });
+
+        matriculaForm.addEventListener('reset', () => {
+            whatsappBtn.style.display = 'none';
+        });
         
-        // Verificar se Firebase foi carregado
         document.addEventListener('DOMContentLoaded', function() {
             if (typeof firebase === 'undefined') {
                 errorAlert.textContent = "Erro de conexão. Verifique sua internet e tente novamente.";
