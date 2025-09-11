@@ -1,251 +1,311 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { 
-  getFirestore, 
-  collection, 
-  addDoc, 
-  getDocs, 
-  query, 
-  where, 
-  updateDoc,
-  doc,
-  deleteDoc
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyDYT4OkPkJHkXE44jqIcaWtXL-f105JNoE",
-  authDomain: "aprovamaispb-6ea02.firebaseapp.com",
-  projectId: "aprovamaispb-6ea02",
-  storageBucket: "aprovamaispb-6ea02.firebasestorage.app",
-  messagingSenderId: "980253365163",
-  appId: "1:980253365163:web:e1d116769cd8031dd1b8ee"
-};
-
-// Inicializar Firebase apenas uma vez
-let app;
-let db;
-
-try {
-  app = initializeApp(firebaseConfig);
-  db = getFirestore(app);
-  console.log("Firebase inicializado com sucesso");
-} catch (error) {
-  console.error("Erro ao inicializar Firebase:", error);
-}
-
-// FUNÇÕES PARA INSCRIÇÕES
-export async function salvarInscricao(dados) {
-  try {
-    const docRef = await addDoc(collection(db, "inscricoes"), dados);
-    console.log("Inscrição salva com ID: ", docRef.id);
-    return docRef.id;
-  } catch (error) {
-    console.error("Erro ao salvar inscrição:", error);
-    throw error;
-  }
-}
-
-export async function listarInscricoes() {
-  try {
-    const snapshot = await getDocs(collection(db, "inscricoes"));
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-  } catch (error) {
-    console.error("Erro ao listar inscrições:", error);
-    return [];
-  }
-}
-
-export async function atualizarInscricao(id, dados) {
-  try {
-    await updateDoc(doc(db, "inscricoes", id), dados);
-    console.log("Inscrição atualizada:", id);
-  } catch (error) {
-    console.error("Erro ao atualizar inscrição:", error);
-    throw error;
-  }
-}
-
-// FUNÇÕES PARA PROFESSORES
-export async function salvarProfessor(prof) {
-  try {
-    const docRef = await addDoc(collection(db, "professores"), {
-      ...prof,
-      criadoEm: new Date().toISOString(),
-      status: "ativo"
-    });
-    console.log("Professor salvo com ID: ", docRef.id);
-    return docRef.id;
-  } catch (error) {
-    console.error("Erro ao salvar professor:", error);
-    throw error;
-  }
-}
-
-export async function listarProfessores() {
-  try {
-    const snapshot = await getDocs(collection(db, "professores"));
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-  } catch (error) {
-    console.error("Erro ao listar professores:", error);
-    return [];
-  }
-}
-
-export async function autenticarProfessor(usuario, senha) {
-  try {
-    const q = query(
-      collection(db, "professores"),
-      where("usuario", "==", usuario),
-      where("senha", "==", senha),
-      where("status", "==", "ativo")
-    );
-    const snapshot = await getDocs(q);
-    return !snapshot.empty;
-  } catch (error) {
-    console.error("Erro ao autenticar professor:", error);
-    return false;
-  }
-}
-
-export async function verificarLoginProfessor(usuario, senha) {
-  try {
-    const q = query(
-      collection(db, "professores"),
-      where("usuario", "==", usuario),
-      where("senha", "==", senha),
-      where("status", "==", "ativo")
-    );
-    const snapshot = await getDocs(q);
-    return !snapshot.empty;
-  } catch (error) {
-    console.error("Erro ao verificar login professor:", error);
-    return false;
-  }
-}
-
-export async function excluirProfessor(id) {
-  try {
-    await deleteDoc(doc(db, "professores", id));
-    console.log("Professor excluído:", id);
-  } catch (error) {
-    console.error("Erro ao excluir professor:", error);
-    throw error;
-  }
-}
-
-// FUNÇÕES PARA TURMAS E DESIGNACÕES
-export async function designarTurma(professor, turma) {
-  try {
-    await addDoc(collection(db, "designacoes"), {
-      professor: professor,
-      turma: turma,
-      designadoEm: new Date().toISOString()
-    });
-    console.log(`Turma ${turma} designada para ${professor}`);
-  } catch (error) {
-    console.error("Erro ao designar turma:", error);
-    throw error;
-  }
-}
-
-export async function buscarTurmasProfessor(usuario) {
-  try {
-    const q = query(
-      collection(db, "designacoes"),
-      where("professor", "==", usuario)
-    );
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-  } catch (error) {
-    console.error("Erro ao buscar turmas do professor:", error);
-    return [];
-  }
-}
-
-export async function buscarInscricoesPorTurma(turma) {
-  try {
-    const q = query(
-      collection(db, "inscricoes"),
-      where("turma", "==", turma)
-    );
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-  } catch (error) {
-    console.error("Erro ao buscar inscrições por turma:", error);
-    return [];
-  }
-}
-
-// FUNÇÕES PARA ADMIN
-export async function autenticarAdmin(usuario, senha) {
-  try {
-    // Verificar se é um professor primeiro
-    const isProfessor = await autenticarProfessor(usuario, senha);
-    
-    if (isProfessor) {
-      // Verificar se é admin (usuários específicos)
-      const admins = ['admin', 'administrador', 'diretor'];
-      return admins.includes(usuario.toLowerCase());
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard - AprovaMaisPB</title>
+  <link rel="stylesheet" href="./assets/css/style.css" />
+  <link rel="icon" type="image/png" href="./assets/img/logo_aprovamaispb.png" />
+  <style>
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin: 30px 0;
     }
-    
-    return false;
-  } catch (error) {
-    console.error("Erro ao autenticar admin:", error);
-    return false;
-  }
-}
-
-// FUNÇÕES PARA RELATÓRIOS
-export async function buscarInscricoesPorStatus(status) {
-  try {
-    const q = query(
-      collection(db, "inscricoes"),
-      where("status", "==", status)
-    );
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-  } catch (error) {
-    console.error("Erro ao buscar inscrições por status:", error);
-    return [];
-  }
-}
-
-export async function buscarInscricoesPorCurso(curso) {
-  try {
-    const q = query(
-      collection(db, "inscricoes"),
-      where("course", "==", curso)
-    );
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-  } catch (error) {
-    console.error("Erro ao buscar inscrições por curso:", error);
-    return [];
-  }
-}
-
-// FUNÇÃO PARA GERAR RELATÓRIOS
-export async function gerarRelatorio(tipo, filtros = {}) {
-  try {
-    let dados = [];
-    
-    switch(tipo) {
-      case 'matriculas':
-        dados = await listarInscricoes();
-        break;
-      case 'professores':
-        dados = await listarProfessores();
-        break;
-      case 'financeiro':
-        // Implementar lógica financeira
-        dados = await listarInscricoes();
-        break;
-      default:
-        dados = await listarInscricoes();
+    .stats-card {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
     }
-    
-    return dados;
-  } catch (error) {
-    console.error("Erro ao gerar relatório:", error);
-    return [];
-  }
-}
+    .stats-number {
+      font-size: 2.5em;
+      font-weight: bold;
+      color: #2563eb;
+      margin: 10px 0;
+    }
+    .stats-label {
+      color: #6b7280;
+      font-size: 0.9em;
+    }
+    .admin-grid {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      gap: 20px;
+      margin: 20px 0;
+    }
+    .admin-sidebar {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .admin-menu {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .admin-menu li {
+      margin: 10px 0;
+    }
+    .admin-menu a {
+      display: block;
+      padding: 12px;
+      border-radius: 8px;
+      text-decoration: none;
+      color: #374151;
+      transition: background 0.3s;
+    }
+    .admin-menu a:hover,
+    .admin-menu a.active {
+      background: #2563eb;
+      color: white;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .table-responsive {
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    th {
+      background: #f9fafb;
+      font-weight: 600;
+    }
+    .btn-action {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 2px;
+      font-size: 0.8em;
+    }
+    .btn-edit { background: #f59e0b; color: white; }
+    .btn-delete { background: #ef4444; color: white; }
+    .btn-assign { background: #10b981; color: white; }
+    .btn-generate { background: #8b5cf6; color: white; }
+    .status-badge {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.8em;
+      font-weight: 500;
+    }
+    .status-ativo { background: #dcfce7; color: #166534; }
+    .status-pendente { background: #fef3c7; color: #92400e; }
+    .status-inativo { background: #fee2e2; color: #991b1b; }
+    .welcome-header {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: white;
+      padding: 30px;
+      border-radius: 12px;
+      margin-bottom: 30px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="nav">
+      <div class="brand">
+        <img src="./assets/img/logo_aprovamaispb.png" alt="Logo" />
+        <span>AprovaMaisPB - Dashboard</span>
+      </div>
+      <ul class="menu">
+        <li><a href="index.html">Início</a></li>
+        <li><a href="matricula.html">Matricule-se</a></li>
+        <li><a href="professores.html">Professores</a></li>
+        <li><a href="dashboard.html" class="active">Dashboard</a></li>
+        <li><a href="#" onclick="fazerLogout()">Sair</a></li>
+      </ul>
+      <button class="hamburger" aria-label="menu" onclick="toggleMenu()">☰</button>
+    </nav>
+  </header>
+
+  <main class="container" style="max-width: 1400px; margin: 0 auto; padding: 20px;">
+    <div class="welcome-header">
+      <h1>Bem-vindo, <span id="user-name">Usuário</span>!</h1>
+      <p>Painel de controle do AprovaMaisPB</p>
+    </div>
+
+    <div class="dashboard-grid">
+      <div class="stats-card">
+        <div class="stats-number" id="total-alunos">0</div>
+        <div class="stats-label">Alunos Ativos</div>
+      </div>
+      <div class="stats-card">
+        <div class="stats-number" id="total-turmas">0</div>
+        <div class="stats-label">Turmas Ativas</div>
+      </div>
+      <div class="stats-card">
+        <div class="stats-number" id="total-professores">0</div>
+        <div class="stats-label">Professores</div>
+      </div>
+      <div class="stats-card">
+        <div class="stats-number" id="receita-mensal">R$ 0</div>
+        <div class="stats-label">Receita Mensal</div>
+      </div>
+    </div>
+
+    <!-- PAINEL ADMINISTRATIVO (só aparece para admin) -->
+    <div id="admin-panel" style="display: none;">
+      <div class="admin-grid">
+        <div class="admin-sidebar">
+          <h3>Painel Admin</h3>
+          <ul class="admin-menu">
+            <li><a href="#alunos" class="active" onclick="showTab('alunos')">👥 Gestão de Alunos</a></li>
+            <li><a href="#professores" onclick="showTab('professores')">👨‍🏫 Gestão de Professores</a></li>
+            <li><a href="#turmas" onclick="showTab('turmas')">🎓 Designação de Turmas</a></li>
+            <li><a href="#financeiro" onclick="showTab('financeiro')">💰 Gestão Financeira</a></li>
+            <li><a href="#relatorios" onclick="showTab('relatorios')">📊 Relatórios</a></li>
+          </ul>
+        </div>
+
+        <div class="admin-content">
+          <!-- ABA ALUNOS -->
+          <div id="tab-alunos" class="tab-content active">
+            <h2>Gestão de Alunos</h2>
+            <div class="table-responsive">
+              <table id="tabela-alunos">
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>CPF</th>
+                    <th>E-mail</th>
+                    <th>Curso</th>
+                    <th>Status</th>
+                    <th>Turma</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Dados carregados via JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ABA PROFESSORES -->
+          <div id="tab-professores" class="tab-content">
+            <h2>Gestão de Professores</h2>
+            <button class="btn-modern" onclick="abrirModalProfessor()">+ Novo Professor</button>
+            <div class="table-responsive">
+              <table id="tabela-professores">
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>Usuário</th>
+                    <th>E-mail</th>
+                    <th>Disciplina</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Dados carregados via JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ... (outras abas do admin) ... -->
+        </div>
+      </div>
+    </div>
+
+    <!-- PAINEL PROFESSOR (só aparece para professores) -->
+    <div id="professor-panel" style="display: none;">
+      <h2>Minhas Turmas</h2>
+      <div id="turmas-professor">
+        <!-- Turmas do professor serão carregadas aqui -->
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAIS E SCRIPTS AQUI (similar ao anterior) -->
+
+  <script type="module">
+    import { 
+      listarInscricoes, 
+      listarProfessores, 
+      buscarTurmasProfessor,
+      salvarProfessor,
+      designarTurma,
+      atualizarInscricao,
+      autenticarProfessor,
+      autenticarAdmin
+    } from "./assets/js/firebase.js";
+
+    // ... (código JavaScript completo) ...
+  </script>
+
+  <script>
+    function toggleMenu(){
+      document.querySelector('.menu').classList.toggle('open');
+    }
+
+    function fazerLogout() {
+      localStorage.removeItem('usuarioLogado');
+      localStorage.removeItem('userType');
+      localStorage.removeItem('isAdmin');
+      window.location.href = 'login.html';
+    }
+
+    function showTab(tabName) {
+      console.log('Mostrando aba:', tabName);
+      // Garantir que os elementos existam antes de manipular
+      const tabElement = document.getElementById(`tab-${tabName}`);
+      const menuLinks = document.querySelectorAll('.admin-menu a');
+      
+      if (tabElement && menuLinks.length > 0) {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        menuLinks.forEach(link => link.classList.remove('active'));
+        
+        tabElement.classList.add('active');
+        document.querySelector(`.admin-menu a[href="#${tabName}"]`).classList.add('active');
+      }
+    }
+
+    function verificarAcesso() {
+      const usuario = localStorage.getItem('usuarioLogado');
+      const isAdmin = localStorage.getItem('isAdmin') === 'true';
+      const userType = localStorage.getItem('userType');
+
+      if (!usuario) {
+        window.location.href = 'login.html';
+        return false;
+      }
+
+      document.getElementById('user-name').textContent = usuario;
+
+      if (isAdmin) {
+        document.getElementById('admin-panel').style.display = 'block';
+        document.getElementById('professor-panel').style.display = 'none';
+      } else {
+        document.getElementById('admin-panel').style.display = 'none';
+        document.getElementById('professor-panel').style.display = 'block';
+      }
+
+      return true;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      if (verificarAcesso()) {
+        carregarDadosDashboard();
+      }
+    });
+  </script>
+</body>
+</html>
