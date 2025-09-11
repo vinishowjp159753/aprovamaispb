@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle Financeiro - AprovaMaisPB</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #1a2a6c;
+            --secondary: #b21f1f;
+            --accent: #fdbb2d;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fb;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 15px;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 500;
+        }
+        
+        .back-btn i {
+            margin-right: 8px;
+        }
+        
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .financial-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .financial-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .card-title {
+            font-size: 16px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        
+        .card-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .card-desc {
+            font-size: 14px;
+            color: #999;
+            margin-top: 5px;
+        }
+        
+        .charts-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .chart-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .transactions {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .filter-select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .btn {
+            padding: 10px 15px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background: var(--primary);
+            color: white;
+            font-weight: 500;
+        }
+        
+        tr:hover {
+            background: #f9f9f9;
+        }
+        
+        .status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status.pago {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .status.pendente {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status.atrasado {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="dashboard.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Voltar ao Dashboard
+            </a>
+            <h1>Controle Financeiro</h1>
+            <div></div> <!-- Espaço para alinhamento -->
+        </div>
+        
+        <div class="financial-cards">
+            <div class="financial-card">
+                <div class="card-header">
+                    <div class="card-title">Receita Total</div>
+                    <div class="card-icon" style="background: rgba(26, 42, 108, 0.1); color: var(--primary);">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                </div>
+                <div class="card-value">R$ 25.680,00</div>
+                <div class="card-desc">Desde o início do ano</div>
+            </div>
+            
+            <div class="financial-card">
+                <div class="card-header">
+                    <div class="card-title">Receita Mensal</div>
+                    <div class="card-icon" style="background: rgba(178, 31, 31, 0.1); color: var(--secondary);">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                </div>
+                <div class="card-value">R$ 8.540,00</div>
+                <div class="card-desc">+15% desde o mês passado</div>
+            </div>
+            
+            <div class="financial-card">
+                <div class="card-header">
+                    <div class="card-title">Despesas</div>
+                    <div class="card-icon" style="background: rgba(253, 187, 45, 0.1); color: var(--accent);">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                </div>
+                <div class="card-value">R$ 4.230,00</div>
+                <div class="card-desc">-5% desde o mês passado</div>
+            </div>
+            
+            <div class="financial-card">
+                <div class="card-header">
+                    <div class="card-title">Lucro Líquido</div>
+                    <div class="card-icon" style="background: rgba(40, 167, 69, 0.1); color: #28a745;">
+                        <i class="fas fa-hand-holding-usd"></i>
+                    </div>
+                </div>
+                <div class="card-value">R$ 4.310,00</div>
+                <div class="card-desc">+22% desde o mês passado</div>
+            </div>
+        </div>
+        
+        <div class="charts-row">
+            <div class="chart-container">
+                <h3 class="chart-title">Receitas x Despesas</h3>
+                <canvas id="revenueExpensesChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3 class="chart-title">Pagamentos por Status</h3>
+                <canvas id="paymentsChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="transactions">
+            <h3 class="chart-title">Últimas Transações</h3>
+            
+            <div class="filters">
+                <select class="filter-select">
+                    <option>Todos os status</option>
+                    <option>Pago</option>
+                    <option>Pendente</option>
+                    <option>Atrasado</option>
+                </select>
+                
+                <select class="filter-select">
+                    <option>Últimos 30 dias</option>
+                    <option>Este mês</option>
+                    <option>Este ano</option>
+                </select>
+                
+                <button class="btn"><i class="fas fa-download"></i> Exportar</button>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Aluno</th>
+                        <th>Descrição</th>
+                        <th>Valor</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>15/08/2023</td>
+                        <td>João Silva</td>
+                        <td>Mensalidade - Turma A</td>
+                        <td>R$ 250,00</td>
+                        <td><span class="status pago">Pago</span></td>
+                    </tr>
+                    <tr>
+                        <td>14/08/2023</td>
+                        <td>Maria Santos</td>
+                        <td>Matrícula</td>
+                        <td>R$ 200,00</td>
+                        <td><span class="status pago">Pago</span></td>
+                    </tr>
+                    <tr>
+                        <td>13/08/2023</td>
+                        <td>Pedro Oliveira</td>
+                        <td>Mensalidade - Turma B</td>
+                        <td>R$ 250,00</td>
+                        <td><span class="status pendente">Pendente</span></td>
+                    </tr>
+                    <tr>
+                        <td>10/08/2023</td>
+                        <td>Ana Costa</td>
+                        <td>Renovação de Matrícula</td>
+                        <td>R$ 180,00</td>
+                        <td><span class="status atrasado">Atrasado</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Gráfico de Receitas x Despesas
+            const revenueExpensesCtx = document.getElementById('revenueExpensesChart').getContext('2d');
+            new Chart(revenueExpensesCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                    datasets: [
+                        {
+                            label: 'Receitas',
+                            data: [7200, 7800, 8200, 8500, 8000, 8540],
+                            backgroundColor: '#1a2a6c'
+                        },
+                        {
+                            label: 'Despesas',
+                            data: [4500, 4600, 4700, 4800, 4100, 4230],
+                            backgroundColor: '#b21f1f'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    }
+                }
+            });
+            
+            // Gráfico de Pagamentos por Status
+            const paymentsCtx = document.getElementById('paymentsChart').getContext('2d');
+            new Chart(paymentsCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Pagos', 'Pendentes', 'Atrasados'],
+                    datasets: [{
+                        data: [65, 25, 10],
+                        backgroundColor: ['#28a745', '#ffc107', '#dc3545']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
