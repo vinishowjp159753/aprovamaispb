@@ -1,105 +1,58 @@
+// assets/js/utils.js
 // Funções utilitárias compartilhadas
 
 export function mostrarNotificacao(mensagem, tipo = "success") {
-  // Verificar se já existe uma notificação
-  const existingNotification = document.querySelector('.notification');
-  if (existingNotification) {
-    existingNotification.remove();
-  }
-  
+  // Remove notificações existentes
+  const existing = document.querySelectorAll('.notification');
+  existing.forEach(n => n.remove());
+
   // Criar elemento de notificação
   const notification = document.createElement('div');
-  notification.className = `notification ${type}`;
+  notification.className = `notification ${tipo}`;
   notification.innerHTML = `
     <span>${mensagem}</span>
-    <button onclick="this.parentElement.remove()">×</button>
+    <button aria-label="fechar" style="background:transparent;border:0;color:inherit;cursor:pointer">×</button>
   `;
-  
-  // Adicionar estilos se não existirem
-  if (!document.querySelector('#notification-styles')) {
-    const style = document.createElement('style');
-    style.id = 'notification-styles';
-    style.textContent = `
-      .notification {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 15px 20px;
-        border-radius: 8px;
-        color: white;
-        z-index: 1000;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        transform: translateX(100%);
-        opacity: 0;
-        transition: transform 0.3s, opacity 0.3s;
-      }
-      .notification.show {
-        transform: translateX(0);
-        opacity: 1;
-      }
-      .notification.success {
-        background: #28a745;
-      }
-      .notification.error {
-        background: #dc3545;
-      }
-      .notification.warning {
-        background: #ffc107;
-        color: #000;
-      }
-    `;
-    document.head.appendChild(style);
-  }
-  
+
+  // fechar ao clicar no X
+  notification.querySelector('button')?.addEventListener('click', () => notification.remove());
+
   document.body.appendChild(notification);
-  
-  // Animação de entrada
-  setTimeout(() => {
-    notification.classList.add('show');
-  }, 100);
-  
-  // Remover após 5 segundos
+
+  // Forçar layout e exibir
+  setTimeout(() => notification.classList.add('show'), 50);
+
+  // remover após 5s
   setTimeout(() => {
     notification.classList.remove('show');
-    setTimeout(() => {
-      if (notification.parentNode) {
-        notification.remove();
-      }
-    }, 300);
+    setTimeout(() => notification.remove(), 350);
   }, 5000);
-  
+
   return notification;
 }
 
 export function validarCPF(cpf) {
+  if (!cpf) return false;
   cpf = cpf.replace(/[^\d]+/g, '');
   if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
-  
+
   let soma = 0;
-  for (let i = 0; i < 9; i++) {
-    soma += parseInt(cpf.charAt(i)) * (10 - i);
-  }
-  
+  for (let i = 0; i < 9; i++) soma += parseInt(cpf.charAt(i)) * (10 - i);
   let resto = 11 - (soma % 11);
   if (resto === 10 || resto === 11) resto = 0;
   if (resto !== parseInt(cpf.charAt(9))) return false;
-  
+
   soma = 0;
-  for (let i = 0; i < 10; i++) {
-    soma += parseInt(cpf.charAt(i)) * (11 - i);
-  }
-  
+  for (let i = 0; i < 10; i++) soma += parseInt(cpf.charAt(i)) * (11 - i);
   resto = 11 - (soma % 11);
   if (resto === 10 || resto === 11) resto = 0;
   if (resto !== parseInt(cpf.charAt(10))) return false;
-  
+
   return true;
 }
 
 export function formatarCPF(cpf) {
+  cpf = cpf.replace(/\D/g, '');
   return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
 }
 
