@@ -188,6 +188,8 @@
             border-radius: 10px;
             width: 500px;
             max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
         }
         
         .modal h2 {
@@ -216,6 +218,25 @@
             display: flex;
             justify-content: flex-end;
             gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .payment-history {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        
+        .payment-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .payment-item:last-child {
+            border-bottom: none;
         }
     </style>
 </head>
@@ -231,8 +252,8 @@
         
         <div class="controls">
             <div class="search-box">
-                <input type="text" placeholder="Buscar aluno...">
-                <button class="btn"><i class="fas fa-search"></i> Buscar</button>
+                <input type="text" placeholder="Buscar aluno..." id="searchInput">
+                <button class="btn" onclick="searchStudents()"><i class="fas fa-search"></i> Buscar</button>
             </div>
             <button class="btn" onclick="exportData()">
                 <i class="fas fa-download"></i> Exportar
@@ -240,7 +261,7 @@
         </div>
         
         <div class="table-container">
-            <table>
+            <table id="studentsTable">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -262,8 +283,8 @@
                         <td>Pacote completo</td>
                         <td>
                             <button class="action-btn edit-btn" onclick="editStudent(1001)"><i class="fas fa-edit"></i></button>
-                            <button class="action-btn payment-btn" onclick="recordPayment(1001)"><i class="fas fa-money-bill"></i></button>
-                            <button class="action-btn obs-btn" onclick="addObservation(1001)"><i class="fas fa-comment"></i></button>
+                            <button class="action-btn payment-btn" onclick="showPaymentModal(1001, 'João Silva')"><i class="fas fa-money-bill"></i></button>
+                            <button class="action-btn obs-btn" onclick="showObservationModal(1001, 'João Silva')"><i class="fas fa-comment"></i></button>
                         </td>
                     </tr>
                     <tr>
@@ -275,8 +296,8 @@
                         <td>Pendente documentação</td>
                         <td>
                             <button class="action-btn edit-btn" onclick="editStudent(1002)"><i class="fas fa-edit"></i></button>
-                            <button class="action-btn payment-btn" onclick="recordPayment(1002)"><i class="fas fa-money-bill"></i></button>
-                            <button class="action-btn obs-btn" onclick="addObservation(1002)"><i class="fas fa-comment"></i></button>
+                            <button class="action-btn payment-btn" onclick="showPaymentModal(1002, 'Maria Santos')"><i class="fas fa-money-bill"></i></button>
+                            <button class="action-btn obs-btn" onclick="showObservationModal(1002, 'Maria Santos')"><i class="fas fa-comment"></i></button>
                         </td>
                     </tr>
                     <tr>
@@ -288,8 +309,8 @@
                         <td>Cancelou matrícula</td>
                         <td>
                             <button class="action-btn edit-btn" onclick="editStudent(1003)"><i class="fas fa-edit"></i></button>
-                            <button class="action-btn payment-btn" onclick="recordPayment(1003)"><i class="fas fa-money-bill"></i></button>
-                            <button class="action-btn obs-btn" onclick="addObservation(1003)"><i class="fas fa-comment"></i></button>
+                            <button class="action-btn payment-btn" onclick="showPaymentModal(1003, 'Pedro Oliveira')"><i class="fas fa-money-bill"></i></button>
+                            <button class="action-btn obs-btn" onclick="showObservationModal(1003, 'Pedro Oliveira')"><i class="fas fa-comment"></i></button>
                         </td>
                     </tr>
                 </tbody>
@@ -322,25 +343,134 @@
             </div>
             <div class="form-actions">
                 <button class="btn" onclick="closeModal('editModal')">Cancelar</button>
-                <button class="btn" style="background: var(--primary);">Salvar</button>
+                <button class="btn" style="background: var(--primary);" onclick="saveStudent()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para registrar pagamento -->
+    <div class="modal" id="paymentModal">
+        <div class="modal-content">
+            <h2>Registrar Pagamento</h2>
+            <p>Aluno: <strong id="paymentStudentName"></strong></p>
+            <div class="form-group">
+                <label for="paymentValue">Valor (R$)</label>
+                <input type="number" id="paymentValue" step="0.01" min="0" placeholder="0,00">
+            </div>
+            <div class="form-group">
+                <label for="paymentDate">Data do Pagamento</label>
+                <input type="date" id="paymentDate">
+            </div>
+            <div class="form-group">
+                <label for="paymentMethod">Método de Pagamento</label>
+                <select id="paymentMethod">
+                    <option value="dinheiro">Dinheiro</option>
+                    <option value="pix">PIX</option>
+                    <option value="cartao">Cartão</option>
+                    <option value="transferencia">Transferência</option>
+                </select>
+            </div>
+            <div class="payment-history" id="paymentHistory">
+                <h3>Histórico de Pagamentos</h3>
+                <div class="payment-item">
+                    <span>15/08/2023</span>
+                    <span>R$ 250,00 (PIX)</span>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button class="btn" onclick="closeModal('paymentModal')">Cancelar</button>
+                <button class="btn" style="background: var(--primary);" onclick="confirmPayment()">Confirmar Pagamento</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para adicionar observação -->
+    <div class="modal" id="observationModal">
+        <div class="modal-content">
+            <h2>Adicionar Observação</h2>
+            <p>Aluno: <strong id="observationStudentName"></strong></p>
+            <div class="form-group">
+                <label for="observationText">Observação</label>
+                <textarea id="observationText" rows="4" placeholder="Digite sua observação aqui..."></textarea>
+            </div>
+            <div class="form-actions">
+                <button class="btn" onclick="closeModal('observationModal')">Cancelar</button>
+                <button class="btn" style="background: var(--primary);" onclick="saveObservation()">Salvar Observação</button>
             </div>
         </div>
     </div>
 
     <script>
+        let currentStudentId = null;
+        let currentStudentName = null;
+        
+        function showPaymentModal(studentId, studentName) {
+            currentStudentId = studentId;
+            currentStudentName = studentName;
+            document.getElementById('paymentStudentName').textContent = studentName;
+            document.getElementById('paymentValue').value = '';
+            document.getElementById('paymentDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('paymentModal').style.display = 'flex';
+        }
+        
+        function showObservationModal(studentId, studentName) {
+            currentStudentId = studentId;
+            currentStudentName = studentName;
+            document.getElementById('observationStudentName').textContent = studentName;
+            document.getElementById('observationText').value = '';
+            document.getElementById('observationModal').style.display = 'flex';
+        }
+        
+        function confirmPayment() {
+            const value = document.getElementById('paymentValue').value;
+            const date = document.getElementById('paymentDate').value;
+            const method = document.getElementById('paymentMethod').value;
+            
+            if (!value || value <= 0) {
+                alert('Por favor, informe um valor válido.');
+                return;
+            }
+            
+            // Aqui você implementaria a lógica para salvar o pagamento no Firebase
+            alert(`Pagamento de R$ ${value} registrado para ${currentStudentName} via ${method}`);
+            
+            // Adicionar ao histórico (apenas para demonstração)
+            const historyDiv = document.getElementById('paymentHistory');
+            const paymentItem = document.createElement('div');
+            paymentItem.className = 'payment-item';
+            paymentItem.innerHTML = `
+                <span>${new Date().toLocaleDateString('pt-BR')}</span>
+                <span>R$ ${parseFloat(value).toFixed(2)} (${method})</span>
+            `;
+            historyDiv.appendChild(paymentItem);
+            
+            // Fechar o modal após um breve delay
+            setTimeout(() => {
+                closeModal('paymentModal');
+            }, 1500);
+        }
+        
+        function saveObservation() {
+            const observationText = document.getElementById('observationText').value;
+            
+            if (!observationText) {
+                alert('Por favor, digite uma observação.');
+                return;
+            }
+            
+            // Aqui você implementaria a lógica para salvar a observação no Firebase
+            alert(`Observação adicionada para ${currentStudentName}: ${observationText}`);
+            closeModal('observationModal');
+        }
+        
         function editStudent(id) {
             document.getElementById('editModal').style.display = 'flex';
             // Aqui você carregaria os dados do aluno com o ID especificado
         }
         
-        function recordPayment(id) {
-            alert('Registrar pagamento para o aluno ID: ' + id);
-            // Implementar lógica de pagamento
-        }
-        
-        function addObservation(id) {
-            alert('Adicionar observação para o aluno ID: ' + id);
-            // Implementar lógica de observação
+        function saveStudent() {
+            alert('Alterações salvas com sucesso!');
+            closeModal('editModal');
         }
         
         function closeModal(modalId) {
@@ -352,12 +482,36 @@
             // Implementar lógica de exportação
         }
         
+        function searchStudents() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#studentsTable tbody tr');
+            
+            rows.forEach(row => {
+                const name = row.cells[1].textContent.toLowerCase();
+                const classText = row.cells[2].textContent.toLowerCase();
+                const status = row.cells[3].textContent.toLowerCase();
+                
+                if (name.includes(searchText) || classText.includes(searchText) || status.includes(searchText)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+        
         // Fechar modal clicando fora dele
         window.onclick = function(event) {
             if (event.target.classList.contains('modal')) {
                 event.target.style.display = 'none';
             }
         }
+        
+        // Permitir busca ao pressionar Enter
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchStudents();
+            }
+        });
     </script>
 </body>
 </html>
