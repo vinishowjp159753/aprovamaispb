@@ -137,6 +137,11 @@
             color: #000;
         }
         
+        .delete-btn {
+            background: var(--secondary);
+            color: white;
+        }
+        
         .form-group {
             margin-bottom: 20px;
         }
@@ -147,7 +152,7 @@
             font-weight: 500;
         }
         
-        .form-group select {
+        .form-group select, .form-group input {
             width: 100%;
             padding: 10px;
             border: 1px solid #ddd;
@@ -156,6 +161,56 @@
         
         .form-actions {
             margin-top: 20px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 500px;
+            max-width: 90%;
+        }
+        
+        .modal h2 {
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status.ativo {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .status.inativo {
+            background: #ffebee;
+            color: #d32f2f;
         }
     </style>
 </head>
@@ -176,47 +231,19 @@
         
         <div id="professores" class="tab-content active">
             <div class="table-container">
-                <table>
+                <table id="teachersTable">
                     <thead>
                         <tr>
                             <th>Nome</th>
                             <th>Matéria</th>
-                            <th>Turmas</th>
+                            <th>Usuário</th>
                             <th>Status</th>
+                            <th>Turmas</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>Carlos Silva</td>
-                            <td>Matemática</td>
-                            <td>Turma A, Turma B</td>
-                            <td>Ativo</td>
-                            <td>
-                                <button class="btn"><i class="fas fa-edit"></i> Editar</button>
-                                <button class="btn assign-btn"><i class="fas fa-users"></i> Designar</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Ana Santos</td>
-                            <td>Português</td>
-                            <td>Turma C</td>
-                            <td>Ativo</td>
-                            <td>
-                                <button class="btn"><i class="fas fa-edit"></i> Editar</button>
-                                <button class="btn assign-btn"><i class="fas fa-users"></i> Designar</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Paulo Oliveira</td>
-                            <td>História</td>
-                            <td>Nenhuma</td>
-                            <td>Inativo</td>
-                            <td>
-                                <button class="btn"><i class="fas fa-edit"></i> Editar</button>
-                                <button class="btn assign-btn"><i class="fas fa-users"></i> Designar</button>
-                            </td>
-                        </tr>
+                        <!-- Os dados serão preenchidos via JavaScript -->
                     </tbody>
                 </table>
             </div>
@@ -227,26 +254,83 @@
             <div class="form-group">
                 <label for="selectProfessor">Selecionar Professor</label>
                 <select id="selectProfessor">
-                    <option>Carlos Silva - Matemática</option>
-                    <option>Ana Santos - Português</option>
-                    <option>Paulo Oliveira - História</option>
+                    <option value="">Selecione um professor</option>
+                    <!-- Opções serão preenchidas via JavaScript -->
                 </select>
             </div>
             <div class="form-group">
                 <label for="selectTurma">Selecionar Turma</label>
                 <select id="selectTurma">
-                    <option>Turma A - Manhã</option>
-                    <option>Turma B - Tarde</option>
-                    <option>Turma C - Noite</option>
+                    <option value="">Selecione uma turma</option>
+                    <option value="turma-a">Turma A - Manhã</option>
+                    <option value="turma-b">Turma B - Tarde</option>
+                    <option value="turma-c">Turma C - Noite</option>
                 </select>
             </div>
             <div class="form-actions">
-                <button class="btn"><i class="fas fa-link"></i> Designar Turma</button>
+                <button class="btn" onclick="designarTurma()"><i class="fas fa-link"></i> Designar Turma</button>
+            </div>
+            
+            <div id="designacoesList" style="margin-top: 30px;">
+                <h3>Designações Ativas</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Professor</th>
+                            <th>Turma</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="designacoesBody">
+                        <!-- Designações serão preenchidas via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para editar professor -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <h2>Editar Professor</h2>
+            <div class="form-group">
+                <label for="editName">Nome Completo</label>
+                <input type="text" id="editName">
+            </div>
+            <div class="form-group">
+                <label for="editEmail">E-mail</label>
+                <input type="email" id="editEmail">
+            </div>
+            <div class="form-group">
+                <label for="editMateria">Matéria</label>
+                <select id="editMateria">
+                    <option value="portugues">Português</option>
+                    <option value="matematica">Matemática</option>
+                    <option value="historia">História</option>
+                    <option value="geografia">Geografia</option>
+                    <option value="ingles">Inglês</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="editStatus">Status</label>
+                <select id="editStatus">
+                    <option value="ativo">Ativo</option>
+                    <option value="inativo">Inativo</option>
+                </select>
+            </div>
+            <div class="form-actions">
+                <button class="btn" onclick="closeModal('editModal')">Cancelar</button>
+                <button class="btn" style="background: var(--primary);" onclick="salvarEdicao()">Salvar</button>
             </div>
         </div>
     </div>
 
     <script>
+        // Dados (substituir por Firebase depois)
+        let professores = JSON.parse(localStorage.getItem('professores')) || [];
+        let designacoes = JSON.parse(localStorage.getItem('designacoes')) || [];
+        let professorEditando = null;
+        
         function openTab(tabName) {
             // Esconder todos os conteúdos de abas
             const tabContents = document.getElementsByClassName('tab-content');
@@ -265,6 +349,179 @@
             
             // Adicionar classe active ao botão clicado
             event.currentTarget.classList.add('active');
+            
+            // Se for a aba de designar, carregar os professores
+            if (tabName === 'designar') {
+                carregarProfessoresParaDesignacao();
+                carregarDesignacoes();
+            }
+        }
+        
+        function carregarProfessores() {
+            const tbody = document.querySelector('#teachersTable tbody');
+            tbody.innerHTML = '';
+            
+            professores.forEach(professor => {
+                const turmas = designacoes.filter(d => d.professorId === professor.id)
+                                          .map(d => d.turma).join(', ') || 'Nenhuma';
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${professor.nome}</td>
+                    <td>${professor.materia}</td>
+                    <td>${professor.usuario}</td>
+                    <td><span class="status ${professor.status}">${professor.status}</span></td>
+                    <td>${turmas}</td>
+                    <td>
+                        <button class="btn" onclick="editarProfessor(${professor.id})"><i class="fas fa-edit"></i> Editar</button>
+                        <button class="btn assign-btn" onclick="designarTurmaProfessor(${professor.id})"><i class="fas fa-users"></i> Designar</button>
+                        <button class="btn delete-btn" onclick="excluirProfessor(${professor.id})"><i class="fas fa-trash"></i> Excluir</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        function carregarProfessoresParaDesignacao() {
+            const select = document.getElementById('selectProfessor');
+            select.innerHTML = '<option value="">Selecione um professor</option>';
+            
+            professores.filter(p => p.status === 'ativo').forEach(professor => {
+                const option = document.createElement('option');
+                option.value = professor.id;
+                option.textContent = `${professor.nome} - ${professor.materia}`;
+                select.appendChild(option);
+            });
+        }
+        
+        function carregarDesignacoes() {
+            const tbody = document.getElementById('designacoesBody');
+            tbody.innerHTML = '';
+            
+            designacoes.forEach(designacao => {
+                const professor = professores.find(p => p.id == designacao.professorId);
+                if (professor) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${professor.nome}</td>
+                        <td>${designacao.turma}</td>
+                        <td>
+                            <button class="btn delete-btn" onclick="removerDesignacao(${designacao.id})">
+                                <i class="fas fa-unlink"></i> Remover
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                }
+            });
+        }
+        
+        function designarTurma() {
+            const professorId = document.getElementById('selectProfessor').value;
+            const turma = document.getElementById('selectTurma').value;
+            
+            if (!professorId || !turma) {
+                alert('Selecione um professor e uma turma.');
+                return;
+            }
+            
+            // Verificar se já existe esta designação
+            const existe = designacoes.some(d => d.professorId == professorId && d.turma === turma);
+            if (existe) {
+                alert('Esta designação já existe.');
+                return;
+            }
+            
+            // Adicionar designação
+            const designacao = {
+                id: Date.now(),
+                professorId: parseInt(professorId),
+                turma: turma,
+                dataDesignacao: new Date().toISOString()
+            };
+            
+            designacoes.push(designacao);
+            localStorage.setItem('designacoes', JSON.stringify(designacoes));
+            
+            alert('Turma designada com sucesso!');
+            carregarDesignacoes();
+            
+            // Limpar seleção
+            document.getElementById('selectProfessor').value = '';
+            document.getElementById('selectTurma').value = '';
+        }
+        
+        function removerDesignacao(designacaoId) {
+            if (confirm('Tem certeza que deseja remover esta designação?')) {
+                designacoes = designacoes.filter(d => d.id !== designacaoId);
+                localStorage.setItem('designacoes', JSON.stringify(designacoes));
+                carregarDesignacoes();
+                carregarProfessores(); // Atualizar a lista de professores também
+            }
+        }
+        
+        function designarTurmaProfessor(professorId) {
+            openTab('designar');
+            document.getElementById('selectProfessor').value = professorId;
+        }
+        
+        function editarProfessor(professorId) {
+            const professor = professores.find(p => p.id === professorId);
+            if (professor) {
+                professorEditando = professor;
+                document.getElementById('editName').value = professor.nome;
+                document.getElementById('editEmail').value = professor.email;
+                document.getElementById('editMateria').value = professor.materia;
+                document.getElementById('editStatus').value = professor.status;
+                document.getElementById('editModal').style.display = 'flex';
+            }
+        }
+        
+        function salvarEdicao() {
+            if (professorEditando) {
+                professorEditando.nome = document.getElementById('editName').value;
+                professorEditando.email = document.getElementById('editEmail').value;
+                professorEditando.materia = document.getElementById('editMateria').value;
+                professorEditando.status = document.getElementById('editStatus').value;
+                
+                localStorage.setItem('professores', JSON.stringify(professores));
+                closeModal('editModal');
+                carregarProfessores();
+                alert('Professor atualizado com sucesso!');
+            }
+        }
+        
+        function excluirProfessor(professorId) {
+            if (confirm('Tem certeza que deseja excluir este professor?')) {
+                // Verificar se o professor tem turmas designadas
+                const temDesignacoes = designacoes.some(d => d.professorId === professorId);
+                
+                if (temDesignacoes) {
+                    alert('Não é possível excluir este professor pois ele tem turmas designadas. Remova as designações primeiro.');
+                    return;
+                }
+                
+                professores = professores.filter(p => p.id !== professorId);
+                localStorage.setItem('professores', JSON.stringify(professores));
+                carregarProfessores();
+                alert('Professor excluído com sucesso!');
+            }
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        // Carregar dados quando a página for carregada
+        document.addEventListener('DOMContentLoaded', function() {
+            carregarProfessores();
+        });
+        
+        // Fechar modal clicando fora dele
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
         }
     </script>
 </body>
