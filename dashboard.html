@@ -4,9 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AprovaMaisPB - Dashboard</title>
-    <!-- Firebase e notificações NO HEAD -->
-    <script src="firebase-config.js"></script>
-    <link rel="stylesheet" href="notification-system.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -311,13 +308,28 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="logo">
-            <img src="assets/img/logo_aprovamaispb.png" alt="Logo AprovaMaisPB" onerror="this.src='data:image/svg+xml;charset=UTF-8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22><rect width=%22100%22 height=%22100%22 fill=%22%231a2a6c%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2212%22 fill=%22%23ffffff%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>AprovaMaisPB</text></svg>'">
+            <img src="assets/img/logo_aprovamaispb.png" alt="Logo AprovaMaisPB" onerror="this.style.display='none'">
             <h2>AprovaMaisPB</h2>
         </div>
         <ul class="menu">
@@ -355,8 +367,8 @@
                     </div>
                 </div>
                 <div class="card-content">
-                    <div class="card-value">142</div>
-                    <div class="card-desc">+12 este mês</div>
+                    <div class="card-value" id="alunosAtivos">142</div>
+                    <div class="card-desc" id="alunosVariacao">+12 este mês</div>
                 </div>
             </div>
             
@@ -368,8 +380,8 @@
                     </div>
                 </div>
                 <div class="card-content">
-                    <div class="card-value">8</div>
-                    <div class="card-desc">2 turmas novas</div>
+                    <div class="card-value" id="turmasAtivas">8</div>
+                    <div class="card-desc" id="turmasVariacao">2 turmas novas</div>
                 </div>
             </div>
             
@@ -381,8 +393,8 @@
                     </div>
                 </div>
                 <div class="card-content">
-                    <div class="card-value">12</div>
-                    <div class="card-desc">3 disponíveis</div>
+                    <div class="card-value" id="totalProfessores">12</div>
+                    <div class="card-desc" id="professoresVariacao">3 disponíveis</div>
                 </div>
             </div>
             
@@ -394,8 +406,8 @@
                     </div>
                 </div>
                 <div class="card-content">
-                    <div class="card-value">R$ 8.540</div>
-                    <div class="card-desc">+15% desde o mês passado</div>
+                    <div class="card-value" id="receitaMensal">R$ 8.540</div>
+                    <div class="card-desc" id="receitaVariacao">+15% desde o mês passado</div>
                 </div>
             </div>
         </div>
@@ -477,6 +489,11 @@
                 localStorage.removeItem('timestampLogin');
                 window.location.href = 'login.html';
             });
+
+            // Carregar dados reais se Firebase estiver disponível
+            if (typeof firebase !== 'undefined') {
+                loadRealData();
+            }
         });
         
         function setupCharts() {
@@ -532,8 +549,54 @@
                 }
             });
         }
+
+        // Função para carregar dados reais do Firebase
+        async function loadRealData() {
+            try {
+                // Verificar se Firebase está disponível
+                if (typeof firebase === 'undefined' || !firebase.apps.length) {
+                    console.log("Firebase não está disponível");
+                    return;
+                }
+
+                // Buscar dados do Firebase
+                const db = firebase.firestore();
+                
+                // Buscar alunos ativos
+                const alunosSnapshot = await db.collection("inscricoes").where("status", "==", "ativo").get();
+                document.getElementById('alunosAtivos').textContent = alunosSnapshot.size;
+                
+                // Buscar professores ativos
+                const professoresSnapshot = await db.collection("professores").where("status", "==", "ativo").get();
+                document.getElementById('totalProfessores').textContent = professoresSnapshot.size;
+                
+                // Calcular turmas ativas
+                const turmasAtivas = new Set();
+                alunosSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.turma) turmasAtivas.add(data.turma);
+                });
+                document.getElementById('turmasAtivas').textContent = turmasAtivas.size;
+                
+                // Buscar receita do mês atual
+                const primeiroDiaMes = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+                const pagamentosSnapshot = await db.collection("pagamentos")
+                    .where("dataPagamento", ">=", primeiroDiaMes)
+                    .get();
+                
+                let receitaMensal = 0;
+                pagamentosSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    receitaMensal += parseFloat(data.valor || 0);
+                });
+                
+                document.getElementById('receitaMensal').textContent = `R$ ${receitaMensal.toFixed(2)}`;
+                
+            } catch (error) {
+                console.error("Erro ao carregar dados do Firebase:", error);
+                // Manter os valores padrão em caso de erro
+            }
+        }
     </script>
-    <script src="notification-system.js"></script>
-    <script src="firebase-integration.js"></script>
 </body>
 </html>
