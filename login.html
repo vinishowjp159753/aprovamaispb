@@ -1,297 +1,171 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login do Administrador - AprovaMaisPB</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #00AEEF 0%, #0077cc 100%);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        
-        .login-container {
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            width: 100%;
-            max-width: 420px;
-            padding: 30px;
-            text-align: center;
-            position: relative;
-        }
-        
-        .logo {
-            margin-bottom: 25px;
-        }
-        
-        .logo img {
-            height: 70px;
-        }
-        
-        .logo h1 {
-            color: #00AEEF;
-            font-size: 22px;
-            margin-top: 10px;
-        }
-        
-        h2 {
-            color: #333;
-            margin-bottom: 25px;
-            font-weight: 600;
-        }
-        
-        .input-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #555;
-            font-weight: 500;
-        }
-        
-        .input-group input {
-            width: 100%;
-            padding: 14px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-        
-        .input-group input:focus {
-            border-color: #00AEEF;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(0, 174, 239, 0.2);
-        }
-        
-        .btn {
-            background: linear-gradient(90deg, #00AEEF, #0077cc);
-            color: white;
-            border: none;
-            padding: 14px;
-            border-radius: 8px;
-            width: 100%;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 174, 239, 0.4);
-        }
-        
-        .btn:active {
-            transform: translateY(0);
-        }
-        
-        .message {
-            margin-top: 20px;
-            padding: 12px;
-            border-radius: 8px;
-            display: none;
-        }
-        
-        .error {
-            background-color: #ffebee;
-            color: #d32f2f;
-            border: 1px solid #f5c6cb;
-        }
-        
-        .success {
-            background-color: #e8f5e9;
-            color: #2e7d32;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .support-info {
-            margin-top: 25px;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            font-size: 14px;
-            color: #6c757d;
-        }
-        
-        .support-info h3 {
-            margin-bottom: 10px;
-            color: #00AEEF;
-        }
-        
-        .support-link {
-            color: #00AEEF;
-            text-decoration: none;
-            font-weight: 500;
-        }
-        
-        .support-link:hover {
-            text-decoration: underline;
-        }
-        
-        .password-toggle {
-            position: absolute;
-            right: 15px;
-            top: 38px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #777;
-        }
-        
-        .input-group {
-            position: relative;
-        }
-        
-        @media (max-width: 480px) {
-            .login-container {
-                padding: 20px;
-            }
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Login - AprovaMaisPB</title>
+  <link rel="stylesheet" href="./assets/css/style.css" />
+  <link rel="icon" type="image/png" href="./assets/img/logo_aprovamaispb.png" />
+  <style>
+    .login-container {
+      max-width: 400px;
+      margin: 50px auto;
+      padding: 30px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .form-group {
+      margin: 20px 0;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    .error-message {
+      color: #dc2626;
+      font-size: 14px;
+      margin-top: 5px;
+      display: none;
+    }
+    .user-type {
+      display: flex;
+      gap: 15px;
+      margin: 20px 0;
+    }
+    .user-type label {
+      flex: 1;
+      padding: 15px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+    }
+    .user-type input[type="radio"]:checked + span {
+      border-color: #2563eb;
+      background: #eff6ff;
+    }
+  </style>
 </head>
 <body>
-    <div class="login-container">
-        <div class="logo">
-            <img src="assets/img/logo_aprovamaispb.png" alt="AprovaMaisPB Logo">
-            <h1>AprovaMaisPB</h1>
-        </div>
-        
-        <h2>Acesso Restrito</h2>
-        
-        <form id="admin-login-form">
-            <div class="input-group">
-                <label for="admin-user">Usuário</label>
-                <input type="text" id="admin-user" required autocomplete="off" placeholder="Digite seu usuário">
-            </div>
-            
-            <div class="input-group">
-                <label for="admin-pass">Senha</label>
-                <input type="password" id="admin-pass" required placeholder="Digite sua senha">
-                <button type="button" class="password-toggle" id="toggle-password">👁️</button>
-            </div>
-            
-            <button type="submit" class="btn">Entrar</button>
-        </form>
-        
-        <div id="admin-msg" class="message error"></div>
-        
-        <div class="support-info">
-            <h3>Precisa de ajuda?</h3>
-            <p>Entre em contato com o suporte técnico para recuperar seu acesso.</p>
-            <p>📞 <a href="tel:+5583999999999" class="support-link">(83) 99999-9999</a></p>
-            <p>✉️ <a href="mailto:suporte@aprovamaispb.com" class="support-link">suporte@aprovamaispb.com</a></p>
-        </div>
+  <header>
+    <nav class="nav">
+      <div class="brand">
+        <img src="./assets/img/logo_aprovamaispb.png" alt="Logo" />
+        <span>AprovaMaisPB</span>
+      </div>
+      <ul class="menu">
+        <li><a href="index.html">Início</a></li>
+        <li><a href="matricula.html">Matricule-se</a></li>
+        <li><a href="professores.html">Professores</a></li>
+        <li><a href="login.html" class="active">Login</a></li>
+      </ul>
+      <button class="hamburger" aria-label="menu" onclick="toggleMenu()">☰</button>
+    </nav>
+  </header>
+
+  <main class="login-container">
+    <h2>Acesso Restrito</h2>
+    <p>Selecione o tipo de acesso e entre com suas credenciais</p>
+    
+    <div class="user-type">
+      <label>
+        <input type="radio" name="userType" value="professor" checked>
+        <span>👨‍🏫 Professor</span>
+      </label>
+      <label>
+        <input type="radio" name="userType" value="admin">
+        <span>👨‍💼 Administrador</span>
+      </label>
     </div>
+    
+    <form id="login-form">
+      <div class="form-group">
+        <label for="usuario">Usuário:</label>
+        <input type="text" id="usuario" required placeholder="Digite seu usuário">
+      </div>
+      
+      <div class="form-group">
+        <label for="senha">Senha:</label>
+        <input type="password" id="senha" required placeholder="Digite sua senha">
+      </div>
+      
+      <div class="error-message" id="login-error">
+        Usuário ou senha incorretos!
+      </div>
+      
+      <button type="submit" class="btn-modern" style="width: 100%">
+        🔐 Entrar no Sistema
+      </button>
+    </form>
+    
+    <div style="margin-top: 20px; padding: 15px; background: #f3f4f6; border-radius: 8px;">
+      <h4>Credenciais de Teste:</h4>
+      <p><strong>Professor:</strong> prof123 / senha123</p>
+      <p><strong>Admin:</strong> admin / admin123</p>
+    </div>
+  </main>
 
-    <script>
-        // Verificar se já está logado
-        function checkIfAlreadyLoggedIn() {
-            const isLoggedIn = localStorage.getItem('adminLoggedIn');
-            const loginTime = localStorage.getItem('adminLoginTime');
-            
-            // Se está logado e o login foi feito há menos de 8 horas
-            if (isLoggedIn && loginTime) {
-                const currentTime = new Date().getTime();
-                const timeDiff = currentTime - parseInt(loginTime);
-                const hoursDiff = timeDiff / (1000 * 60 * 60);
-                
-                if (hoursDiff < 8) {
-                    window.location.href = 'admin.html';
-                    return true;
-                } else {
-                    // Login expirado
-                    localStorage.removeItem('adminLoggedIn');
-                    localStorage.removeItem('adminLoginTime');
-                }
-            }
-            return false;
+  <script type="module">
+    import { autenticarProfessor, autenticarAdmin } from "./assets/js/firebase.js";
+
+    document.getElementById('login-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const usuario = document.getElementById('usuario').value;
+      const senha = document.getElementById('senha').value;
+      const userType = document.querySelector('input[name="userType"]:checked').value;
+      const errorElement = document.getElementById('login-error');
+      
+      errorElement.style.display = 'none';
+      
+      try {
+        let autenticado = false;
+        let isAdmin = false;
+        
+        if (userType === 'professor') {
+          autenticado = await autenticarProfessor(usuario, senha);
+          isAdmin = false;
+        } else {
+          autenticado = await autenticarAdmin(usuario, senha);
+          isAdmin = true;
         }
         
-        // Verificar se já está logado ao carregar a página
-        if (checkIfAlreadyLoggedIn()) {
-            // Redirecionamento será feito pela função acima
+        if (autenticado) {
+          localStorage.setItem('usuarioLogado', usuario);
+          localStorage.setItem('userType', userType);
+          localStorage.setItem('isAdmin', isAdmin);
+          
+          window.location.href = 'dashboard.html';
+        } else {
+          errorElement.style.display = 'block';
         }
-        
-        // Toggle password visibility
-        document.getElementById('toggle-password').addEventListener('click', function() {
-            const passwordInput = document.getElementById('admin-pass');
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            this.textContent = type === 'password' ? '👁️' : '🔒';
-        });
-        
-        document.getElementById('admin-login-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const user = document.getElementById('admin-user').value;
-            const pass = document.getElementById('admin-pass').value;
-            const messageDiv = document.getElementById('admin-msg');
-            
-            // Limpar mensagens anteriores
-            messageDiv.style.display = 'none';
-            messageDiv.className = 'message';
-            
-            // Validação básica
-            if (!user || !pass) {
-                messageDiv.textContent = 'Por favor, preencha todos os campos.';
-                messageDiv.classList.add('error');
-                messageDiv.style.display = 'block';
-                return;
-            }
-            
-            // Verificar credenciais
-            if (user === 'administrador' && pass === '159753') {
-                messageDiv.textContent = 'Login bem-sucedido! Redirecionando...';
-                messageDiv.classList.add('success');
-                messageDiv.style.display = 'block';
-                
-                // Salvar estado de login com timestamp
-                localStorage.setItem('adminLoggedIn', 'true');
-                localStorage.setItem('adminLoginTime', new Date().getTime().toString());
-                
-                // Redirecionar para o dashboard após 1 segundo
-                setTimeout(() => {
-                    window.location.href = 'admin.html';
-                }, 1000);
-            } else {
-                messageDiv.textContent = 'Usuário ou senha incorretos. Tente novamente.';
-                messageDiv.classList.add('error');
-                messageDiv.style.display = 'block';
-                
-                // Efeito de shake no formulário para indicar erro
-                document.querySelector('.login-container').style.animation = 'shake 0.5s';
-                setTimeout(() => {
-                    document.querySelector('.login-container').style.animation = '';
-                }, 500);
-            }
-        });
+      } catch (error) {
+        console.error('Erro no login:', error);
+        errorElement.style.display = 'block';
+      }
+    });
+  </script>
 
-        // Adicionar estilo de animação para shake
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes shake {
-                0%, 100% { transform: translateX(0); }
-                10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
-                20%, 40%, 60%, 80% { transform: translateX(10px); }
-            }
-        `;
-        document.head.appendChild(style);
-    </script>
+  <script>
+    function toggleMenu(){
+      document.querySelector('.menu').classList.toggle('open');
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      const usuarioLogado = localStorage.getItem('usuarioLogado');
+      if (usuarioLogado) {
+        window.location.href = 'dashboard.html';
+      }
+    });
+  </script>
 </body>
 </html>
