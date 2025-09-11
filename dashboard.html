@@ -6,124 +6,199 @@
     <title>AprovaMaisPB - Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="firebase-config.js"></script> <!-- seu Firebase -->
+    <script src="firebase-config.js"></script>
     <style>
-        /* seu CSS atual permanece o mesmo */
+        /* --- MESMO ESTILO DO SEU DASHBOARD --- */
+        :root {
+            --primary: #1a2a6c;
+            --secondary: #b21f1f;
+            --accent: #fdbb2d;
+        }
+        body { font-family: 'Segoe UI', sans-serif; margin:0; background:#f5f7fb; display:flex; min-height:100vh;}
+        .sidebar { width:250px; background: linear-gradient(to bottom, var(--primary), #2c3e50); color:white; padding:20px 0; height:100vh; position:fixed;}
+        .logo { text-align:center; margin-bottom:20px; }
+        .logo img { max-width:120px; }
+        .menu { list-style:none; padding:0;}
+        .menu li { margin-bottom:5px; }
+        .menu a { display:flex; align-items:center; padding:12px 20px; color: rgba(255,255,255,0.8); text-decoration:none; border-left:4px solid transparent; }
+        .menu a:hover, .menu a.active { background: rgba(255,255,255,0.1); color:white; border-left:4px solid var(--accent); }
+        .menu i { margin-right:10px; font-size:18px; }
+        .main-content { flex:1; margin-left:250px; padding:20px;}
+        .header { display:flex; justify-content:space-between; margin-bottom:30px; border-bottom:1px solid #e0e0e0; padding-bottom:15px;}
+        .dashboard-cards { display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:20px; margin-bottom:30px;}
+        .card { background:white; border-radius:10px; padding:20px; box-shadow:0 5px 15px rgba(0,0,0,0.05);}
+        .card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;}
+        .card-title { font-size:16px; color:#666; font-weight:500;}
+        .card-icon { width:50px; height:50px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:24px; }
+        .card-content { margin-top:10px;}
+        .card-value { font-size:28px; font-weight:700; color: var(--primary);}
+        .card-desc { font-size:14px; color:#999; margin-top:5px;}
+        .charts { display:grid; grid-template-columns:2fr 1fr; gap:20px; margin-bottom:30px;}
+        .chart-container { background:white; border-radius:10px; padding:20px; box-shadow:0 5px 15px rgba(0,0,0,0.05);}
+        .chart-title { font-size:18px; margin-bottom:15px; color: var(--primary); font-weight:600;}
     </style>
 </head>
 <body>
-    <!-- Sidebar e main content permanecem iguais -->
-
-    <div class="dashboard-cards">
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">Alunos Ativos</div>
-                <div class="card-icon" style="background: rgba(26, 42, 108, 0.1); color: var(--primary);">
-                    <i class="fas fa-user-graduate"></i>
-                </div>
-            </div>
-            <div class="card-content">
-                <div class="card-value" id="alunosAtivos">0</div>
-                <div class="card-desc" id="alunosVariacao">0 este mês</div>
-            </div>
+    <div class="sidebar">
+        <div class="logo">
+            <img src="assets/img/logo_aprovamaispb.png" alt="Logo">
+            <h2>AprovaMaisPB</h2>
         </div>
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">Turmas Ativas</div>
-                <div class="card-icon" style="background: rgba(178, 31, 31, 0.1); color: var(--secondary);">
-                    <i class="fas fa-users"></i>
-                </div>
-            </div>
-            <div class="card-content">
-                <div class="card-value" id="turmasAtivas">0</div>
-                <div class="card-desc" id="turmasVariacao">0 novas</div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">Professores</div>
-                <div class="card-icon" style="background: rgba(253, 187, 45, 0.1); color: var(--accent);">
-                    <i class="fas fa-chalkboard-teacher"></i>
-                </div>
-            </div>
-            <div class="card-content">
-                <div class="card-value" id="totalProfessores">0</div>
-                <div class="card-desc" id="professoresVariacao">0 disponíveis</div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">Receita Mensal</div>
-                <div class="card-icon" style="background: rgba(40, 167, 69, 0.1); color: var(--success);">
-                    <i class="fas fa-dollar-sign"></i>
-                </div>
-            </div>
-            <div class="card-content">
-                <div class="card-value" id="receitaMensal">R$ 0,00</div>
-                <div class="card-desc" id="receitaVariacao">+0% desde o mês passado</div>
-            </div>
-        </div>
+        <ul class="menu">
+            <li><a href="index.html"><i class="fas fa-home"></i> Início</a></li>
+            <li><a href="matricula.html"><i class="fas fa-user-graduate"></i> Matricule-se</a></li>
+            <li><a href="professores.html"><i class="fas fa-chalkboard-teacher"></i> Professores</a></li>
+            <li><a href="dashboard.html" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+            <li><a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Sair</a></li>
+        </ul>
     </div>
 
-    <div class="charts">
-        <div class="chart-container">
-            <h3 class="chart-title">Desempenho Mensal de Matrículas</h3>
-            <canvas id="enrollmentsChart"></canvas>
+    <div class="main-content">
+        <div class="header">
+            <div>
+                <h1>Bem-vindo, <span id="userName">Administrador</span>!</h1>
+                <p>Painel de controle do AprovaMaisPB</p>
+            </div>
+            <div>
+                <i class="fas fa-user-circle" style="font-size:40px; color: var(--primary);"></i>
+            </div>
         </div>
-        <div class="chart-container">
-            <h3 class="chart-title">Distribuição por Turma</h3>
-            <canvas id="classesChart"></canvas>
+
+        <div class="dashboard-cards">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Alunos Ativos</div>
+                    <div class="card-icon" style="background: rgba(26,42,108,0.1); color: var(--primary);"><i class="fas fa-user-graduate"></i></div>
+                </div>
+                <div class="card-content">
+                    <div class="card-value" id="alunosAtivos">0</div>
+                    <div class="card-desc" id="alunosVariacao">--</div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Turmas Ativas</div>
+                    <div class="card-icon" style="background: rgba(178,31,31,0.1); color: var(--secondary);"><i class="fas fa-users"></i></div>
+                </div>
+                <div class="card-content">
+                    <div class="card-value" id="turmasAtivas">0</div>
+                    <div class="card-desc" id="turmasVariacao">--</div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Professores</div>
+                    <div class="card-icon" style="background: rgba(253,187,45,0.1); color: var(--accent);"><i class="fas fa-chalkboard-teacher"></i></div>
+                </div>
+                <div class="card-content">
+                    <div class="card-value" id="totalProfessores">0</div>
+                    <div class="card-desc" id="professoresVariacao">--</div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Receita Mensal</div>
+                    <div class="card-icon" style="background: rgba(40,167,69,0.1); color: #28a745;"><i class="fas fa-dollar-sign"></i></div>
+                </div>
+                <div class="card-content">
+                    <div class="card-value" id="receitaMensal">R$ 0,00</div>
+                    <div class="card-desc" id="receitaVariacao">--</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="charts">
+            <div class="chart-container">
+                <h3 class="chart-title">Desempenho Mensal de Matrículas</h3>
+                <canvas id="enrollmentsChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3 class="chart-title">Distribuição por Turma</h3>
+                <canvas id="classesChart"></canvas>
+            </div>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            if (typeof firebase === 'undefined') return;
-            const db = firebase.firestore();
+        document.addEventListener('DOMContentLoaded', function() {
+            const usuarioLogado = localStorage.getItem('usuarioLogado');
+            if(!usuarioLogado){ window.location.href='login.html'; return; }
+            document.getElementById('userName').textContent = usuarioLogado;
 
-            // Carregar alunos ativos e turmas
-            const alunosSnapshot = await db.collection('inscricoes').get();
-            const alunosAtivos = alunosSnapshot.docs.filter(doc => doc.data().status === 'ativo');
-            document.getElementById('alunosAtivos').textContent = alunosAtivos.length;
-
-            const turmasSet = new Set(alunosAtivos.map(a => a.data().turma));
-            document.getElementById('turmasAtivas').textContent = turmasSet.size;
-
-            // Professores
-            const profSnapshot = await db.collection('professores').where('status', '==', 'ativo').get();
-            document.getElementById('totalProfessores').textContent = profSnapshot.size;
-
-            // Receita mensal
-            const primeiroDiaMes = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-            const pagamentosSnapshot = await db.collection('pagamentos')
-                .where('dataPagamento', '>=', primeiroDiaMes)
-                .get();
-            let receita = 0;
-            pagamentosSnapshot.forEach(p => receita += parseFloat(p.data().valor || 0));
-            document.getElementById('receitaMensal').textContent = `R$ ${receita.toFixed(2)}`;
-
-            // Gráfico de matrículas por mês
-            const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-            const matriculasPorMes = new Array(12).fill(0);
-            alunosSnapshot.forEach(doc => {
-                const data = doc.data().criadoEm.toDate();
-                matriculasPorMes[data.getMonth()] += 1;
-            });
-            new Chart(document.getElementById('enrollmentsChart'), {
-                type: 'line',
-                data: { labels: meses, datasets: [{ label: 'Matrículas', data: matriculasPorMes, borderColor: '#1a2a6c', backgroundColor: 'rgba(26,42,108,0.1)', tension: 0.3, fill:true }] },
-                options: { responsive:true }
+            document.getElementById('logoutBtn').addEventListener('click', function(e){
+                e.preventDefault();
+                localStorage.clear();
+                window.location.href='login.html';
             });
 
-            // Gráfico distribuição por turma
-            const turmasLabels = Array.from(turmasSet);
-            const turmasData = turmasLabels.map(t => alunosAtivos.filter(a => a.data().turma === t).length);
-            new Chart(document.getElementById('classesChart'), {
-                type:'doughnut',
-                data:{ labels:turmasLabels, datasets:[{data:turmasData, backgroundColor:['#1a2a6c','#b21f1f','#fdbb2d','#28a745','#17a2b8']] } ],
+            setupCharts();
+            loadDashboardData();
+        });
+
+        let enrollmentsChart, classesChart;
+
+        function setupCharts() {
+            const enrollCtx = document.getElementById('enrollmentsChart').getContext('2d');
+            enrollmentsChart = new Chart(enrollCtx, {
+                type:'line',
+                data:{ labels:['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'], datasets:[{label:'Matrículas', data:Array(12).fill(0), borderColor:'#1a2a6c', backgroundColor:'rgba(26,42,108,0.1)', tension:0.3, fill:true}] },
                 options:{ responsive:true }
             });
-        });
+
+            const classesCtx = document.getElementById('classesChart').getContext('2d');
+            classesChart = new Chart(classesCtx, {
+                type:'doughnut',
+                data:{ labels:[], datasets:[{data:[], backgroundColor:[]}] },
+                options:{ responsive:true }
+            });
+        }
+
+        async function loadDashboardData() {
+            try {
+                const db = firebase.firestore();
+
+                // Alunos Ativos
+                const alunosSnapshot = await db.collection("inscricoes").where("status","==","ativo").get();
+                document.getElementById('alunosAtivos').textContent = alunosSnapshot.size;
+
+                // Turmas
+                const turmasSet = new Set();
+                alunosSnapshot.forEach(doc=>{ const data=doc.data(); if(data.turma) turmasSet.add(data.turma); });
+                document.getElementById('turmasAtivas').textContent = turmasSet.size;
+
+                // Professores
+                const profSnapshot = await db.collection("professores").where("status","==","ativo").get();
+                document.getElementById('totalProfessores').textContent = profSnapshot.size;
+
+                // Receita Mensal
+                const hoje = new Date(), inicioMes = new Date(hoje.getFullYear(), hoje.getMonth(),1);
+                const pagamentosSnapshot = await db.collection("pagamentos").where("dataPagamento",">=", inicioMes).get();
+                let receita = 0;
+                pagamentosSnapshot.forEach(doc=>{ receita += parseFloat(doc.data().valor||0); });
+                document.getElementById('receitaMensal').textContent = `R$ ${receita.toFixed(2)}`;
+
+                // Atualizar gráfico de matrículas (por mês)
+                let mensal = Array(12).fill(0);
+                alunosSnapshot.forEach(doc=>{
+                    const data = doc.data();
+                    if(data.dataMatricula){
+                        const d = data.dataMatricula.toDate ? data.dataMatricula.toDate() : new Date(data.dataMatricula);
+                        mensal[d.getMonth()] +=1;
+                    }
+                });
+                enrollmentsChart.data.datasets[0].data = mensal;
+                enrollmentsChart.update();
+
+                // Atualizar gráfico de turmas
+                let turmaCount = {};
+                alunosSnapshot.forEach(doc=>{ const t=doc.data().turma; if(t) turmaCount[t] = (turmaCount[t]||0)+1; });
+                classesChart.data.labels = Object.keys(turmaCount);
+                classesChart.data.datasets[0].data = Object.values(turmaCount);
+                classesChart.data.datasets[0].backgroundColor = ['#1a2a6c','#b21f1f','#fdbb2d','#28a745','#17a2b8'];
+                classesChart.update();
+
+            } catch(err){ console.error(err); }
+        }
     </script>
 </body>
 </html>
