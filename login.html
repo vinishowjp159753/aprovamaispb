@@ -1,138 +1,348 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Login - AprovaMaisPB</title>
-  <link rel="stylesheet" href="./assets/css/style.css" />
-  <link rel="icon" type="image/png" href="./assets/img/logo_aprovamaispb.png" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AprovaMaisPB - Login</title>
+    <!-- Importação do Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <!-- Seus arquivos locais -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <script src="assets/js/firebase.js" defer></script>
+    <script src="assets/js/utils.js" defer></script>
+    <style>
+        /* Estilos específicos para a página de login */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 450px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #1a2a6c;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .logo {
+            max-width: 120px;
+            margin-bottom: 15px;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .content {
+            padding: 25px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .input-group select, 
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .input-group select:focus, 
+        .input-group input:focus {
+            border-color: #1a2a6c;
+            outline: none;
+        }
+        
+        .input-group input[type="password"] {
+            letter-spacing: 3px;
+            font-weight: bold;
+        }
+        
+        .btn {
+            background: #1a2a6c;
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            width: 100%;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover {
+            background: #2a3a9c;
+        }
+        
+        .error-message {
+            color: #d32f2f;
+            text-align: center;
+            margin: 15px 0;
+            font-weight: 500;
+            padding: 10px;
+            background: #ffebee;
+            border-radius: 6px;
+            display: none;
+        }
+        
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .info-box h3 {
+            margin-bottom: 8px;
+            color: #1565c0;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 15px;
+            background: #f5f5f5;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .success-message {
+            display: none;
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            margin-top: 15px;
+            border-left: 4px solid #4caf50;
+        }
+        
+        @media (max-width: 500px) {
+            .container {
+                width: 95%;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <header>
-    <nav class="nav">
-      <div class="brand">
-        <img src="./assets/img/logo_aprovamaispb.png" alt="Logo" />
-        <span>AprovaMaisPB</span>
-      </div>
-      <ul class="menu">
-        <li><a href="index.html">Início</a></li>
-        <li><a href="matricula.html">Matricule-se</a></li>
-        <li><a href="professores.html">Professores</a></li>
-        <li><a href="login.html" class="active">Login</a></li>
-      </ul>
-      <button class="hamburger" aria-label="menu" onclick="toggleMenu()">☰</button>
-    </nav>
-  </header>
-
-  <main class="login-container">
-    <h2>Acesso Restrito</h2>
-    <p>Selecione o tipo de acesso e entre com suas credenciais</p>
-    
-    <div class="user-type">
-      <label>
-        <input type="radio" name="userType" value="professor" checked>
-        <span>👨‍🏫 Professor</span>
-      </label>
-      <label>
-        <input type="radio" name="userType" value="admin">
-        <span>👨‍💼 Administrador</span>
-      </label>
-    </div>
-    
-    <form id="login-form">
-      <div class="form-group">
-        <label for="usuario">Usuário:</label>
-        <input type="text" id="usuario" required placeholder="Digite seu usuário">
-      </div>
-      
-      <div class="form-group">
-        <label for="senha">Senha:</label>
-        <input type="password" id="senha" required placeholder="Digite sua senha">
-      </div>
-      
-      <div class="error-message" id="login-error">
-        Usuário ou senha incorretos!
-      </div>
-      
-      <button type="submit" class="btn-modern" style="width: 100%">
-        🔐 Entrar no Sistema
-      </button>
-    </form>
-    
-    <div style="margin-top: 20px; padding: 15px; background: #f3f4f6; border-radius: 8px;">
-      <h4>Credenciais Padrão (se não houver admin):</h4>
-      <p><strong>Admin:</strong> admin / admin123</p>
-    </div>
-  </main>
-
-  <script type="module">
-    import { autenticarProfessor, autenticarAdmin } from "./assets/js/firebase.js";
-
-    // 🔹 Função auxiliar para garantir admin inicial
-    async function garantirAdminPadrao() {
-      try {
-        const snapshot = await firebase.firestore().collection("admins").get();
-        if (snapshot.empty) {
-          await firebase.firestore().collection("admins").add({
-            usuario: "admin",
-            senha: "admin123",
-            criadoEm: Date.now()
-          });
-          console.log("✅ Admin padrão criado (admin / admin123)");
-        }
-      } catch (err) {
-        console.error("Erro ao garantir admin:", err);
-      }
-    }
-
-    document.getElementById('login-form').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      
-      const usuario = document.getElementById('usuario').value;
-      const senha = document.getElementById('senha').value;
-      const userType = document.querySelector('input[name="userType"]:checked').value;
-      const errorElement = document.getElementById('login-error');
-      
-      errorElement.style.display = 'none';
-      
-      try {
-        let autenticado = false;
-        let isAdmin = false;
+    <div class="container">
+        <div class="header">
+            <img src="assets/img/logo_aprovamaispb.png" alt="Logo AprovaMaisPB" class="logo">
+            <h1>AprovaMaisPB</h1>
+            <p>Acesso Restrito ao Sistema</p>
+        </div>
         
-        if (userType === 'professor') {
-          autenticado = await autenticarProfessor(usuario, senha);
-          isAdmin = false;
-        } else {
-          await garantirAdminPadrao();
-          autenticado = await autenticarAdmin(usuario, senha);
-          isAdmin = true;
+        <div class="content">
+            <div class="input-group">
+                <label for="tipoAcesso">Tipo de Acesso:</label>
+                <select id="tipoAcesso">
+                    <option value="professor">Professor</option>
+                    <option value="administrador">Administrador</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="usuario">Usuário:</label>
+                <input type="text" id="usuario" placeholder="Digite seu usuário" value="harasson51">
+            </div>
+            
+            <div class="input-group">
+                <label for="senha">Senha:</label>
+                <input type="password" id="senha" placeholder="Digite sua senha">
+            </div>
+            
+            <div class="error-message" id="errorMessage">
+                Usuário ou senha incorretos!
+            </div>
+            
+            <button class="btn" id="btnEntrar">Entrar no Sistema</button>
+            
+            <div class="success-message" id="successMessage">
+                Autenticação bem-sucedida! Conectando ao sistema...
+            </div>
+            
+            <div class="info-box">
+                <h3>Credenciais Padrão (se não houver admin):</h3>
+                <p>Admin: admin / admin123</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Sistema AprovaMaisPB &copy; 2023 - Todos os direitos reservados</p>
+        </div>
+    </div>
+
+    <script>
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAK3U35fipoWOOIJg0yrtgmVfQ7XQxZxqY",
+            authDomain: "aprovamaispb-d4e75.firebaseapp.com",
+            projectId: "aprovamaispb-d4e75",
+            storageBucket: "aprovamaispb-d4e75.firebasestorage.app",
+            messagingSenderId: "828577018900",
+            appId: "1:828577018900:web:473d8c3fc2685d3f192301"
+        };
+
+        // Inicializar Firebase
+        if (typeof firebase !== 'undefined' && firebase.apps.length === 0) {
+            firebase.initializeApp(firebaseConfig);
         }
         
-        if (autenticado) {
-          localStorage.setItem('usuarioLogado', usuario);
-          localStorage.setItem('userType', userType);
-          localStorage.setItem('isAdmin', isAdmin);
-          window.location.href = 'dashboard.html';
-        } else {
-          errorElement.style.display = 'block';
+        const db = firebase.firestore();
+        
+        // Elementos da interface
+        const tipoAcesso = document.getElementById('tipoAcesso');
+        const usuario = document.getElementById('usuario');
+        const senha = document.getElementById('senha');
+        const btnEntrar = document.getElementById('btnEntrar');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        
+        // Funções de autenticação
+        async function autenticarProfessor(usuario, senha) {
+            try {
+                const snapshot = await db.collection("professores")
+                    .where("usuario", "==", usuario)
+                    .where("senha", "==", senha)
+                    .get();
+                return !snapshot.empty;
+            } catch (err) {
+                console.error("Erro ao autenticar professor:", err);
+                return false;
+            }
         }
-      } catch (error) {
-        console.error('Erro no login:', error);
-        errorElement.style.display = 'block';
-      }
-    });
-  </script>
 
-  <script>
-    function toggleMenu(){
-      document.querySelector('.menu').classList.toggle('open');
-    }
-    document.addEventListener('DOMContentLoaded', function() {
-      const usuarioLogado = localStorage.getItem('usuarioLogado');
-      if (usuarioLogado) {
-        window.location.href = 'dashboard.html';
-      }
-    });
-  </script>
+        async function autenticarAdmin(usuario, senha) {
+            try {
+                const snapshot = await db.collection("admins")
+                    .where("usuario", "==", usuario)
+                    .where("senha", "==", senha)
+                    .get();
+                return !snapshot.empty;
+            } catch (err) {
+                console.error("Erro ao autenticar admin:", err);
+                return false;
+            }
+        }
+        
+        // Evento de clique no botão de entrar
+        btnEntrar.addEventListener('click', async () => {
+            const user = usuario.value.trim();
+            const pass = senha.value.trim();
+            const accessType = tipoAcesso.value;
+            
+            if (!user || !pass) {
+                errorMessage.textContent = "Por favor, preencha todos os campos!";
+                errorMessage.style.display = 'block';
+                successMessage.style.display = 'none';
+                return;
+            }
+            
+            try {
+                let authenticated = false;
+                
+                if (accessType === 'professor') {
+                    authenticated = await autenticarProfessor(user, pass);
+                } else if (accessType === 'administrador') {
+                    authenticated = await autenticarAdmin(user, pass);
+                }
+                
+                if (authenticated) {
+                    errorMessage.style.display = 'none';
+                    successMessage.style.display = 'block';
+                    
+                    // Salvar informações de login no localStorage
+                    localStorage.setItem('usuarioLogado', user);
+                    localStorage.setItem('tipoAcesso', accessType);
+                    localStorage.setItem('timestampLogin', new Date().getTime());
+                    
+                    // Redirecionar para o dashboard após 1.5 segundos
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1500);
+                } else {
+                    errorMessage.textContent = "Usuário ou senha incorretos!";
+                    errorMessage.style.display = 'block';
+                    successMessage.style.display = 'none';
+                }
+            } catch (error) {
+                console.error("Erro durante autenticação:", error);
+                errorMessage.textContent = "Erro de conexão. Tente novamente.";
+                errorMessage.style.display = 'block';
+                successMessage.style.display = 'none';
+            }
+        });
+        
+        // Verificar se o Firebase foi carregado corretamente
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof firebase === 'undefined') {
+                errorMessage.textContent = "Erro: Firebase não carregado. Verifique sua conexão.";
+                errorMessage.style.display = 'block';
+                btnEntrar.disabled = true;
+            } else {
+                console.log("Firebase carregado com sucesso!");
+            }
+            
+            // Verificar se já está logado e redirecionar
+            const usuarioLogado = localStorage.getItem('usuarioLogado');
+            if (usuarioLogado) {
+                window.location.href = 'dashboard.html';
+            }
+            
+            // Focar no campo de senha ao pressionar Enter no usuário
+            usuario.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    senha.focus();
+                }
+            });
+            
+            // Clicar no botão entrar ao pressionar Enter na senha
+            senha.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    btnEntrar.click();
+                }
+            });
+        });
+    </script>
 </body>
 </html>
