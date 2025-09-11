@@ -3,37 +3,47 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Portal do Professor - AprovaMaisPB</title>
+  <title>Área do Professor - AprovaMaisPB</title>
   <link rel="stylesheet" href="./assets/css/style.css" />
   <link rel="icon" type="image/png" href="./assets/img/logo_aprovamaispb.png" />
   <style>
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 20px;
-      margin: 30px 0;
-    }
-    .stats-card {
+    .login-container {
+      max-width: 400px;
+      margin: 50px auto;
+      padding: 30px;
       background: white;
-      padding: 25px;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      text-align: center;
     }
-    .stats-number {
-      font-size: 2.5em;
-      font-weight: bold;
-      color: #2563eb;
-      margin: 10px 0;
+    .form-group {
+      margin: 20px 0;
     }
-    .stats-label {
-      color: #6b7280;
-      font-size: 0.9em;
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    .error-message {
+      color: #dc2626;
+      font-size: 14px;
+      margin-top: 5px;
+      display: none;
+    }
+    .professor-panel {
+      display: none;
     }
     .turmas-container {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
       gap: 20px;
+      margin: 30px 0;
     }
     .turma-card {
       background: white;
@@ -44,7 +54,7 @@
     }
     .turma-header {
       display: flex;
-      justify-content: between;
+      justify-content: space-between;
       align-items: center;
       margin-bottom: 15px;
     }
@@ -72,9 +82,6 @@
       justify-content: space-between;
       align-items: center;
     }
-    .aluno-item:last-child {
-      border-bottom: none;
-    }
     .aluno-info {
       display: flex;
       flex-direction: column;
@@ -95,50 +102,12 @@
       border-radius: 6px;
       cursor: pointer;
     }
-    .filters {
-      display: flex;
-      gap: 15px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
-    .filter-select {
-      padding: 10px;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
-      background: white;
-    }
-    .search-box {
-      flex: 1;
-      padding: 10px;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
-      min-width: 250px;
-    }
-    .calendar-section {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      margin-top: 30px;
-    }
-    .calendar-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 5px;
-      margin-top: 15px;
-    }
-    .calendar-day {
-      padding: 10px;
-      text-align: center;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    .calendar-day:hover {
-      background: #f3f4f6;
-    }
-    .calendar-day.active {
-      background: #2563eb;
+    .welcome-header {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
       color: white;
+      padding: 30px;
+      border-radius: 12px;
+      margin-bottom: 30px;
     }
   </style>
 </head>
@@ -152,73 +121,128 @@
       <ul class="menu">
         <li><a href="index.html">Início</a></li>
         <li><a href="matricula.html">Matricule-se</a></li>
-        <li><a href="professores.html" class="active">Portal Professor</a></li>
-        <li><a href="login.html">Sair</a></li>
+        <li><a href="professores.html" class="active">Área do Professor</a></li>
+        <li><a href="login.html">Login Admin</a></li>
       </ul>
       <button class="hamburger" aria-label="menu" onclick="toggleMenu()">☰</button>
     </nav>
   </header>
 
-  <main class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
-    <h1>Portal do Professor</h1>
-    <p class="subtitle">Bem-vindo ao seu painel de controle</p>
+  <!-- TELA DE LOGIN -->
+  <div id="login-section">
+    <main class="login-container">
+      <h2>Área Restrita - Professores</h2>
+      <p>Entre com suas credenciais fornecidas pela administração</p>
+      
+      <form id="login-form">
+        <div class="form-group">
+          <label for="usuario">Usuário:</label>
+          <input type="text" id="usuario" required placeholder="Seu usuário">
+        </div>
+        
+        <div class="form-group">
+          <label for="senha">Senha:</label>
+          <input type="password" id="senha" required placeholder="Sua senha">
+        </div>
+        
+        <div class="error-message" id="login-error">
+          Usuário ou senha incorretos!
+        </div>
+        
+        <button type="submit" class="btn-modern" style="width: 100%">
+          🔐 Entrar como Professor
+        </button>
+      </form>
+      
+      <div style="margin-top: 20px; padding: 15px; background: #f3f4f6; border-radius: 8px;">
+        <h4>📋 Informações:</h4>
+        <p>Seu login e senha são fornecidos pela administração do curso.</p>
+        <p>Em caso de problemas, entre em contato com a direção.</p>
+      </div>
+    </main>
+  </div>
 
-    <div class="dashboard-grid">
-      <div class="stats-card">
-        <div class="stats-number" id="total-alunos">0</div>
-        <div class="stats-label">Alunos Ativos</div>
+  <!-- PAINEL DO PROFESSOR (aparece após login) -->
+  <div id="professor-panel" class="professor-panel">
+    <main class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+      <div class="welcome-header">
+        <h1>Bem-vindo, Professor <span id="professor-name">!</span></h1>
+        <p>Painel de controle das suas turmas e alunos</p>
+        <button class="btn-modern" onclick="fazerLogout()" style="margin-top: 15px;">
+          🚪 Sair
+        </button>
       </div>
-      <div class="stats-card">
-        <div class="stats-number" id="total-turmas">0</div>
-        <div class="stats-label">Turmas Ativas</div>
-      </div>
-      <div class="stats-card">
-        <div class="stats-number" id="aulas-hoje">0</div>
-        <div class="stats-label">Aulas Hoje</div>
-      </div>
-      <div class="stats-card">
-        <div class="stats-number" id="presenca">0%</div>
-        <div class="stats-label">Taxa de Presença</div>
-      </div>
-    </div>
 
-    <div class="filters">
-      <select class="filter-select" id="filter-turma">
-        <option value="">Todas as Turmas</option>
-        <option value="manha">Manhã</option>
-        <option value="tarde">Tarde</option>
-        <option value="noite">Noite</option>
-      </select>
-      <select class="filter-select" id="filter-status">
-        <option value="">Todos os Status</option>
-        <option value="ativo">Ativos</option>
-        <option value="inativo">Inativos</option>
-        <option value="pendente">Pendentes</option>
-      </select>
-      <input type="text" class="search-box" id="search-aluno" placeholder="Buscar aluno...">
-    </div>
-
-    <h2>Minhas Turmas</h2>
-    <div class="turmas-container" id="turmas-list">
-      <!-- Turmas serão carregadas via JavaScript -->
-    </div>
-
-    <div class="calendar-section">
-      <h2>Calendário de Aulas</h2>
-      <div class="calendar-grid" id="calendar">
-        <!-- Calendário será gerado via JavaScript -->
+      <div class="dashboard-grid">
+        <div class="stats-card">
+          <div class="stats-number" id="total-alunos">0</div>
+          <div class="stats-label">Alunos</div>
+        </div>
+        <div class="stats-card">
+          <div class="stats-number" id="total-turmas">0</div>
+          <div class="stats-label">Turmas</div>
+        </div>
+        <div class="stats-card">
+          <div class="stats-number" id="aulas-hoje">0</div>
+          <div class="stats-label">Aulas Hoje</div>
+        </div>
       </div>
-    </div>
-  </main>
+
+      <h2>Minhas Turmas</h2>
+      <div class="turmas-container" id="turmas-list">
+        <!-- Turmas serão carregadas via JavaScript -->
+      </div>
+
+      <div style="margin-top: 40px; padding: 20px; background: #f8fafc; border-radius: 12px;">
+        <h3>📞 Suporte</h3>
+        <p>Precisa de ajuda? Entre em contato com a administração:</p>
+        <p><strong>Telefone:</strong> (83) 99999-9999</p>
+        <p><strong>Email:</strong> suporte@aprovamaispb.com</p>
+      </div>
+    </main>
+  </div>
 
   <script type="module">
-    import { buscarTurmasProfessor, buscarInscricoesPorTurma } from "./assets/js/firebase.js";
+    import { verificarLoginProfessor, buscarTurmasProfessor, buscarInscricoesPorTurma } from "./assets/js/firebase.js";
 
-    let professorUsuario = "professor1"; // Isso virá do login
-
-    async function carregarDadosProfessor() {
+    // Função de login
+    document.getElementById('login-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const usuario = document.getElementById('usuario').value;
+      const senha = document.getElementById('senha').value;
+      const errorElement = document.getElementById('login-error');
+      
+      errorElement.style.display = 'none';
+      
       try {
-        const turmas = await buscarTurmasProfessor(professorUsuario);
+        const logado = await verificarLoginProfessor(usuario, senha);
+        
+        if (logado) {
+          // Salvar sessão
+          localStorage.setItem('professorLogado', usuario);
+          localStorage.setItem('professorSenha', senha); // Em produção, use tokens JWT
+          
+          // Mostrar painel
+          document.getElementById('login-section').style.display = 'none';
+          document.getElementById('professor-panel').style.display = 'block';
+          document.getElementById('professor-name').textContent = usuario;
+          
+          // Carregar dados do professor
+          carregarDadosProfessor(usuario);
+        } else {
+          errorElement.style.display = 'block';
+        }
+      } catch (error) {
+        console.error('Erro no login:', error);
+        errorElement.style.display = 'block';
+      }
+    });
+
+    async function carregarDadosProfessor(usuario) {
+      try {
+        // Buscar turmas do professor
+        const turmas = await buscarTurmasProfessor(usuario);
         document.getElementById('total-turmas').textContent = turmas.length;
         
         let totalAlunos = 0;
@@ -260,8 +284,7 @@
         }
 
         document.getElementById('total-alunos').textContent = totalAlunos;
-        document.getElementById('aulas-hoje').textContent = turmas.length; // Simplificado
-        document.getElementById('presenca').textContent = '85%'; // Exemplo
+        document.getElementById('aulas-hoje').textContent = turmas.length;
 
       } catch (error) {
         console.error('Erro ao carregar dados:', error);
@@ -272,45 +295,28 @@
       window.open(`https://wa.me/55${telefone.replace(/\D/g, '')}`, '_blank');
     }
 
-    function gerarCalendario() {
-      const calendar = document.getElementById('calendar');
-      const dias = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-      
-      // Cabeçalho dos dias
-      dias.forEach(dia => {
-        const dayHeader = document.createElement('div');
-        dayHeader.style.fontWeight = 'bold';
-        dayHeader.textContent = dia;
-        calendar.appendChild(dayHeader);
-      });
-
-      // Dias do mês
-      for (let i = 1; i <= 31; i++) {
-        const day = document.createElement('div');
-        day.className = 'calendar-day';
-        day.textContent = i;
-        if (i === new Date().getDate()) {
-          day.classList.add('active');
-        }
-        calendar.appendChild(day);
-      }
+    function fazerLogout() {
+      localStorage.removeItem('professorLogado');
+      localStorage.removeItem('professorSenha');
+      window.location.reload();
     }
 
+    // Verificar se já está logado
     document.addEventListener('DOMContentLoaded', function() {
-      carregarDadosProfessor();
-      gerarCalendario();
+      const professorLogado = localStorage.getItem('professorLogado');
+      if (professorLogado) {
+        document.getElementById('login-section').style.display = 'none';
+        document.getElementById('professor-panel').style.display = 'block';
+        document.getElementById('professor-name').textContent = professorLogado;
+        carregarDadosProfessor(professorLogado);
+      }
     });
-
-    // Filtros
-    document.getElementById('filter-turma').addEventListener('change', carregarDadosProfessor);
-    document.getElementById('filter-status').addEventListener('change', carregarDadosProfessor);
-    document.getElementById('search-aluno').addEventListener('input', carregarDadosProfessor);
   </script>
 
   <script>
-  function toggleMenu(){
-    document.querySelector('.menu').classList.toggle('open');
-  }
+    function toggleMenu(){
+      document.querySelector('.menu').classList.toggle('open');
+    }
   </script>
 </body>
 </html>
