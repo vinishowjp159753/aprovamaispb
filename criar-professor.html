@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Criar Professor - AprovaMaisPB</title>
-    <script src="notification-system.js"></script>
-    <script src="firebase-integration.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -13,263 +11,136 @@
             --secondary: #b21f1f;
             --accent: #fdbb2d;
         }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background-color: #f5f7fb;
-            color: #333;
-        }
-        
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-        
-        .back-btn {
-            display: inline-flex;
-            align-items: center;
-            padding: 10px 15px;
-            background: var(--primary);
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: 500;
-        }
-        
-        .back-btn i {
-            margin-right: 8px;
-        }
-        
-        h1 {
-            color: var(--primary);
-            text-align: center;
-            margin: 20px 0;
-        }
-        
-        .form-container {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #555;
-        }
-        
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-        
-        .form-row {
-            display: flex;
-            gap: 20px;
-        }
-        
-        .form-row .form-group {
-            flex: 1;
-        }
-        
-        .btn {
-            padding: 12px 25px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 500;
-        }
-        
-        .btn i {
-            margin-right: 8px;
-        }
-        
-        .form-actions {
-            text-align: center;
-            margin-top: 30px;
-        }
-        
-        .alert {
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            display: none;
-        }
-        
-        .alert.success {
-            background: #e8f5e9;
-            color: #2e7d32;
-            border: 1px solid #c8e6c9;
-        }
-        
-        .alert.error {
-            background: #ffebee;
-            color: #d32f2f;
-            border: 1px solid #ffcdd2;
-        }
-        
-        .password-generator {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .password-generator input {
-            flex: 1;
-        }
-        
-        .generate-btn {
-            padding: 10px 15px;
-            background: var(--accent);
-            color: black;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f5f7fb; color: #333; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .back-btn { display: inline-flex; align-items: center; padding: 10px 15px; background: var(--primary); color: white; text-decoration: none; border-radius: 5px; font-weight: 500; }
+        .back-btn i { margin-right: 8px; }
+        h1 { color: var(--primary); text-align: center; margin: 20px 0; }
+        .form-container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: #555; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 5px; font-size: 16px; }
+        .form-row { display: flex; gap: 20px; }
+        .form-row .form-group { flex: 1; }
+        .btn { padding: 12px 25px; background: var(--primary); color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: 500; }
+        .btn i { margin-right: 8px; }
+        .form-actions { text-align: center; margin-top: 30px; }
+        .alert { padding: 15px; border-radius: 5px; margin-bottom: 20px; display: none; }
+        .alert.success { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+        .alert.error { background: #ffebee; color: #d32f2f; border: 1px solid #ffcdd2; }
+        .password-generator { display: flex; align-items: center; gap: 10px; }
+        .password-generator input { flex: 1; }
+        .generate-btn { padding: 10px 15px; background: var(--accent); color: black; border: none; border-radius: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <a href="dashboard.html" class="back-btn">
-                <i class="fas fa-arrow-left"></i> Voltar ao Dashboard
-            </a>
-            <h1>Criar Acesso para Professor</h1>
-            <div></div> <!-- Espaço para alinhamento -->
-        </div>
-        
-        <div class="alert success" id="successAlert">
-            <i class="fas fa-check-circle"></i> Professor criado com sucesso!
-        </div>
-        
-        <div class="alert error" id="errorAlert">
-            <i class="fas fa-exclamation-circle"></i> Preencha todos os campos obrigatórios.
-        </div>
-        
-        <div class="form-container">
-            <form id="teacherForm">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="teacherName">Nome Completo *</label>
-                        <input type="text" id="teacherName" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="teacherEmail">E-mail *</label>
-                        <input type="email" id="teacherEmail" required>
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="teacherUser">Usuário *</label>
-                        <input type="text" id="teacherUser" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="teacherPassword">Senha *</label>
-                        <div class="password-generator">
-                            <input type="text" id="teacherPassword" required>
-                            <button type="button" class="generate-btn" onclick="generatePassword()">
-                                <i class="fas fa-sync-alt"></i> Gerar
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="teacherPhone">Telefone</label>
-                        <input type="tel" id="teacherPhone">
-                    </div>
-                    <div class="form-group">
-                        <label for="teacherSubject">Matéria *</label>
-                        <select id="teacherSubject" required>
-                            <option value="">Selecione uma matéria</option>
-                            <option value="portugues">Português</option>
-                            <option value="matematica">Matemática</option>
-                            <option value="historia">História</option>
-                            <option value="geografia">Geografia</option>
-                            <option value="ingles">Inglês</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="teacherBio">Breve Biografia</label>
-                    <textarea id="teacherBio" rows="4"></textarea>
-                </div>
-                
-                <div class="form-actions">
-                    <button type="submit" class="btn">
-                        <i class="fas fa-user-plus"></i> Criar Professor
-                    </button>
-                </div>
-            </form>
-        </div>
+<div class="container">
+    <div class="header">
+        <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Voltar ao Dashboard</a>
+        <h1>Criar Acesso para Professor</h1>
+        <div></div>
     </div>
 
-    <script>
-        // Função para gerar senha aleatória
-        function generatePassword() {
-            const length = 8;
-            const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            let password = "";
+    <div class="alert success" id="successAlert"><i class="fas fa-check-circle"></i> Professor criado com sucesso!</div>
+    <div class="alert error" id="errorAlert"><i class="fas fa-exclamation-circle"></i> Preencha todos os campos obrigatórios.</div>
+
+    <div class="form-container">
+        <form id="teacherForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="teacherName">Nome Completo *</label>
+                    <input type="text" id="teacherName" required>
+                </div>
+                <div class="form-group">
+                    <label for="teacherEmail">E-mail *</label>
+                    <input type="email" id="teacherEmail" required>
+                </div>
+            </div>
             
-            for (let i = 0; i < length; i++) {
-                password += charset.charAt(Math.floor(Math.random() * charset.length));
-            }
-            
-            document.getElementById('teacherPassword').value = password;
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="teacherUser">Usuário *</label>
+                    <input type="text" id="teacherUser" required>
+                </div>
+                <div class="form-group">
+                    <label for="teacherPassword">Senha *</label>
+                    <div class="password-generator">
+                        <input type="text" id="teacherPassword" required>
+                        <button type="button" class="generate-btn" onclick="generatePassword()"><i class="fas fa-sync-alt"></i> Gerar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="teacherPhone">Telefone</label>
+                    <input type="tel" id="teacherPhone">
+                </div>
+                <div class="form-group">
+                    <label for="teacherSubject">Matéria *</label>
+                    <select id="teacherSubject" required>
+                        <option value="">Selecione uma matéria</option>
+                        <option value="portugues">Português</option>
+                        <option value="matematica">Matemática</option>
+                        <option value="historia">História</option>
+                        <option value="geografia">Geografia</option>
+                        <option value="ingles">Inglês</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="teacherBio">Breve Biografia</label>
+                <textarea id="teacherBio" rows="4"></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn"><i class="fas fa-user-plus"></i> Criar Professor</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+    import { initializeApp } from "./assets/js/firebase-config.js";
+    import { getFirestore, collection, addDoc, Timestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+    const app = initializeApp();
+    const db = getFirestore(app);
+
+    function generatePassword() {
+        const length = 8;
+        const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        let password = "";
+        for (let i = 0; i < length; i++) {
+            password += charset.charAt(Math.floor(Math.random() * charset.length));
         }
-        
-        // Array para armazenar professores (substituir por Firebase depois)
-        let professores = JSON.parse(localStorage.getItem('professores')) || [];
-        
-        document.getElementById('teacherForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const name = document.getElementById('teacherName').value;
-            const email = document.getElementById('teacherEmail').value;
-            const user = document.getElementById('teacherUser').value;
-            const password = document.getElementById('teacherPassword').value;
-            const subject = document.getElementById('teacherSubject').value;
-            const phone = document.getElementById('teacherPhone').value;
-            const bio = document.getElementById('teacherBio').value;
-            
-            if (!name || !email || !user || !password || !subject) {
-                document.getElementById('errorAlert').style.display = 'block';
-                document.getElementById('successAlert').style.display = 'none';
-                return;
-            }
-            
-            // Criar objeto professor
-            const professor = {
-                id: Date.now(), // ID único baseado no timestamp
+        document.getElementById('teacherPassword').value = password;
+    }
+
+    const form = document.getElementById('teacherForm');
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const name = document.getElementById('teacherName').value;
+        const email = document.getElementById('teacherEmail').value;
+        const user = document.getElementById('teacherUser').value;
+        const password = document.getElementById('teacherPassword').value;
+        const subject = document.getElementById('teacherSubject').value;
+        const phone = document.getElementById('teacherPhone').value;
+        const bio = document.getElementById('teacherBio').value;
+
+        if (!name || !email || !user || !password || !subject) {
+            document.getElementById('errorAlert').style.display = 'block';
+            document.getElementById('successAlert').style.display = 'none';
+            return;
+        }
+
+        try {
+            await addDoc(collection(db, "professores"), {
                 nome: name,
                 email: email,
                 usuario: user,
@@ -277,35 +148,29 @@
                 materia: subject,
                 telefone: phone,
                 biografia: bio,
-                status: 'ativo',
-                dataCriacao: new Date().toISOString()
-            };
-            
-            // Adicionar ao array de professores
-            professores.push(professor);
-            
-            // Salvar no localStorage (substituir por Firebase depois)
-            localStorage.setItem('professores', JSON.stringify(professores));
-            
-            // Mostrar mensagem de sucesso
+                status: "ativo",
+                criadoEm: Timestamp.now()
+            });
+
             document.getElementById('successAlert').style.display = 'block';
             document.getElementById('errorAlert').style.display = 'none';
-            
-            // Limpar formulário
-            document.getElementById('teacherForm').reset();
-            
-            // Esconder alerta após 3 segundos
+
+            form.reset();
+            generatePassword();
+
             setTimeout(() => {
                 document.getElementById('successAlert').style.display = 'none';
-                // Redirecionar para gerenciar professores após criação
                 window.location.href = 'gerenciar-professores.html';
             }, 2000);
-        });
-        
-        // Gerar uma senha inicial ao carregar a página
-        window.onload = generatePassword;
-    </script>
-    script src="notification-system.js"></script>
-    <script src="firebase-integration.js"></script>
+
+        } catch (error) {
+            console.error("Erro ao criar professor:", error);
+            document.getElementById('errorAlert').style.display = 'block';
+            document.getElementById('successAlert').style.display = 'none';
+        }
+    });
+
+    window.onload = generatePassword;
+</script>
 </body>
 </html>
