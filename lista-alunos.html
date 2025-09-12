@@ -263,105 +263,103 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "./assets/js/firebase-config.js";
-        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+    import { initializeApp } from "./assets/js/firebase-config.js";
+    import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-        const app = initializeApp();
-        const db = getFirestore(app);
+    const app = initializeApp();
+    const db = getFirestore(app);
 
-        let currentStudentId = null;
-        let currentStudentName = null;
+    let currentStudentId = null;
+    let currentStudentName = null;
 
-        async function loadStudents() {
-            const tableBody = document.querySelector('#studentsTable tbody');
-            tableBody.innerHTML = '';
-            try {
-                const snapshot = await getDocs(collection(db, "inscricoes"));
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td style="display:none;">${doc.id}</td>
-                        <td>${data.nomeCompleto || ''}</td>
-                        <td>${data.turma || ''}</td>
-                        <td><span class="status ${data.status === 'confirmado' ? 'ativo' : 'inativo'}">${data.status}</span></td>
-                        <td>${data.telefone || ''}</td>
-                        <td>${data.email || ''}</td>
-                        <td>${data.cidade || ''}</td>
-                        <td>${data.estado || ''}</td>
-                        <td>${data.turno || ''}</td>
-                        <td>${data.observacoes || ''}</td>
-                        <td>
-                            <button class="action-btn edit-btn" onclick="editStudent('${doc.id}')"><i class="fas fa-edit"></i></button>
-                            <button class="action-btn payment-btn" onclick="showPaymentModal('${doc.id}', '${data.nomeCompleto}')"><i class="fas fa-money-bill"></i></button>
-                            <button class="action-btn obs-btn" onclick="showObservationModal('${doc.id}', '${data.nomeCompleto}')"><i class="fas fa-comment"></i></button>
-                        </td>
-                    `;
-                    tableBody.appendChild(row);
-                });
-            } catch(e) {
-                console.error("Erro ao carregar alunos:", e);
-            }
-        }
+    function renderStudents(snapshot) {
+        const tableBody = document.querySelector('#studentsTable tbody');
+        tableBody.innerHTML = '';
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td style="display:none;">${doc.id}</td>
+                <td>${data.nomeCompleto || ''}</td>
+                <td>${data.turma || ''}</td>
+                <td><span class="status ${data.status === 'confirmado' ? 'ativo' : 'inativo'}">${data.status}</span></td>
+                <td>${data.telefone || ''}</td>
+                <td>${data.email || ''}</td>
+                <td>${data.cidade || ''}</td>
+                <td>${data.estado || ''}</td>
+                <td>${data.turno || ''}</td>
+                <td>${data.observacoes || ''}</td>
+                <td>
+                    <button class="action-btn edit-btn" onclick="editStudent('${doc.id}')"><i class="fas fa-edit"></i></button>
+                    <button class="action-btn payment-btn" onclick="showPaymentModal('${doc.id}', '${data.nomeCompleto}')"><i class="fas fa-money-bill"></i></button>
+                    <button class="action-btn obs-btn" onclick="showObservationModal('${doc.id}', '${data.nomeCompleto}')"><i class="fas fa-comment"></i></button>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
 
-        // Busca
-        function searchStudents() {
-            const searchText = document.getElementById('searchInput').value.toLowerCase();
-            document.querySelectorAll('#studentsTable tbody tr').forEach(row => {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(searchText) ? '' : 'none';
-            });
-        }
+    // Observa alterações em tempo real
+    onSnapshot(collection(db, "inscricoes"), (snapshot) => {
+        renderStudents(snapshot.docs);
+    });
 
-        // Exportação (simples)
-        function exportData() {
-            alert('Exportar dados ainda não implementado.');
-        }
+    // Busca
+    function searchStudents() {
+        const searchText = document.getElementById('searchInput').value.toLowerCase();
+        document.querySelectorAll('#studentsTable tbody tr').forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(searchText) ? '' : 'none';
+        });
+    }
 
-        // Modais
-        function editStudent(id) {
-            currentStudentId = id;
-            document.getElementById('editModal').style.display = 'flex';
-        }
+    // Exportação (simples)
+    function exportData() {
+        alert('Exportar dados ainda não implementado.');
+    }
 
-        function showObservationModal(id, name) {
-            currentStudentId = id;
-            currentStudentName = name;
-            document.getElementById('observationStudentName').textContent = name;
-            document.getElementById('observationText').value = '';
-            document.getElementById('observationModal').style.display = 'flex';
-        }
+    // Modais
+    function editStudent(id) {
+        currentStudentId = id;
+        document.getElementById('editModal').style.display = 'flex';
+    }
 
-        function showPaymentModal(id, name) {
-            currentStudentId = id;
-            currentStudentName = name;
-            document.getElementById('paymentStudentName').textContent = name;
-            document.getElementById('paymentValue').value = '';
-            document.getElementById('paymentDate').value = '';
-            document.getElementById('paymentMethod').value = 'dinheiro';
-            document.getElementById('paymentModal').style.display = 'flex';
-        }
+    function showObservationModal(id, name) {
+        currentStudentId = id;
+        currentStudentName = name;
+        document.getElementById('observationStudentName').textContent = name;
+        document.getElementById('observationText').value = '';
+        document.getElementById('observationModal').style.display = 'flex';
+    }
 
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
+    function showPaymentModal(id, name) {
+        currentStudentId = id;
+        currentStudentName = name;
+        document.getElementById('paymentStudentName').textContent = name;
+        document.getElementById('paymentValue').value = '';
+        document.getElementById('paymentDate').value = '';
+        document.getElementById('paymentMethod').value = 'dinheiro';
+        document.getElementById('paymentModal').style.display = 'flex';
+    }
 
-        function saveStudent() {
-            alert('Salvar alterações ainda não implementado.');
-            closeModal('editModal');
-        }
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
 
-        function saveObservation() {
-            alert('Salvar observação ainda não implementado.');
-            closeModal('observationModal');
-        }
+    function saveStudent() {
+        alert('Salvar alterações ainda não implementado.');
+        closeModal('editModal');
+    }
 
-        function confirmPayment() {
-            alert('Registrar pagamento ainda não implementado.');
-            closeModal('paymentModal');
-        }
+    function saveObservation() {
+        alert('Salvar observação ainda não implementado.');
+        closeModal('observationModal');
+    }
 
-        loadStudents();
-    </script>
+    function confirmPayment() {
+        alert('Registrar pagamento ainda não implementado.');
+        closeModal('paymentModal');
+    }
+</script>
 </body>
 </html>
