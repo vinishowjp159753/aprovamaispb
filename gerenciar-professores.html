@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gerenciar Professores - AprovaMaisPB</title>
+<script type="module" src="notification-system.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 :root {
@@ -11,8 +12,8 @@
     --secondary: #b21f1f;
     --accent: #fdbb2d;
 }
-* { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-body { background-color:#f5f7fb; color:#333; }
+* { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+body { background:#f5f7fb; color:#333; }
 .container { max-width:1200px; margin:0 auto; padding:20px; }
 .header { display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; }
 .back-btn { display:inline-flex; align-items:center; padding:10px 15px; background:var(--primary); color:white; text-decoration:none; border-radius:5px; font-weight:500; }
@@ -25,7 +26,7 @@ h1 { color:var(--primary); text-align:center; margin:20px 0; }
 .tab-content.active { display:block; }
 .table-container { overflow-x:auto; }
 table { width:100%; border-collapse:collapse; }
-th, td { padding:15px; text-align:left; border-bottom:1px solid #eee; }
+th,td { padding:15px; text-align:left; border-bottom:1px solid #eee; }
 th { background:var(--primary); color:white; font-weight:500; }
 tr:hover { background:#f9f9f9; }
 .btn { padding:8px 15px; background:var(--primary); color:white; border:none; border-radius:5px; cursor:pointer; font-weight:500; }
@@ -34,12 +35,10 @@ tr:hover { background:#f9f9f9; }
 .delete-btn { background:var(--secondary); color:white; }
 .form-group { margin-bottom:20px; }
 .form-group label { display:block; margin-bottom:8px; font-weight:500; }
-.form-group select, .form-group input { width:100%; padding:10px; border:1px solid #ddd; border-radius:5px; }
-.form-actions { margin-top:20px; }
+.form-group select, .form-group input, .form-group textarea { width:100%; padding:10px; border:1px solid #ddd; border-radius:5px; }
+.form-actions { margin-top:20px; display:flex; justify-content:flex-end; gap:10px; }
 .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000; }
 .modal-content { background:white; padding:30px; border-radius:10px; width:500px; max-width:90%; }
-.modal h2 { margin-bottom:20px; color:var(--primary); }
-.form-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:20px; }
 .status { padding:5px 10px; border-radius:20px; font-size:12px; font-weight:500; }
 .status.ativo { background:#e8f5e9; color:#2e7d32; }
 .status.inativo { background:#ffebee; color:#d32f2f; }
@@ -48,17 +47,19 @@ tr:hover { background:#f9f9f9; }
 <body>
 <div class="container">
     <div class="header">
-        <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Voltar ao Dashboard</a>
+        <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Dashboard</a>
         <h1>Gerenciar Professores</h1>
         <div></div>
     </div>
-    
+
     <div class="tabs">
-        <button class="tab active" onclick="openTab('professores')">Lista de Professores</button>
+        <button class="tab active" onclick="openTab('lista')">Lista de Professores</button>
+        <button class="tab" onclick="openTab('criar')">Criar Professor</button>
         <button class="tab" onclick="openTab('designar')">Designar Turmas</button>
     </div>
 
-    <div id="professores" class="tab-content active">
+    <!-- Lista de Professores -->
+    <div id="lista" class="tab-content active">
         <div class="table-container">
             <table id="teachersTable">
                 <thead>
@@ -71,53 +72,89 @@ tr:hover { background:#f9f9f9; }
                         <th>Ações</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <!-- Dados do Firebase -->
-                </tbody>
+                <tbody></tbody>
             </table>
         </div>
     </div>
 
+    <!-- Criar Professor -->
+    <div id="criar" class="tab-content">
+        <form id="teacherForm">
+            <div class="form-group">
+                <label>Nome *</label><input type="text" id="teacherName" required>
+            </div>
+            <div class="form-group">
+                <label>E-mail *</label><input type="email" id="teacherEmail" required>
+            </div>
+            <div class="form-group">
+                <label>Usuário *</label><input type="text" id="teacherUser" required>
+            </div>
+            <div class="form-group">
+                <label>Senha *</label>
+                <div style="display:flex; gap:10px;">
+                    <input type="text" id="teacherPassword" required>
+                    <button type="button" onclick="generatePassword()">Gerar</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Telefone</label><input type="tel" id="teacherPhone">
+            </div>
+            <div class="form-group">
+                <label>Matéria *</label>
+                <select id="teacherSubject" required>
+                    <option value="">Selecione</option>
+                    <option value="portugues">Português</option>
+                    <option value="matematica">Matemática</option>
+                    <option value="historia">História</option>
+                    <option value="geografia">Geografia</option>
+                    <option value="ingles">Inglês</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Biografia</label><textarea id="teacherBio" rows="3"></textarea>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn">Criar Professor</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Designar Turmas -->
     <div id="designar" class="tab-content">
-        <h2>Designar Turma para Professor</h2>
         <div class="form-group">
-            <label for="selectProfessor">Selecionar Professor</label>
-            <select id="selectProfessor"><option value="">Selecione um professor</option></select>
+            <label>Professor</label>
+            <select id="selectProfessor"><option value="">Selecione</option></select>
         </div>
         <div class="form-group">
-            <label for="selectTurma">Selecionar Turma</label>
+            <label>Turma</label>
             <select id="selectTurma">
-                <option value="">Selecione uma turma</option>
+                <option value="">Selecione</option>
                 <option value="turma-a">Turma A - Manhã</option>
                 <option value="turma-b">Turma B - Tarde</option>
                 <option value="turma-c">Turma C - Noite</option>
             </select>
         </div>
         <div class="form-actions">
-            <button class="btn" onclick="designarTurma()"><i class="fas fa-link"></i> Designar Turma</button>
+            <button class="btn" onclick="designarTurma()">Designar Turma</button>
         </div>
-        <div id="designacoesList" style="margin-top:30px;">
-            <h3>Designações Ativas</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Professor</th>
-                        <th>Turma</th>
-                        <th>Ação</th>
-                    </tr>
-                </thead>
-                <tbody id="designacoesBody"></tbody>
-            </table>
-        </div>
+        <h3>Designações Ativas</h3>
+        <table>
+            <thead>
+                <tr><th>Professor</th><th>Turma</th><th>Ação</th></tr>
+            </thead>
+            <tbody id="designacoesBody"></tbody>
+        </table>
     </div>
 </div>
 
+<!-- Modal edição -->
 <div class="modal" id="editModal">
     <div class="modal-content">
         <h2>Editar Professor</h2>
-        <div class="form-group"><label for="editName">Nome Completo</label><input type="text" id="editName"></div>
-        <div class="form-group"><label for="editEmail">E-mail</label><input type="email" id="editEmail"></div>
-        <div class="form-group"><label for="editMateria">Matéria</label>
+        <div class="form-group"><label>Nome</label><input type="text" id="editName"></div>
+        <div class="form-group"><label>Email</label><input type="email" id="editEmail"></div>
+        <div class="form-group">
+            <label>Matéria</label>
             <select id="editMateria">
                 <option value="portugues">Português</option>
                 <option value="matematica">Matemática</option>
@@ -126,7 +163,8 @@ tr:hover { background:#f9f9f9; }
                 <option value="ingles">Inglês</option>
             </select>
         </div>
-        <div class="form-group"><label for="editStatus">Status</label>
+        <div class="form-group">
+            <label>Status</label>
             <select id="editStatus">
                 <option value="ativo">Ativo</option>
                 <option value="inativo">Inativo</option>
@@ -134,148 +172,143 @@ tr:hover { background:#f9f9f9; }
         </div>
         <div class="form-actions">
             <button class="btn" onclick="closeModal('editModal')">Cancelar</button>
-            <button class="btn" style="background: var(--primary);" onclick="salvarEdicao()">Salvar</button>
+            <button class="btn" style="background:var(--primary);" onclick="salvarEdicao()">Salvar</button>
         </div>
     </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "./assets/js/firebase-config.js";
-import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, setDoc, addDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 const app = initializeApp();
 const db = getFirestore(app);
+let professores=[], designacoes=[], professorEditando=null;
 
-let professores = [];
-let designacoes = [];
-let professorEditando = null;
+// Gerar senha
+function generatePassword(){
+    let charset="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", password="";
+    for(let i=0;i<8;i++) password+=charset.charAt(Math.floor(Math.random()*charset.length));
+    document.getElementById('teacherPassword').value=password;
+}
 
-function openTab(tabName) {
-    const tabContents = document.getElementsByClassName('tab-content');
-    for (let i = 0; i < tabContents.length; i++) tabContents[i].classList.remove('active');
-    const tabs = document.getElementsByClassName('tab');
-    for (let i = 0; i < tabs.length; i++) tabs[i].classList.remove('active');
-    document.getElementById(tabName).classList.add('active');
+// Tabs
+window.openTab = async function(tab){
+    const contents=document.querySelectorAll('.tab-content');
+    contents.forEach(c=>c.classList.remove('active'));
+    document.getElementById(tab).classList.add('active');
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
     event.currentTarget.classList.add('active');
-
-    if(tabName === 'designar'){
-        carregarProfessoresParaDesignacao();
-        carregarDesignacoes();
-    }
+    if(tab==='designar'){ await carregarProfessoresParaDesignacao(); await carregarDesignacoes(); }
 }
 
+// Criar professor
+document.getElementById('teacherForm').addEventListener('submit', async e=>{
+    e.preventDefault();
+    const nome=document.getElementById('teacherName').value;
+    const email=document.getElementById('teacherEmail').value;
+    const usuario=document.getElementById('teacherUser').value;
+    const senha=document.getElementById('teacherPassword').value;
+    const materia=document.getElementById('teacherSubject').value;
+    const telefone=document.getElementById('teacherPhone').value;
+    const bio=document.getElementById('teacherBio').value;
+    if(!nome||!email||!usuario||!senha||!materia){ alert('Preencha os campos obrigatórios'); return; }
+    await addDoc(collection(db,'professores'), { nome,email,usuario,senha,materia,telefone,bio,status:'ativo',dataCriacao:new Date().toISOString() });
+    document.getElementById('teacherForm').reset();
+    alert('Professor criado com sucesso!');
+    await carregarProfessores();
+    openTab('lista');
+});
+
+// Carregar professores
 async function carregarProfessores(){
-    const tbody = document.querySelector('#teachersTable tbody');
-    tbody.innerHTML = '';
-    professores = [];
+    professores=[]; designacoes=[];
     const snapshot = await getDocs(collection(db,'professores'));
-    snapshot.forEach(docSnap=>{
-        let professor = docSnap.data();
-        professor.idFirebase = docSnap.id;
-        professores.push(professor);
-    });
+    snapshot.forEach(docSnap=>professores.push({idFirebase:docSnap.id, ...docSnap.data()}));
+    const snapD = await getDocs(collection(db,'designacoes'));
+    snapD.forEach(docSnap=>designacoes.push({idFirebase:docSnap.id,...docSnap.data()}));
 
-    professores.forEach(professor=>{
-        const turmas = designacoes.filter(d=>d.professorId===professor.idFirebase).map(d=>d.turma).join(', ') || 'Nenhuma';
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${professor.nome}</td>
-            <td>${professor.materia}</td>
-            <td>${professor.usuario}</td>
-            <td><span class="status ${professor.status}">${professor.status}</span></td>
-            <td>${turmas}</td>
-            <td>
-                <button class="btn" onclick="editarProfessor('${professor.idFirebase}')"><i class="fas fa-edit"></i> Editar</button>
-                <button class="btn assign-btn" onclick="designarTurmaProfessor('${professor.idFirebase}')"><i class="fas fa-users"></i> Designar</button>
-                <button class="btn delete-btn" onclick="excluirProfessor('${professor.idFirebase}')"><i class="fas fa-trash"></i> Excluir</button>
-            </td>
-        `;
-        tbody.appendChild(row);
+    const tbody=document.querySelector('#teachersTable tbody'); tbody.innerHTML='';
+    professores.forEach(p=>{
+        const turmas=designacoes.filter(d=>d.professorId===p.idFirebase).map(d=>d.turma).join(', ')||'Nenhuma';
+        const tr=document.createElement('tr');
+        tr.innerHTML=`<td>${p.nome}</td><td>${p.materia}</td><td>${p.usuario}</td><td><span class="status ${p.status}">${p.status}</span></td><td>${turmas}</td>
+        <td><button class="btn" onclick="editarProfessor('${p.idFirebase}')"><i class="fas fa-edit"></i> Editar</button>
+        <button class="btn assign-btn" onclick="designarTurmaProfessor('${p.idFirebase}')"><i class="fas fa-users"></i> Designar</button>
+        <button class="btn delete-btn" onclick="excluirProfessor('${p.idFirebase}')"><i class="fas fa-trash"></i> Excluir</button></td>`;
+        tbody.appendChild(tr);
     });
 }
 
-function carregarProfessoresParaDesignacao(){
-    const select = document.getElementById('selectProfessor');
-    select.innerHTML = '<option value="">Selecione um professor</option>';
-    professores.filter(p=>p.status==='ativo').forEach(p=>{
-        const option = document.createElement('option');
-        option.value = p.idFirebase;
-        option.textContent = `${p.nome} - ${p.materia}`;
-        select.appendChild(option);
-    });
-}
-
-function carregarDesignacoes(){
-    const tbody = document.getElementById('designacoesBody');
-    tbody.innerHTML = '';
-    designacoes.forEach(d=>{
-        const professor = professores.find(p=>p.idFirebase===d.professorId);
-        if(professor){
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${professor.nome}</td>
-                <td>${d.turma}</td>
-                <td>
-                    <button class="btn delete-btn" onclick="removerDesignacao('${d.id}')"><i class="fas fa-unlink"></i> Remover</button>
-                </td>
-            `;
-            tbody.appendChild(row);
-        }
-    });
-}
-
-function designarTurmaProfessor(professorId){
-    openTab('designar');
-    document.getElementById('selectProfessor').value = professorId;
-}
-
-function editarProfessor(idFirebase){
-    const professor = professores.find(p=>p.idFirebase===idFirebase);
-    if(professor){
-        professorEditando = professor;
-        document.getElementById('editName').value = professor.nome;
-        document.getElementById('editEmail').value = professor.email;
-        document.getElementById('editMateria').value = professor.materia;
-        document.getElementById('editStatus').value = professor.status;
+// Editar professor
+window.editarProfessor=async function(id){
+    const p=professores.find(x=>x.idFirebase===id);
+    if(p){ professorEditando=p;
+        document.getElementById('editName').value=p.nome;
+        document.getElementById('editEmail').value=p.email;
+        document.getElementById('editMateria').value=p.materia;
+        document.getElementById('editStatus').value=p.status;
         document.getElementById('editModal').style.display='flex';
     }
 }
-
-async function salvarEdicao(){
+window.salvarEdicao=async function(){
     if(professorEditando){
-        const ref = doc(db,'professores',professorEditando.idFirebase);
-        await updateDoc(ref,{
-            nome: document.getElementById('editName').value,
-            email: document.getElementById('editEmail').value,
-            materia: document.getElementById('editMateria').value,
-            status: document.getElementById('editStatus').value
+        await updateDoc(doc(db,'professores',professorEditando.idFirebase),{
+            nome:document.getElementById('editName').value,
+            email:document.getElementById('editEmail').value,
+            materia:document.getElementById('editMateria').value,
+            status:document.getElementById('editStatus').value
         });
         closeModal('editModal');
         await carregarProfessores();
-        alert('Professor atualizado com sucesso!');
+        alert('Professor atualizado!');
     }
 }
 
-async function excluirProfessor(idFirebase){
-    const temDesignacoes = designacoes.some(d=>d.professorId===idFirebase);
-    if(temDesignacoes){ alert('Não é possível excluir, remova designações primeiro.'); return; }
-    if(confirm('Deseja realmente excluir este professor?')){
-        await deleteDoc(doc(db,'professores',idFirebase));
-        await carregarProfessores();
-        alert('Professor excluído com sucesso!');
-    }
+// Excluir professor
+window.excluirProfessor=async function(id){
+    const tem=designacoes.some(d=>d.professorId===id);
+    if(tem){ alert('Remova designações primeiro'); return; }
+    if(confirm('Deseja excluir?')){ await deleteDoc(doc(db,'professores',id)); await carregarProfessores(); }
 }
 
-function closeModal(modalId){ document.getElementById(modalId).style.display='none'; }
+// Fechar modal
+window.closeModal=function(id){ document.getElementById(id).style.display='none'; }
 
-document.addEventListener('DOMContentLoaded', async ()=>{
+// Designar turmas
+window.carregarProfessoresParaDesignacao=async function(){
+    const select=document.getElementById('selectProfessor'); select.innerHTML='<option value="">Selecione</option>';
+    professores.filter(p=>p.status==='ativo').forEach(p=>{
+        const option=document.createElement('option'); option.value=p.idFirebase; option.textContent=`${p.nome} - ${p.materia}`; select.appendChild(option);
+    });
+}
+window.carregarDesignacoes=async function(){
+    const tbody=document.getElementById('designacoesBody'); tbody.innerHTML='';
+    designacoes.forEach(d=>{
+        const p=professores.find(x=>x.idFirebase===d.professorId);
+        if(p){
+            const tr=document.createElement('tr');
+            tr.innerHTML=`<td>${p.nome}</td><td>${d.turma}</td><td><button class="btn delete-btn" onclick="removerDesignacao('${d.idFirebase}')"><i class="fas fa-unlink"></i> Remover</button></td>`;
+            tbody.appendChild(tr);
+        }
+    });
+}
+window.designarTurma=async function(){
+    const professorId=document.getElementById('selectProfessor').value;
+    const turma=document.getElementById('selectTurma').value;
+    if(!professorId||!turma){ alert('Selecione professor e turma'); return; }
+    const existe=designacoes.some(d=>d.professorId===professorId && d.turma===turma);
+    if(existe){ alert('Designação já existe'); return; }
+    await addDoc(collection(db,'designacoes'),{professorId,turma,dataDesignacao:new Date().toISOString()});
     await carregarProfessores();
-});
-
-// Fechar modal clicando fora
-window.onclick = function(event){
-    if(event.target.classList.contains('modal')) event.target.style.display='none';
+    document.getElementById('selectProfessor').value=''; document.getElementById('selectTurma').value='';
 }
+window.removerDesignacao=async function(id){ if(confirm('Remover designação?')){ await deleteDoc(doc(db,'designacoes',id)); await carregarProfessores(); } }
+window.designarTurmaProfessor=function(id){ openTab('designar'); document.getElementById('selectProfessor').value=id; }
+
+// Início
+document.addEventListener('DOMContentLoaded', carregarProfessores);
+window.onclick=function(e){ if(e.target.classList.contains('modal')) e.target.style.display='none'; }
 </script>
 </body>
 </html>
