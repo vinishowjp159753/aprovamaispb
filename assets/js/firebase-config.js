@@ -2,6 +2,7 @@
 
 // Importações do Firebase
 import { initializeApp as firebaseInitializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getFirestore, collection, getDocs, addDoc, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 // Configuração do Firebase
 const firebaseConfig = {
@@ -13,7 +14,11 @@ const firebaseConfig = {
   appId: "1:828577018900:web:473d8c3fc2685d3f192301"
 };
 
-// Função que inicializa o Firebase e retorna a app
-export function initializeApp() {
-  return firebaseInitializeApp(firebaseConfig);
-}
+// Inicializa o Firebase
+const app = firebaseInitializeApp(firebaseConfig);
+
+// Inicializa o Firestore
+const db = getFirestore(app);
+
+// Exporta Firestore e funções para uso nos HTMLs
+export { db, collection, getDocs, addDoc, doc, updateDoc, deleteDoc };
