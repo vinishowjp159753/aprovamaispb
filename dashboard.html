@@ -1,168 +1,158 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AprovaMaisPB - Dashboard</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="assets/css/dashboard.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard AprovaMaisPB</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="assets/css/dashboard.css">
 </head>
 <body>
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="logo">
-            <img src="assets/img/logo_aprovamaispb.png" alt="Logo AprovaMaisPB">
-            <h2>AprovaMaisPB</h2>
+
+<div class="sidebar">
+    <div class="logo">
+        <img src="assets/img/logo_aprovamaispb.png" alt="Logo AprovaMaisPB">
+        <h2>AprovaMaisPB</h2>
+    </div>
+    <ul class="menu">
+        <li><a href="index.html"><i class="fas fa-home"></i> <span>Início</span></a></li>
+        <li><a href="matricula.html"><i class="fas fa-user-graduate"></i> <span>Matricule-se</span></a></li>
+        <li><a href="professores.html"><i class="fas fa-chalkboard-teacher"></i> <span>Professores</span></a></li>
+        <li><a href="dashboard.html" class="active"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+        <li><a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span>Sair</span></a></li>
+    </ul>
+</div>
+
+<div class="main-content">
+    <div class="header">
+        <div class="welcome">
+            <h1>Bem-vindo, <span id="userName">Administrador</span>!</h1>
+            <p>Painel de controle do AprovaMaisPB</p>
         </div>
-        <ul class="menu">
-            <li><a href="index.html"><i class="fas fa-home"></i> <span>Início</span></a></li>
-            <li><a href="matricula.html"><i class="fas fa-user-graduate"></i> <span>Matricule-se</span></a></li>
-            <li><a href="professores.html"><i class="fas fa-chalkboard-teacher"></i> <span>Professores</span></a></li>
-            <li><a href="dashboard.html" class="active"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
-            <li><a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span>Sair</span></a></li>
-        </ul>
     </div>
 
-    <!-- Main Content -->
-    <div class="main-content">
-        <div class="header">
-            <div class="welcome">
-                <h1>Bem-vindo, <span id="userName">Administrador</span>!</h1>
-                <p>Painel de controle do AprovaMaisPB</p>
+    <div class="dashboard-cards">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Alunos Ativos</div>
+                <div class="card-icon" style="background: rgba(26, 42, 108, 0.1); color: var(--primary);">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="card-value" id="alunosAtivos">0</div>
+                <div class="card-desc">Atualizado em tempo real</div>
             </div>
         </div>
 
-        <!-- Dashboard Cards -->
-        <div class="dashboard-cards">
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">Alunos Ativos</div>
-                    <div class="card-icon" style="background: rgba(26, 42, 108, 0.1); color: var(--primary);">
-                        <i class="fas fa-user-graduate"></i>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <div class="card-value" id="alunosAtivos">0</div>
-                    <div class="card-desc" id="alunosVariacao">Carregando...</div>
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Turmas Ativas</div>
+                <div class="card-icon" style="background: rgba(178, 31, 31, 0.1); color: var(--secondary);">
+                    <i class="fas fa-users"></i>
                 </div>
             </div>
-            
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">Turmas Ativas</div>
-                    <div class="card-icon" style="background: rgba(178, 31, 31, 0.1); color: var(--secondary);">
-                        <i class="fas fa-users"></i>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <div class="card-value" id="turmasAtivas">0</div>
-                    <div class="card-desc" id="turmasVariacao">Carregando...</div>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">Professores</div>
-                    <div class="card-icon" style="background: rgba(253, 187, 45, 0.1); color: var(--accent);">
-                        <i class="fas fa-chalkboard-teacher"></i>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <div class="card-value" id="totalProfessores">0</div>
-                    <div class="card-desc" id="professoresVariacao">Carregando...</div>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">Receita Mensal</div>
-                    <div class="card-icon" style="background: rgba(40, 167, 69, 0.1); color: var(--success);">
-                        <i class="fas fa-dollar-sign"></i>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <div class="card-value" id="receitaMensal">R$ 0,00</div>
-                    <div class="card-desc" id="receitaVariacao">Carregando...</div>
-                </div>
+            <div class="card-content">
+                <div class="card-value" id="turmasAtivas">0</div>
+                <div class="card-desc">Atualizado em tempo real</div>
             </div>
         </div>
 
-        <!-- Quick Actions -->
-        <div class="quick-actions">
-            <h2 class="section-title">Ações Rápidas</h2>
-            <div class="actions-grid">
-                <div class="action-card" onclick="location.href='lista-alunos.html'">
-                    <div class="action-icon" style="background: rgba(26, 42, 108, 0.1); color: var(--primary);">
-                        <i class="fas fa-list"></i>
-                    </div>
-                    <h3 class="action-title">Lista Completa de Alunos</h3>
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Professores</div>
+                <div class="card-icon" style="background: rgba(253, 187, 45, 0.1); color: var(--accent);">
+                    <i class="fas fa-chalkboard-teacher"></i>
                 </div>
-                
-                <div class="action-card" onclick="location.href='criar-professor.html'">
-                    <div class="action-icon" style="background: rgba(178, 31, 31, 0.1); color: var(--secondary);">
-                        <i class="fas fa-user-plus"></i>
-                    </div>
-                    <h3 class="action-title">Criar Acesso Professor</h3>
+            </div>
+            <div class="card-content">
+                <div class="card-value" id="totalProfessores">0</div>
+                <div class="card-desc">Atualizado em tempo real</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Receita Mensal</div>
+                <div class="card-icon" style="background: rgba(40, 167, 69, 0.1); color: var(--success);">
+                    <i class="fas fa-dollar-sign"></i>
                 </div>
-                
-                <div class="action-card" onclick="location.href='gerenciar-professores.html'">
-                    <div class="action-icon" style="background: rgba(253, 187, 45, 0.1); color: var(--accent);">
-                        <i class="fas fa-cogs"></i>
-                    </div>
-                    <h3 class="action-title">Gerenciar Professores</h3>
-                </div>
-                
-                <div class="action-card" onclick="location.href='controle-financeiro.html'">
-                    <div class="action-icon" style="background: rgba(40, 167, 69, 0.1); color: var(--success);">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <h3 class="action-title">Controle Financeiro</h3>
-                </div>
+            </div>
+            <div class="card-content">
+                <div class="card-value" id="receitaMensal">R$ 0,00</div>
+                <div class="card-desc">Atualizado em tempo real</div>
             </div>
         </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "./assets/js/firebase-config.js";
-        import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+    <div class="charts">
+        <div class="chart-container">
+            <h3 class="chart-title">Distribuição por Turma</h3>
+            <canvas id="classesChart"></canvas>
+        </div>
+    </div>
+</div>
 
-        const app = initializeApp();
-        const db = getFirestore(app);
+<script type="module">
+import { initializeApp } from "./assets/js/firebase-config.js";
+import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-        async function loadDashboardData(){
-            try{
-                const alunosSnapshot = await getDocs(collection(db,"inscricoes"));
-                const professoresSnapshot = await getDocs(collection(db,"professores"));
+const app = initializeApp();
+const db = getFirestore(app);
 
-                // Alunos ativos
-                const ativos = alunosSnapshot.docs.filter(doc => doc.data().status === "ativo").length;
-                document.getElementById('alunosAtivos').textContent = ativos;
+async function loadDashboardData() {
+    // Carregar alunos
+    const snapshot = await getDocs(collection(db, "inscricoes"));
+    const alunos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-                // Turmas ativas
-                const turmasSet = new Set();
-                alunosSnapshot.docs.forEach(doc => {
-                    if(doc.data().status === "ativo") turmasSet.add(doc.data().turma);
-                });
-                document.getElementById('turmasAtivas').textContent = turmasSet.size;
+    // Alunos ativos
+    const alunosAtivos = alunos.filter(a => a.status === "ativo").length;
+    document.getElementById("alunosAtivos").textContent = alunosAtivos;
 
-                // Professores
-                const profAtivos = professoresSnapshot.docs.filter(doc => doc.data().status === "ativo").length;
-                document.getElementById('totalProfessores').textContent = profAtivos;
+    // Receita mensal (somar todos os valorPago)
+    let receita = 0;
+    alunos.forEach(a => {
+        if (a.valorPago) receita += Number(a.valorPago);
+    });
+    document.getElementById("receitaMensal").textContent = `R$ ${receita.toFixed(2)}`;
 
-                // Receita mensal
-                let receita = 0;
-                alunosSnapshot.docs.forEach(doc => {
-                    if(doc.data().valorPago) receita += Number(doc.data().valorPago);
-                });
-                document.getElementById('receitaMensal').textContent = `R$ ${receita.toFixed(2)}`;
+    // Turmas ativas
+    const turmasSet = new Set();
+    alunos.forEach(a => {
+        if (a.turma) turmasSet.add(a.turma);
+    });
+    document.getElementById("turmasAtivas").textContent = turmasSet.size;
 
-            }catch(error){
-                console.error("Erro ao carregar dashboard:",error);
-            }
+    // Professores ativos
+    const professoresSnapshot = await getDocs(query(collection(db, "professores"), where("status", "==", "ativo")));
+    document.getElementById("totalProfessores").textContent = professoresSnapshot.size;
+
+    // Gráfico de turmas
+    const cursosMap = {};
+    alunos.forEach(a => {
+        if (a.turma) {
+            if (!cursosMap[a.turma]) cursosMap[a.turma] = 0;
+            cursosMap[a.turma]++;
         }
+    });
 
-        loadDashboardData();
-    </script>
+    const ctx = document.getElementById("classesChart").getContext("2d");
+    new Chart(ctx, {
+        type: "pie",
+        data: {
+            labels: Object.keys(cursosMap),
+            datasets: [{
+                data: Object.values(cursosMap),
+                backgroundColor: ["#1a2a6c","#b21f1f","#fdbb2d","#28a745","#17a2b8"]
+            }]
+        },
+        options: { responsive: true }
+    });
+}
+
+loadDashboardData();
+</script>
+
 </body>
 </html>
