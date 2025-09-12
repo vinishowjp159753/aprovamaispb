@@ -4,42 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de Alunos - AprovaMaisPB</title>
+    <script type="module" src="assets/js/firebase-config.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/lista-alunos.css">
+    <style>
+        /* --- Aqui você coloca o CSS da lista de alunos --- */
+        body { font-family: Arial, sans-serif; background: #f5f7fb; margin:0; }
+        .container { max-width: 1200px; margin: auto; padding: 20px; }
+        h1 { text-align: center; color: #1a2a6c; margin-bottom: 20px; }
+        .search-box { display:flex; margin-bottom: 15px; }
+        .search-box input { flex:1; padding:10px; border-radius:5px; border:1px solid #ddd; margin-right:10px; }
+        .btn { padding:10px 15px; border:none; border-radius:5px; background:#1a2a6c; color:white; cursor:pointer; }
+        table { width:100%; border-collapse: collapse; background:white; border-radius:10px; overflow:hidden; }
+        th, td { padding:15px; border-bottom:1px solid #eee; text-align:left; }
+        th { background:#1a2a6c; color:white; }
+        tr:hover { background:#f9f9f9; }
+        .status { padding:5px 10px; border-radius:20px; font-size:12px; font-weight:500; }
+        .status.ativo { background:#e8f5e9; color:#2e7d32; }
+        .status.inativo { background:#ffebee; color:#d32f2f; }
+    </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Voltar ao Dashboard</a>
-            <h1>Lista de Alunos</h1>
-            <div></div>
+        <h1>Lista de Alunos</h1>
+
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Buscar aluno...">
+            <button class="btn" onclick="searchStudents()"><i class="fas fa-search"></i> Buscar</button>
         </div>
 
-        <div class="controls">
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Buscar aluno...">
-                <button class="btn" onclick="searchStudents()"><i class="fas fa-search"></i> Buscar</button>
-            </div>
-        </div>
-
-        <div class="table-container">
-            <table id="studentsTable">
-                <thead>
-                    <tr>
-                        <th>Pedido</th>
-                        <th>Nome</th>
-                        <th>Turma</th>
-                        <th>Status</th>
-                        <th>Telefone</th>
-                        <th>Email</th>
-                        <th>Senha</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Dados serão inseridos via JS -->
-                </tbody>
-            </table>
-        </div>
+        <table id="studentsTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Turma</th>
+                    <th>Status</th>
+                    <th>Número do Pedido</th>
+                    <th>Telefone</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Alunos serão carregados aqui -->
+            </tbody>
+        </table>
     </div>
 
     <script type="module">
@@ -49,60 +57,49 @@
         const app = initializeApp();
         const db = getFirestore(app);
 
-        const studentsTableBody = document.querySelector('#studentsTable tbody');
-
         async function loadStudents() {
-            studentsTableBody.innerHTML = "<tr><td colspan='7'>Carregando...</td></tr>";
+            const tableBody = document.querySelector('#studentsTable tbody');
+            tableBody.innerHTML = '';
 
             try {
-                const snapshot = await getDocs(collection(db, "inscricao"));
-                studentsTableBody.innerHTML = "";
+                const querySnapshot = await getDocs(collection(db, "inscricoes"));
 
-                snapshot.forEach(doc => {
+                querySnapshot.forEach(doc => {
                     const data = doc.data();
                     const row = document.createElement('tr');
 
                     row.innerHTML = `
-                        <td>${data.numeroPedido || '-'}</td>
-                        <td>${data.name || '-'}</td>
-                        <td>${data.course || '-'}</td>
+                        <td>${doc.id}</td>
+                        <td>${data.name || ''}</td>
+                        <td>${data.course || ''}</td>
                         <td><span class="status ${data.status === 'confirmado' ? 'ativo' : 'inativo'}">${data.status}</span></td>
-                        <td>${data.phone || '-'}</td>
-                        <td>${data.email || '-'}</td>
-                        <td>${data.senha || '-'}</td>
+                        <td>${data.numeroPedido || ''}</td>
+                        <td>${data.phone || ''}</td>
+                        <td>${data.email || ''}</td>
                     `;
 
-                    studentsTableBody.appendChild(row);
+                    tableBody.appendChild(row);
                 });
-
             } catch (error) {
                 console.error("Erro ao carregar alunos:", error);
-                studentsTableBody.innerHTML = "<tr><td colspan='7'>Erro ao carregar dados.</td></tr>";
             }
         }
 
         function searchStudents() {
             const searchText = document.getElementById('searchInput').value.toLowerCase();
-            const rows = studentsTableBody.querySelectorAll('tr');
+            const rows = document.querySelectorAll('#studentsTable tbody tr');
 
             rows.forEach(row => {
-                const name = row.cells[1].textContent.toLowerCase();
-                const course = row.cells[2].textContent.toLowerCase();
-                const status = row.cells[3].textContent.toLowerCase();
-
-                if (name.includes(searchText) || course.includes(searchText) || status.includes(searchText)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
+                const cellsText = Array.from(row.cells).map(cell => cell.textContent.toLowerCase()).join(' ');
+                row.style.display = cellsText.includes(searchText) ? '' : 'none';
             });
         }
 
-        // Atualiza a lista ao carregar a página
-        window.addEventListener('load', loadStudents);
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') searchStudents();
+        });
 
-        // Atualiza a lista a cada 10 segundos (opcional)
-        setInterval(loadStudents, 10000);
+        loadStudents();
     </script>
 </body>
 </html>
