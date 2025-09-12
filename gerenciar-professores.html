@@ -116,4 +116,166 @@ tr:hover { background:#f9f9f9; }
     <div class="modal-content">
         <h2>Editar Professor</h2>
         <div class="form-group"><label for="editName">Nome Completo</label><input type="text" id="editName"></div>
-        <div class="form-group"><label for="editEmail">E-mail</label><input type="em
+        <div class="form-group"><label for="editEmail">E-mail</label><input type="email" id="editEmail"></div>
+        <div class="form-group"><label for="editMateria">Matéria</label>
+            <select id="editMateria">
+                <option value="portugues">Português</option>
+                <option value="matematica">Matemática</option>
+                <option value="historia">História</option>
+                <option value="geografia">Geografia</option>
+                <option value="ingles">Inglês</option>
+            </select>
+        </div>
+        <div class="form-group"><label for="editStatus">Status</label>
+            <select id="editStatus">
+                <option value="ativo">Ativo</option>
+                <option value="inativo">Inativo</option>
+            </select>
+        </div>
+        <div class="form-actions">
+            <button class="btn" onclick="closeModal('editModal')">Cancelar</button>
+            <button class="btn" style="background: var(--primary);" onclick="salvarEdicao()">Salvar</button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "./assets/js/firebase-config.js";
+import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+const app = initializeApp();
+const db = getFirestore(app);
+
+let professores = [];
+let designacoes = [];
+let professorEditando = null;
+
+function openTab(tabName) {
+    const tabContents = document.getElementsByClassName('tab-content');
+    for (let i = 0; i < tabContents.length; i++) tabContents[i].classList.remove('active');
+    const tabs = document.getElementsByClassName('tab');
+    for (let i = 0; i < tabs.length; i++) tabs[i].classList.remove('active');
+    document.getElementById(tabName).classList.add('active');
+    event.currentTarget.classList.add('active');
+
+    if(tabName === 'designar'){
+        carregarProfessoresParaDesignacao();
+        carregarDesignacoes();
+    }
+}
+
+async function carregarProfessores(){
+    const tbody = document.querySelector('#teachersTable tbody');
+    tbody.innerHTML = '';
+    professores = [];
+    const snapshot = await getDocs(collection(db,'professores'));
+    snapshot.forEach(docSnap=>{
+        let professor = docSnap.data();
+        professor.idFirebase = docSnap.id;
+        professores.push(professor);
+    });
+
+    professores.forEach(professor=>{
+        const turmas = designacoes.filter(d=>d.professorId===professor.idFirebase).map(d=>d.turma).join(', ') || 'Nenhuma';
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${professor.nome}</td>
+            <td>${professor.materia}</td>
+            <td>${professor.usuario}</td>
+            <td><span class="status ${professor.status}">${professor.status}</span></td>
+            <td>${turmas}</td>
+            <td>
+                <button class="btn" onclick="editarProfessor('${professor.idFirebase}')"><i class="fas fa-edit"></i> Editar</button>
+                <button class="btn assign-btn" onclick="designarTurmaProfessor('${professor.idFirebase}')"><i class="fas fa-users"></i> Designar</button>
+                <button class="btn delete-btn" onclick="excluirProfessor('${professor.idFirebase}')"><i class="fas fa-trash"></i> Excluir</button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+function carregarProfessoresParaDesignacao(){
+    const select = document.getElementById('selectProfessor');
+    select.innerHTML = '<option value="">Selecione um professor</option>';
+    professores.filter(p=>p.status==='ativo').forEach(p=>{
+        const option = document.createElement('option');
+        option.value = p.idFirebase;
+        option.textContent = `${p.nome} - ${p.materia}`;
+        select.appendChild(option);
+    });
+}
+
+function carregarDesignacoes(){
+    const tbody = document.getElementById('designacoesBody');
+    tbody.innerHTML = '';
+    designacoes.forEach(d=>{
+        const professor = professores.find(p=>p.idFirebase===d.professorId);
+        if(professor){
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${professor.nome}</td>
+                <td>${d.turma}</td>
+                <td>
+                    <button class="btn delete-btn" onclick="removerDesignacao('${d.id}')"><i class="fas fa-unlink"></i> Remover</button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        }
+    });
+}
+
+function designarTurmaProfessor(professorId){
+    openTab('designar');
+    document.getElementById('selectProfessor').value = professorId;
+}
+
+function editarProfessor(idFirebase){
+    const professor = professores.find(p=>p.idFirebase===idFirebase);
+    if(professor){
+        professorEditando = professor;
+        document.getElementById('editName').value = professor.nome;
+        document.getElementById('editEmail').value = professor.email;
+        document.getElementById('editMateria').value = professor.materia;
+        document.getElementById('editStatus').value = professor.status;
+        document.getElementById('editModal').style.display='flex';
+    }
+}
+
+async function salvarEdicao(){
+    if(professorEditando){
+        const ref = doc(db,'professores',professorEditando.idFirebase);
+        await updateDoc(ref,{
+            nome: document.getElementById('editName').value,
+            email: document.getElementById('editEmail').value,
+            materia: document.getElementById('editMateria').value,
+            status: document.getElementById('editStatus').value
+        });
+        closeModal('editModal');
+        await carregarProfessores();
+        alert('Professor atualizado com sucesso!');
+    }
+}
+
+async function excluirProfessor(idFirebase){
+    const temDesignacoes = designacoes.some(d=>d.professorId===idFirebase);
+    if(temDesignacoes){ alert('Não é possível excluir, remova designações primeiro.'); return; }
+    if(confirm('Deseja realmente excluir este professor?')){
+        await deleteDoc(doc(db,'professores',idFirebase));
+        await carregarProfessores();
+        alert('Professor excluído com sucesso!');
+    }
+}
+
+function closeModal(modalId){ document.getElementById(modalId).style.display='none'; }
+
+document.addEventListener('DOMContentLoaded', async ()=>{
+    await carregarProfessores();
+});
+
+// Fechar modal clicando fora
+window.onclick = function(event){
+    if(event.target.classList.contains('modal')) event.target.style.display='none';
+}
+</script>
+</body>
+</html>
