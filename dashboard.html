@@ -4,8 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AprovaMaisPB - Dashboard</title>
+
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- CSS -->
     <link rel="stylesheet" href="assets/css/dashboard.css">
 </head>
 <body>
@@ -31,13 +37,6 @@
                 <h1>Bem-vindo, <span id="userName">Administrador</span>!</h1>
                 <p>Painel de controle do AprovaMaisPB</p>
             </div>
-            <div class="user-info">
-                <i class="fas fa-user-circle" style="font-size: 40px; color: var(--primary);"></i>
-                <div>
-                    <div id="currentUser">admin</div>
-                    <small>Administrador</small>
-                </div>
-            </div>
         </div>
 
         <!-- Dashboard Cards -->
@@ -45,65 +44,40 @@
             <div class="card">
                 <div class="card-header">
                     <div class="card-title">Alunos Ativos</div>
-                    <div class="card-icon" style="background: rgba(26, 42, 108, 0.1); color: var(--primary);">
+                    <div class="card-icon" style="background: rgba(26, 42, 108, 0.1); color: #1a2a6c;">
                         <i class="fas fa-user-graduate"></i>
                     </div>
                 </div>
                 <div class="card-content">
                     <div class="card-value" id="alunosAtivos">0</div>
-                    <div class="card-desc" id="alunosVariacao">Carregando...</div>
+                    <div class="card-desc" id="alunosVariacao">Atualizado em tempo real</div>
                 </div>
             </div>
             
             <div class="card">
                 <div class="card-header">
                     <div class="card-title">Turmas Ativas</div>
-                    <div class="card-icon" style="background: rgba(178, 31, 31, 0.1); color: var(--secondary);">
+                    <div class="card-icon" style="background: rgba(178, 31, 31, 0.1); color: #b21f1f;">
                         <i class="fas fa-users"></i>
                     </div>
                 </div>
                 <div class="card-content">
                     <div class="card-value" id="turmasAtivas">0</div>
-                    <div class="card-desc" id="turmasVariacao">Carregando...</div>
+                    <div class="card-desc" id="turmasVariacao">Total de turmas ativas</div>
                 </div>
             </div>
             
             <div class="card">
                 <div class="card-header">
                     <div class="card-title">Professores</div>
-                    <div class="card-icon" style="background: rgba(253, 187, 45, 0.1); color: var(--accent);">
+                    <div class="card-icon" style="background: rgba(253, 187, 45, 0.1); color: #fdbb2d;">
                         <i class="fas fa-chalkboard-teacher"></i>
                     </div>
                 </div>
                 <div class="card-content">
                     <div class="card-value" id="totalProfessores">0</div>
-                    <div class="card-desc" id="professoresVariacao">Carregando...</div>
+                    <div class="card-desc" id="professoresVariacao">Atualizado em tempo real</div>
                 </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">Receita Mensal</div>
-                    <div class="card-icon" style="background: rgba(40, 167, 69, 0.1); color: var(--success);">
-                        <i class="fas fa-dollar-sign"></i>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <div class="card-value" id="receitaMensal">R$ 0,00</div>
-                    <div class="card-desc" id="receitaVariacao">Carregando...</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Charts -->
-        <div class="charts">
-            <div class="chart-container">
-                <h3 class="chart-title">Desempenho Mensal de Matrículas</h3>
-                <canvas id="enrollmentsChart"></canvas>
-            </div>
-            <div class="chart-container">
-                <h3 class="chart-title">Distribuição por Turma</h3>
-                <canvas id="classesChart"></canvas>
             </div>
         </div>
 
@@ -112,43 +86,39 @@
             <h2 class="section-title">Ações Rápidas</h2>
             <div class="actions-grid">
                 <div class="action-card" onclick="location.href='lista-alunos.html'">
-                    <div class="action-icon" style="background: rgba(26, 42, 108, 0.1); color: var(--primary);">
+                    <div class="action-icon" style="background: rgba(26, 42, 108, 0.1); color: #1a2a6c;">
                         <i class="fas fa-list"></i>
                     </div>
                     <h3 class="action-title">Lista Completa de Alunos</h3>
-                    <p class="action-desc">Visualize, edite e gerencie todos os alunos</p>
                 </div>
                 
                 <div class="action-card" onclick="location.href='criar-professor.html'">
-                    <div class="action-icon" style="background: rgba(178, 31, 31, 0.1); color: var(--secondary);">
+                    <div class="action-icon" style="background: rgba(178, 31, 31, 0.1); color: #b21f1f;">
                         <i class="fas fa-user-plus"></i>
                     </div>
                     <h3 class="action-title">Criar Acesso Professor</h3>
-                    <p class="action-desc">Crie login e senha para professores</p>
                 </div>
                 
                 <div class="action-card" onclick="location.href='gerenciar-professores.html'">
-                    <div class="action-icon" style="background: rgba(253, 187, 45, 0.1); color: var(--accent);">
+                    <div class="action-icon" style="background: rgba(253, 187, 45, 0.1); color: #fdbb2d;">
                         <i class="fas fa-cogs"></i>
                     </div>
                     <h3 class="action-title">Gerenciar Professores</h3>
-                    <p class="action-desc">Designar turmas e gerenciar professores</p>
                 </div>
                 
                 <div class="action-card" onclick="location.href='controle-financeiro.html'">
-                    <div class="action-icon" style="background: rgba(40, 167, 69, 0.1); color: var(--success);">
+                    <div class="action-icon" style="background: rgba(40, 167, 69, 0.1); color: #28a745;">
                         <i class="fas fa-chart-line"></i>
                     </div>
                     <h3 class="action-title">Controle Financeiro</h3>
-                    <p class="action-desc">Acompanhe receitas e finanças</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Firebase & Dashboard Script -->
+    <!-- Firebase & Script -->
     <script type="module">
-        import { initializeApp } from "./assets/js/firebase-config.js";
+        import { initializeApp } from './assets/js/firebase-config.js';
         import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
         const app = initializeApp();
@@ -156,9 +126,11 @@
 
         async function loadDashboardData() {
             try {
+                // Alunos ativos
                 const alunosSnapshot = await getDocs(query(collection(db, "inscricao"), where("status", "==", "confirmado")));
                 document.getElementById('alunosAtivos').textContent = alunosSnapshot.size;
 
+                // Turmas ativas
                 const turmasSet = new Set();
                 alunosSnapshot.forEach(doc => {
                     const data = doc.data();
@@ -166,47 +138,12 @@
                 });
                 document.getElementById('turmasAtivas').textContent = turmasSet.size;
 
+                // Professores ativos
                 const professoresSnapshot = await getDocs(query(collection(db, "professores"), where("status", "==", "ativo")));
                 document.getElementById('totalProfessores').textContent = professoresSnapshot.size;
-
-                let receitaMensal = 0;
-                alunosSnapshot.forEach(doc => {
-                    const data = doc.data();
-                    if (data.valorPago) receitaMensal += Number(data.valorPago);
-                });
-                document.getElementById('receitaMensal').textContent = `R$ ${receitaMensal.toFixed(2)}`;
-
-                setupCharts(alunosSnapshot);
             } catch (error) {
                 console.error("Erro ao carregar dashboard:", error);
             }
-        }
-
-        function setupCharts(alunosSnapshot) {
-            const months = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
-            const matriculasPorMes = new Array(12).fill(0);
-            alunosSnapshot.forEach(doc => {
-                const data = doc.data();
-                if (data.criadoEm) matriculasPorMes[new Date(data.criadoEm).getMonth()]++;
-            });
-
-            new Chart(document.getElementById('enrollmentsChart').getContext('2d'), {
-                type: 'bar',
-                data: { labels: months, datasets: [{ label: 'Matrículas', data: matriculasPorMes, backgroundColor: 'rgba(26,42,108,0.7)' }]},
-                options: { responsive: true }
-            });
-
-            const cursosMap = {};
-            alunosSnapshot.forEach(doc => {
-                const data = doc.data();
-                if (data.course) cursosMap[data.course] = (cursosMap[data.course] || 0) + 1;
-            });
-
-            new Chart(document.getElementById('classesChart').getContext('2d'), {
-                type: 'pie',
-                data: { labels: Object.keys(cursosMap), datasets: [{ data: Object.values(cursosMap), backgroundColor: ['#1a2a6c','#b21f1f','#fdbb2d','#28a745','#17a2b8'] }]},
-                options: { responsive: true }
-            });
         }
 
         loadDashboardData();
