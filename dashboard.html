@@ -148,18 +148,15 @@
 
     <!-- Firebase & Dashboard Script -->
     <script type="module">
-        import { initializeApp } from "./assets/js/firebase-config.js";
-        import { getFirestore, collection, getDocs, query, where, Timestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-
-        const app = initializeApp();
-        const db = getFirestore(app);
+        import { db } from "./assets/js/firebase-config.js";
+        import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
         async function loadDashboardData() {
             try {
-                // Alunos ativos
+                // Alunos confirmados
                 const alunosSnapshot = await getDocs(query(collection(db, "inscricao"), where("status", "==", "confirmado")));
                 document.getElementById('alunosAtivos').textContent = alunosSnapshot.size;
-                document.getElementById('alunosVariacao').textContent = `Atualizado em tempo real`;
+                document.getElementById('alunosVariacao').textContent = "Atualizado em tempo real";
 
                 // Turmas ativas
                 const turmasSet = new Set();
@@ -168,24 +165,23 @@
                     if (data.course) turmasSet.add(data.course);
                 });
                 document.getElementById('turmasAtivas').textContent = turmasSet.size;
-                document.getElementById('turmasVariacao').textContent = `Total de turmas ativas`;
+                document.getElementById('turmasVariacao').textContent = "Total de turmas ativas";
 
                 // Professores ativos
                 const professoresSnapshot = await getDocs(query(collection(db, "professores"), where("status", "==", "ativo")));
                 document.getElementById('totalProfessores').textContent = professoresSnapshot.size;
-                document.getElementById('professoresVariacao').textContent = `Atualizado em tempo real`;
+                document.getElementById('professoresVariacao').textContent = "Atualizado em tempo real";
 
                 // Receita mensal
-                const hoje = new Date();
-                const primeiroDiaMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
                 let receitaMensal = 0;
                 alunosSnapshot.forEach(doc => {
                     const data = doc.data();
                     if (data.valorPago) receitaMensal += Number(data.valorPago);
                 });
                 document.getElementById('receitaMensal').textContent = `R$ ${receitaMensal.toFixed(2)}`;
-                document.getElementById('receitaVariacao').textContent = `Atualizado em tempo real`;
+                document.getElementById('receitaVariacao').textContent = "Atualizado em tempo real";
 
+                // Setup charts
                 setupCharts(alunosSnapshot);
             } catch (error) {
                 console.error("Erro ao carregar dashboard:", error);
@@ -193,17 +189,27 @@
         }
 
         function setupCharts(alunosSnapshot) {
-            // Gráfico de matrículas
             const months = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
             const matriculasPorMes = new Array(12).fill(0);
+            const cursosMap = {};
+
             alunosSnapshot.forEach(doc => {
                 const data = doc.data();
+                
+                // Matrículas por mês
                 if (data.criadoEm) {
                     const date = new Date(data.criadoEm);
                     matriculasPorMes[date.getMonth()]++;
                 }
+
+                // Distribuição por curso
+                if (data.course) {
+                    if (!cursosMap[data.course]) cursosMap[data.course] = 0;
+                    cursosMap[data.course]++;
+                }
             });
 
+            // Matrículas Chart
             const ctx1 = document.getElementById('enrollmentsChart').getContext('2d');
             new Chart(ctx1, {
                 type: 'bar',
@@ -218,16 +224,7 @@
                 options: { responsive: true }
             });
 
-            // Distribuição por curso
-            const cursosMap = {};
-            alunosSnapshot.forEach(doc => {
-                const data = doc.data();
-                if (data.course) {
-                    if (!cursosMap[data.course]) cursosMap[data.course] = 0;
-                    cursosMap[data.course]++;
-                }
-            });
-
+            // Distribuição por Turma Chart
             const ctx2 = document.getElementById('classesChart').getContext('2d');
             new Chart(ctx2, {
                 type: 'pie',
@@ -235,9 +232,7 @@
                     labels: Object.keys(cursosMap),
                     datasets: [{
                         data: Object.values(cursosMap),
-                        backgroundColor: [
-                            '#1a2a6c', '#b21f1f', '#fdbb2d', '#28a745', '#17a2b8'
-                        ]
+                        backgroundColor: ['#1a2a6c', '#b21f1f', '#fdbb2d', '#28a745', '#17a2b8']
                     }]
                 },
                 options: { responsive: true }
