@@ -1,195 +1,54 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lista de Alunos - AprovaMaisPB</title>
-<link rel="stylesheet" href="assets/css/lista-alunos.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>
-/* Estilos básicos da tabela e modais */
-body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f5f7fb; }
-h1 { text-align:center; margin:20px 0; color:#1a2a6c; }
-.controls { text-align:center; margin-bottom:15px; }
-#searchInput { padding:8px; width:300px; border-radius:5px; border:1px solid #ccc; }
-.table-container { max-width:1200px; margin:0 auto; background:white; border-radius:10px; overflow:hidden; box-shadow:0 5px 15px rgba(0,0,0,0.05); }
-table { width:100%; border-collapse:collapse; }
-th, td { padding:12px; text-align:left; border-bottom:1px solid #eee; }
-th { background:#1a2a6c; color:white; }
-tr:hover { background:#f0f0f0; }
-.action-btn { margin-right:5px; padding:5px 8px; border:none; border-radius:3px; cursor:pointer; }
-.edit { background:#ffc107; color:#000; }
-.payment { background:#28a745; color:#fff; }
-.obs { background:#17a2b8; color:#fff; }
-/* Modais */
-.modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000; }
-.modal-content { background:white; padding:20px; border-radius:10px; width:400px; max-width:90%; }
-.modal h2 { color:#1a2a6c; margin-bottom:15px; }
-.form-group { margin-bottom:15px; }
-.form-group label { display:block; margin-bottom:5px; }
-.form-group input, .form-group textarea, .form-group select { width:100%; padding:8px; border-radius:5px; border:1px solid #ccc; }
-.form-actions { text-align:right; margin-top:10px; }
-.form-actions button { padding:8px 12px; border:none; border-radius:5px; cursor:pointer; margin-left:5px; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Alunos - AprovaMaisPB</title>
+    <link rel="stylesheet" href="assets/css/lista-alunos.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-
-<h1>Lista de Alunos</h1>
-
-<div class="controls">
-    <input type="text" id="searchInput" placeholder="Buscar aluno...">
-</div>
-
-<div class="table-container">
-    <table id="studentsTable">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nome</th>
-                <th>Curso</th>
-                <th>Status</th>
-                <th>Número do Pedido</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Linhas preenchidas via JS -->
-        </tbody>
-    </table>
-</div>
-
-<!-- Modal Pagamento -->
-<div class="modal" id="paymentModal">
-    <div class="modal-content">
-        <h2>Registrar Pagamento</h2>
-        <p>Aluno: <strong id="paymentStudentName"></strong></p>
-        <div class="form-group">
-            <label>Valor (R$)</label>
-            <input type="number" id="paymentValue" min="0" step="0.01">
+    <div class="container">
+        <div class="header">
+            <a href="dashboard.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Voltar ao Dashboard
+            </a>
+            <h1>Lista Completa de Alunos</h1>
+            <div></div>
         </div>
-        <div class="form-group">
-            <label>Data</label>
-            <input type="date" id="paymentDate">
+        
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" placeholder="Buscar aluno..." id="searchInput">
+                <button class="btn" id="searchBtn"><i class="fas fa-search"></i> Buscar</button>
+            </div>
+            <button class="btn" id="exportBtn">
+                <i class="fas fa-download"></i> Exportar
+            </button>
         </div>
-        <div class="form-group">
-            <label>Método de Pagamento</label>
-            <select id="paymentMethod">
-                <option value="dinheiro">Dinheiro</option>
-                <option value="pix">PIX</option>
-                <option value="cartao">Cartão</option>
-                <option value="transferencia">Transferência</option>
-            </select>
-        </div>
-        <div class="form-actions">
-            <button onclick="closeModal('paymentModal')">Cancelar</button>
-            <button onclick="confirmPayment()">Confirmar</button>
+        
+        <div class="table-container">
+            <table id="studentsTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Curso</th>
+                        <th>Status</th>
+                        <th>Número do Pedido</th>
+                        <th>Email</th>
+                        <th>Telefone</th>
+                        <th>Senha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Os alunos serão carregados aqui pelo JS -->
+                </tbody>
+            </table>
         </div>
     </div>
-</div>
 
-<!-- Modal Observação -->
-<div class="modal" id="observationModal">
-    <div class="modal-content">
-        <h2>Adicionar Observação</h2>
-        <p>Aluno: <strong id="observationStudentName"></strong></p>
-        <div class="form-group">
-            <textarea id="observationText" rows="4" placeholder="Digite a observação..."></textarea>
-        </div>
-        <div class="form-actions">
-            <button onclick="closeModal('observationModal')">Cancelar</button>
-            <button onclick="saveObservation()">Salvar</button>
-        </div>
-    </div>
-</div>
-
-<script type="module">
-import { initializeApp } from './assets/js/firebase-config.js';
-import { getFirestore, collection, getDocs, addDoc, doc, updateDoc } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
-
-const app = initializeApp();
-const db = getFirestore(app);
-
-const tableBody = document.querySelector('#studentsTable tbody');
-const searchInput = document.getElementById('searchInput');
-
-let currentStudentId = null;
-let currentStudentName = null;
-
-async function loadStudents() {
-    tableBody.innerHTML = '';
-    const snapshot = await getDocs(collection(db, "inscricao"));
-    snapshot.forEach(docSnap => {
-        const data = docSnap.data();
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${docSnap.id}</td>
-            <td>${data.name || ''}</td>
-            <td>${data.course || ''}</td>
-            <td>${data.status || ''}</td>
-            <td>${data.numeroPedido || ''}</td>
-            <td>
-                <button class="action-btn edit" onclick="alert('Editar aluno: ${data.name}')"><i class="fas fa-edit"></i></button>
-                <button class="action-btn payment" onclick="showPaymentModal('${docSnap.id}','${data.name}')"><i class="fas fa-money-bill"></i></button>
-                <button class="action-btn obs" onclick="showObservationModal('${docSnap.id}','${data.name}')"><i class="fas fa-comment"></i></button>
-            </td>
-        `;
-        tableBody.appendChild(tr);
-    });
-}
-
-function showPaymentModal(id, name){
-    currentStudentId = id;
-    currentStudentName = name;
-    document.getElementById('paymentStudentName').textContent = name;
-    document.getElementById('paymentValue').value = '';
-    document.getElementById('paymentDate').value = new Date().toISOString().split('T')[0];
-    document.getElementById('paymentModal').style.display = 'flex';
-}
-
-function confirmPayment(){
-    const value = document.getElementById('paymentValue').value;
-    const date = document.getElementById('paymentDate').value;
-    const method = document.getElementById('paymentMethod').value;
-    if(!value || value<=0){ alert('Informe um valor válido'); return; }
-
-    // Salvar pagamento no Firestore
-    const paymentsRef = collection(db,'inscricao',currentStudentId,'pagamentos');
-    addDoc(paymentsRef,{
-        valor:Number(value),
-        data:date,
-        metodo:method
-    }).then(()=> { alert('Pagamento registrado!'); closeModal('paymentModal'); });
-}
-
-function showObservationModal(id,name){
-    currentStudentId = id;
-    currentStudentName = name;
-    document.getElementById('observationStudentName').textContent = name;
-    document.getElementById('observationText').value = '';
-    document.getElementById('observationModal').style.display = 'flex';
-}
-
-function saveObservation(){
-    const text = document.getElementById('observationText').value;
-    if(!text){ alert('Digite uma observação'); return; }
-
-    const obsRef = doc(db,'inscricao',currentStudentId);
-    updateDoc(obsRef,{ observacao:text }).then(()=>{ alert('Observação salva!'); closeModal('observationModal'); });
-}
-
-function closeModal(id){ document.getElementById(id).style.display = 'none'; }
-
-searchInput.addEventListener('input', ()=>{
-    const filter = searchInput.value.toLowerCase();
-    const rows = tableBody.querySelectorAll('tr');
-    rows.forEach(row=>{
-        const text = row.textContent.toLowerCase();
-        row.style.display = text.includes(filter)?'':'none';
-    });
-});
-
-loadStudents();
-</script>
-
+    <!-- Scripts -->
+    <script type="module" src="assets/js/lista-alunos.js"></script>
 </body>
 </html>
