@@ -1,0 +1,135 @@
+:root {
+    --primary: #1a2a6c;
+    --secondary: #b21f1f;
+    --accent: #fdbb2d;
+    --success: #28a745;
+    --light: #f8f9fa;
+    --dark: #343a40;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    background: #f5f7fb;
+    color: #333;
+}
+
+.sidebar {
+    width: 220px;
+    background: var(--primary);
+    color: white;
+    height: 100vh;
+    position: fixed;
+    padding-top: 20px;
+}
+
+.sidebar .logo {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.sidebar .logo img {
+    width: 80px;
+}
+
+.sidebar ul.menu {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar ul.menu li {
+    margin: 10px 0;
+}
+
+.sidebar ul.menu li a {
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+}
+
+.sidebar ul.menu li a.active {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+}
+
+.main-content {
+    margin-left: 240px;
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.dashboard-cards {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+}
+
+.card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    flex: 1;
+    min-width: 220px;
+    padding: 20px;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-value {
+    font-size: 28px;
+    font-weight: 700;
+    margin-top: 10px;
+}
+
+.charts {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.chart-container {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    flex: 1;
+    min-width: 400px;
+    padding: 20px;
+}
+
+.quick-actions {
+    margin-top: 30px;
+}
+
+.actions-grid {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.action-card {
+    background: white;
+    flex: 1;
+    min-width: 220px;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.action-card:hover {
+    transform: translateY(-5px);
+}
