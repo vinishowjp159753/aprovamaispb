@@ -1,184 +1,143 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AprovaMaisPB - Dashboard</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="assets/css/dashboard.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lista de Alunos - AprovaMaisPB</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="assets/css/lista-alunos.css">
 </head>
 <body>
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="logo">
-            <img src="assets/img/logo_aprovamaispb.png" alt="Logo AprovaMaisPB">
-            <h2>AprovaMaisPB</h2>
-        </div>
-        <ul class="menu">
-            <li><a href="index.html"><i class="fas fa-home"></i> <span>Início</span></a></li>
-            <li><a href="matricula.html"><i class="fas fa-user-graduate"></i> <span>Matricule-se</span></a></li>
-            <li><a href="professores.html"><i class="fas fa-chalkboard-teacher"></i> <span>Professores</span></a></li>
-            <li><a href="dashboard.html" class="active"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
-            <li><a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span>Sair</span></a></li>
-        </ul>
+<div class="container">
+    <h1>Lista de Alunos</h1>
+    <input type="text" id="searchInput" placeholder="Buscar aluno...">
+    <table id="studentsTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Turma</th>
+                <th>Telefone</th>
+                <th>Status</th>
+                <th>Valor Pago</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<!-- Modals -->
+<div class="modal" id="paymentModal">
+    <div class="modal-content">
+        <h2>Registrar Pagamento</h2>
+        <p id="paymentStudentName"></p>
+        <input type="number" id="paymentValue" placeholder="Valor">
+        <button onclick="confirmPayment()">Confirmar</button>
+        <button onclick="closeModal('paymentModal')">Cancelar</button>
     </div>
+</div>
 
-    <!-- Main Content -->
-    <div class="main-content">
-        <div class="header">
-            <div class="welcome">
-                <h1>Bem-vindo, <span id="userName">Administrador</span>!</h1>
-                <p>Painel de controle do AprovaMaisPB</p>
-            </div>
-            <div class="user-info">
-                <i class="fas fa-user-circle" style="font-size: 40px; color: var(--primary);"></i>
-                <div>
-                    <div id="currentUser">admin</div>
-                    <small>Administrador</small>
-                </div>
-            </div>
-        </div>
-
-        <!-- Dashboard Cards -->
-        <div class="dashboard-cards">
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">Alunos Ativos</div>
-                    <div class="card-icon" style="background: rgba(26, 42, 108, 0.1); color: var(--primary);">
-                        <i class="fas fa-user-graduate"></i>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <div class="card-value" id="alunosAtivos">0</div>
-                    <div class="card-desc" id="alunosVariacao">Carregando...</div>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">Turmas Ativas</div>
-                    <div class="card-icon" style="background: rgba(178, 31, 31, 0.1); color: var(--secondary);">
-                        <i class="fas fa-users"></i>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <div class="card-value" id="turmasAtivas">0</div>
-                    <div class="card-desc" id="turmasVariacao">Carregando...</div>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">Professores</div>
-                    <div class="card-icon" style="background: rgba(253, 187, 45, 0.1); color: var(--accent);">
-                        <i class="fas fa-chalkboard-teacher"></i>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <div class="card-value" id="totalProfessores">0</div>
-                    <div class="card-desc" id="professoresVariacao">Carregando...</div>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">Receita Mensal</div>
-                    <div class="card-icon" style="background: rgba(40, 167, 69, 0.1); color: var(--success);">
-                        <i class="fas fa-dollar-sign"></i>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <div class="card-value" id="receitaMensal">R$ 0,00</div>
-                    <div class="card-desc" id="receitaVariacao">Carregando...</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="quick-actions">
-            <h2 class="section-title">Ações Rápidas</h2>
-            <div class="actions-grid">
-                <div class="action-card" onclick="location.href='lista-alunos.html'">
-                    <div class="action-icon" style="background: rgba(26, 42, 108, 0.1); color: var(--primary);">
-                        <i class="fas fa-list"></i>
-                    </div>
-                    <h3 class="action-title">Lista Completa de Alunos</h3>
-                    <p class="action-desc">Visualize, edite e gerencie todos os alunos</p>
-                </div>
-                
-                <div class="action-card" onclick="location.href='criar-professor.html'">
-                    <div class="action-icon" style="background: rgba(178, 31, 31, 0.1); color: var(--secondary);">
-                        <i class="fas fa-user-plus"></i>
-                    </div>
-                    <h3 class="action-title">Criar Acesso Professor</h3>
-                    <p class="action-desc">Crie login e senha para professores</p>
-                </div>
-                
-                <div class="action-card" onclick="location.href='gerenciar-professores.html'">
-                    <div class="action-icon" style="background: rgba(253, 187, 45, 0.1); color: var(--accent);">
-                        <i class="fas fa-cogs"></i>
-                    </div>
-                    <h3 class="action-title">Gerenciar Professores</h3>
-                    <p class="action-desc">Designar turmas e gerenciar professores</p>
-                </div>
-                
-                <div class="action-card" onclick="location.href='controle-financeiro.html'">
-                    <div class="action-icon" style="background: rgba(40, 167, 69, 0.1); color: var(--success);">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <h3 class="action-title">Controle Financeiro</h3>
-                    <p class="action-desc">Acompanhe receitas e finanças</p>
-                </div>
-            </div>
-        </div>
+<div class="modal" id="obsModal">
+    <div class="modal-content">
+        <h2>Observação</h2>
+        <p id="obsStudentName"></p>
+        <textarea id="observationText"></textarea>
+        <button onclick="saveObservation()">Salvar</button>
+        <button onclick="closeModal('obsModal')">Cancelar</button>
     </div>
+</div>
 
-    <script type="module">
-        import { initializeApp } from "./assets/js/firebase-config.js";
-        import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+<script type="module">
+import { initializeApp } from "./assets/js/firebase-config.js";
+import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-        const app = initializeApp();
-        const db = getFirestore(app);
+const app = initializeApp();
+const db = getFirestore(app);
 
-        async function loadDashboardData() {
-            try {
-                // Buscar alunos confirmados
-                const alunosSnapshot = await getDocs(collection(db, "inscricoes"));
+let currentStudentId = null;
 
-                const alunosAtivos = alunosSnapshot.docs.filter(doc => doc.data().status === "ativo").length;
-                document.getElementById('alunosAtivos').textContent = alunosAtivos;
-                document.getElementById('alunosVariacao').textContent = `Atualizado em tempo real`;
+async function loadStudents(){
+    const tbody = document.querySelector('#studentsTable tbody');
+    tbody.innerHTML = '';
+    const snapshot = await getDocs(collection(db,"inscricoes"));
+    snapshot.forEach(docSnap => {
+        const data = docSnap.data();
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${docSnap.id}</td>
+            <td>${data.nomeCompleto}</td>
+            <td>${data.turma}</td>
+            <td>${data.telefone}</td>
+            <td>${data.status}</td>
+            <td>${data.valorPago || 0}</td>
+            <td>
+                <button onclick="toggleStatus('${docSnap.id}','${data.status}')">Status</button>
+                <button onclick="openPayment('${docSnap.id}','${data.nomeCompleto}',${data.valorPago || 0})">Pagamento</button>
+                <button onclick="openObservation('${docSnap.id}','${data.nomeCompleto}','${data.observacoes || ''}')">Observação</button>
+                <button onclick="deleteStudent('${docSnap.id}')">Excluir</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
 
-                // Turmas
-                const turmasSet = new Set();
-                alunosSnapshot.forEach(doc => {
-                    const data = doc.data();
-                    if (data.turma) turmasSet.add(data.turma);
-                });
-                document.getElementById('turmasAtivas').textContent = turmasSet.size;
-                document.getElementById('turmasVariacao').textContent = `Total de turmas`;
+function toggleStatus(id,status){
+    const newStatus = status === 'ativo' ? 'pendente' : 'ativo';
+    updateDoc(doc(db,"inscricoes",id),{status:newStatus});
+    loadStudents();
+}
 
-                // Professores ativos
-                const professoresSnapshot = await getDocs(collection(db, "professores"));
-                document.getElementById('totalProfessores').textContent = professoresSnapshot.size;
-                document.getElementById('professoresVariacao').textContent = `Atualizado em tempo real`;
+function openPayment(id,name,currentValue){
+    currentStudentId = id;
+    document.getElementById('paymentStudentName').textContent = name;
+    document.getElementById('paymentValue').value = currentValue;
+    document.getElementById('paymentModal').style.display = 'flex';
+}
 
-                // Receita Mensal (somar valorPago)
-                let receitaMensal = 0;
-                alunosSnapshot.forEach(doc => {
-                    const data = doc.data();
-                    if (data.valorPago) receitaMensal += Number(data.valorPago);
-                });
-                document.getElementById('receitaMensal').textContent = `R$ ${receitaMensal.toFixed(2)}`;
-                document.getElementById('receitaVariacao').textContent = `Atualizado em tempo real`;
+function confirmPayment(){
+    const value = document.getElementById('paymentValue').value;
+    updateDoc(doc(db,"inscricoes",currentStudentId),{valorPago:value});
+    closeModal('paymentModal');
+    loadStudents();
+}
 
-            } catch (error) {
-                console.error("Erro ao carregar dashboard:", error);
-            }
-        }
+function openObservation(id,name,obs){
+    currentStudentId = id;
+    document.getElementById('obsStudentName').textContent = name;
+    document.getElementById('observationText').value = obs;
+    document.getElementById('obsModal').style.display = 'flex';
+}
 
-        loadDashboardData();
-    </script>
+function saveObservation(){
+    const obs = document.getElementById('observationText').value;
+    updateDoc(doc(db,"inscricoes",currentStudentId),{observacoes:obs});
+    closeModal('obsModal');
+    loadStudents();
+}
+
+function deleteStudent(id){
+    if(confirm("Deseja realmente excluir este aluno?")){
+        deleteDoc(doc(db,"inscricoes",id));
+        loadStudents();
+    }
+}
+
+function closeModal(modalId){
+    document.getElementById(modalId).style.display = 'none';
+}
+
+document.getElementById('searchInput').addEventListener('input',()=>{
+    const input = document.getElementById('searchInput').value.toLowerCase();
+    const rows = document.querySelectorAll('#studentsTable tbody tr');
+    rows.forEach(row=>{
+        const nome = row.cells[1].textContent.toLowerCase();
+        const turma = row.cells[2].textContent.toLowerCase();
+        row.style.display = (nome.includes(input)||turma.includes(input))?'':'none';
+    });
+});
+
+loadStudents();
+</script>
 </body>
 </html>
