@@ -4,51 +4,105 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de Alunos - AprovaMaisPB</title>
-    <link rel="stylesheet" href="assets/css/lista-alunos.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/lista-alunos.css">
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <a href="dashboard.html" class="back-btn">
-                <i class="fas fa-arrow-left"></i> Voltar ao Dashboard
-            </a>
-            <h1>Lista Completa de Alunos</h1>
+            <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Voltar ao Dashboard</a>
+            <h1>Lista de Alunos</h1>
             <div></div>
         </div>
-        
+
         <div class="controls">
             <div class="search-box">
-                <input type="text" placeholder="Buscar aluno..." id="searchInput">
-                <button class="btn" id="searchBtn"><i class="fas fa-search"></i> Buscar</button>
+                <input type="text" id="searchInput" placeholder="Buscar aluno...">
+                <button class="btn" onclick="searchStudents()"><i class="fas fa-search"></i> Buscar</button>
             </div>
-            <button class="btn" id="exportBtn">
-                <i class="fas fa-download"></i> Exportar
-            </button>
         </div>
-        
+
         <div class="table-container">
             <table id="studentsTable">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <th>Pedido</th>
                         <th>Nome</th>
-                        <th>Curso</th>
+                        <th>Turma</th>
                         <th>Status</th>
-                        <th>Número do Pedido</th>
-                        <th>Email</th>
                         <th>Telefone</th>
+                        <th>Email</th>
                         <th>Senha</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Os alunos serão carregados aqui pelo JS -->
+                    <!-- Dados serão inseridos via JS -->
                 </tbody>
             </table>
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script type="module" src="assets/js/lista-alunos.js"></script>
+    <script type="module">
+        import { initializeApp } from './assets/js/firebase-config.js';
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+        const app = initializeApp();
+        const db = getFirestore(app);
+
+        const studentsTableBody = document.querySelector('#studentsTable tbody');
+
+        async function loadStudents() {
+            studentsTableBody.innerHTML = "<tr><td colspan='7'>Carregando...</td></tr>";
+
+            try {
+                const snapshot = await getDocs(collection(db, "inscricao"));
+                studentsTableBody.innerHTML = "";
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const row = document.createElement('tr');
+
+                    row.innerHTML = `
+                        <td>${data.numeroPedido || '-'}</td>
+                        <td>${data.name || '-'}</td>
+                        <td>${data.course || '-'}</td>
+                        <td><span class="status ${data.status === 'confirmado' ? 'ativo' : 'inativo'}">${data.status}</span></td>
+                        <td>${data.phone || '-'}</td>
+                        <td>${data.email || '-'}</td>
+                        <td>${data.senha || '-'}</td>
+                    `;
+
+                    studentsTableBody.appendChild(row);
+                });
+
+            } catch (error) {
+                console.error("Erro ao carregar alunos:", error);
+                studentsTableBody.innerHTML = "<tr><td colspan='7'>Erro ao carregar dados.</td></tr>";
+            }
+        }
+
+        function searchStudents() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            const rows = studentsTableBody.querySelectorAll('tr');
+
+            rows.forEach(row => {
+                const name = row.cells[1].textContent.toLowerCase();
+                const course = row.cells[2].textContent.toLowerCase();
+                const status = row.cells[3].textContent.toLowerCase();
+
+                if (name.includes(searchText) || course.includes(searchText) || status.includes(searchText)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // Atualiza a lista ao carregar a página
+        window.addEventListener('load', loadStudents);
+
+        // Atualiza a lista a cada 10 segundos (opcional)
+        setInterval(loadStudents, 10000);
+    </script>
 </body>
 </html>
