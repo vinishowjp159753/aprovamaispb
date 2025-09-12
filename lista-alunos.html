@@ -5,188 +5,121 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lista de Alunos - AprovaMaisPB</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>
-:root {
-  --primary: #1a2a6c;
-  --secondary: #b21f1f;
-  --accent: #fdbb2d;
-  --success: #28a745;
-  --info: #17a2b8;
-}
-body { font-family: 'Segoe UI', sans-serif; background:#f5f7fb; margin:0; padding:0;}
-.container { max-width:1200px; margin:20px auto; padding:20px;}
-.header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; background:#fff; padding:20px; border-radius:10px; box-shadow:0 5px 15px rgba(0,0,0,0.05);}
-.back-btn { text-decoration:none; padding:10px 15px; background:var(--primary); color:#fff; border-radius:5px;}
-.controls { display:flex; justify-content:space-between; margin-bottom:20px; }
-.controls input { padding:10px; border-radius:5px; border:1px solid #ccc; width:300px;}
-.controls .btn { padding:10px 15px; border:none; border-radius:5px; background:var(--primary); color:#fff; cursor:pointer;}
-.table-container { background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 5px 15px rgba(0,0,0,0.05);}
-table { width:100%; border-collapse:collapse;}
-th,td { padding:12px; text-align:left; border-bottom:1px solid #eee;}
-th { background:var(--primary); color:#fff;}
-tr:hover { background:#f9f9f9;}
-.status { padding:5px 10px; border-radius:20px; font-size:12px; font-weight:500;}
-.status.ativo { background:#e8f5e9; color:#2e7d32;}
-.status.pendente { background:#ffebee; color:#d32f2f;}
-.action-btn { padding:5px 8px; margin-right:5px; border:none; border-radius:3px; cursor:pointer;}
-.edit-btn { background:#ffc107; color:#000;}
-.payment-btn { background:var(--success); color:#fff;}
-.obs-btn { background:var(--info); color:#fff;}
-.delete-btn { background:#d32f2f; color:#fff;}
-.modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000;}
-.modal-content { background:#fff; padding:20px; border-radius:10px; width:500px; max-width:90%; max-height:90vh; overflow-y:auto;}
-.modal h2 { color:var(--primary); margin-bottom:20px;}
-.form-group { margin-bottom:15px;}
-.form-group label { display:block; margin-bottom:5px;}
-.form-group input, .form-group textarea, .form-group select { width:100%; padding:10px; border-radius:5px; border:1px solid #ddd;}
-.form-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:20px;}
-.payment-history { margin-top:10px; padding:10px; background:#f8f9fa; border-radius:5px;}
-.payment-item { display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #ddd;}
-.payment-item:last-child { border-bottom:none;}
-</style>
+<link rel="stylesheet" href="assets/css/lista-alunos.css">
 </head>
 <body>
 <div class="container">
-    <div class="header">
-        <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Voltar</a>
-        <h1>Lista de Alunos</h1>
-        <div></div>
-    </div>
-    <div class="controls">
-        <input type="text" id="searchInput" placeholder="Buscar aluno...">
-        <button class="btn" onclick="searchStudents()"><i class="fas fa-search"></i> Buscar</button>
-    </div>
-    <div class="table-container">
-        <table id="studentsTable">
-            <thead>
-                <tr>
-                    <th style="display:none;">ID</th>
-                    <th>Nome</th>
-                    <th>Turma</th>
-                    <th>Telefone</th>
-                    <th>Status</th>
-                    <th>Valor Pago</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
+    <h1>Lista de Alunos</h1>
+    <input type="text" id="searchInput" placeholder="Buscar aluno...">
+    <table id="studentsTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Turma</th>
+                <th>Telefone</th>
+                <th>Status</th>
+                <th>Valor Pago</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
 </div>
 
-<!-- Modais -->
+<!-- Modals -->
 <div class="modal" id="paymentModal">
-  <div class="modal-content">
-    <h2>Registrar Pagamento</h2>
-    <p>Aluno: <strong id="paymentStudentName"></strong></p>
-    <div class="form-group">
-      <label for="paymentValue">Valor (R$)</label>
-      <input type="number" id="paymentValue" step="0.01" min="0">
+    <div class="modal-content">
+        <h2>Registrar Pagamento</h2>
+        <p id="paymentStudentName"></p>
+        <input type="number" id="paymentValue" placeholder="Valor">
+        <button onclick="confirmPayment()">Confirmar</button>
+        <button onclick="closeModal('paymentModal')">Cancelar</button>
     </div>
-    <div class="form-group">
-      <label for="paymentMethod">Método</label>
-      <select id="paymentMethod">
-        <option value="dinheiro">Dinheiro</option>
-        <option value="pix">PIX</option>
-        <option value="cartao">Cartão</option>
-        <option value="transferencia">Transferência</option>
-      </select>
-    </div>
-    <div class="payment-history" id="paymentHistory"></div>
-    <div class="form-actions">
-      <button class="btn" onclick="closeModal('paymentModal')">Cancelar</button>
-      <button class="btn" style="background:var(--primary);" onclick="confirmPayment()">Confirmar</button>
-    </div>
-  </div>
 </div>
 
 <div class="modal" id="obsModal">
-  <div class="modal-content">
-    <h2>Adicionar Observação</h2>
-    <p>Aluno: <strong id="obsStudentName"></strong></p>
-    <textarea id="observationText" rows="4" placeholder="Digite sua observação..."></textarea>
-    <div class="form-actions">
-      <button class="btn" onclick="closeModal('obsModal')">Cancelar</button>
-      <button class="btn" style="background:var(--primary);" onclick="saveObservation()">Salvar</button>
+    <div class="modal-content">
+        <h2>Observação</h2>
+        <p id="obsStudentName"></p>
+        <textarea id="observationText"></textarea>
+        <button onclick="saveObservation()">Salvar</button>
+        <button onclick="closeModal('obsModal')">Cancelar</button>
     </div>
-  </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "./assets/js/firebase-config.js";
-import { getFirestore, collection, onSnapshot, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 const app = initializeApp();
 const db = getFirestore(app);
 
 let currentStudentId = null;
-let currentStudentData = null;
 
-// Carregar alunos em tempo real
-const alunosCollection = collection(db, "inscricoes");
-onSnapshot(alunosCollection, snapshot => {
+async function loadStudents(){
     const tbody = document.querySelector('#studentsTable tbody');
-    tbody.innerHTML = "";
+    tbody.innerHTML = '';
+    const snapshot = await getDocs(collection(db,"inscricoes"));
     snapshot.forEach(docSnap => {
         const data = docSnap.data();
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td style="display:none;">${docSnap.id}</td>
+            <td>${docSnap.id}</td>
             <td>${data.nomeCompleto}</td>
-            <td>${data.turma || ''}</td>
-            <td>${data.telefone || ''}</td>
-            <td><span class="status ${data.status}">${data.status}</span></td>
+            <td>${data.turma}</td>
+            <td>${data.telefone}</td>
+            <td>${data.status}</td>
             <td>${data.valorPago || 0}</td>
             <td>
-                <button class="action-btn edit-btn" onclick="toggleStatus('${docSnap.id}','${data.status}')"><i class="fas fa-edit"></i></button>
-                <button class="action-btn payment-btn" onclick="showPaymentModal('${docSnap.id}','${data.nomeCompleto}',${data.valorPago || 0})"><i class="fas fa-money-bill"></i></button>
-                <button class="action-btn obs-btn" onclick="showObsModal('${docSnap.id}','${data.nomeCompleto}','${data.observacoes || ''}')"><i class="fas fa-comment"></i></button>
-                <button class="action-btn delete-btn" onclick="deleteStudent('${docSnap.id}')"><i class="fas fa-trash"></i></button>
+                <button onclick="toggleStatus('${docSnap.id}','${data.status}')">Status</button>
+                <button onclick="openPayment('${docSnap.id}','${data.nomeCompleto}',${data.valorPago || 0})">Pagamento</button>
+                <button onclick="openObservation('${docSnap.id}','${data.nomeCompleto}','${data.observacoes || ''}')">Observação</button>
+                <button onclick="deleteStudent('${docSnap.id}')">Excluir</button>
             </td>
         `;
         tbody.appendChild(tr);
     });
-});
-
-// Funções de ações
-function toggleStatus(id, status) {
-    const newStatus = status === "pendente" ? "ativo" : "pendente";
-    const studentRef = doc(db, "inscricoes", id);
-    updateDoc(studentRef, { status: newStatus });
 }
 
-function showPaymentModal(id, name, valorPago){
+function toggleStatus(id,status){
+    const newStatus = status === 'ativo' ? 'pendente' : 'ativo';
+    updateDoc(doc(db,"inscricoes",id),{status:newStatus});
+    loadStudents();
+}
+
+function openPayment(id,name,currentValue){
     currentStudentId = id;
-    currentStudentData = {valorPago};
     document.getElementById('paymentStudentName').textContent = name;
-    document.getElementById('paymentValue').value = valorPago || 0;
+    document.getElementById('paymentValue').value = currentValue;
     document.getElementById('paymentModal').style.display = 'flex';
 }
 
 function confirmPayment(){
-    const value = Number(document.getElementById('paymentValue').value);
-    const studentRef = doc(db,"inscricoes",currentStudentId);
-    updateDoc(studentRef, { valorPago: value }).then(()=>closeModal('paymentModal'));
+    const value = document.getElementById('paymentValue').value;
+    updateDoc(doc(db,"inscricoes",currentStudentId),{valorPago:value});
+    closeModal('paymentModal');
+    loadStudents();
 }
 
-function showObsModal(id,name,obs){
+function openObservation(id,name,obs){
     currentStudentId = id;
     document.getElementById('obsStudentName').textContent = name;
-    document.getElementById
-    ('observationText').value = obs || '';
+    document.getElementById('observationText').value = obs;
     document.getElementById('obsModal').style.display = 'flex';
 }
 
 function saveObservation(){
     const obs = document.getElementById('observationText').value;
-    const studentRef = doc(db,"inscricoes",currentStudentId);
-    updateDoc(studentRef, { observacoes: obs }).then(()=> closeModal('obsModal'));
+    updateDoc(doc(db,"inscricoes",currentStudentId),{observacoes:obs});
+    closeModal('obsModal');
+    loadStudents();
 }
 
 function deleteStudent(id){
     if(confirm("Deseja realmente excluir este aluno?")){
-        const studentRef = doc(db,"inscricoes",id);
-        deleteDoc(studentRef);
+        deleteDoc(doc(db,"inscricoes",id));
+        loadStudents();
     }
 }
 
@@ -194,30 +127,17 @@ function closeModal(modalId){
     document.getElementById(modalId).style.display = 'none';
 }
 
-// Função de busca
-function searchStudents(){
+document.getElementById('searchInput').addEventListener('input',()=>{
     const input = document.getElementById('searchInput').value.toLowerCase();
     const rows = document.querySelectorAll('#studentsTable tbody tr');
-    rows.forEach(row => {
+    rows.forEach(row=>{
         const nome = row.cells[1].textContent.toLowerCase();
         const turma = row.cells[2].textContent.toLowerCase();
-        if(nome.includes(input) || turma.includes(input)){
-            row.style.display = '';
-        } else {
-            row.style.display = 'none';
-        }
+        row.style.display = (nome.includes(input)||turma.includes(input))?'':'none';
     });
-}
+});
 
-// Fechar modais ao clicar fora
-window.onclick = function(event){
-    const modals = ['paymentModal','obsModal'];
-    modals.forEach(modalId => {
-        const modal = document.getElementById(modalId);
-        if(event.target == modal) modal.style.display = 'none';
-    });
-}
+loadStudents();
 </script>
 </body>
 </html>
-
