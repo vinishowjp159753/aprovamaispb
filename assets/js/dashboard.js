@@ -1,101 +1,135 @@
-// dashboard.js
-import { db } from './firebase-config.js'; // Import do Firestore
-import { collection, getDocs } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+// assets/js/dashboard.js
+import { db } from './firebase-config.js';
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  orderBy,
+} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-async function carregarDashboard() {
-    // Coleções
-    const alunosCol = collection(db, 'alunos');
-    const profsCol = collection(db, 'professores');
-    const turmasCol = collection(db, 'turmas');
-
-    const alunosSnap = await getDocs(alunosCol);
-    const profsSnap = await getDocs(profsCol);
-    const turmasSnap = await getDocs(turmasCol);
-
-    // Cards
-    const alunos = [];
-    let receitaMensal = 0;
-    const turmasAtivasSet = new Set();
-
-    alunosSnap.forEach(doc => {
-        const data = doc.data();
-        alunos.push(data);
-        if (data.status === 'ativo') {
-            turmasAtivasSet.add(data.turma);
-        }
-        if (data.pagamentos) {
-            data.pagamentos.forEach(p => {
-                const pago = new Date(p.data);
-                const now = new Date();
-                if (pago.getMonth() === now.getMonth() && pago.getFullYear() === now.getFullYear()) {
-                    receitaMensal += parseFloat(p.valor);
-                }
-            });
-        }
-    });
-
-    document.getElementById('alunosAtivos').textContent = alunos.filter(a => a.status === 'ativo').length;
-    document.getElementById('turmasAtivas').textContent = turmasAtivasSet.size;
-    document.getElementById('totalProfessores').textContent = profsSnap.size;
-    document.getElementById('receitaMensal').textContent = `R$ ${receitaMensal.toFixed(2)}`;
-
-    // Gráfico de matrículas (mensal)
-    const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-    const matriculasMensal = new Array(12).fill(0);
-
-    alunos.forEach(a => {
-        const matriculaDate = new Date(a.dataMatricula); // campo dataMatricula necessário no Firebase
-        matriculasMensal[matriculaDate.getMonth()] += 1;
-    });
-
-    const ctxEnroll = document.getElementById('enrollmentsChart').getContext('2d');
-    new Chart(ctxEnroll, {
-        type: 'line',
-        data: {
-            labels: meses,
-            datasets: [{
-                label: 'Matrículas Mensais',
-                data: matriculasMensal,
-                borderColor: 'rgba(26,42,108,1)',
-                backgroundColor: 'rgba(26,42,108,0.2)',
-                tension: 0.3,
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { display: true }
-            }
-        }
-    });
-
-    // Gráfico de turmas
-    const turmaContagem = {};
-    alunos.forEach(a => {
-        if (!turmaContagem[a.turma]) turmaContagem[a.turma] = 0;
-        turmaContagem[a.turma]++;
-    });
-
-    const ctxTurmas = document.getElementById('classesChart').getContext('2d');
-    new Chart(ctxTurmas, {
-        type: 'doughnut',
-        data: {
-            labels: Object.keys(turmaContagem),
-            datasets: [{
-                label: 'Distribuição por Turma',
-                data: Object.values(turmaContagem),
-                backgroundColor: ['#1a2a6c','#b21f1f','#fdbb2d','#28a745','#17a2b8','#6f42c1']
-            }]
-        },
-        options: { responsive: true }
-    });
+// Função utilitária para formatar moeda
+function formatCurrency(value) {
+  return value.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL"
+  });
 }
 
-// Logout simples
-document.getElementById('logoutBtn').addEventListener('click', () => {
-    alert('Deslogado!');
-    // firebase.auth().signOut(); // caso utilize autenticação
-});
+// =========================
+// Carregar Alunos
+// =========================
+async function carregarAlunos() {
+  const snap = await getDocs(collection(db, "matriculas"));
+  const totalAlunos = snap.size;
 
-window.onload
+  document.getElementById("alunosAtivos").innerText = totalAlunos;
+  document.getElementById("alunosVariacao").innerText = `${totalAlunos} alunos matriculados`;
+
+  return snap.docs.map(doc => doc.data());
+}
+
+// =========================
+// Carregar Turmas
+// =========================
+async function carregarTurmas() {
+  const snap = await getDocs(collection(db, "turmas"));
+  const turmas = snap.docs.map(doc => doc.data());
+  const turmasAtivas = turmas.filter(t => t.ativa === true).length;
+
+  document.getElementById("turmasAtivas").innerText = turmasAtivas;
+  document.getElementById("turmasVariacao").innerText = `${turmasAtivas} turmas em andamento`;
+
+  return turmas;
+}
+
+// =========================
+// Carregar Professores
+// =========================
+async function carregarProfessores() {
+  const snap = await getDocs(collection(db, "professores"));
+  const totalProfessores = snap.size;
+
+  document.getElementById("totalProfessores").innerText = totalProfessores;
+  document.getElementById("professoresVariacao").innerText = `${totalProfessores} cadastrados`;
+
+  return snap.docs.map(doc => doc.data());
+}
+
+// =========================
+// Carregar Receita
+// =========================
+async function carregarReceita() {
+  const snap = await getDocs(collection(db, "pagamentos"));
+  const pagamentos = snap.docs.map(doc => doc.data());
+
+  // Receita apenas do mês atual
+  const mesAtual = new Date().getMonth();
+  const receitaMes = pagamentos
+    .filter(p => new Date(p.data).getMonth() === mesAtual)
+    .reduce((sum, p) => sum + (p.valor || 0), 0);
+
+  document.getElementById("receitaMensal").innerText = formatCurrency(receitaMes);
+  document.getElementById("receitaVariacao").innerText = "Receita do mês atual";
+
+  return pagamentos;
+}
+
+// =========================
+// Gerar Gráficos
+// =========================
+function gerarGraficos(alunos, turmas) {
+  // Gráfico de matrículas mensais
+  const ctx1 = document.getElementById("enrollmentsChart").getContext("2d");
+
+  const porMes = {};
+  alunos.forEach(aluno => {
+    const mes = new Date(aluno.data).toLocaleString("pt-BR", { month: "short" });
+    porMes[mes] = (porMes[mes] || 0) + 1;
+  });
+
+  new Chart(ctx1, {
+    type: "line",
+    data: {
+      labels: Object.keys(porMes),
+      datasets: [{
+        label: "Matrículas",
+        data: Object.values(porMes),
+        borderColor: "#1a2a6c",
+        backgroundColor: "rgba(26,42,108,0.2)",
+        fill: true,
+      }]
+    },
+  });
+
+  // Gráfico de distribuição por turma
+  const ctx2 = document.getElementById("turmasChart").getContext("2d");
+
+  const porTurma = {};
+  alunos.forEach(aluno => {
+    porTurma[aluno.turma] = (porTurma[aluno.turma] || 0) + 1;
+  });
+
+  new Chart(ctx2, {
+    type: "doughnut",
+    data: {
+      labels: Object.keys(porTurma),
+      datasets: [{
+        data: Object.values(porTurma),
+        backgroundColor: ["#1a2a6c", "#b21f1f", "#fdbb2d", "#28a745", "#17a2b8"],
+      }]
+    },
+  });
+}
+
+// =========================
+// Inicialização
+// =========================
+(async function initDashboard() {
+  const alunos = await carregarAlunos();
+  const turmas = await carregarTurmas();
+  await carregarProfessores();
+  await carregarReceita();
+
+  gerarGraficos(alunos, turmas);
+})();
