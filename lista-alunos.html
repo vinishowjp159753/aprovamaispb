@@ -3,48 +3,36 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lista de Alunos - AprovaMaisPB</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<title>Lista de Alunos</title>
 <link rel="stylesheet" href="assets/css/lista-alunos.css">
 </head>
 <body>
+
 <div class="container">
     <h1>Lista de Alunos</h1>
     <input type="text" id="searchInput" placeholder="Buscar aluno...">
-    <table id="studentsTable">
+    <table>
         <thead>
             <tr>
-                <th>ID</th>
                 <th>Nome</th>
                 <th>Turma</th>
+                <th>Número do Pedido</th>
                 <th>Telefone</th>
                 <th>Status</th>
-                <th>Valor Pago</th>
                 <th>Ações</th>
             </tr>
         </thead>
-        <tbody></tbody>
+        <tbody id="alunosTableBody"></tbody>
     </table>
 </div>
 
-<!-- Modals -->
-<div class="modal" id="paymentModal">
+<!-- Modal para Pagamento / Observações -->
+<div id="modal" class="modal">
     <div class="modal-content">
-        <h2>Registrar Pagamento</h2>
-        <p id="paymentStudentName"></p>
-        <input type="number" id="paymentValue" placeholder="Valor">
-        <button onclick="confirmPayment()">Confirmar</button>
-        <button onclick="closeModal('paymentModal')">Cancelar</button>
-    </div>
-</div>
-
-<div class="modal" id="obsModal">
-    <div class="modal-content">
-        <h2>Observação</h2>
-        <p id="obsStudentName"></p>
-        <textarea id="observationText"></textarea>
-        <button onclick="saveObservation()">Salvar</button>
-        <button onclick="closeModal('obsModal')">Cancelar</button>
+        <h3 id="modalTitle"></h3>
+        <input type="text" id="modalInput" placeholder="">
+        <button id="saveModalBtn">Salvar</button>
+        <button id="closeModalBtn">Fechar</button>
     </div>
 </div>
 
@@ -55,89 +43,102 @@ import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc } from "ht
 const app = initializeApp();
 const db = getFirestore(app);
 
-let currentStudentId = null;
+const alunosTableBody = document.getElementById("alunosTableBody");
+const searchInput = document.getElementById("searchInput");
 
-async function loadStudents(){
-    const tbody = document.querySelector('#studentsTable tbody');
-    tbody.innerHTML = '';
-    const snapshot = await getDocs(collection(db,"inscricoes"));
-    snapshot.forEach(docSnap => {
-        const data = docSnap.data();
-        const tr = document.createElement('tr');
+const modal = document.getElementById("modal");
+const modalTitle = document.getElementById("modalTitle");
+const modalInput = document.getElementById("modalInput");
+const saveModalBtn = document.getElementById("saveModalBtn");
+const closeModalBtn = document.getElementById("closeModalBtn");
+
+let alunosData = [];
+let selectedAlunoId = null;
+let selectedField = null;
+
+// Carregar alunos
+async function loadAlunos() {
+    const snapshot = await getDocs(collection(db, "inscricoes"));
+    alunosData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    renderTable(alunosData);
+}
+
+// Renderizar tabela
+function renderTable(data) {
+    alunosTableBody.innerHTML = "";
+    data.forEach(aluno => {
+        const tr = document.createElement("tr");
         tr.innerHTML = `
-            <td>${docSnap.id}</td>
-            <td>${data.nomeCompleto}</td>
-            <td>${data.turma}</td>
-            <td>${data.telefone}</td>
-            <td>${data.status}</td>
-            <td>${data.valorPago || 0}</td>
+            <td>${aluno.nomeCompleto}</td>
+            <td>${aluno.turma}</td>
+            <td>${aluno.numeroPedido}</td>
+            <td>${aluno.telefone}</td>
+            <td>${aluno.status}</td>
             <td>
-                <button onclick="toggleStatus('${docSnap.id}','${data.status}')">Status</button>
-                <button onclick="openPayment('${docSnap.id}','${data.nomeCompleto}',${data.valorPago || 0})">Pagamento</button>
-                <button onclick="openObservation('${docSnap.id}','${data.nomeCompleto}','${data.observacoes || ''}')">Observação</button>
-                <button onclick="deleteStudent('${docSnap.id}')">Excluir</button>
+                <button onclick="toggleStatus('${aluno.id}')">Status</button>
+                <button onclick="editField('${aluno.id}', 'valorPago', 'Atualizar Pagamento')">Pagamento</button>
+                <button onclick="editField('${aluno.id}', 'observacoes', 'Editar Observação')">Observação</button>
+                <button onclick="deleteAluno('${aluno.id}')">Excluir</button>
             </td>
         `;
-        tbody.appendChild(tr);
+        alunosTableBody.appendChild(tr);
     });
 }
 
-function toggleStatus(id,status){
-    const newStatus = status === 'ativo' ? 'pendente' : 'ativo';
-    updateDoc(doc(db,"inscricoes",id),{status:newStatus});
-    loadStudents();
-}
-
-function openPayment(id,name,currentValue){
-    currentStudentId = id;
-    document.getElementById('paymentStudentName').textContent = name;
-    document.getElementById('paymentValue').value = currentValue;
-    document.getElementById('paymentModal').style.display = 'flex';
-}
-
-function confirmPayment(){
-    const value = document.getElementById('paymentValue').value;
-    updateDoc(doc(db,"inscricoes",currentStudentId),{valorPago:value});
-    closeModal('paymentModal');
-    loadStudents();
-}
-
-function openObservation(id,name,obs){
-    currentStudentId = id;
-    document.getElementById('obsStudentName').textContent = name;
-    document.getElementById('observationText').value = obs;
-    document.getElementById('obsModal').style.display = 'flex';
-}
-
-function saveObservation(){
-    const obs = document.getElementById('observationText').value;
-    updateDoc(doc(db,"inscricoes",currentStudentId),{observacoes:obs});
-    closeModal('obsModal');
-    loadStudents();
-}
-
-function deleteStudent(id){
-    if(confirm("Deseja realmente excluir este aluno?")){
-        deleteDoc(doc(db,"inscricoes",id));
-        loadStudents();
-    }
-}
-
-function closeModal(modalId){
-    document.getElementById(modalId).style.display = 'none';
-}
-
-document.getElementById('searchInput').addEventListener('input',()=>{
-    const input = document.getElementById('searchInput').value.toLowerCase();
-    const rows = document.querySelectorAll('#studentsTable tbody tr');
-    rows.forEach(row=>{
-        const nome = row.cells[1].textContent.toLowerCase();
-        const turma = row.cells[2].textContent.toLowerCase();
-        row.style.display = (nome.includes(input)||turma.includes(input))?'':'none';
-    });
+// Buscar alunos
+searchInput.addEventListener("input", () => {
+    const term = searchInput.value.toLowerCase();
+    const filtered = alunosData.filter(a => a.nomeCompleto.toLowerCase().includes(term));
+    renderTable(filtered);
 });
 
-loadStudents();
+// Toggle Status
+window.toggleStatus = async (id) => {
+    const aluno = alunosData.find(a => a.id === id);
+    if (!aluno) return;
+    const newStatus = aluno.status === "ativo" ? "pendente" : "ativo";
+    await updateDoc(doc(db, "inscricoes", id), { status: newStatus });
+    loadAlunos(); // Recarrega a tabela
+};
+
+// Editar campo (pagamento ou observação)
+window.editField = (id, field, title) => {
+    selectedAlunoId = id;
+    selectedField = field;
+    modalTitle.textContent = title;
+    const aluno = alunosData.find(a => a.id === id);
+    modalInput.value = aluno[field] || "";
+    modal.style.display = "flex";
+};
+
+// Salvar no modal
+saveModalBtn.addEventListener("click", async () => {
+    if (!selectedAlunoId || !selectedField) return;
+    const value = modalInput.value;
+    await updateDoc(doc(db, "inscricoes", selectedAlunoId), { [selectedField]: value });
+    modal.style.display = "none";
+    selectedAlunoId = null;
+    selectedField = null;
+    loadAlunos();
+});
+
+// Fechar modal
+closeModalBtn.addEventListener("click", () => {
+    modal.style.display = "none";
+    selectedAlunoId = null;
+    selectedField = null;
+});
+
+// Excluir aluno
+window.deleteAluno = async (id) => {
+    if (confirm("Tem certeza que deseja excluir este aluno?")) {
+        await deleteDoc(doc(db, "inscricoes", id));
+        loadAlunos();
+    }
+};
+
+loadAlunos();
 </script>
+
 </body>
 </html>
