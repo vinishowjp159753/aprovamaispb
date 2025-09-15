@@ -198,4 +198,44 @@ matriculaForm.addEventListener('submit', async e=>{
         telefone: document.getElementById('telefone').value.trim(),
         email: document.getElementById('email').value.trim(),
         turma: document.getElementById('turma').value,
-        turno: document.getElementById
+        turno: document.getElementById('turno').value,
+        endereco: document.getElementById('endereco').value.trim(),
+        cidade: document.getElementById('cidade').value.trim(),
+        estado: document.getElementById('estado').value,
+        observacoes: document.getElementById('observacoes').value.trim()
+    };
+    
+    // Validação básica
+    if(!dadosMatricula.nomeCompleto || !dadosMatricula.dataNascimento || !dadosMatricula.cpf || !dadosMatricula.telefone || !dadosMatricula.email || !dadosMatricula.turma || !dadosMatricula.turno || !dadosMatricula.endereco || !dadosMatricula.cidade || !dadosMatricula.estado){
+        errorAlert.style.display='block';
+        successAlert.style.display='none';
+        return;
+    }
+    
+    try{
+        btnText.style.display='none';
+        btnLoading.style.display='inline-block';
+        submitBtn.disabled=true;
+        
+        const matriculaId = await salvarInscricao(dadosMatricula);
+
+        successAlert.style.display='block';
+        errorAlert.style.display='none';
+        matriculaForm.reset();
+        
+        // Redireciona automaticamente para checkout com valor fixo de 150
+        window.location.href = `checkout.html?matriculaId=${matriculaId}&valor=150`;
+        
+    }catch(err){
+        console.error(err);
+        errorAlert.textContent='Erro ao processar matrícula. Tente novamente.';
+        errorAlert.style.display='block';
+        successAlert.style.display='none';
+        btnText.style.display='block';
+        btnLoading.style.display='none';
+        submitBtn.disabled=false;
+    }
+});
+</script>
+</body>
+</html>
