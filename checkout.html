@@ -6,92 +6,75 @@
 <title>Checkout - AprovaMaisPB</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-:root { --primary:#1a2a6c; --secondary:#b21f1f; --accent:#fdbb2d; }
-body { font-family:'Segoe UI',sans-serif; background:linear-gradient(135deg,#1a2a6c,#b21f1f,#fdbb2d); display:flex; justify-content:center; align-items:center; min-height:100vh; }
-.container { max-width:600px; width:100%; background:rgba(255,255,255,0.95); padding:30px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.3); }
-.header { text-align:center; margin-bottom:20px; }
-.header img { max-width:120px; margin-bottom:15px; }
-.header h1 { font-size:24px; }
-.btn { padding:14px 25px; margin-top:10px; width:100%; border:none; border-radius:6px; cursor:pointer; font-size:16px; font-weight:600; color:white; background:var(--primary); transition:0.3s; }
-.btn:hover { background:#2a3a9c; }
-.alert { display:none; padding:15px; border-radius:6px; margin-top:20px; }
-.alert.success { background:#e8f5e9; color:#2e7d32; border:1px solid #c8e6c9; }
-.alert.error { background:#ffebee; color:#d32f2f; border:1px solid #ffcdd2; }
+:root {
+    --primary: #1a2a6c;
+    --secondary: #b21f1f;
+    --accent: #fdbb2d;
+}
+* {margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;}
+body {background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d); min-height:100vh; display:flex; justify-content:center; align-items:center; padding:20px;}
+.container {width:100%; max-width:600px; background:rgba(255,255,255,0.95); border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.3); padding:30px;}
+h1 {text-align:center; margin-bottom:20px; color:var(--primary);}
+.summary {margin-bottom:20px; background:#f7f7f7; padding:15px; border-radius:8px;}
+.summary p {margin-bottom:10px;}
+.btn {padding:14px 25px; background: var(--primary); color:white; border:none; border-radius:6px; cursor:pointer; font-size:16px; font-weight:600; width:100%; transition:background 0.3s; text-align:center; margin-bottom:10px;}
+.btn:hover {background:#2a3a9c;}
+.alert {padding:15px; border-radius:6px; margin-bottom:20px; display:none;}
+.alert.success {background:#e8f5e9; color:#2e7d32; border:1px solid #c8e6c9;}
+.alert.error {background:#ffebee; color:#d32f2f; border:1px solid #ffcdd2;}
 </style>
 </head>
 <body>
 <div class="container">
-    <div class="header">
-        <img src="assets/img/logo_aprovamaispb.png" alt="Logo AprovaMaisPB" onerror="this.style.display='none'">
-        <h1>Checkout - Matrícula</h1>
-        <p>Valor: <strong>R$150,00</strong></p>
-    </div>
-
-    <div class="alert success" id="successAlert">Pagamento aprovado! Matrícula confirmada.</div>
-    <div class="alert error" id="errorAlert">Ocorreu um erro no pagamento.</div>
-
-    <button class="btn" id="cartaoBtn">Pagar com Cartão</button>
-    <button class="btn" id="pixBtn" style="background-color:#25D366;">Pagar com Pix</button>
+    <h1>Finalize seu Pagamento</h1>
+    <div class="summary" id="summary"></div>
+    <div class="alert success" id="successAlert">Pagamento realizado com sucesso!</div>
+    <div class="alert error" id="errorAlert">Erro ao processar o pagamento. Tente novamente.</div>
+    <button class="btn" id="payBtn">Pagar R$150</button>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-<script src="https://stc.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.directpayment.js"></script>
-
 <script>
 const firebaseConfig = {
-  apiKey:"AIzaSyAK3U35fipoWOOIJg0yrtgmVfQ7XQxZxqY",
-  authDomain:"aprovamaispb-d4e75.firebaseapp.com",
-  projectId:"aprovamaispb-d4e75",
-  storageBucket:"aprovamaispb-d4e75.firebasestorage.app",
-  messagingSenderId:"828577018900",
-  appId:"1:828577018900:web:473d8c3fc2685d3f192301"
+    apiKey: "AIzaSyAK3U35fipoWOOIJg0yrtgmVfQ7XQxZxqY",
+    authDomain: "aprovamaispb-d4e75.firebaseapp.com",
+    projectId: "aprovamaispb-d4e75",
+    storageBucket: "aprovamaispb-d4e75.firebasestorage.app",
+    messagingSenderId: "828577018900",
+    appId: "1:828577018900:web:473d8c3fc2685d3f192301"
 };
-if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-const urlParams = new URLSearchParams(window.location.search);
-const matriculaId = urlParams.get('matriculaId');
+const summary = document.getElementById('summary');
+const payBtn = document.getElementById('payBtn');
 const successAlert = document.getElementById('successAlert');
 const errorAlert = document.getElementById('errorAlert');
 
-async function iniciarPagamento(metodo){
-    try {
-        const resp = await fetch('http://localhost:3000/create-checkout', {
-            method:'POST',
-            headers:{'Content-Type':'application/x-www-form-urlencoded'},
-            body: new URLSearchParams({
-                matriculaId,
-                valor:'150.00',
-                nome:'Aluno Teste', // Substituir pelos dados reais
-                email:'aluno@teste.com'
-            })
-        });
-        const xml = await resp.text();
-        const checkoutCode = xml.match(/<code>(.*?)<\/code>/)[1];
+// Pega os dados da URL
+const urlParams = new URLSearchParams(window.location.search);
+const matriculaId = urlParams.get('matriculaId');
+const nome = urlParams.get('nome');
+const email = urlParams.get('email');
+const valor = urlParams.get('valor');
 
-        // Abrir popup PagSeguro
-        PagSeguroLightbox(checkoutCode, {
-            success: function(transactionCode){
-                db.collection('inscricoes').doc(matriculaId).update({valorPago:150});
-                successAlert.style.display='block';
-                errorAlert.style.display='none';
-            },
-            abort: function(){
-                errorAlert.textContent='Pagamento cancelado.';
-                errorAlert.style.display='block';
-            }
-        });
+summary.innerHTML = `<p><strong>Nome:</strong> ${nome}</p>
+<p><strong>E-mail:</strong> ${email}</p>
+<p><strong>Valor a Pagar:</strong> R$ ${valor}</p>`;
 
-    } catch(err){
-        console.error(err);
-        errorAlert.style.display='block';
-        successAlert.style.display='none';
-    }
-}
+// Função para redirecionar para PagSeguro
+payBtn.addEventListener('click', () => {
+    // Link do PagSeguro com pagamento via redirecionamento
+    const token = "f3f24edd-dabd-4975-994b-77f6b75f3ab6a55011fb48d1968bf0ad13c7a36660cd64ad-d06e-4ffa-8b30-87a340f7d72c";
+    const redirectUrl = `checkout-success.html?matriculaId=${matriculaId}`;
 
-document.getElementById('cartaoBtn').addEventListener('click', ()=> iniciarPagamento('CREDIT_CARD'));
-document.getElementById('pixBtn').addEventListener('click', ()=> iniciarPagamento('PIX'));
+    // Parâmetros do PagSeguro
+    const pagSeguroUrl = `https://pagseguro.uol.com.br/v2/checkout/payment.html?token=${token}&email=${email}&valor=${valor}&redirectURL=${encodeURIComponent(redirectUrl)}`;
+
+    // Redireciona
+    window.location.href = pagSeguroUrl;
+});
 </script>
 </body>
 </html>
