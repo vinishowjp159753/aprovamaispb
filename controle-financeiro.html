@@ -191,7 +191,7 @@
       const valor = document.getElementById('valorDespesa').value;
       
       if (!descricao || !valor) {
-        showNotification('Preencha pelo menos a descrição e o valor da despesa.', 'error');
+        alert('Preencha pelo menos a descrição e o valor da despesa.');
         return;
       }
       
@@ -204,7 +204,7 @@
           data: serverTimestamp()
         });
         
-        showNotification('Despesa adicionada com sucesso!', 'success');
+        alert('Despesa adicionada com sucesso!');
         
         // Fechar o modal e limpar os campos
         document.getElementById('modalDespesa').style.display = 'none';
@@ -218,28 +218,25 @@
         
       } catch (error) {
         console.error('Erro ao adicionar despesa:', error);
-        showNotification('Erro ao adicionar despesa. Verifique o console para detalhes.', 'error');
+        alert('Erro ao adicionar despesa. Verifique o console para detalhes.');
       }
     };
 
     // Funções auxiliares para editar e excluir (para implementar depois)
     window.editarDespesa = function(id) {
-      showNotification('Funcionalidade de edição em desenvolvimento.', 'info');
+      alert('Funcionalidade de edição em desenvolvimento.');
     };
 
     window.excluirDespesa = function(id) {
       if (confirm('Tem certeza que deseja excluir esta despesa?')) {
-        showNotification('Funcionalidade de exclusão em desenvolvimento.', 'info');
+        alert('Funcionalidade de exclusão em desenvolvimento.');
       }
     };
 
-    // Função para exibir notificações
+    // Função para exibir notificações (simplificada)
     function showNotification(message, type = "info") {
-      if (typeof NotificationSystem !== 'undefined') {
-        NotificationSystem.show(message, type);
-      } else {
-        alert(message);
-      }
+      // Sistema de notificação simples usando alert
+      alert(message);
     }
 
     // Funções para abrir e fechar o modal
@@ -260,7 +257,6 @@
     };
   </script>
 
-  <link rel="stylesheet" href="assets/css/notification-system.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -561,8 +557,5 @@
   <div class="refresh-btn" onclick="window.location.reload()">
     <i class="fas fa-sync-alt"></i>
   </div>
-
-  <!-- Scripts -->
-  <script src="assets/js/notification-system.js"></script>
 </body>
 </html>
