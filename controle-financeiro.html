@@ -9,20 +9,17 @@
   <script type="module">
     import { db } from './assets/js/firebase-config.js';
     import {
-      collection, getDocs, query, where, orderBy, addDoc, 
-      updateDoc, deleteDoc, doc, serverTimestamp
+      collection, getDocs, query, where, orderBy, addDoc, serverTimestamp
     } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-    // Variáveis globais
+    // Variáveis globais para armazenar as instâncias dos gráficos
     let revenueExpensesChart = null;
     let paymentsChart = null;
-    let despesaEditandoId = null;
 
     document.addEventListener('DOMContentLoaded', async () => {
       try {
         await carregarDadosFinanceiros();
         await carregarDespesas();
-        await carregarUltimasTransacoes();
       } catch (error) {
         console.error("Erro ao carregar dados financeiros:", error);
         alert("Erro ao carregar dados financeiros. Verifique o console para detalhes.");
@@ -30,28 +27,21 @@
     });
 
     async function carregarDadosFinanceiros() {
-      // Receita Total (todas as inscrições)
+      // Receita Total
       const inscricoesSnap = await getDocs(collection(db, 'inscricoes'));
       const receitaTotal = inscricoesSnap.docs.reduce((acc, d) => acc + (Number(d.data().valorPago) || 0), 0);
 
-      // Receita Mensal (inscrições do mês atual)
+      // Receita Mensal
       const now = new Date();
       const inicioMes = new Date(now.getFullYear(), now.getMonth(), 1);
-      const fimMes = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-      
-      const qInscricoes = query(
-        collection(db, 'inscricoes'), 
-        where('dataPagamento', '>=', inicioMes),
-        where('dataPagamento', '<=', fimMes)
-      );
-      const mensalSnap = await getDocs(qInscricoes);
-      const receitaMensal = mensalSnap.docs.reduce((acc, d) => acc + (Number(d.data().valorPago) || 0), 0);
+      const q = query(collection(db,'inscricoes'), where('dataPagamento','>=',inicioMes));
+      const mensalSnap = await getDocs(q);
+      const receitaMensal = mensalSnap.docs.reduce((acc,d)=>acc + (Number(d.data().valorPago)||0),0);
 
       // Despesas do mês atual
       const despesasQuery = query(
         collection(db, 'despesas'), 
-        where('data', '>=', inicioMes),
-        where('data', '<=', fimMes)
+        where('data', '>=', inicioMes)
       );
       const despSnap = await getDocs(despesasQuery);
       let totalDespesas = 0;
@@ -61,14 +51,11 @@
         totalDespesas += Number(d.valor) || 0;
       });
 
-      // Cálculo do Lucro Líquido (Receita Mensal - Despesas Mensais)
-      const lucroLiquido = receitaMensal - totalDespesas;
-
       // Atualiza indicadores
       document.querySelectorAll('.financial-card .card-value')[0].textContent = `R$ ${receitaTotal.toFixed(2)}`;
       document.querySelectorAll('.financial-card .card-value')[1].textContent = `R$ ${receitaMensal.toFixed(2)}`;
       document.querySelectorAll('.financial-card .card-value')[2].textContent = `R$ ${totalDespesas.toFixed(2)}`;
-      document.querySelectorAll('.financial-card .card-value')[3].textContent = `R$ ${lucroLiquido.toFixed(2)}`;
+      document.querySelectorAll('.financial-card .card-value')[3].textContent = `R$ ${(receitaMensal - totalDespesas).toFixed(2)}`;
 
       // Destruir gráficos existentes antes de criar novos
       if (revenueExpensesChart) {
@@ -113,28 +100,14 @@
         }
       });
 
-      // Calcular estatísticas de pagamentos
-      let pagos = 0, pendentes = 0, atrasados = 0;
-      
-      inscricoesSnap.forEach(doc => {
-        const data = doc.data();
-        if (data.statusPagamento === 'pago') {
-          pagos++;
-        } else if (data.statusPagamento === 'pendente') {
-          pendentes++;
-        } else if (data.statusPagamento === 'atrasado') {
-          atrasados++;
-        }
-      });
-
-      // Gráfico de Status de Pagamentos
+      // Gráfico de Status de Pagamentos (exemplo)
       const paymentsCtx = document.getElementById('paymentsChart').getContext('2d');
       paymentsChart = new Chart(paymentsCtx, {
         type: 'doughnut',
         data: {
           labels: ['Pagos', 'Pendentes', 'Atrasados'],
           datasets: [{
-            data: [pagos, pendentes, atrasados],
+            data: [60, 25, 15],
             backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
             borderWidth: 1
           }]
@@ -151,6 +124,10 @@
     async function carregarDespesas() {
       const tbody = document.querySelector('#despesasTable tbody');
       tbody.innerHTML = '';
+      
+      // Carregar últimas transações
+      const transacoesTbody = document.querySelector('#transactionsTable tbody');
+      transacoesTbody.innerHTML = '';
       
       // Carregar despesas
       const despesasQuery = query(
@@ -181,83 +158,41 @@
           </td>
         `;
         tbody.appendChild(tr);
-      });
-    }
-
-    async function carregarUltimasTransacoes() {
-      const transacoesTbody = document.querySelector('#transactionsTable tbody');
-      transacoesTbody.innerHTML = '';
-      
-      // Array para armazenar todas as transações
-      let todasTransacoes = [];
-      
-      // Carregar despesas
-      const despesasQuery = query(
-        collection(db, 'despesas'),
-        orderBy('data', 'desc')
-      );
-      const despesasSnap = await getDocs(despesasQuery);
-      
-      despesasSnap.forEach(doc => {
-        const d = doc.data();
-        const valor = Number(d.valor) || 0;
-        const dataDespesa = d.data.toDate();
         
-        todasTransacoes.push({
-          tipo: 'despesa',
-          data: dataDespesa,
-          descricao: d.descricao || 'Despesa',
-          alunoFornecedor: '-',
-          valor: valor,
-          status: 'Pago'
-        });
+        // Adicionar às últimas transações (apenas 5 primeiras)
+        if (transacoesTbody.childElementCount < 5) {
+          const trTransacao = document.createElement('tr');
+          trTransacao.innerHTML = `
+            <td>${dataDespesa.toLocaleDateString()}</td>
+            <td>-</td>
+            <td>${d.descricao || 'Despesa'}</td>
+            <td>R$ ${valor.toFixed(2)}</td>
+            <td><span class="status pago">Pago</span></td>
+          `;
+          transacoesTbody.appendChild(trTransacao);
+        }
       });
       
-      // Carregar inscrições (matrículas pagas)
+      // Adicionar também as inscrições como transações
       const inscricoesQuery = query(
         collection(db, 'inscricoes'),
         orderBy('dataPagamento', 'desc')
       );
-      const inscricoesSnap = await getDocs(inscricoesQuery);
+      const inscricoesOrdenadas = await getDocs(inscricoesQuery);
       
-      inscricoesSnap.forEach(doc => {
-        const i = doc.data();
-        const valorPago = Number(i.valorPago) || 0;
-        
-        // Só adicionar se houver valor pago
-        if (valorPago > 0) {
-          todasTransacoes.push({
-            tipo: 'receita',
-            data: i.dataPagamento.toDate(),
-            descricao: `Matrícula - ${i.curso || 'Curso'}`,
-            alunoFornecedor: i.nomeAluno || 'Aluno',
-            valor: valorPago,
-            status: i.statusPagamento === 'pago' ? 'Recebido' : 'Pendente'
-          });
+      inscricoesOrdenadas.forEach(doc => {
+        if (transacoesTbody.childElementCount < 10) {
+          const i = doc.data();
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${i.dataPagamento.toDate().toLocaleDateString()}</td>
+            <td>${i.nomeAluno || 'Aluno'}</td>
+            <td>Inscrição - ${i.curso || 'Curso'}</td>
+            <td>R$ ${(Number(i.valorPago) || 0).toFixed(2)}</td>
+            <td><span class="status recebido">Recebido</span></td>
+          `;
+          transacoesTbody.appendChild(tr);
         }
-      });
-      
-      // Ordenar transações por data (mais recente primeiro)
-      todasTransacoes.sort((a, b) => b.data - a.data);
-      
-      // Adicionar apenas as 10 transações mais recentes à tabela
-      todasTransacoes.slice(0, 10).forEach(transacao => {
-        const tr = document.createElement('tr');
-        
-        // Definir classe de status com base no tipo
-        let statusClass = 'pago';
-        if (transacao.tipo === 'receita') {
-          statusClass = transacao.status === 'Recebido' ? 'recebido' : 'pendente';
-        }
-        
-        tr.innerHTML = `
-          <td>${transacao.data.toLocaleDateString()}</td>
-          <td>${transacao.alunoFornecedor}</td>
-          <td>${transacao.descricao}</td>
-          <td>R$ ${transacao.valor.toFixed(2)}</td>
-          <td><span class="status ${statusClass}">${transacao.status}</span></td>
-        `;
-        transacoesTbody.appendChild(tr);
       });
     }
 
@@ -273,113 +208,48 @@
       }
       
       try {
-        if (despesaEditandoId) {
-          // Modo edição - atualizar despesa existente
-          await updateDoc(doc(db, 'despesas', despesaEditandoId), {
-            descricao: descricao,
-            observacao: observacao,
-            valor: parseFloat(valor),
-            data: serverTimestamp()
-          });
-          
-          alert('Despesa atualizada com sucesso!');
-          despesaEditandoId = null;
-        } else {
-          // Modo adição - criar nova despesa
-          await addDoc(collection(db, 'despesas'), {
-            descricao: descricao,
-            observacao: observacao,
-            valor: parseFloat(valor),
-            data: serverTimestamp()
-          });
-          
-          alert('Despesa adicionada com sucesso!');
-        }
+        // Adicionar documento ao Firestore
+        await addDoc(collection(db, 'despesas'), {
+          descricao: descricao,
+          observacao: observacao,
+          valor: parseFloat(valor),
+          data: serverTimestamp()
+        });
+        
+        alert('Despesa adicionada com sucesso!');
         
         // Fechar o modal e limpar os campos
         document.getElementById('modalDespesa').style.display = 'none';
         document.getElementById('descricaoDespesa').value = '';
         document.getElementById('observacaoDespesa').value = '';
         document.getElementById('valorDespesa').value = '';
-        document.getElementById('modalTitle').textContent = 'Adicionar Nova Despesa';
-        document.getElementById('submitButton').innerHTML = '<i class="fas fa-check"></i> Inserir Despesa';
         
         // Recarregar os dados
         await carregarDadosFinanceiros();
         await carregarDespesas();
-        await carregarUltimasTransacoes();
         
       } catch (error) {
-        console.error('Erro ao salvar despesa:', error);
-        alert('Erro ao salvar despesa. Verifique o console para detalhes.');
+        console.error('Erro ao adicionar despesa:', error);
+        alert('Erro ao adicionar despesa. Verifique o console para detalhes.');
       }
     };
 
-    // Função para editar despesa
-    window.editarDespesa = async function(id) {
-      try {
-        // Buscar os dados da despesa no Firebase
-        const despesaDoc = await getDoc(doc(db, 'despesas', id));
-        
-        if (despesaDoc.exists()) {
-          const despesaData = despesaDoc.data();
-          
-          // Preencher o modal com os dados da despesa
-          document.getElementById('descricaoDespesa').value = despesaData.descricao || '';
-          document.getElementById('observacaoDespesa').value = despesaData.observacao || '';
-          document.getElementById('valorDespesa').value = despesaData.valor || '';
-          
-          // Alterar o título do modal e o texto do botão
-          document.getElementById('modalTitle').textContent = 'Editar Despesa';
-          document.getElementById('submitButton').innerHTML = '<i class="fas fa-save"></i> Atualizar Despesa';
-          
-          // Armazenar o ID da despesa que está sendo editada
-          despesaEditandoId = id;
-          
-          // Abrir o modal
-          document.getElementById('modalDespesa').style.display = 'flex';
-        } else {
-          alert('Despesa não encontrada.');
-        }
-      } catch (error) {
-        console.error('Erro ao carregar despesa para edição:', error);
-        alert('Erro ao carregar despesa para edição.');
+    // Funções auxiliares para editar e excluir (para implementar depois)
+    window.editarDespesa = function(id) {
+      alert('Funcionalidade de edição em desenvolvimento.');
+    };
+
+    window.excluirDespesa = function(id) {
+      if (confirm('Tem certeza que deseja excluir esta despesa?')) {
+        alert('Funcionalidade de exclusão em desenvolvimento.');
       }
     };
 
-    // Função para excluir despesa
-    window.excluirDespesa = async function(id) {
-      if (confirm('Tem certeza que deseja excluir esta despesa? Esta ação não pode ser desfeita.')) {
-        try {
-          await deleteDoc(doc(db, 'despesas', id));
-          alert('Despesa excluída com sucesso!');
-          
-          // Recarregar os dados
-          await carregarDadosFinanceiros();
-          await carregarDespesas();
-          await carregarUltimasTransacoes();
-        } catch (error) {
-          console.error('Erro ao excluir despesa:', error);
-          alert('Erro ao excluir despesa. Verifique o console para detalhes.');
-        }
-      }
-    };
-
-    // Função para abrir modal de nova despesa
+    // Funções para abrir e fechar o modal
     window.abrirModalDespesa = function() {
-      // Limpar campos e resetar para modo de adição
-      document.getElementById('descricaoDespesa').value = '';
-      document.getElementById('observacaoDespesa').value = '';
-      document.getElementById('valorDespesa').value = '';
-      document.getElementById('modalTitle').textContent = 'Adicionar Nova Despesa';
-      document.getElementById('submitButton').innerHTML = '<i class="fas fa-check"></i> Inserir Despesa';
-      despesaEditandoId = null;
-      
-      // Abrir o modal
       document.getElementById('modalDespesa').style.display = 'flex';
     };
 
-    // Funções para fechar o modal
     window.fecharModalDespesa = function() {
       document.getElementById('modalDespesa').style.display = 'none';
     };
@@ -388,7 +258,7 @@
     window.onclick = function(event) {
       const modal = document.getElementById('modalDespesa');
       if (event.target === modal) {
-        document.getElementById('modalDespesa').style.display = 'none';
+        modal.style.display = 'none';
       }
     };
   </script>
@@ -397,6 +267,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
+    /* mantém todo o CSS já existente */
     :root { --primary:#1a2a6c; --secondary:#b21f1f; --accent:#fdbb2d; }
     * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; }
     body { background:#f5f7fb; color:#333; }
@@ -663,11 +534,11 @@
     </div>
   </div>
 
-  <!-- Modal para Adicionar/Editar Despesa -->
+  <!-- Modal para Adicionar Despesa -->
   <div id="modalDespesa" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 id="modalTitle" class="modal-title">Adicionar Nova Despesa</h3>
+        <h3 class="modal-title">Adicionar Nova Despesa</h3>
         <span class="close" onclick="fecharModalDespesa()">&times;</span>
       </div>
       <div class="form-group">
@@ -682,7 +553,7 @@
         <label for="valorDespesa">Valor (R$) *</label>
         <input type="number" id="valorDespesa" class="form-control" placeholder="0,00" step="0.01" min="0">
       </div>
-      <button id="submitButton" class="btn-submit" onclick="adicionarDespesa()">
+      <button class="btn-submit" onclick="adicionarDespesa()">
         <i class="fas fa-check"></i> Inserir Despesa
       </button>
     </div>
