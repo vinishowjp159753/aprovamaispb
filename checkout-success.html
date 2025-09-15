@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pagamento Concluído - AprovaMaisPB</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+    --primary: #1a2a6c;
+    --secondary: #b21f1f;
+    --accent: #fdbb2d;
+}
+* {margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;}
+body {background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d); min-height:100vh; display:flex; justify-content:center; align-items:center; padding:20px;}
+.container {width:100%; max-width:600px; background:rgba(255,255,255,0.95); border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.3); padding:30px; text-align:center;}
+h1 {color:var(--primary); margin-bottom:20px;}
+.alert {padding:15px; border-radius:6px; margin-bottom:20px;}
+.alert.success {background:#e8f5e9; color:#2e7d32; border:1px solid #c8e6c9;}
+.alert.error {background:#ffebee; color:#d32f2f; border:1px solid #ffcdd2;}
+.btn {padding:14px 25px; background: var(--primary); color:white; border:none; border-radius:6px; cursor:pointer; font-size:16px; font-weight:600; width:100%; transition:background 0.3s; text-align:center;}
+.btn:hover {background:#2a3a9c;}
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>Processando Pagamento...</h1>
+    <div id="alertMsg" class="alert"></div>
+    <a href="index.html" class="btn">Voltar ao Início</a>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {
+    apiKey: "AIzaSyAK3U35fipoWOOIJg0yrtgmVfQ7XQxZxqY",
+    authDomain: "aprovamaispb-d4e75.firebaseapp.com",
+    projectId: "aprovamaispb-d4e75",
+    storageBucket: "aprovamaispb-d4e75.firebasestorage.app",
+    messagingSenderId: "828577018900",
+    appId: "1:828577018900:web:473d8c3fc2685d3f192301"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const alertMsg = document.getElementById('alertMsg');
+
+// Pega matriculaId da URL
+const urlParams = new URLSearchParams(window.location.search);
+const matriculaId = urlParams.get('matriculaId');
+
+if (!matriculaId) {
+    alertMsg.textContent = "ID da matrícula não encontrado!";
+    alertMsg.className = "alert error";
+} else {
+    // Atualiza valorPago no Firestore
+    db.collection('inscricoes').doc(matriculaId).update({
+        valorPago: 150
+    }).then(() => {
+        alertMsg.textContent = "Pagamento aprovado! Seu valor foi registrado com sucesso.";
+        alertMsg.className = "alert success";
+    }).catch((err) => {
+        console.error(err);
+        alertMsg.textContent = "Erro ao atualizar pagamento. Contate o suporte.";
+        alertMsg.className = "alert error";
+    });
+}
+</script>
+</body>
+</html>
