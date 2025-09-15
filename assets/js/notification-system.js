@@ -1,5 +1,4 @@
 <!-- notification-system.js -->
-<script>
     // Sistema de Notificações
     class NotificationSystem {
         constructor() {
@@ -136,4 +135,3 @@
     window.notifications = notifications;
     window.showLoading = showLoading;
     window.hideLoading = hideLoading;
-</script>
