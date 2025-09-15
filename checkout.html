@@ -6,10 +6,9 @@
 <title>Checkout - AprovaMaisPB</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-/* MESMO ESTILO DO SITE (cores, botões, containers) */
-:root { --primary: #1a2a6c; --secondary: #b21f1f; --accent: #fdbb2d; }
-body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d); display:flex; justify-content:center; align-items:center; min-height:100vh; }
-.container { max-width:600px; width:100%; background: rgba(255,255,255,0.95); padding: 30px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.3); }
+:root { --primary:#1a2a6c; --secondary:#b21f1f; --accent:#fdbb2d; }
+body { font-family:'Segoe UI',sans-serif; background:linear-gradient(135deg,#1a2a6c,#b21f1f,#fdbb2d); display:flex; justify-content:center; align-items:center; min-height:100vh; }
+.container { max-width:600px; width:100%; background:rgba(255,255,255,0.95); padding:30px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.3); }
 .header { text-align:center; margin-bottom:20px; }
 .header img { max-width:120px; margin-bottom:15px; }
 .header h1 { font-size:24px; }
@@ -41,14 +40,14 @@ body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, 
 
 <script>
 const firebaseConfig = {
-  apiKey: "AIzaSyAK3U35fipoWOOIJg0yrtgmVfQ7XQxZxqY",
-  authDomain: "aprovamaispb-d4e75.firebaseapp.com",
-  projectId: "aprovamaispb-d4e75",
-  storageBucket: "aprovamaispb-d4e75.firebasestorage.app",
-  messagingSenderId: "828577018900",
-  appId: "1:828577018900:web:473d8c3fc2685d3f192301"
+  apiKey:"AIzaSyAK3U35fipoWOOIJg0yrtgmVfQ7XQxZxqY",
+  authDomain:"aprovamaispb-d4e75.firebaseapp.com",
+  projectId:"aprovamaispb-d4e75",
+  storageBucket:"aprovamaispb-d4e75.firebasestorage.app",
+  messagingSenderId:"828577018900",
+  appId:"1:828577018900:web:473d8c3fc2685d3f192301"
 };
-if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -58,27 +57,31 @@ const errorAlert = document.getElementById('errorAlert');
 
 async function iniciarPagamento(metodo){
     try {
-        // Chama o backend que retorna o checkoutCode
         const resp = await fetch('http://localhost:3000/create-checkout', {
             method:'POST',
             headers:{'Content-Type':'application/x-www-form-urlencoded'},
             body: new URLSearchParams({
                 matriculaId,
                 valor:'150.00',
-                nome:'Aluno Teste', // Substitua com dados reais
+                nome:'Aluno Teste', // Substituir pelos dados reais
                 email:'aluno@teste.com'
             })
         });
         const xml = await resp.text();
         const checkoutCode = xml.match(/<code>(.*?)<\/code>/)[1];
 
-        // Aqui você abriria o popup do PagSeguro
-        alert('Checkout criado! Popup do PagSeguro aqui.');
-
-        // Depois de receber notificação de pagamento aprovado (via webhook):
-        await db.collection('inscricoes').doc(matriculaId).update({valorPago:150});
-        successAlert.style.display='block';
-        errorAlert.style.display='none';
+        // Abrir popup PagSeguro
+        PagSeguroLightbox(checkoutCode, {
+            success: function(transactionCode){
+                db.collection('inscricoes').doc(matriculaId).update({valorPago:150});
+                successAlert.style.display='block';
+                errorAlert.style.display='none';
+            },
+            abort: function(){
+                errorAlert.textContent='Pagamento cancelado.';
+                errorAlert.style.display='block';
+            }
+        });
 
     } catch(err){
         console.error(err);
