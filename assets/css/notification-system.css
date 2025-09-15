@@ -1,5 +1,4 @@
 <!-- notification-system.css -->
-<style>
     .notification-container {
         position: fixed;
         top: 20px;
@@ -131,4 +130,3 @@
     .notification.hide {
         animation: slideOut 0.3s ease-in forwards;
     }
-</style>
