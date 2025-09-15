@@ -9,12 +9,14 @@
   <script type="module">
     import { db } from './assets/js/firebase-config.js';
     import {
-      collection, getDocs, query, where, orderBy, addDoc, serverTimestamp
+      collection, getDocs, query, where, orderBy, addDoc, 
+      updateDoc, deleteDoc, doc, serverTimestamp
     } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-    // Variáveis globais para armazenar as instâncias dos gráficos
+    // Variáveis globais
     let revenueExpensesChart = null;
     let paymentsChart = null;
+    let despesaEditandoId = null;
 
     document.addEventListener('DOMContentLoaded', async () => {
       try {
@@ -208,48 +210,111 @@
       }
       
       try {
-        // Adicionar documento ao Firestore
-        await addDoc(collection(db, 'despesas'), {
-          descricao: descricao,
-          observacao: observacao,
-          valor: parseFloat(valor),
-          data: serverTimestamp()
-        });
-        
-        alert('Despesa adicionada com sucesso!');
+        if (despesaEditandoId) {
+          // Modo edição - atualizar despesa existente
+          await updateDoc(doc(db, 'despesas', despesaEditandoId), {
+            descricao: descricao,
+            observacao: observacao,
+            valor: parseFloat(valor),
+            data: serverTimestamp()
+          });
+          
+          alert('Despesa atualizada com sucesso!');
+          despesaEditandoId = null;
+        } else {
+          // Modo adição - criar nova despesa
+          await addDoc(collection(db, 'despesas'), {
+            descricao: descricao,
+            observacao: observacao,
+            valor: parseFloat(valor),
+            data: serverTimestamp()
+          });
+          
+          alert('Despesa adicionada com sucesso!');
+        }
         
         // Fechar o modal e limpar os campos
         document.getElementById('modalDespesa').style.display = 'none';
         document.getElementById('descricaoDespesa').value = '';
         document.getElementById('observacaoDespesa').value = '';
         document.getElementById('valorDespesa').value = '';
+        document.getElementById('modalTitle').textContent = 'Adicionar Nova Despesa';
+        document.getElementById('submitButton').innerHTML = '<i class="fas fa-check"></i> Inserir Despesa';
         
         // Recarregar os dados
         await carregarDadosFinanceiros();
         await carregarDespesas();
         
       } catch (error) {
-        console.error('Erro ao adicionar despesa:', error);
-        alert('Erro ao adicionar despesa. Verifique o console para detalhes.');
+        console.error('Erro ao salvar despesa:', error);
+        alert('Erro ao salvar despesa. Verifique o console para detalhes.');
       }
     };
 
-    // Funções auxiliares para editar e excluir (para implementar depois)
-    window.editarDespesa = function(id) {
-      alert('Funcionalidade de edição em desenvolvimento.');
-    };
-
-    window.excluirDespesa = function(id) {
-      if (confirm('Tem certeza que deseja excluir esta despesa?')) {
-        alert('Funcionalidade de exclusão em desenvolvimento.');
+    // Função para editar despesa
+    window.editarDespesa = async function(id) {
+      try {
+        // Buscar os dados da despesa no Firebase
+        const despesaDoc = await getDocs(query(collection(db, 'despesas'), where('__name__', '==', id)));
+        
+        if (!despesaDoc.empty) {
+          const despesaData = despesaDoc.docs[0].data();
+          
+          // Preencher o modal com os dados da despesa
+          document.getElementById('descricaoDespesa').value = despesaData.descricao || '';
+          document.getElementById('observacaoDespesa').value = despesaData.observacao || '';
+          document.getElementById('valorDespesa').value = despesaData.valor || '';
+          
+          // Alterar o título do modal e o texto do botão
+          document.getElementById('modalTitle').textContent = 'Editar Despesa';
+          document.getElementById('submitButton').innerHTML = '<i class="fas fa-save"></i> Atualizar Despesa';
+          
+          // Armazenar o ID da despesa que está sendo editada
+          despesaEditandoId = id;
+          
+          // Abrir o modal
+          document.getElementById('modalDespesa').style.display = 'flex';
+        } else {
+          alert('Despesa não encontrada.');
+        }
+      } catch (error) {
+        console.error('Erro ao carregar despesa para edição:', error);
+        alert('Erro ao carregar despesa para edição.');
       }
     };
 
-    // Funções para abrir e fechar o modal
+    // Função para excluir despesa
+    window.excluirDespesa = async function(id) {
+      if (confirm('Tem certeza que deseja excluir esta despesa? Esta ação não pode ser desfeita.')) {
+        try {
+          await deleteDoc(doc(db, 'despesas', id));
+          alert('Despesa excluída com sucesso!');
+          
+          // Recarregar os dados
+          await carregarDadosFinanceiros();
+          await carregarDespesas();
+        } catch (error) {
+          console.error('Erro ao excluir despesa:', error);
+          alert('Erro ao excluir despesa. Verifique o console para detalhes.');
+        }
+      }
+    };
+
+    // Função para abrir modal de nova despesa
     window.abrirModalDespesa = function() {
+      // Limpar campos e resetar para modo de adição
+      document.getElementById('descricaoDespesa').value = '';
+      document.getElementById('observacaoDespesa').value = '';
+      document.getElementById('valorDespesa').value = '';
+      document.getElementById('modalTitle').textContent = 'Adicionar Nova Despesa';
+      document.getElementById('submitButton').innerHTML = '<i class="fas fa-check"></i> Inserir Despesa';
+      despesaEditandoId = null;
+      
+      // Abrir o modal
       document.getElementById('modalDespesa').style.display = 'flex';
     };
 
+    // Funções para fechar o modal
     window.fecharModalDespesa = function() {
       document.getElementById('modalDespesa').style.display = 'none';
     };
@@ -258,7 +323,7 @@
     window.onclick = function(event) {
       const modal = document.getElementById('modalDespesa');
       if (event.target === modal) {
-        modal.style.display = 'none';
+        document.getElementById('modalDespesa').style.display = 'none';
       }
     };
   </script>
@@ -267,7 +332,6 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
-    /* mantém todo o CSS já existente */
     :root { --primary:#1a2a6c; --secondary:#b21f1f; --accent:#fdbb2d; }
     * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; }
     body { background:#f5f7fb; color:#333; }
@@ -486,7 +550,7 @@
       </div>
       <div class="chart-container">
         <h3 class="chart-title">Pagamentos por Status</h3>
-        <canvas id="paymentsChart"></canvas>
+        <canvas id='paymentsChart'></canvas>
       </div>
     </div>
 
@@ -534,11 +598,11 @@
     </div>
   </div>
 
-  <!-- Modal para Adicionar Despesa -->
+  <!-- Modal para Adicionar/Editar Despesa -->
   <div id="modalDespesa" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 class="modal-title">Adicionar Nova Despesa</h3>
+        <h3 id="modalTitle" class="modal-title">Adicionar Nova Despesa</h3>
         <span class="close" onclick="fecharModalDespesa()">&times;</span>
       </div>
       <div class="form-group">
@@ -553,7 +617,7 @@
         <label for="valorDespesa">Valor (R$) *</label>
         <input type="number" id="valorDespesa" class="form-control" placeholder="0,00" step="0.01" min="0">
       </div>
-      <button class="btn-submit" onclick="adicionarDespesa()">
+      <button id="submitButton" class="btn-submit" onclick="adicionarDespesa()">
         <i class="fas fa-check"></i> Inserir Despesa
       </button>
     </div>
