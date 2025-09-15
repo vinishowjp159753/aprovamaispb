@@ -9,10 +9,20 @@
   <script type="module">
     import { db } from './assets/js/firebase-config.js';
     import {
-      collection, getDocs, query, where
+      collection, getDocs, query, where, orderBy, addDoc, serverTimestamp
     } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
     document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        await carregarDadosFinanceiros();
+        await carregarDespesas();
+      } catch (error) {
+        console.error("Erro ao carregar dados financeiros:", error);
+        showNotification("Erro ao carregar dados financeiros. Verifique o console para detalhes.", "error");
+      }
+    });
+
+    async function carregarDadosFinanceiros() {
       // Receita Total
       const inscricoesSnap = await getDocs(collection(db, 'inscricoes'));
       const receitaTotal = inscricoesSnap.docs.reduce((acc, d) => acc + (Number(d.data().valorPago) || 0), 0);
@@ -24,49 +34,230 @@
       const mensalSnap = await getDocs(q);
       const receitaMensal = mensalSnap.docs.reduce((acc,d)=>acc + (Number(d.data().valorPago)||0),0);
 
-      // Despesas
-      const despSnap = await getDocs(collection(db,'despesas'));
+      // Despesas do mês atual
+      const despesasQuery = query(
+        collection(db, 'despesas'), 
+        where('data', '>=', inicioMes)
+      );
+      const despSnap = await getDocs(despesasQuery);
       let totalDespesas = 0;
-      const tbody = document.querySelector('tbody');
-      despSnap.forEach(doc=>{
+      
+      despSnap.forEach(doc => {
         const d = doc.data();
         totalDespesas += Number(d.valor) || 0;
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${new Date(d.data.seconds*1000).toLocaleDateString()}</td>
-                        <td>-</td>
-                        <td>${d.observacao || ''}</td>
-                        <td>R$ ${(Number(d.valor)||0).toFixed(2)}</td>
-                        <td><span class="status pago">Pago</span></td>`;
-        tbody.appendChild(tr);
       });
 
       // Atualiza indicadores
       document.querySelectorAll('.financial-card .card-value')[0].textContent = `R$ ${receitaTotal.toFixed(2)}`;
       document.querySelectorAll('.financial-card .card-value')[1].textContent = `R$ ${receitaMensal.toFixed(2)}`;
       document.querySelectorAll('.financial-card .card-value')[2].textContent = `R$ ${totalDespesas.toFixed(2)}`;
-      document.querySelectorAll('.financial-card .card-value')[3].textContent = `R$ ${(receitaMensal-totalDespesas).toFixed(2)}`;
+      document.querySelectorAll('.financial-card .card-value')[3].textContent = `R$ ${(receitaMensal - totalDespesas).toFixed(2)}`;
 
-      // Gráficos simples
+      // Gráfico de Receitas x Despesas
       const revenueCtx = document.getElementById('revenueExpensesChart').getContext('2d');
       new Chart(revenueCtx, {
-        type:'bar',
-        data:{
-          labels:['Receitas','Despesas'],
-          datasets:[{data:[receitaMensal,totalDespesas],backgroundColor:['#1a2a6c','#b21f1f']}]
+        type: 'bar',
+        data: {
+          labels: ['Receitas', 'Despesas'],
+          datasets: [{
+            data: [receitaMensal, totalDespesas], 
+            backgroundColor: ['#1a2a6c', '#b21f1f'],
+            borderColor: ['#0f1a45', '#8a1919'],
+            borderWidth: 1
+          }]
         },
-        options:{responsive:true,plugins:{legend:{display:false}}}
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            title: {
+              display: true,
+              text: 'Comparativo Mensal'
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return 'R$ ' + value.toFixed(2);
+                }
+              }
+            }
+          }
+        }
       });
 
+      // Gráfico de Status de Pagamentos (exemplo)
       const paymentsCtx = document.getElementById('paymentsChart').getContext('2d');
       new Chart(paymentsCtx, {
-        type:'doughnut',
-        data:{
-          labels:['Pagos','Pendentes','Atrasados'],
-          datasets:[{data:[60,25,15],backgroundColor:['#28a745','#ffc107','#dc3545']}]
+        type: 'doughnut',
+        data: {
+          labels: ['Pagos', 'Pendentes', 'Atrasados'],
+          datasets: [{
+            data: [60, 25, 15],
+            backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
+            borderWidth: 1
+          }]
         },
-        options:{responsive:true,plugins:{legend:{position:'bottom'}}}
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: 'bottom' }
+          }
+        }
       });
-    });
+    }
+
+    async function carregarDespesas() {
+      const tbody = document.querySelector('#despesasTable tbody');
+      tbody.innerHTML = '';
+      
+      // Carregar últimas transações
+      const transacoesTbody = document.querySelector('#transactionsTable tbody');
+      transacoesTbody.innerHTML = '';
+      
+      // Carregar despesas
+      const despesasQuery = query(
+        collection(db, 'despesas'),
+        orderBy('data', 'desc')
+      );
+      const despesasSnap = await getDocs(despesasQuery);
+      
+      despesasSnap.forEach(doc => {
+        const d = doc.data();
+        const valor = Number(d.valor) || 0;
+        const dataDespesa = d.data.toDate();
+        
+        // Adicionar à tabela de despesas
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${dataDespesa.toLocaleDateString()}</td>
+          <td>${d.descricao || 'Despesa'}</td>
+          <td>${d.observacao || '-'}</td>
+          <td>R$ ${valor.toFixed(2)}</td>
+          <td>
+            <button class="btn-icon" onclick="editarDespesa('${doc.id}')">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn-icon btn-danger" onclick="excluirDespesa('${doc.id}')">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+        
+        // Adicionar às últimas transações (apenas 5 primeiras)
+        if (transacoesTbody.childElementCount < 5) {
+          const trTransacao = document.createElement('tr');
+          trTransacao.innerHTML = `
+            <td>${dataDespesa.toLocaleDateString()}</td>
+            <td>-</td>
+            <td>${d.descricao || 'Despesa'}</td>
+            <td>R$ ${valor.toFixed(2)}</td>
+            <td><span class="status pago">Pago</span></td>
+          `;
+          transacoesTbody.appendChild(trTransacao);
+        }
+      });
+      
+      // Adicionar também as inscrições como transações
+      const inscricoesQuery = query(
+        collection(db, 'inscricoes'),
+        orderBy('dataPagamento', 'desc')
+      );
+      const inscricoesOrdenadas = await getDocs(inscricoesQuery);
+      
+      inscricoesOrdenadas.forEach(doc => {
+        if (transacoesTbody.childElementCount < 10) {
+          const i = doc.data();
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${i.dataPagamento.toDate().toLocaleDateString()}</td>
+            <td>${i.nomeAluno || 'Aluno'}</td>
+            <td>Inscrição - ${i.curso || 'Curso'}</td>
+            <td>R$ ${(Number(i.valorPago) || 0).toFixed(2)}</td>
+            <td><span class="status recebido">Recebido</span></td>
+          `;
+          transacoesTbody.appendChild(tr);
+        }
+      });
+    }
+
+    // Função para adicionar nova despesa
+    window.adicionarDespesa = async function() {
+      const descricao = document.getElementById('descricaoDespesa').value;
+      const observacao = document.getElementById('observacaoDespesa').value;
+      const valor = document.getElementById('valorDespesa').value;
+      
+      if (!descricao || !valor) {
+        showNotification('Preencha pelo menos a descrição e o valor da despesa.', 'error');
+        return;
+      }
+      
+      try {
+        // Adicionar documento ao Firestore
+        await addDoc(collection(db, 'despesas'), {
+          descricao: descricao,
+          observacao: observacao,
+          valor: parseFloat(valor),
+          data: serverTimestamp()
+        });
+        
+        showNotification('Despesa adicionada com sucesso!', 'success');
+        
+        // Fechar o modal e limpar os campos
+        document.getElementById('modalDespesa').style.display = 'none';
+        document.getElementById('descricaoDespesa').value = '';
+        document.getElementById('observacaoDespesa').value = '';
+        document.getElementById('valorDespesa').value = '';
+        
+        // Recarregar os dados
+        await carregarDadosFinanceiros();
+        await carregarDespesas();
+        
+      } catch (error) {
+        console.error('Erro ao adicionar despesa:', error);
+        showNotification('Erro ao adicionar despesa. Verifique o console para detalhes.', 'error');
+      }
+    };
+
+    // Funções auxiliares para editar e excluir (para implementar depois)
+    window.editarDespesa = function(id) {
+      showNotification('Funcionalidade de edição em desenvolvimento.', 'info');
+    };
+
+    window.excluirDespesa = function(id) {
+      if (confirm('Tem certeza que deseja excluir esta despesa?')) {
+        showNotification('Funcionalidade de exclusão em desenvolvimento.', 'info');
+      }
+    };
+
+    // Função para exibir notificações
+    function showNotification(message, type = "info") {
+      if (typeof NotificationSystem !== 'undefined') {
+        NotificationSystem.show(message, type);
+      } else {
+        alert(message);
+      }
+    }
+
+    // Funções para abrir e fechar o modal
+    window.abrirModalDespesa = function() {
+      document.getElementById('modalDespesa').style.display = 'flex';
+    };
+
+    window.fecharModalDespesa = function() {
+      document.getElementById('modalDespesa').style.display = 'none';
+    };
+
+    // Fechar modal clicando fora dele
+    window.onclick = function(event) {
+      const modal = document.getElementById('modalDespesa');
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
+    };
   </script>
 
   <link rel="stylesheet" href="assets/css/notification-system.css">
@@ -83,6 +274,7 @@
     .back-btn{display:inline-flex;align-items:center;padding:10px 15px;background:var(--primary);color:white;text-decoration:none;border-radius:5px;font-weight:500;}
     .back-btn i{margin-right:8px;}
     h1{color:var(--primary);text-align:center;margin:20px 0;}
+    h2{color:var(--primary);margin:25px 0 15px 0;display:flex;justify-content:space-between;align-items:center;}
     .financial-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;margin-bottom:30px;}
     .financial-card{background:white;border-radius:10px;padding:20px;box-shadow:0 5px 15px rgba(0,0,0,.05);}
     .card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;}
@@ -93,7 +285,7 @@
     .charts-row{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:30px;}
     .chart-container{background:white;border-radius:10px;padding:20px;box-shadow:0 5px 15px rgba(0,0,0,.05);}
     .chart-title{font-size:18px;margin-bottom:15px;color:var(--primary);font-weight:600;}
-    .transactions{background:white;border-radius:10px;padding:20px;box-shadow:0 5px 15px rgba(0,0,0,.05);}
+    .transactions{background:white;border-radius:10px;padding:20px;box-shadow:0 5px 15px rgba(0,0,0,.05);margin-bottom:30px;}
     table{width:100%;border-collapse:collapse;}
     th,td{padding:15px;text-align:left;border-bottom:1px solid #eee;}
     th{background:var(--primary);color:white;font-weight:500;}
@@ -102,6 +294,130 @@
     .status.pago{background:#e8f5e9;color:#2e7d32;}
     .status.pendente{background:#fff3cd;color:#856404;}
     .status.atrasado{background:#f8d7da;color:#721c24;}
+    .status.recebido{background:#e8f5e9;color:#2e7d32;}
+    
+    /* Botão de adicionar */
+    .btn-add {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+    }
+    .btn-add i {
+      margin-right: 8px;
+    }
+    
+    /* Botões de ação na tabela */
+    .btn-icon {
+      background: #f0f0f0;
+      border: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-right: 5px;
+    }
+    .btn-icon:hover {
+      background: #e0e0e0;
+    }
+    .btn-danger {
+      color: #dc3545;
+    }
+    
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-content {
+      background-color: white;
+      padding: 25px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .modal-title {
+      font-size: 20px;
+      color: var(--primary);
+      margin: 0;
+    }
+    .close {
+      color: #aaa;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .close:hover {
+      color: #000;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+    .form-control {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    .btn-submit {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 500;
+      width: 100%;
+      margin-top: 10px;
+    }
+    .btn-submit:hover {
+      background: #15245e;
+    }
+    
+    /* Botão de atualizar */
+    .refresh-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--primary);
+      color: white;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+      z-index: 100;
+    }
   </style>
 </head>
 <body>
@@ -116,33 +432,137 @@
 
     <!-- Cards de indicadores -->
     <div class="financial-cards">
-      <div class="financial-card"><div class="card-header">
-        <div class="card-title">Receita Total</div>
-        <div class="card-icon" style="background:rgba(26,42,108,0.1);color:var(--primary);">
-          <i class="fas fa-dollar-sign"></i>
-        </div></div>
+      <div class="financial-card">
+        <div class="card-header">
+          <div class="card-title">Receita Total</div>
+          <div class="card-icon" style="background:rgba(26,42,108,0.1);color:var(--primary);">
+            <i class="fas fa-dollar-sign"></i>
+          </div>
+        </div>
         <div class="card-value">R$ 0,00</div>
         <div class="card-desc">Desde o início do ano</div>
       </div>
 
-      <div class="financial-card"><div class="card-header">
-        <div class="card-title">Receita Mensal</div>
-        <div class="card-icon" style="background:rgba(178,31,31,0.1);color:var(--secondary);">
-          <i class="fas fa-chart-line"></i>
-        </div></div>
+      <div class="financial-card">
+        <div class="card-header">
+          <div class="card-title">Receita Mensal</div>
+          <div class="card-icon" style="background:rgba(178,31,31,0.1);color:var(--secondary);">
+            <i class="fas fa-chart-line"></i>
+          </div>
+        </div>
         <div class="card-value">R$ 0,00</div>
         <div class="card-desc">Mês atual</div>
       </div>
 
-      <div class="financial-card"><div class="card-header">
-        <div class="card-title">Despesas</div>
-        <div class="card-icon" style="background:rgba(253,187,45,0.1);color:var(--accent);">
-          <i class="fas fa-money-bill-wave"></i>
-        </div></div>
+      <div class="financial-card">
+        <div class="card-header">
+          <div class="card-title">Despesas</div>
+          <div class="card-icon" style="background:rgba(253,187,45,0.1);color:var(--accent);">
+            <i class="fas fa-money-bill-wave"></i>
+          </div>
+        </div>
         <div class="card-value">R$ 0,00</div>
         <div class="card-desc">Mês atual</div>
       </div>
 
-      <div class="financial-card"><div class="card-header">
-        <div class="card-title">Lucro Líquido</div>
-        <div class="card-icon" style=
+      <div class="financial-card">
+        <div class="card-header">
+          <div class="card-title">Lucro Líquido</div>
+          <div class="card-icon" style="background:rgba(40,167,69,0.1);color:#28a745;">
+            <i class="fas fa-hand-holding-usd"></i>
+          </div>
+        </div>
+        <div class="card-value">R$ 0,00</div>
+        <div class="card-desc">Mês atual</div>
+      </div>
+    </div>
+
+    <div class="charts-row">
+      <div class="chart-container">
+        <h3 class="chart-title">Receitas x Despesas</h3>
+        <canvas id="revenueExpensesChart"></canvas>
+      </div>
+      <div class="chart-container">
+        <h3 class="chart-title">Pagamentos por Status</h3>
+        <canvas id="paymentsChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Tabela de Despesas -->
+    <div class="transactions">
+      <h2>
+        Despesas
+        <button class="btn-add" onclick="abrirModalDespesa()">
+          <i class="fas fa-plus"></i> Adicionar Despesa
+        </button>
+      </h2>
+      <table id="despesasTable">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Descrição</th>
+            <th>Observação</th>
+            <th>Valor</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- As despesas serão preenchidas via JavaScript -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Tabela de Últimas Transações -->
+    <div class="transactions">
+      <h3 class="chart-title">Últimas Transações</h3>
+      <table id="transactionsTable">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Aluno/Fornecedor</th>
+            <th>Descrição</th>
+            <th>Valor</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- As transações serão preenchidas via JavaScript -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal para Adicionar Despesa -->
+  <div id="modalDespesa" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Adicionar Nova Despesa</h3>
+        <span class="close" onclick="fecharModalDespesa()">&times;</span>
+      </div>
+      <div class="form-group">
+        <label for="descricaoDespesa">Descrição *</label>
+        <input type="text" id="descricaoDespesa" class="form-control" placeholder="Ex: Material de escritório">
+      </div>
+      <div class="form-group">
+        <label for="observacaoDespesa">Observação</label>
+        <textarea id="observacaoDespesa" class="form-control" rows="3" placeholder="Detalhes adicionais sobre a despesa"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="valorDespesa">Valor (R$) *</label>
+        <input type="number" id="valorDespesa" class="form-control" placeholder="0,00" step="0.01" min="0">
+      </div>
+      <button class="btn-submit" onclick="adicionarDespesa()">
+        <i class="fas fa-check"></i> Inserir Despesa
+      </button>
+    </div>
+  </div>
+
+  <!-- Botão de atualizar -->
+  <div class="refresh-btn" onclick="window.location.reload()">
+    <i class="fas fa-sync-alt"></i>
+  </div>
+
+  <!-- Scripts -->
+  <script src="assets/js/notification-system.js"></script>
+</body>
+</html>
