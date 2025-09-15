@@ -1,172 +1,145 @@
-// ===============================
-// firebase-integration.js
-// ===============================
-// Funções para integração com Firebase
+// assets/js/firebase-integration.js
+import {
+  collection, getDocs, addDoc, updateDoc, doc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { db } from './firebase-config.js';
 
-// ---------- Alunos ----------
+// === Alunos ===
 async function getAlunos() {
-    try {
-        const snapshot = await db.collection("inscricoes").get();
-        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    } catch (error) {
-        console.error("Erro ao buscar alunos:", error);
-        notifications.error("Erro ao carregar alunos");
-        return [];
-    }
+  try {
+    const snapshot = await getDocs(collection(db, "inscricoes"));
+    return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (e) {
+    console.error("Erro ao buscar alunos:", e);
+    notifications.error("Erro ao carregar alunos");
+    return [];
+  }
 }
 
 async function saveAluno(alunoData) {
-    try {
-        const docRef = await db.collection("inscricoes").add({
-            ...alunoData,
-            criadoEm: firebase.firestore.FieldValue.serverTimestamp(),
-            status: "pendente"
-        });
-        notifications.success("Aluno salvo com sucesso!");
-        return docRef.id;
-    } catch (error) {
-        console.error("Erro ao salvar aluno:", error);
-        notifications.error("Erro ao salvar aluno");
-        throw error;
-    }
+  try {
+    const docRef = await addDoc(collection(db, "inscricoes"), {
+      ...alunoData,
+      criadoEm: serverTimestamp(),
+      status: "pendente"
+    });
+    notifications.success("Aluno salvo com sucesso!");
+    return docRef.id;
+  } catch (e) {
+    console.error("Erro ao salvar aluno:", e);
+    notifications.error("Erro ao salvar aluno");
+    throw e;
+  }
 }
 
 async function updateAluno(id, alunoData) {
-    try {
-        await db.collection("inscricoes").doc(id).update({
-            ...alunoData,
-            atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        notifications.success("Aluno atualizado com sucesso!");
-    } catch (error) {
-        console.error("Erro ao atualizar aluno:", error);
-        notifications.error("Erro ao atualizar aluno");
-        throw error;
-    }
+  try {
+    await updateDoc(doc(db, "inscricoes", id), {
+      ...alunoData,
+      atualizadoEm: serverTimestamp()
+    });
+    notifications.success("Aluno atualizado com sucesso!");
+  } catch (e) {
+    console.error("Erro ao atualizar aluno:", e);
+    notifications.error("Erro ao atualizar aluno");
+    throw e;
+  }
 }
 
-// ---------- Professores ----------
+// === Professores ===
 async function getProfessores() {
-    try {
-        const snapshot = await db.collection("professores").get();
-        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    } catch (error) {
-        console.error("Erro ao buscar professores:", error);
-        notifications.error("Erro ao carregar professores");
-        return [];
-    }
+  try {
+    const snapshot = await getDocs(collection(db, "professores"));
+    return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (e) {
+    console.error("Erro ao buscar professores:", e);
+    notifications.error("Erro ao carregar professores");
+    return [];
+  }
 }
 
 async function saveProfessor(professorData) {
-    try {
-        const docRef = await db.collection("professores").add({
-            ...professorData,
-            criadoEm: firebase.firestore.FieldValue.serverTimestamp(),
-            status: "ativo"
-        });
-        notifications.success("Professor salvo com sucesso!");
-        return docRef.id;
-    } catch (error) {
-        console.error("Erro ao salvar professor:", error);
-        notifications.error("Erro ao salvar professor");
-        throw error;
-    }
+  try {
+    const docRef = await addDoc(collection(db, "professores"), {
+      ...professorData,
+      criadoEm: serverTimestamp(),
+      status: "ativo"
+    });
+    notifications.success("Professor salvo com sucesso!");
+    return docRef.id;
+  } catch (e) {
+    console.error("Erro ao salvar professor:", e);
+    notifications.error("Erro ao salvar professor");
+    throw e;
+  }
 }
 
-// ---------- Pagamentos ----------
+// === Pagamentos ===
 async function registrarPagamento(pagamentoData) {
-    try {
-        const docRef = await db.collection("pagamentos").add({
-            ...pagamentoData,
-            registradoEm: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        notifications.success("Pagamento registrado com sucesso!");
-        return docRef.id;
-    } catch (error) {
-        console.error("Erro ao registrar pagamento:", error);
-        notifications.error("Erro ao registrar pagamento");
-        throw error;
-    }
+  try {
+    const docRef = await addDoc(collection(db, "pagamentos"), {
+      ...pagamentoData,
+      registradoEm: serverTimestamp()
+    });
+    notifications.success("Pagamento registrado com sucesso!");
+    return docRef.id;
+  } catch (e) {
+    console.error("Erro ao registrar pagamento:", e);
+    notifications.error("Erro ao registrar pagamento");
+    throw e;
+  }
 }
 
-// ---------- Controle Financeiro ----------
+// === Controle Financeiro ===
+import { query, where } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
 async function getReceitaTotal() {
-    try {
-        const snapshot = await db.collection("inscricoes").get();
-        let total = 0;
-        snapshot.forEach(doc => total += Number(doc.data().valorPago) || 0);
-        return total;
-    } catch (e) {
-        console.error("Erro ao calcular receita total:", e);
-        notifications.error("Erro ao calcular receita total");
-        return 0;
-    }
+  const snap = await getDocs(collection(db, "inscricoes"));
+  return snap.docs.reduce((acc, d) => acc + (Number(d.data().valorPago) || 0), 0);
 }
 
 async function getReceitaMensal() {
-    const now = new Date();
-    const inicioMes = new Date(now.getFullYear(), now.getMonth(), 1);
-    try {
-        const snapshot = await db.collection("inscricoes")
-            .where("dataPagamento", ">=", inicioMes)
-            .get();
-        let total = 0;
-        snapshot.forEach(doc => total += Number(doc.data().valorPago) || 0);
-        return total;
-    } catch (e) {
-        console.error("Erro ao calcular receita mensal:", e);
-        return 0;
-    }
+  const now = new Date();
+  const inicio = new Date(now.getFullYear(), now.getMonth(), 1);
+  const q = query(collection(db, "inscricoes"),
+                  where("dataPagamento", ">=", inicio));
+  const snap = await getDocs(q);
+  return snap.docs.reduce((acc, d) => acc + (Number(d.data().valorPago) || 0), 0);
 }
 
 async function getDespesas(mensal = false) {
-    try {
-        let ref = db.collection("despesas");
-        if (mensal) {
-            const now = new Date();
-            const inicioMes = new Date(now.getFullYear(), now.getMonth(), 1);
-            ref = ref.where("data", ">=", inicioMes);
-        }
-        const snapshot = await ref.get();
-        let total = 0;
-        const lista = [];
-        snapshot.forEach(doc => {
-            const d = doc.data();
-            lista.push({ id: doc.id, ...d });
-            total += Number(d.valor) || 0;
-        });
-        return { total, lista };
-    } catch (e) {
-        console.error("Erro ao buscar despesas:", e);
-        notifications.error("Erro ao buscar despesas");
-        return { total: 0, lista: [] };
-    }
+  let q = collection(db, "despesas");
+  if (mensal) {
+    const now = new Date();
+    const inicio = new Date(now.getFullYear(), now.getMonth(), 1);
+    q = query(q, where("data", ">=", inicio));
+  }
+  const snap = await getDocs(q);
+  let total = 0;
+  const lista = [];
+  snap.forEach(d => {
+    const dados = d.data();
+    total += Number(dados.valor) || 0;
+    lista.push({ id: d.id, ...dados });
+  });
+  return { total, lista };
 }
 
 async function salvarDespesa(despesa) {
-    try {
-        const docRef = await db.collection("despesas").add({
-            ...despesa,
-            criadoEm: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        notifications.success("Despesa registrada!");
-        return docRef.id;
-    } catch (e) {
-        console.error("Erro ao salvar despesa:", e);
-        notifications.error("Erro ao salvar despesa");
-        throw e;
-    }
+  return addDoc(collection(db, "despesas"), {
+    ...despesa,
+    criadoEm: serverTimestamp()
+  });
 }
 
-// ---------- Exporta para escopo global ----------
-window.getAlunos        = getAlunos;
-window.saveAluno        = saveAluno;
-window.updateAluno      = updateAluno;
-window.getProfessores   = getProfessores;
-window.saveProfessor    = saveProfessor;
+// Expõe no escopo global
+window.getAlunos         = getAlunos;
+window.saveAluno         = saveAluno;
+window.updateAluno       = updateAluno;
+window.getProfessores    = getProfessores;
+window.saveProfessor     = saveProfessor;
 window.registrarPagamento = registrarPagamento;
-
-window.getReceitaTotal  = getReceitaTotal;
-window.getReceitaMensal = getReceitaMensal;
-window.getDespesas      = getDespesas;
-window.salvarDespesa    = salvarDespesa;
+window.getReceitaTotal   = getReceitaTotal;
+window.getReceitaMensal  = getReceitaMensal;
+window.getDespesas       = getDespesas;
+window.salvarDespesa     = salvarDespesa;
