@@ -12,13 +12,17 @@
       collection, getDocs, query, where, orderBy, addDoc, serverTimestamp
     } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
+    // Variáveis globais para armazenar as instâncias dos gráficos
+    let revenueExpensesChart = null;
+    let paymentsChart = null;
+
     document.addEventListener('DOMContentLoaded', async () => {
       try {
         await carregarDadosFinanceiros();
         await carregarDespesas();
       } catch (error) {
         console.error("Erro ao carregar dados financeiros:", error);
-        showNotification("Erro ao carregar dados financeiros. Verifique o console para detalhes.", "error");
+        alert("Erro ao carregar dados financeiros. Verifique o console para detalhes.");
       }
     });
 
@@ -53,9 +57,17 @@
       document.querySelectorAll('.financial-card .card-value')[2].textContent = `R$ ${totalDespesas.toFixed(2)}`;
       document.querySelectorAll('.financial-card .card-value')[3].textContent = `R$ ${(receitaMensal - totalDespesas).toFixed(2)}`;
 
+      // Destruir gráficos existentes antes de criar novos
+      if (revenueExpensesChart) {
+        revenueExpensesChart.destroy();
+      }
+      if (paymentsChart) {
+        paymentsChart.destroy();
+      }
+
       // Gráfico de Receitas x Despesas
       const revenueCtx = document.getElementById('revenueExpensesChart').getContext('2d');
-      new Chart(revenueCtx, {
+      revenueExpensesChart = new Chart(revenueCtx, {
         type: 'bar',
         data: {
           labels: ['Receitas', 'Despesas'],
@@ -90,7 +102,7 @@
 
       // Gráfico de Status de Pagamentos (exemplo)
       const paymentsCtx = document.getElementById('paymentsChart').getContext('2d');
-      new Chart(paymentsCtx, {
+      paymentsChart = new Chart(paymentsCtx, {
         type: 'doughnut',
         data: {
           labels: ['Pagos', 'Pendentes', 'Atrasados'],
@@ -232,12 +244,6 @@
         alert('Funcionalidade de exclusão em desenvolvimento.');
       }
     };
-
-    // Função para exibir notificações (simplificada)
-    function showNotification(message, type = "info") {
-      // Sistema de notificação simples usando alert
-      alert(message);
-    }
 
     // Funções para abrir e fechar o modal
     window.abrirModalDespesa = function() {
