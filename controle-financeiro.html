@@ -4,11 +4,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Controle Financeiro - AprovaMaisPB</title>
-  <script src="firebase-config.js"></script>
-  <link rel="stylesheet" href="notification-system.css">
+
+  <!-- Firebase v8 compatível com db.collection -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+
+  <!-- Configuração do Firebase -->
+  <script src="assets/js/firebase-config.js"></script>
+
+  <!-- Estilos e bibliotecas -->
+  <link rel="stylesheet" href="assets/css/notification-system.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
+    /* (mantém todo o CSS já existente da página) */
     :root { --primary:#1a2a6c; --secondary:#b21f1f; --accent:#fdbb2d; }
     * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; }
     body { background:#f5f7fb; color:#333; }
@@ -39,125 +50,86 @@
   </style>
 </head>
 <body>
-<div class="container">
-  <div class="header">
-    <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Voltar ao Dashboard</a>
-    <h1>Controle Financeiro</h1>
-    <div></div>
+  <div class="container">
+    <div class="header">
+      <a href="dashboard.html" class="back-btn">
+        <i class="fas fa-arrow-left"></i> Voltar ao Dashboard
+      </a>
+      <h1>Controle Financeiro</h1>
+      <div></div>
+    </div>
+
+    <!-- Cards de indicadores -->
+    <div class="financial-cards">
+      <div class="financial-card">
+        <div class="card-header">
+          <div class="card-title">Receita Total</div>
+          <div class="card-icon" style="background:rgba(26,42,108,0.1);color:var(--primary);">
+            <i class="fas fa-dollar-sign"></i>
+          </div>
+        </div>
+        <div class="card-value">R$ 0,00</div>
+        <div class="card-desc">Desde o início do ano</div>
+      </div>
+
+      <div class="financial-card">
+        <div class="card-header">
+          <div class="card-title">Receita Mensal</div>
+          <div class="card-icon" style="background:rgba(178,31,31,0.1);color:var(--secondary);">
+            <i class="fas fa-chart-line"></i>
+          </div>
+        </div>
+        <div class="card-value">R$ 0,00</div>
+        <div class="card-desc">Mês atual</div>
+      </div>
+
+      <div class="financial-card">
+        <div class="card-header">
+          <div class="card-title">Despesas</div>
+          <div class="card-icon" style="background:rgba(253,187,45,0.1);color:var(--accent);">
+            <i class="fas fa-money-bill-wave"></i>
+          </div>
+        </div>
+        <div class="card-value">R$ 0,00</div>
+        <div class="card-desc">Mês atual</div>
+      </div>
+
+      <div class="financial-card">
+        <div class="card-header">
+          <div class="card-title">Lucro Líquido</div>
+          <div class="card-icon" style="background:rgba(40,167,69,0.1);color:#28a745;">
+            <i class="fas fa-hand-holding-usd"></i>
+          </div>
+        </div>
+        <div class="card-value">R$ 0,00</div>
+        <div class="card-desc">Mês atual</div>
+      </div>
+    </div>
+
+    <div class="charts-row">
+      <div class="chart-container">
+        <h3 class="chart-title">Receitas x Despesas</h3>
+        <canvas id="revenueExpensesChart"></canvas>
+      </div>
+      <div class="chart-container">
+        <h3 class="chart-title">Pagamentos por Status</h3>
+        <canvas id="paymentsChart"></canvas>
+      </div>
+    </div>
+
+    <div class="transactions">
+      <h3 class="chart-title">Últimas Transações</h3>
+      <table>
+        <thead>
+          <tr><th>Data</th><th>Aluno</th><th>Descrição</th><th>Valor</th><th>Status</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
   </div>
 
-  <div class="financial-cards">
-    <div class="financial-card">
-      <div class="card-header">
-        <div class="card-title">Receita Total</div>
-        <div class="card-icon" style="background:rgba(26,42,108,0.1);color:var(--primary);"><i class="fas fa-dollar-sign"></i></div>
-      </div>
-      <div class="card-value">R$ 0,00</div>
-      <div class="card-desc">Desde o início do ano</div>
-    </div>
-    <div class="financial-card">
-      <div class="card-header">
-        <div class="card-title">Receita Mensal</div>
-        <div class="card-icon" style="background:rgba(178,31,31,0.1);color:var(--secondary);"><i class="fas fa-chart-line"></i></div>
-      </div>
-      <div class="card-value">R$ 0,00</div>
-      <div class="card-desc">Mês atual</div>
-    </div>
-    <div class="financial-card">
-      <div class="card-header">
-        <div class="card-title">Despesas</div>
-        <div class="card-icon" style="background:rgba(253,187,45,0.1);color:var(--accent);"><i class="fas fa-money-bill-wave"></i></div>
-      </div>
-      <div class="card-value">R$ 0,00</div>
-      <div class="card-desc">Mês atual</div>
-    </div>
-    <div class="financial-card">
-      <div class="card-header">
-        <div class="card-title">Lucro Líquido</div>
-        <div class="card-icon" style="background:rgba(40,167,69,0.1);color:#28a745;"><i class="fas fa-hand-holding-usd"></i></div>
-      </div>
-      <div class="card-value">R$ 0,00</div>
-      <div class="card-desc">Mês atual</div>
-    </div>
-  </div>
-
-  <div class="charts-row">
-    <div class="chart-container">
-      <h3 class="chart-title">Receitas x Despesas</h3>
-      <canvas id="revenueExpensesChart"></canvas>
-    </div>
-    <div class="chart-container">
-      <h3 class="chart-title">Pagamentos por Status</h3>
-      <canvas id="paymentsChart"></canvas>
-    </div>
-  </div>
-
-  <div class="transactions">
-    <h3 class="chart-title">Últimas Transações</h3>
-    <table>
-      <thead>
-        <tr><th>Data</th><th>Aluno</th><th>Descrição</th><th>Valor</th><th>Status</th></tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-</div>
-
-<script src="notification-system.js"></script>
-<script src="firebase-integration.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', async () => {
-  const total   = await getReceitaTotal();
-  const mensal  = await getReceitaMensal();
-  const { total: despMes, lista: listaDesp } = await getDespesas(true);
-
-  document.querySelector('.financial-card:nth-child(1) .card-value')
-    .textContent = `R$ ${total.toLocaleString('pt-BR',{minimumFractionDigits:2})}`;
-  document.querySelector('.financial-card:nth-child(2) .card-value')
-    .textContent = `R$ ${mensal.toLocaleString('pt-BR',{minimumFractionDigits:2})}`;
-  document.querySelector('.financial-card:nth-child(3) .card-value')
-    .textContent = `R$ ${despMes.toLocaleString('pt-BR',{minimumFractionDigits:2})}`;
-  document.querySelector('.financial-card:nth-child(4) .card-value')
-    .textContent = `R$ ${(mensal - despMes).toLocaleString('pt-BR',{minimumFractionDigits:2})}`;
-
-  const tbody = document.querySelector('.transactions tbody');
-  tbody.innerHTML = '';
-  const { lista: todasDesp } = await getDespesas();
-  todasDesp.forEach(d => {
-    const data = d.data?.toDate ? d.data.toDate().toLocaleDateString('pt-BR') : '-';
-    tbody.innerHTML += `<tr>
-      <td>${data}</td><td>-</td>
-      <td>${d.observacao || d.descricao || 'Despesa'}</td>
-      <td>R$ ${Number(d.valor).toLocaleString('pt-BR',{minimumFractionDigits:2})}</td>
-      <td><span class="status atrasado">Despesa</span></td>
-    </tr>`;
-  });
-
-  // Monta gráficos básicos (você pode sofisticar depois)
-  new Chart(document.getElementById('revenueExpensesChart'), {
-    type:'bar',
-    data:{ labels:['Mês'], datasets:[
-      { label:'Receitas', data:[mensal], backgroundColor:'#1a2a6c' },
-      { label:'Despesas', data:[despMes], backgroundColor:'#b21f1f' }
-    ]},
-    options:{ responsive:true }
-  });
-
-  // Pagamentos por status (usa inscrições)
-  const alunos = await getAlunos();
-  let pagos=0, pend=0, atr=0;
-  alunos.forEach(a => {
-    if(a.status==='pago') pagos++;
-    else if(a.status==='pendente') pend++;
-    else if(a.status==='atrasado') atr++;
-  });
-  new Chart(document.getElementById('paymentsChart'), {
-    type:'doughnut',
-    data:{ labels:['Pagos','Pendentes','Atrasados'],
-      datasets:[{ data:[pagos,pend,atr], backgroundColor:['#28a745','#ffc107','#dc3545'] }] },
-    options:{ responsive:true }
-  });
-});
-</script>
+  <!-- Scripts -->
+  <script src="assets/js/notification-system.js"></script>
+  <script src="assets/js/firebase-integration.js"></script>
 </body>
 </html>
