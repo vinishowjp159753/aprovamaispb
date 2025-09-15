@@ -136,11 +136,9 @@
 </div>
 
 <script type="module">
-    import { initializeApp } from './assets/js/firebase-config.js';
+    import { app, db } from "./assets/js/firebase-config.js";
     import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, addDoc, query, where } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-    const app = initializeApp();
-    const db = getFirestore(app);
     let professores = [];
     let designacoes = [];
     let professorEditando = null;
