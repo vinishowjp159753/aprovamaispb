@@ -22,6 +22,7 @@
       try {
         await carregarDadosFinanceiros();
         await carregarDespesas();
+        await carregarUltimasTransacoes();
       } catch (error) {
         console.error("Erro ao carregar dados financeiros:", error);
         alert("Erro ao carregar dados financeiros. Verifique o console para detalhes.");
@@ -29,21 +30,28 @@
     });
 
     async function carregarDadosFinanceiros() {
-      // Receita Total
+      // Receita Total (todas as inscrições)
       const inscricoesSnap = await getDocs(collection(db, 'inscricoes'));
       const receitaTotal = inscricoesSnap.docs.reduce((acc, d) => acc + (Number(d.data().valorPago) || 0), 0);
 
-      // Receita Mensal
+      // Receita Mensal (inscrições do mês atual)
       const now = new Date();
       const inicioMes = new Date(now.getFullYear(), now.getMonth(), 1);
-      const q = query(collection(db,'inscricoes'), where('dataPagamento','>=',inicioMes));
-      const mensalSnap = await getDocs(q);
-      const receitaMensal = mensalSnap.docs.reduce((acc,d)=>acc + (Number(d.data().valorPago)||0),0);
+      const fimMes = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      
+      const qInscricoes = query(
+        collection(db, 'inscricoes'), 
+        where('dataPagamento', '>=', inicioMes),
+        where('dataPagamento', '<=', fimMes)
+      );
+      const mensalSnap = await getDocs(qInscricoes);
+      const receitaMensal = mensalSnap.docs.reduce((acc, d) => acc + (Number(d.data().valorPago) || 0), 0);
 
       // Despesas do mês atual
       const despesasQuery = query(
         collection(db, 'despesas'), 
-        where('data', '>=', inicioMes)
+        where('data', '>=', inicioMes),
+        where('data', '<=', fimMes)
       );
       const despSnap = await getDocs(despesasQuery);
       let totalDespesas = 0;
@@ -53,11 +61,14 @@
         totalDespesas += Number(d.valor) || 0;
       });
 
+      // Cálculo do Lucro Líquido (Receita Mensal - Despesas Mensais)
+      const lucroLiquido = receitaMensal - totalDespesas;
+
       // Atualiza indicadores
       document.querySelectorAll('.financial-card .card-value')[0].textContent = `R$ ${receitaTotal.toFixed(2)}`;
       document.querySelectorAll('.financial-card .card-value')[1].textContent = `R$ ${receitaMensal.toFixed(2)}`;
       document.querySelectorAll('.financial-card .card-value')[2].textContent = `R$ ${totalDespesas.toFixed(2)}`;
-      document.querySelectorAll('.financial-card .card-value')[3].textContent = `R$ ${(receitaMensal - totalDespesas).toFixed(2)}`;
+      document.querySelectorAll('.financial-card .card-value')[3].textContent = `R$ ${lucroLiquido.toFixed(2)}`;
 
       // Destruir gráficos existentes antes de criar novos
       if (revenueExpensesChart) {
@@ -102,14 +113,28 @@
         }
       });
 
-      // Gráfico de Status de Pagamentos (exemplo)
+      // Calcular estatísticas de pagamentos
+      let pagos = 0, pendentes = 0, atrasados = 0;
+      
+      inscricoesSnap.forEach(doc => {
+        const data = doc.data();
+        if (data.statusPagamento === 'pago') {
+          pagos++;
+        } else if (data.statusPagamento === 'pendente') {
+          pendentes++;
+        } else if (data.statusPagamento === 'atrasado') {
+          atrasados++;
+        }
+      });
+
+      // Gráfico de Status de Pagamentos
       const paymentsCtx = document.getElementById('paymentsChart').getContext('2d');
       paymentsChart = new Chart(paymentsCtx, {
         type: 'doughnut',
         data: {
           labels: ['Pagos', 'Pendentes', 'Atrasados'],
           datasets: [{
-            data: [60, 25, 15],
+            data: [pagos, pendentes, atrasados],
             backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
             borderWidth: 1
           }]
@@ -126,10 +151,6 @@
     async function carregarDespesas() {
       const tbody = document.querySelector('#despesasTable tbody');
       tbody.innerHTML = '';
-      
-      // Carregar últimas transações
-      const transacoesTbody = document.querySelector('#transactionsTable tbody');
-      transacoesTbody.innerHTML = '';
       
       // Carregar despesas
       const despesasQuery = query(
@@ -160,41 +181,83 @@
           </td>
         `;
         tbody.appendChild(tr);
+      });
+    }
+
+    async function carregarUltimasTransacoes() {
+      const transacoesTbody = document.querySelector('#transactionsTable tbody');
+      transacoesTbody.innerHTML = '';
+      
+      // Array para armazenar todas as transações
+      let todasTransacoes = [];
+      
+      // Carregar despesas
+      const despesasQuery = query(
+        collection(db, 'despesas'),
+        orderBy('data', 'desc')
+      );
+      const despesasSnap = await getDocs(despesasQuery);
+      
+      despesasSnap.forEach(doc => {
+        const d = doc.data();
+        const valor = Number(d.valor) || 0;
+        const dataDespesa = d.data.toDate();
         
-        // Adicionar às últimas transações (apenas 5 primeiras)
-        if (transacoesTbody.childElementCount < 5) {
-          const trTransacao = document.createElement('tr');
-          trTransacao.innerHTML = `
-            <td>${dataDespesa.toLocaleDateString()}</td>
-            <td>-</td>
-            <td>${d.descricao || 'Despesa'}</td>
-            <td>R$ ${valor.toFixed(2)}</td>
-            <td><span class="status pago">Pago</span></td>
-          `;
-          transacoesTbody.appendChild(trTransacao);
-        }
+        todasTransacoes.push({
+          tipo: 'despesa',
+          data: dataDespesa,
+          descricao: d.descricao || 'Despesa',
+          alunoFornecedor: '-',
+          valor: valor,
+          status: 'Pago'
+        });
       });
       
-      // Adicionar também as inscrições como transações
+      // Carregar inscrições (matrículas pagas)
       const inscricoesQuery = query(
         collection(db, 'inscricoes'),
         orderBy('dataPagamento', 'desc')
       );
-      const inscricoesOrdenadas = await getDocs(inscricoesQuery);
+      const inscricoesSnap = await getDocs(inscricoesQuery);
       
-      inscricoesOrdenadas.forEach(doc => {
-        if (transacoesTbody.childElementCount < 10) {
-          const i = doc.data();
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${i.dataPagamento.toDate().toLocaleDateString()}</td>
-            <td>${i.nomeAluno || 'Aluno'}</td>
-            <td>Inscrição - ${i.curso || 'Curso'}</td>
-            <td>R$ ${(Number(i.valorPago) || 0).toFixed(2)}</td>
-            <td><span class="status recebido">Recebido</span></td>
-          `;
-          transacoesTbody.appendChild(tr);
+      inscricoesSnap.forEach(doc => {
+        const i = doc.data();
+        const valorPago = Number(i.valorPago) || 0;
+        
+        // Só adicionar se houver valor pago
+        if (valorPago > 0) {
+          todasTransacoes.push({
+            tipo: 'receita',
+            data: i.dataPagamento.toDate(),
+            descricao: `Matrícula - ${i.curso || 'Curso'}`,
+            alunoFornecedor: i.nomeAluno || 'Aluno',
+            valor: valorPago,
+            status: i.statusPagamento === 'pago' ? 'Recebido' : 'Pendente'
+          });
         }
+      });
+      
+      // Ordenar transações por data (mais recente primeiro)
+      todasTransacoes.sort((a, b) => b.data - a.data);
+      
+      // Adicionar apenas as 10 transações mais recentes à tabela
+      todasTransacoes.slice(0, 10).forEach(transacao => {
+        const tr = document.createElement('tr');
+        
+        // Definir classe de status com base no tipo
+        let statusClass = 'pago';
+        if (transacao.tipo === 'receita') {
+          statusClass = transacao.status === 'Recebido' ? 'recebido' : 'pendente';
+        }
+        
+        tr.innerHTML = `
+          <td>${transacao.data.toLocaleDateString()}</td>
+          <td>${transacao.alunoFornecedor}</td>
+          <td>${transacao.descricao}</td>
+          <td>R$ ${transacao.valor.toFixed(2)}</td>
+          <td><span class="status ${statusClass}">${transacao.status}</span></td>
+        `;
+        transacoesTbody.appendChild(tr);
       });
     }
 
@@ -244,6 +307,7 @@
         // Recarregar os dados
         await carregarDadosFinanceiros();
         await carregarDespesas();
+        await carregarUltimasTransacoes();
         
       } catch (error) {
         console.error('Erro ao salvar despesa:', error);
@@ -255,10 +319,10 @@
     window.editarDespesa = async function(id) {
       try {
         // Buscar os dados da despesa no Firebase
-        const despesaDoc = await getDocs(query(collection(db, 'despesas'), where('__name__', '==', id)));
+        const despesaDoc = await getDoc(doc(db, 'despesas', id));
         
-        if (!despesaDoc.empty) {
-          const despesaData = despesaDoc.docs[0].data();
+        if (despesaDoc.exists()) {
+          const despesaData = despesaDoc.data();
           
           // Preencher o modal com os dados da despesa
           document.getElementById('descricaoDespesa').value = despesaData.descricao || '';
@@ -293,6 +357,7 @@
           // Recarregar os dados
           await carregarDadosFinanceiros();
           await carregarDespesas();
+          await carregarUltimasTransacoes();
         } catch (error) {
           console.error('Erro ao excluir despesa:', error);
           alert('Erro ao excluir despesa. Verifique o console para detalhes.');
@@ -550,7 +615,7 @@
       </div>
       <div class="chart-container">
         <h3 class="chart-title">Pagamentos por Status</h3>
-        <canvas id='paymentsChart'></canvas>
+        <canvas id="paymentsChart"></canvas>
       </div>
     </div>
 
