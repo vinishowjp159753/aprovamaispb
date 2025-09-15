@@ -1,7 +1,9 @@
+// ===============================
 // firebase-integration.js
+// ===============================
 // Funções para integração com Firebase
 
-// Funções para Alunos
+// ---------- Alunos ----------
 async function getAlunos() {
     try {
         const snapshot = await db.collection("inscricoes").get();
@@ -43,7 +45,7 @@ async function updateAluno(id, alunoData) {
     }
 }
 
-// Funções para Professores
+// ---------- Professores ----------
 async function getProfessores() {
     try {
         const snapshot = await db.collection("professores").get();
@@ -71,7 +73,7 @@ async function saveProfessor(professorData) {
     }
 }
 
-// Funções para Pagamentos
+// ---------- Pagamentos ----------
 async function registrarPagamento(pagamentoData) {
     try {
         const docRef = await db.collection("pagamentos").add({
@@ -87,10 +89,84 @@ async function registrarPagamento(pagamentoData) {
     }
 }
 
-// Adicionar funções ao escopo global
-window.getAlunos = getAlunos;
-window.saveAluno = saveAluno;
-window.updateAluno = updateAluno;
-window.getProfessores = getProfessores;
-window.saveProfessor = saveProfessor;
+// ---------- Controle Financeiro ----------
+async function getReceitaTotal() {
+    try {
+        const snapshot = await db.collection("inscricoes").get();
+        let total = 0;
+        snapshot.forEach(doc => total += Number(doc.data().valorPago) || 0);
+        return total;
+    } catch (e) {
+        console.error("Erro ao calcular receita total:", e);
+        notifications.error("Erro ao calcular receita total");
+        return 0;
+    }
+}
+
+async function getReceitaMensal() {
+    const now = new Date();
+    const inicioMes = new Date(now.getFullYear(), now.getMonth(), 1);
+    try {
+        const snapshot = await db.collection("inscricoes")
+            .where("dataPagamento", ">=", inicioMes)
+            .get();
+        let total = 0;
+        snapshot.forEach(doc => total += Number(doc.data().valorPago) || 0);
+        return total;
+    } catch (e) {
+        console.error("Erro ao calcular receita mensal:", e);
+        return 0;
+    }
+}
+
+async function getDespesas(mensal = false) {
+    try {
+        let ref = db.collection("despesas");
+        if (mensal) {
+            const now = new Date();
+            const inicioMes = new Date(now.getFullYear(), now.getMonth(), 1);
+            ref = ref.where("data", ">=", inicioMes);
+        }
+        const snapshot = await ref.get();
+        let total = 0;
+        const lista = [];
+        snapshot.forEach(doc => {
+            const d = doc.data();
+            lista.push({ id: doc.id, ...d });
+            total += Number(d.valor) || 0;
+        });
+        return { total, lista };
+    } catch (e) {
+        console.error("Erro ao buscar despesas:", e);
+        notifications.error("Erro ao buscar despesas");
+        return { total: 0, lista: [] };
+    }
+}
+
+async function salvarDespesa(despesa) {
+    try {
+        const docRef = await db.collection("despesas").add({
+            ...despesa,
+            criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        notifications.success("Despesa registrada!");
+        return docRef.id;
+    } catch (e) {
+        console.error("Erro ao salvar despesa:", e);
+        notifications.error("Erro ao salvar despesa");
+        throw e;
+    }
+}
+
+// ---------- Exporta para escopo global ----------
+window.getAlunos        = getAlunos;
+window.saveAluno        = saveAluno;
+window.updateAluno      = updateAluno;
+window.getProfessores   = getProfessores;
+window.saveProfessor    = saveProfessor;
 window.registrarPagamento = registrarPagamento;
+
+window.getReceitaTotal  = getReceitaTotal;
+window.getReceitaMensal = getReceitaMensal;
+window.getDespesas      = getDespesas;
+window.salvarDespesa    = salvarDespesa;
