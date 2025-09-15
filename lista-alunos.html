@@ -9,6 +9,7 @@
 <body>
 
 <div class="container">
+    <button id="backBtn">← Voltar ao Dashboard</button>
     <h1>Lista de Alunos</h1>
     <input type="text" id="searchInput" placeholder="Buscar aluno...">
     <table>
@@ -35,7 +36,7 @@
         <button id="closeModalBtn">Fechar</button>
     </div>
 </div>
-
+ 
 <script type="module">
 import { app, db } from "./assets/js/firebase-config.js";
 import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
@@ -133,6 +134,12 @@ window.deleteAluno = async (id) => {
         loadAlunos();
     }
 };
+
+// Botão de voltar ao dashboard
+const backBtn = document.getElementById("backBtn");
+backBtn.addEventListener("click", () => {
+    window.location.href = "dashboard.html"; // substitua pelo caminho correto do seu dashboard
+});
 
 loadAlunos();
 </script>
