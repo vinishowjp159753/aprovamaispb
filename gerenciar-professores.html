@@ -48,8 +48,8 @@
     </div>
 
     <div class="tabs">
-        <button class="tab active" onclick="openTab('professores')">Lista de Professores</button>
-        <button class="tab" onclick="openTab('designar')">Designar Turmas</button>
+        <button class="tab active" data-tab="professores">Lista de Professores</button>
+        <button class="tab" data-tab="designar">Designar Turmas</button>
     </div>
 
     <!-- Aba Lista de Professores -->
@@ -87,7 +87,7 @@
                 <option value="Turma C - Noite">Turma C - Noite</option>
             </select>
         </div>
-        <button class="btn assign-btn" onclick="designarTurma()">Designar Turma</button>
+        <button class="btn assign-btn" id="designarTurmaBtn">Designar Turma</button>
 
         <h3 style="margin-top:20px;">Designações Ativas</h3>
         <table>
@@ -129,8 +129,8 @@
             </select>
         </div>
         <div class="form-actions">
-            <button class="btn" onclick="closeModal()">Cancelar</button>
-            <button class="btn" style="background: var(--primary);" onclick="salvarEdicao()">Salvar</button>
+            <button class="btn" id="cancelarEdicaoBtn">Cancelar</button>
+            <button class="btn" style="background: var(--primary);" id="salvarEdicaoBtn">Salvar</button>
         </div>
     </div>
 </div>
@@ -144,6 +144,45 @@
     let professores = [];
     let designacoes = [];
     let professorEditando = null;
+
+    // Funções globais que serão acessíveis pelo HTML
+    window.openTab = function(tabName) {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.getElementById(tabName).classList.add('active');
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+        if(tabName === 'designar') carregarDesignacoes();
+    }
+
+    window.editarProfessor = async function(id) {
+        const p = professores.find(x => x.id === id);
+        professorEditando = p;
+        document.getElementById("editName").value = p.nome;
+        document.getElementById("editEmail").value = p.email;
+        document.getElementById("editMateria").value = p.materia;
+        document.getElementById("editStatus").value = p.status;
+        document.getElementById("editModal").style.display = "flex";
+    }
+
+    window.excluirProfessor = async function(id) {
+        if(!confirm("Deseja realmente excluir este professor?")) return;
+        // Verificar designações
+        const q = query(collection(db,"designacoes"), where("professorId","==",id));
+        const snapshot = await getDocs(q);
+        if(!snapshot.empty){ alert("Remova as designações deste professor antes de excluir."); return; }
+        await deleteDoc(doc(db,"professores",id));
+        carregarProfessores();
+        alert("Professor excluído com sucesso!");
+    }
+
+    window.closeModal = function(){ 
+        document.getElementById("editModal").style.display="none"; 
+    }
+
+    window.removerDesignacao = async function(id){ 
+        await deleteDoc(doc(db,"designacoes",id)); 
+        carregarDesignacoes(); 
+    }
 
     async function carregarProfessores() {
         const snapshot = await getDocs(collection(db, "professores"));
@@ -164,30 +203,21 @@
                 <td>${p.usuario}</td>
                 <td><span class="status ${p.status}">${p.status}</span></td>
                 <td>
-                    <button class="btn" onclick="editarProfessor('${p.id}')"><i class="fas fa-edit"></i> Editar</button>
-                    <button class="btn delete-btn" onclick="excluirProfessor('${p.id}')"><i class="fas fa-trash"></i> Excluir</button>
+                    <button class="btn editar-prof-btn" data-id="${p.id}"><i class="fas fa-edit"></i> Editar</button>
+                    <button class="btn delete-btn excluir-prof-btn" data-id="${p.id}"><i class="fas fa-trash"></i> Excluir</button>
                 </td>
             `;
             tbody.appendChild(tr);
         });
-    }
-
-    function openTab(tabName) {
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        document.getElementById(tabName).classList.add('active');
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        event.currentTarget.classList.add('active');
-        if(tabName === 'designar') carregarDesignacoes();
-    }
-
-    async function editarProfessor(id) {
-        const p = professores.find(x => x.id === id);
-        professorEditando = p;
-        document.getElementById("editName").value = p.nome;
-        document.getElementById("editEmail").value = p.email;
-        document.getElementById("editMateria").value = p.materia;
-        document.getElementById("editStatus").value = p.status;
-        document.getElementById("editModal").style.display = "flex";
+        
+        // Adicionar event listeners aos botões
+        document.querySelectorAll('.editar-prof-btn').forEach(btn => {
+            btn.addEventListener('click', () => window.editarProfessor(btn.dataset.id));
+        });
+        
+        document.querySelectorAll('.excluir-prof-btn').forEach(btn => {
+            btn.addEventListener('click', () => window.excluirProfessor(btn.dataset.id));
+        });
     }
 
     async function salvarEdicao() {
@@ -202,19 +232,6 @@
         carregarProfessores();
         alert("Professor atualizado com sucesso!");
     }
-
-    async function excluirProfessor(id) {
-        if(!confirm("Deseja realmente excluir este professor?")) return;
-        // Verificar designações
-        const q = query(collection(db,"designacoes"), where("professorId","==",id));
-        const snapshot = await getDocs(q);
-        if(!snapshot.empty){ alert("Remova as designações deste professor antes de excluir."); return; }
-        await deleteDoc(doc(db,"professores",id));
-        carregarProfessores();
-        alert("Professor excluído com sucesso!");
-    }
-
-    function closeModal(){ document.getElementById("editModal").style.display="none"; }
 
     // Aba Designar Turmas
     function carregarProfessoresSelect(){
@@ -251,16 +268,36 @@
             if(prof){
                 const tr = document.createElement("tr");
                 tr.innerHTML = `<td>${prof.nome}</td><td>${d.data().turma}</td>
-                    <td><button class="btn delete-btn" onclick="removerDesignacao('${d.id}')"><i class="fas fa-unlink"></i> Remover</button></td>`;
+                    <td><button class="btn delete-btn remover-designacao-btn" data-id="${d.id}"><i class="fas fa-unlink"></i> Remover</button></td>`;
                 tbody.appendChild(tr);
             }
         });
+        
+        // Adicionar event listeners aos botões de remover designação
+        document.querySelectorAll('.remover-designacao-btn').forEach(btn => {
+            btn.addEventListener('click', () => window.removerDesignacao(btn.dataset.id));
+        });
     }
 
-    async function removerDesignacao(id){ await deleteDoc(doc(db,"designacoes",id)); carregarDesignacoes(); }
-
-    window.addEventListener("DOMContentLoaded", carregarProfessores);
-    window.onclick = e=>{ if(e.target.classList.contains("modal")) closeModal(); }
+    // Inicialização quando o DOM estiver carregado
+    document.addEventListener("DOMContentLoaded", function() {
+        carregarProfessores();
+        
+        // Configurar tabs
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => window.openTab(tab.dataset.tab));
+        });
+        
+        // Configurar botões
+        document.getElementById('designarTurmaBtn').addEventListener('click', designarTurma);
+        document.getElementById('salvarEdicaoBtn').addEventListener('click', salvarEdicao);
+        document.getElementById('cancelarEdicaoBtn').addEventListener('click', closeModal);
+        
+        // Fechar modal ao clicar fora
+        window.onclick = function(e) {
+            if(e.target.classList.contains("modal")) closeModal();
+        }
+    });
 </script>
 </body>
 </html>
