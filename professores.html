@@ -4,373 +4,225 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Área do Professor - AprovaMaisPB</title>
-  <script src="firebase-config.js"></script>
-  <link rel="stylesheet" href="notification-system.css">
-  <link rel="stylesheet" href="./assets/css/style.css" />
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="./assets/css/style.css">
+  <link rel="stylesheet" href="./assets/css/notification-system.css">
   <link rel="icon" type="image/png" href="./assets/img/logo_aprovamaispb.png" />
+
   <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      background: #f3f4f6;
-      margin: 0;
-      padding: 0;
-    }
-    .login-container {
-      max-width: 400px;
-      margin: 50px auto;
-      padding: 30px;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    .form-group {
-      margin: 20px 0;
-    }
-    .form-group label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 500;
-    }
-    .form-group input {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
-      font-size: 16px;
-    }
-    .error-message {
-      color: #dc2626;
-      font-size: 14px;
-      margin-top: 5px;
-      display: none;
-    }
-    .professor-panel {
-      display: none;
-    }
-    .turmas-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-      gap: 20px;
-      margin: 30px 0;
-    }
-    .turma-card {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      border-left: 4px solid #2563eb;
-    }
-    .turma-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-    }
-    .turma-title {
-      font-size: 1.2em;
-      font-weight: bold;
-      color: #1f2937;
-    }
-    .turma-badge {
-      background: #10b981;
-      color: white;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 0.8em;
-    }
-    .aluno-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-    .aluno-item {
-      padding: 10px;
-      border-bottom: 1px solid #e5e7eb;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .aluno-info {
-      display: flex;
-      flex-direction: column;
-    }
-    .aluno-name {
-      font-weight: 500;
-    }
-    .aluno-contact {
-      font-size: 0.8em;
-      color: #6b7280;
-    }
-    .btn-small {
-      padding: 6px 12px;
-      font-size: 0.8em;
-      background: #2563eb;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    .btn-small:hover {
-      background: #1e40af;
-    }
-    .btn-modern {
-      padding: 12px;
-      background: #2563eb;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 1em;
-    }
-    .btn-modern:hover {
-      background: #1e40af;
-    }
-    .welcome-header {
-      background: linear-gradient(135deg, #2563eb, #1d4ed8);
-      color: white;
-      padding: 30px;
-      border-radius: 12px;
-      margin-bottom: 30px;
-    }
-    .dashboard-grid {
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-    .stats-card {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      flex: 1;
-      min-width: 150px;
-      text-align: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    .stats-number {
-      font-size: 1.5em;
-      font-weight: bold;
-    }
-    .stats-label {
-      color: #6b7280;
-    }
+    body { font-family:'Inter',sans-serif; background:#f3f4f6; margin:0; padding:0; }
+    .login-container { max-width:400px; margin:50px auto; padding:30px; background:white; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); }
+    .form-group { margin:20px 0; }
+    .form-group label { display:block; margin-bottom:8px; font-weight:500; }
+    .form-group input { width:100%; padding:12px; border:1px solid #d1d5db; border-radius:8px; font-size:16px; }
+    .error-message { color:#dc2626; font-size:14px; margin-top:5px; display:none; }
+    .professor-panel { display:none; }
+    .turmas-container { display:grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap:20px; margin:30px 0; }
+    .turma-card { background:white; padding:20px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); border-left:4px solid #2563eb; }
+    .turma-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; }
+    .turma-title { font-size:1.2em; font-weight:bold; color:#1f2937; }
+    .turma-badge { background:#10b981; color:white; padding:4px 12px; border-radius:20px; font-size:0.8em; }
+    .aluno-list { list-style:none; padding:0; margin:0; }
+    .aluno-item { padding:10px; border-bottom:1px solid #e5e7eb; display:flex; justify-content:space-between; align-items:center; }
+    .aluno-info { display:flex; flex-direction:column; }
+    .aluno-name { font-weight:500; }
+    .aluno-contact { font-size:0.8em; color:#6b7280; }
+    .btn-small { padding:6px 12px; font-size:0.8em; background:#2563eb; color:white; border:none; border-radius:6px; cursor:pointer; }
+    .btn-small:hover { background:#1e40af; }
+    .btn-modern { padding:12px; background:#2563eb; color:white; border:none; border-radius:8px; cursor:pointer; font-size:1em; }
+    .btn-modern:hover { background:#1e40af; }
+    .welcome-header { background: linear-gradient(135deg, #2563eb, #1d4ed8); color:white; padding:30px; border-radius:12px; margin-bottom:30px; }
+    .dashboard-grid { display:flex; gap:20px; flex-wrap:wrap; }
+    .stats-card { background:white; padding:20px; border-radius:12px; flex:1; min-width:150px; text-align:center; box-shadow:0 4px 12px rgba(0,0,0,0.1); }
+    .stats-number { font-size:1.5em; font-weight:bold; }
+    .stats-label { color:#6b7280; }
   </style>
 </head>
 <body>
-  <header>
-    <nav class="nav">
-      <div class="brand">
-        <img src="./assets/img/logo_aprovamaispb.png" alt="Logo" />
-        <span>AprovaMaisPB</span>
+
+<header>
+  <nav class="nav">
+    <div class="brand">
+      <img src="./assets/img/logo_aprovamaispb.png" alt="Logo" />
+      <span>AprovaMaisPB</span>
+    </div>
+    <ul class="menu">
+      <li><a href="index.html">Início</a></li>
+      <li><a href="matricula.html">Matricule-se</a></li>
+      <li><a href="professores.html" class="active">Área do Professor</a></li>
+      <li><a href="login.html">Login Admin</a></li>
+    </ul>
+    <button class="hamburger" aria-label="menu" onclick="toggleMenu()">☰</button>
+  </nav>
+</header>
+
+<!-- LOGIN -->
+<div id="login-section">
+  <main class="login-container">
+    <h2>Área Restrita - Professores</h2>
+    <p>Entre com suas credenciais fornecidas pela administração</p>
+    <form id="login-form">
+      <div class="form-group">
+        <label for="usuario">Usuário:</label>
+        <input type="text" id="usuario" required placeholder="Seu usuário">
       </div>
-      <ul class="menu">
-        <li><a href="index.html">Início</a></li>
-        <li><a href="matricula.html">Matricule-se</a></li>
-        <li><a href="professores.html" class="active">Área do Professor</a></li>
-        <li><a href="login.html">Login Admin</a></li>
-      </ul>
-      <button class="hamburger" aria-label="menu" onclick="toggleMenu()">☰</button>
-    </nav>
-  </header>
-
-  <!-- TELA DE LOGIN -->
-  <div id="login-section">
-    <main class="login-container">
-      <h2>Área Restrita - Professores</h2>
-      <p>Entre com suas credenciais fornecidas pela administração</p>
-      
-      <form id="login-form">
-        <div class="form-group">
-          <label for="usuario">Usuário:</label>
-          <input type="text" id="usuario" required placeholder="Seu usuário">
-        </div>
-        
-        <div class="form-group">
-          <label for="senha">Senha:</label>
-          <input type="password" id="senha" required placeholder="Sua senha">
-        </div>
-        
-        <div class="error-message" id="login-error">
-          Usuário ou senha incorretos!
-        </div>
-        
-        <button type="submit" class="btn-modern" style="width: 100%">
-          🔐 Entrar como Professor
-        </button>
-      </form>
-      
-      <div style="margin-top: 20px; padding: 15px; background: #f3f4f6; border-radius: 8px;">
-        <h4>📋 Informações:</h4>
-        <p>Seu login e senha são fornecidos pela administração do curso.</p>
-        <p>Em caso de problemas, entre em contato com a direção.</p>
+      <div class="form-group">
+        <label for="senha">Senha:</label>
+        <input type="password" id="senha" required placeholder="Sua senha">
       </div>
-    </main>
-  </div>
-
-  <!-- PAINEL DO PROFESSOR -->
-  <div id="professor-panel" class="professor-panel">
-    <main class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
-      <div class="welcome-header">
-        <h1>Bem-vindo, Professor <span id="professor-name">!</span></h1>
-        <p>Painel de controle das suas turmas e alunos</p>
-        <button class="btn-modern" onclick="fazerLogout()" style="margin-top: 15px;">
-          🚪 Sair
-        </button>
+      <div class="error-message" id="login-error">
+        Usuário ou senha incorretos!
       </div>
+      <button type="submit" class="btn-modern" style="width:100%">🔐 Entrar como Professor</button>
+    </form>
+    <div style="margin-top:20px; padding:15px; background:#f3f4f6; border-radius:8px;">
+      <h4>📋 Informações:</h4>
+      <p>Seu login e senha são fornecidos pela administração do curso.</p>
+      <p>Em caso de problemas, entre em contato com a direção.</p>
+    </div>
+  </main>
+</div>
 
-      <div class="dashboard-grid">
-        <div class="stats-card">
-          <div class="stats-number" id="total-alunos">0</div>
-          <div class="stats-label">Alunos</div>
-        </div>
-        <div class="stats-card">
-          <div class="stats-number" id="total-turmas">0</div>
-          <div class="stats-label">Turmas</div>
-        </div>
-        <div class="stats-card">
-          <div class="stats-number" id="aulas-hoje">0</div>
-          <div class="stats-label">Aulas Hoje</div>
-        </div>
-      </div>
+<!-- PAINEL -->
+<div id="professor-panel" class="professor-panel">
+  <main class="container" style="max-width:1200px; margin:0 auto; padding:20px;">
+    <div class="welcome-header">
+      <h1>Bem-vindo, Professor <span id="professor-name">!</span></h1>
+      <p>Painel de controle das suas turmas e alunos</p>
+      <button class="btn-modern" onclick="fazerLogout()" style="margin-top:15px;">🚪 Sair</button>
+    </div>
 
-      <h2>Minhas Turmas</h2>
-      <div class="turmas-container" id="turmas-list">
-        <!-- Turmas serão carregadas via JavaScript -->
-      </div>
+    <div class="dashboard-grid">
+      <div class="stats-card"><div class="stats-number" id="total-alunos">0</div><div class="stats-label">Alunos</div></div>
+      <div class="stats-card"><div class="stats-number" id="total-turmas">0</div><div class="stats-label">Turmas</div></div>
+      <div class="stats-card"><div class="stats-number" id="aulas-hoje">0</div><div class="stats-label">Aulas Hoje</div></div>
+    </div>
 
-      <div style="margin-top: 40px; padding: 20px; background: #f8fafc; border-radius: 12px;">
-        <h3>📞 Suporte</h3>
-        <p>Precisa de ajuda? Entre em contato com a administração:</p>
-        <p><strong>Telefone:</strong> (83) 99999-9999</p>
-        <p><strong>Email:</strong> suporte@aprovamaispb.com</p>
-      </div>
-    </main>
-  </div>
+    <h2>Minhas Turmas</h2>
+    <div class="turmas-container" id="turmas-list"></div>
 
-  <script type="module">
-    import { verificarLoginProfessor, buscarTurmasProfessor, buscarInscricoesPorTurma } from "./assets/js/firebase.js";
+    <div style="margin-top:40px; padding:20px; background:#f8fafc; border-radius:12px;">
+      <h3>📞 Suporte</h3>
+      <p>Precisa de ajuda? Entre em contato com a administração:</p>
+      <p><strong>Telefone:</strong> (83) 99999-9999</p>
+      <p><strong>Email:</strong> suporte@aprovamaispb.com</p>
+    </div>
+  </main>
+</div>
 
-    document.getElementById('login-form').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const usuario = document.getElementById('usuario').value;
-      const senha = document.getElementById('senha').value;
-      const errorElement = document.getElementById('login-error');
-      errorElement.style.display = 'none';
-      
-      try {
-        const logado = await verificarLoginProfessor(usuario, senha);
-        if (logado) {
-          localStorage.setItem('professorLogado', usuario);
-          localStorage.setItem('professorSenha', senha);
-          document.getElementById('login-section').style.display = 'none';
-          document.getElementById('professor-panel').style.display = 'block';
-          document.getElementById('professor-name').textContent = usuario;
-          carregarDadosProfessor(usuario);
-        } else {
-          errorElement.style.display = 'block';
-        }
-      } catch (error) {
-        console.error('Erro no login:', error);
-        errorElement.style.display = 'block';
+<!-- SCRIPTS -->
+<script src="./assets/js/firebase-config.js"></script>
+<script src="./assets/js/firebase-integration.js"></script>
+<script src="./assets/js/notification-system.js"></script>
+
+<script>
+  // LOGIN
+  document.getElementById('login-form').addEventListener('submit', async function(e){
+    e.preventDefault();
+    const usuario = document.getElementById('usuario').value;
+    const senha = document.getElementById('senha').value;
+    const errorElement = document.getElementById('login-error');
+    errorElement.style.display = 'none';
+
+    try {
+      const logado = await window.firebaseApp.autenticarProfessor(usuario, senha);
+      if(logado){
+        localStorage.setItem('professorLogado', usuario);
+        document.getElementById('login-section').style.display='none';
+        document.getElementById('professor-panel').style.display='block';
+        document.getElementById('professor-name').textContent = usuario;
+        carregarDadosProfessor(usuario);
+      } else {
+        errorElement.style.display='block';
       }
-    });
+    } catch(err){ console.error(err); errorElement.style.display='block'; }
+  });
 
-    async function carregarDadosProfessor(usuario) {
-      try {
-        const turmas = await buscarTurmasProfessor(usuario);
-        document.getElementById('total-turmas').textContent = turmas.length;
-        let totalAlunos = 0;
-        const turmasContainer = document.getElementById('turmas-list');
-        turmasContainer.innerHTML = '';
+  // CARREGAR TURMAS E ALUNOS
+  async function carregarDadosProfessor(usuario){
+    try{
+      const turmas = await window.firebaseApp.buscarTurmasProfessor(usuario);
+      document.getElementById('total-turmas').textContent = turmas.length;
+      let totalAlunos = 0;
+      const turmasContainer = document.getElementById('turmas-list');
+      turmasContainer.innerHTML='';
 
-        for (const turma of turmas) {
-          const alunos = await buscarInscricoesPorTurma(turma.turma);
-          totalAlunos += alunos.length;
+      for(const turma of turmas){
+        const alunos = await window.firebaseApp.buscarInscricoesPorTurma(turma.turma || turma.nome);
+        totalAlunos += alunos.length;
 
-          const turmaHTML = `
-            <div class="turma-card">
-              <div class="turma-header">
-                <div class="turma-title">Turma ${turma.turma}</div>
-                <div class="turma-badge">${alunos.length} alunos</div>
-              </div>
-              <div class="turma-info">
-                <p><strong>Horário:</strong> ${turma.horario || '08:00 - 12:00'}</p>
-                <p><strong>Dias:</strong> ${turma.dias || 'Segunda a Sexta'}</p>
-              </div>
-              <button class="btn-small" onclick="baixarListaAlunos('${turma.turma}')">💾 Baixar Lista</button>
-              <h4>Alunos:</h4>
-              <ul class="aluno-list">
-                ${alunos.slice(0, 5).map(aluno => `
-                  <li class="aluno-item">
-                    <div class="aluno-info">
-                      <span class="aluno-name">${aluno.name}</span>
-                      <span class="aluno-contact">${aluno.phone} - ${aluno.email}</span>
-                    </div>
-                    <button class="btn-small" onclick="contatarAluno('${aluno.phone}')">
-                      📞 Contatar
-                    </button>
-                  </li>
-                `).join('')}
-              </ul>
-              ${alunos.length > 5 ? `<p>+ ${alunos.length - 5} outros alunos</p>` : ''}
+        const turmaHTML = `
+          <div class="turma-card">
+            <div class="turma-header">
+              <div class="turma-title">Turma ${turma.turma || turma.nome}</div>
+              <div class="turma-badge">${alunos.length} alunos</div>
             </div>
-          `;
-          turmasContainer.innerHTML += turmaHTML;
-        }
-
-        document.getElementById('total-alunos').textContent = totalAlunos;
-        document.getElementById('aulas-hoje').textContent = turmas.length;
-
-      } catch (error) {
-        console.error('Erro ao carregar dados:', error);
+            <div class="turma-info">
+              <p><strong>Horário:</strong> ${turma.horario||'08:00 - 12:00'}</p>
+              <p><strong>Dias:</strong> ${turma.dias||'Segunda a Sexta'}</p>
+            </div>
+            <h4>Alunos:</h4>
+            <ul class="aluno-list">
+              ${alunos.slice(0,5).map(a=>`
+                <li class="aluno-item">
+                  <div class="aluno-info">
+                    <span class="aluno-name">${a.nome || a.name}</span>
+                    <span class="aluno-contact">${a.telefone || a.phone} - ${a.email}</span>
+                  </div>
+                  <button class="btn-small" onclick="contatarAluno('${a.telefone || a.phone}')">📞 Contatar</button>
+                </li>
+              `).join('')}
+            </ul>
+            ${alunos.length>5?`<p>+ ${alunos.length-5} outros alunos</p>`:''}
+            <button class="btn-small" onclick="baixarLista('${turma.turma || turma.nome}')">💾 Baixar Lista</button>
+          </div>
+        `;
+        turmasContainer.innerHTML += turmaHTML;
       }
+
+      document.getElementById('total-alunos').textContent = totalAlunos;
+      document.getElementById('aulas-hoje').textContent = turmas.length;
+    } catch(err){ console.error(err); }
+  }
+
+  function contatarAluno(telefone){ window.open(`https://wa.me/55${telefone.replace(/\D/g,'')}`,'_blank'); }
+
+  function fazerLogout(){
+    localStorage.removeItem('professorLogado');
+    window.location.reload();
+  }
+
+  // DOWNLOAD CSV
+  async function baixarLista(turmaNome){
+    const alunos = await window.firebaseApp.buscarInscricoesPorTurma(turmaNome);
+    if(alunos.length===0){ alert('Nenhum aluno encontrado'); return; }
+
+    let csv = 'Nome,Telefone,Email\n';
+    alunos.forEach(a=>{ csv+=`${a.nome || a.name},${a.telefone || a.phone},${a.email}\n`; });
+
+    const blob = new Blob([csv],{type:'text/csv'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Turma_${turmaNome}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // VERIFICAR SE JÁ ESTÁ LOGADO
+  document.addEventListener('DOMContentLoaded',()=>{
+    const professorLogado = localStorage.getItem('professorLogado');
+    if(professorLogado){
+      document.getElementById('login-section').style.display='none';
+      document.getElementById('professor-panel').style.display='block';
+      document.getElementById('professor-name').textContent = professorLogado;
+      carregarDadosProfessor(professorLogado);
     }
+  });
 
-    async function baixarListaAlunos(turmaNome) {
-      try {
-        const alunos = await buscarInscricoesPorTurma(turmaNome);
-        let csv = 'Nome,Telefone,Email\n';
-        alunos.forEach(aluno => {
-          csv += `"${aluno.name}","${aluno.phone}","${aluno.email}"\n`;
-        });
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `Lista_Alunos_${turmaNome}.csv`;
-        link.click();
-      } catch (error) {
-        console.error('Erro ao gerar CSV:', error);
-      }
-    }
+  function toggleMenu(){ document.querySelector('.menu').classList.toggle('open'); }
+</script>
 
-    function contatarAluno(telefone) {
-      window.open(`https://wa.me/55${telefone.replace(/\D/g, '')}`, '_blank');
-    }
-
-    function fazerLogout() {
-      localStorage.removeItem('professorLogado');
-      localStorage.removeItem('professorSenha');
-      window.location.reload();
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-      const professorLogado = localStorage.getItem('professorLogado');
-      if (professorLogado) {
-        document.getElementById('login-section').style.display = 'none';
-        document.getElementById('professor-panel').style.display = 'block';
-        document.getElementById('professor-name').textContent = professorLogado;
-        carregarDadosProfessor(professorLogado);
-      }
-    });
-
-    window.baixarListaAlunos = baixarListaAlunos;
-  </script>
-
-  <script>
-    function toggleMenu(){
-      document.querySelector('.menu').classList.toggle('open');
-    }
-  </script>
-  <script src="notification-system.js"></script>
-  <script src="firebase-integration.js"></script>
 </body>
 </html>
