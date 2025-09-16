@@ -6,86 +6,51 @@
 <title>Matrícula - AprovaMaisPB</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-    :root {
-        --primary: #1a2a6c;
-        --secondary: #b21f1f;
-        --accent: #fdbb2d;
-    }
-    
-    * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    
-    body {
-        background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
-        min-height:100vh;
-        display:flex;
-        justify-content:center;
-        align-items:center;
-        padding:20px;
-    }
-    
-    .container {
-        width:100%;
-        max-width:800px;
-        background: rgba(255,255,255,0.95);
-        border-radius:12px;
-        box-shadow:0 10px 30px rgba(0,0,0,0.3);
-        overflow:hidden;
-    }
-    
-    .header {
-        background: var(--primary);
-        color:white;
-        padding:20px;
-        text-align:center;
-    }
-    
-    .logo { max-width:120px; margin-bottom:15px; }
-    .header h1 { font-size:24px; margin-bottom:10px; }
-    .content { padding:30px; }
-    
-    .form-row { display:flex; gap:20px; margin-bottom:20px; }
-    .form-group { flex:1; margin-bottom:20px; }
-    .form-group label { display:block; margin-bottom:8px; font-weight:600; color:#555; }
-    .form-group input, .form-group select, .form-group textarea {
-        width:100%; padding:12px 15px; border:1px solid #ddd; border-radius:6px; font-size:16px;
-    }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color:var(--primary); outline:none; }
-
-    .btn {
-        padding:14px 25px;
-        background: var(--primary);
-        color:white;
-        border:none;
-        border-radius:6px;
-        cursor:pointer;
-        font-size:16px;
-        font-weight:600;
-        width:100%;
-        transition: background 0.3s;
-        text-align:center;
-    }
-    .btn:hover { background:#2a3a9c; }
-    .btn:disabled { background:#cccccc; cursor:not-allowed; }
-
-    .alert {
-        padding:15px;
-        border-radius:6px;
-        margin-bottom:20px;
-        display:none;
-    }
-    .alert.success { background:#e8f5e9; color:#2e7d32; border:1px solid #c8e6c9; }
-    .alert.error { background:#ffebee; color:#d32f2f; border:1px solid #ffcdd2; }
-
-    .back-btn { display:inline-flex; align-items:center; padding:10px 15px; background:var(--primary); color:white; text-decoration:none; border-radius:5px; font-weight:500; margin-bottom:20px; }
-    .back-btn i { margin-right:8px; }
-    
-    .loading { display:inline-block; width:20px; height:20px; border:3px solid rgba(255,255,255,.3); border-radius:50%; border-top-color:#fff; animation:spin 1s linear infinite; margin-right:10px; }
-    @keyframes spin { to { transform:rotate(360deg); } }
-
-    @media (max-width:768px){ .form-row{flex-direction:column; gap:0;} }
+:root {
+    --primary: #1a2a6c;
+    --secondary: #b21f1f;
+    --accent: #fdbb2d;
+}
+* { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+body {
+    background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+.container {
+    width:100%;
+    max-width:800px;
+    background: rgba(255,255,255,0.95);
+    border-radius:12px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.3);
+    overflow:hidden;
+}
+.header { background: var(--primary); color:white; padding:20px; text-align:center; }
+.logo { max-width:120px; margin-bottom:15px; }
+.header h1 { font-size:24px; margin-bottom:10px; }
+.content { padding:30px; }
+.form-row { display:flex; gap:20px; margin-bottom:20px; }
+.form-group { flex:1; margin-bottom:20px; }
+.form-group label { display:block; margin-bottom:8px; font-weight:600; color:#555; }
+.form-group input, .form-group select, .form-group textarea {
+    width:100%; padding:12px 15px; border:1px solid #ddd; border-radius:6px; font-size:16px;
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); outline:none; }
+.btn {
+    padding:14px 25px; background: var(--primary); color:white; border:none; border-radius:6px;
+    cursor:pointer; font-size:16px; font-weight:600; width:100%; transition: background 0.3s; text-align:center;
+}
+.btn:hover { background:#2a3a9c; }
+.alert { padding:15px; border-radius:6px; margin-bottom:20px; display:none; }
+.alert.success { background:#e8f5e9; color:#2e7d32; border:1px solid #c8e6c9; }
+.alert.error { background:#ffebee; color:#d32f2f; border:1px solid #ffcdd2; }
 </style>
 </head>
 <body>
+
 <div class="container">
     <div class="header">
         <img src="assets/img/logo_aprovamaispb.png" alt="Logo AprovaMaisPB" class="logo" onerror="this.style.display='none'">
@@ -94,9 +59,7 @@
     </div>
 
     <div class="content">
-        <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Voltar para o Início</a>
-
-        <div class="alert success" id="successAlert"><i class="fas fa-check-circle"></i> Matrícula realizada com sucesso!</div>
+        <div class="alert success" id="successAlert"><i class="fas fa-check-circle"></i> Matrícula realizada! Clique em finalizar pagamento.</div>
         <div class="alert error" id="errorAlert"><i class="fas fa-exclamation-circle"></i> Preencha todos os campos obrigatórios.</div>
 
         <form id="matriculaForm">
@@ -110,7 +73,7 @@
                     <input type="date" id="dataNascimento" required>
                 </div>
             </div>
-
+            
             <div class="form-row">
                 <div class="form-group">
                     <label for="cpf">CPF *</label>
@@ -121,12 +84,12 @@
                     <input type="tel" id="telefone" required placeholder="(00) 00000-0000">
                 </div>
             </div>
-
+            
             <div class="form-group">
                 <label for="email">E-mail *</label>
                 <input type="email" id="email" required>
             </div>
-
+            
             <div class="form-row">
                 <div class="form-group">
                     <label for="turma">Turma *</label>
@@ -153,42 +116,11 @@
                 <textarea id="endereco" rows="3" required></textarea>
             </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="cidade">Cidade *</label>
-                    <input type="text" id="cidade" required>
-                </div>
-                <div class="form-group">
-                    <label for="estado">Estado *</label>
-                    <select id="estado" required>
-                        <option value="">Selecione um estado</option>
-                        <option value="PB">Paraíba</option>
-                        <option value="PE">Pernambuco</option>
-                        <option value="RN">Rio Grande do Norte</option>
-                        <option value="CE">Ceará</option>
-                        <option value="AL">Alagoas</option>
-                        <option value="SE">Sergipe</option>
-                        <option value="BA">Bahia</option>
-                        <option value="MA">Maranhão</option>
-                        <option value="PI">Piauí</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="observacoes">Observações</label>
-                <textarea id="observacoes" rows="3" placeholder="Informações adicionais, alergias, necessidades especiais, etc."></textarea>
-            </div>
-
-            <button type="submit" class="btn" id="submitBtn">
-                <span id="btnText">Realizar Matrícula</span>
-                <span id="btnLoading" class="loading" style="display:none;"></span>
-            </button>
+            <button type="submit" class="btn" id="submitBtn">Realizar Matrícula</button>
         </form>
     </div>
 </div>
 
-<!-- Firebase -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
@@ -206,62 +138,44 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 const matriculaForm = document.getElementById('matriculaForm');
-const submitBtn = document.getElementById('submitBtn');
-const btnText = document.getElementById('btnText');
-const btnLoading = document.getElementById('btnLoading');
 const successAlert = document.getElementById('successAlert');
 const errorAlert = document.getElementById('errorAlert');
 
-matriculaForm.addEventListener('submit', async function(e){
+matriculaForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    errorAlert.style.display = 'none';
+    successAlert.style.display = 'none';
 
-    const dados = {
-        nomeCompleto: document.getElementById('nomeCompleto').value.trim(),
-        dataNascimento: document.getElementById('dataNascimento').value,
-        cpf: document.getElementById('cpf').value.trim(),
-        telefone: document.getElementById('telefone').value.trim(),
-        email: document.getElementById('email').value.trim(),
-        turma: document.getElementById('turma').value,
-        turno: document.getElementById('turno').value,
-        endereco: document.getElementById('endereco').value.trim(),
-        cidade: document.getElementById('cidade').value.trim(),
-        estado: document.getElementById('estado').value,
-        observacoes: document.getElementById('observacoes').value.trim(),
-        status: "pendente",
-        valorPago: 0,
-        criadoEm: new Date()
-    };
+    const nomeCompleto = document.getElementById('nomeCompleto').value.trim();
+    const dataNascimento = document.getElementById('dataNascimento').value;
+    const cpf = document.getElementById('cpf').value.trim();
+    const telefone = document.getElementById('telefone').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const turma = document.getElementById('turma').value;
+    const turno = document.getElementById('turno').value;
+    const endereco = document.getElementById('endereco').value.trim();
 
-    if(!dados.nomeCompleto || !dados.dataNascimento || !dados.cpf || !dados.telefone || !dados.email || !dados.turma || !dados.turno || !dados.endereco || !dados.cidade || !dados.estado){
+    if(!nomeCompleto || !dataNascimento || !cpf || !telefone || !email || !turma || !turno || !endereco){
         errorAlert.style.display = 'block';
-        successAlert.style.display = 'none';
         return;
     }
 
-    try{
-        btnText.style.display = 'none';
-        btnLoading.style.display = 'inline-block';
-        submitBtn.disabled = true;
-
-        const docRef = await addDoc(collection(db, "inscricoes"), dados);
+    try {
+        const docRef = await addDoc(collection(db, "inscricoes"), {
+            nomeCompleto, dataNascimento, cpf, telefone, email, turma, turno, endereco, valorPago:0, status:"pendente", criadoEm:new Date()
+        });
 
         successAlert.style.display = 'block';
-        errorAlert.style.display = 'none';
 
-        // Redirecionar para checkout PayPal
-        setTimeout(()=>{
+        // Redireciona para checkout do PayPal com matriculaId
+        setTimeout(() => {
             window.location.href = `checkout.html?matriculaId=${docRef.id}`;
         }, 1000);
 
     } catch(err){
         console.error(err);
-        errorAlert.textContent = "Erro ao processar matrícula. Tente novamente.";
+        errorAlert.textContent = "Erro ao processar matrícula";
         errorAlert.style.display = 'block';
-        successAlert.style.display = 'none';
-    } finally{
-        btnText.style.display = 'block';
-        btnLoading.style.display = 'none';
-        submitBtn.disabled = false;
     }
 });
 </script>
