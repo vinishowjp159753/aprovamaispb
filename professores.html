@@ -5,10 +5,16 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Área do Professor - AprovaMaisPB</title>
   <script src="firebase-config.js"></script>
-    <link rel="stylesheet" href="notification-system.css">
+  <link rel="stylesheet" href="notification-system.css">
   <link rel="stylesheet" href="./assets/css/style.css" />
   <link rel="icon" type="image/png" href="./assets/img/logo_aprovamaispb.png" />
   <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f3f4f6;
+      margin: 0;
+      padding: 0;
+    }
     .login-container {
       max-width: 400px;
       margin: 50px auto;
@@ -104,12 +110,48 @@
       border-radius: 6px;
       cursor: pointer;
     }
+    .btn-small:hover {
+      background: #1e40af;
+    }
+    .btn-modern {
+      padding: 12px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+    .btn-modern:hover {
+      background: #1e40af;
+    }
     .welcome-header {
       background: linear-gradient(135deg, #2563eb, #1d4ed8);
       color: white;
       padding: 30px;
       border-radius: 12px;
       margin-bottom: 30px;
+    }
+    .dashboard-grid {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .stats-card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      flex: 1;
+      min-width: 150px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .stats-number {
+      font-size: 1.5em;
+      font-weight: bold;
+    }
+    .stats-label {
+      color: #6b7280;
     }
   </style>
 </head>
@@ -164,7 +206,7 @@
     </main>
   </div>
 
-  <!-- PAINEL DO PROFESSOR (aparece após login) -->
+  <!-- PAINEL DO PROFESSOR -->
   <div id="professor-panel" class="professor-panel">
     <main class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
       <div class="welcome-header">
@@ -207,30 +249,21 @@
   <script type="module">
     import { verificarLoginProfessor, buscarTurmasProfessor, buscarInscricoesPorTurma } from "./assets/js/firebase.js";
 
-    // Função de login
     document.getElementById('login-form').addEventListener('submit', async function(e) {
       e.preventDefault();
-      
       const usuario = document.getElementById('usuario').value;
       const senha = document.getElementById('senha').value;
       const errorElement = document.getElementById('login-error');
-      
       errorElement.style.display = 'none';
       
       try {
         const logado = await verificarLoginProfessor(usuario, senha);
-        
         if (logado) {
-          // Salvar sessão
           localStorage.setItem('professorLogado', usuario);
-          localStorage.setItem('professorSenha', senha); // Em produção, use tokens JWT
-          
-          // Mostrar painel
+          localStorage.setItem('professorSenha', senha);
           document.getElementById('login-section').style.display = 'none';
           document.getElementById('professor-panel').style.display = 'block';
           document.getElementById('professor-name').textContent = usuario;
-          
-          // Carregar dados do professor
           carregarDadosProfessor(usuario);
         } else {
           errorElement.style.display = 'block';
@@ -243,10 +276,8 @@
 
     async function carregarDadosProfessor(usuario) {
       try {
-        // Buscar turmas do professor
         const turmas = await buscarTurmasProfessor(usuario);
         document.getElementById('total-turmas').textContent = turmas.length;
-        
         let totalAlunos = 0;
         const turmasContainer = document.getElementById('turmas-list');
         turmasContainer.innerHTML = '';
@@ -265,6 +296,7 @@
                 <p><strong>Horário:</strong> ${turma.horario || '08:00 - 12:00'}</p>
                 <p><strong>Dias:</strong> ${turma.dias || 'Segunda a Sexta'}</p>
               </div>
+              <button class="btn-small" onclick="baixarListaAlunos('${turma.turma}')">💾 Baixar Lista</button>
               <h4>Alunos:</h4>
               <ul class="aluno-list">
                 ${alunos.slice(0, 5).map(aluno => `
@@ -293,6 +325,23 @@
       }
     }
 
+    async function baixarListaAlunos(turmaNome) {
+      try {
+        const alunos = await buscarInscricoesPorTurma(turmaNome);
+        let csv = 'Nome,Telefone,Email\n';
+        alunos.forEach(aluno => {
+          csv += `"${aluno.name}","${aluno.phone}","${aluno.email}"\n`;
+        });
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `Lista_Alunos_${turmaNome}.csv`;
+        link.click();
+      } catch (error) {
+        console.error('Erro ao gerar CSV:', error);
+      }
+    }
+
     function contatarAluno(telefone) {
       window.open(`https://wa.me/55${telefone.replace(/\D/g, '')}`, '_blank');
     }
@@ -303,7 +352,6 @@
       window.location.reload();
     }
 
-    // Verificar se já está logado
     document.addEventListener('DOMContentLoaded', function() {
       const professorLogado = localStorage.getItem('professorLogado');
       if (professorLogado) {
@@ -313,6 +361,8 @@
         carregarDadosProfessor(professorLogado);
       }
     });
+
+    window.baixarListaAlunos = baixarListaAlunos;
   </script>
 
   <script>
@@ -321,6 +371,6 @@
     }
   </script>
   <script src="notification-system.js"></script>
-    <script src="firebase-integration.js"></script>
+  <script src="firebase-integration.js"></script>
 </body>
 </html>
