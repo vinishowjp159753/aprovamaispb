@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal do Aluno - Aprova Mais PB</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        
+        .navbar {
+            background-color: var(--primary-color);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .portal-header {
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 10px 10px;
+        }
+        
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            border: none;
+            transition: transform 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+            font-weight: 600;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .indication-box {
+            background: linear-gradient(135deg, #ff7e5f, #feb47b);
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .discount-badge {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .code-box {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .btn-copy {
+            background-color: white;
+            color: var(--accent-color);
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-copy:hover {
+            background-color: var(--light-color);
+        }
+        
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .status-active {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .status-pending {
+            background-color: #ffc107;
+            color: black;
+        }
+        
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 2rem 0;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <img src="https://aprovamaispb-three.vercel.app/index.html" alt="Logo Aprova Mais PB" height="40" class="d-inline-block align-top">
+                Aprova Mais PB
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://aprovamaispb-three.vercel.app/index.html">Início</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Portal do Aluno</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Cursos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Contato</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <div class="portal-header">
+        <div class="container text-center">
+            <h1>Portal do Aluno</h1>
+            <p class="lead">Bem-vindo ao seu painel de controle</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <!-- Dados da Inscrição -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-user-graduate me-2"></i>Dados da Inscrição
+                    </div>
+                    <div class="card-body">
+                        <div class="info-item">
+                            <span>Nome:</span>
+                            <strong>João Silva Santos</strong>
+                        </div>
+                        <div class="info-item">
+                            <span>Curso:</span>
+                            <strong>Pré-Enem 2023</strong>
+                        </div>
+                        <div class="info-item">
+                            <span>Data de Inscrição:</span>
+                            <strong>15/03/2023</strong>
+                        </div>
+                        <div class="info-item">
+                            <span>Status:</span>
+                            <span class="status-badge status-active">Ativo</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informações de Pagamento -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-credit-card me-2"></i>Informações de Pagamento
+                    </div>
+                    <div class="card-body">
+                        <div class="info-item">
+                            <span>Último Pagamento:</span>
+                            <strong>10/08/2023</strong>
+                        </div>
+                        <div class="info-item">
+                            <span>Próximo Vencimento:</span>
+                            <strong>10/09/2023</strong>
+                        </div>
+                        <div class="info-item">
+                            <span>Valor da Mensalidade:</span>
+                            <strong>R$ 299,90</strong>
+                        </div>
+                        <div class="info-item">
+                            <span>Status do Pagamento:</span>
+                            <span class="status-badge status-active">Em dia</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Indique e Ganhe -->
+            <div class="col-12 mt-4">
+                <div class="card indication-box">
+                    <div class="card-body">
+                        <h3><i class="fas fa-gift me-2"></i>Indique e Ganhe 50% de Desconto</h3>
+                        <p>Indique um amigo e ganhe 50% de desconto na sua próxima mensalidade!</p>
+                        
+                        <div class="code-box">
+                            <span id="referralCode">APROVA-JSANTOS-2023</span>
+                            <button class="btn-copy" onclick="copyCode()">
+                                <i class="fas fa-copy me-1"></i>Copiar
+                            </button>
+                        </div>
+                        
+                        <p class="small">Seu amigo deve usar este código durante a matrícula para que você ganhe o desconto.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5>Aprova Mais PB</h5>
+                    <p>Preparando você para conquistar seu lugar ao sol!</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Contato</h5>
+                    <p><i class="fas fa-phone me-2"></i>(83) 9 9999-9999</p>
+                    <p><i class="fas fa-envelope me-2"></i>contato@aprovamaispb.com.br</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Redes Sociais</h5>
+                    <div class="d-flex gap-3">
+                        <a href="#" class="text-white"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-facebook fa-lg"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-whatsapp fa-lg"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr class="mt-4 mb-4" style="background-color: rgba(255,255,255,0.2)">
+            <div class="text-center">
+                <p class="mb-0">© 2023 Aprova Mais PB. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Função para copiar o código de indicação
+        function copyCode() {
+            const code = document.getElementById('referralCode').innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                const button = document.querySelector('.btn-copy');
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-check me-1"></i>Copiado!';
+                
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                }, 2000);
+            });
+        }
+        
+        // Lógica para gerar código de indicação (simulação)
+        function generateReferralCode(name, year) {
+            // Remove espaços e converte para maiúsculas
+            const formattedName = name.replace(/\s+/g, '').toUpperCase();
+            // Gera código no formato APROVA-NOME-ANO
+            return `APROVA-${formattedName}-${year}`;
+        }
+        
+        // Simulação de dados do aluno (em uma aplicação real, isso viria do backend)
+        const studentData = {
+            name: "João Silva Santos",
+            course: "Pré-Enem 2023",
+            enrollmentDate: "15/03/2023",
+            lastPayment: "10/08/2023",
+            nextDueDate: "10/09/2023", // 1 mês após o último pagamento
+            monthlyFee: 299.90,
+            status: "active",
+            paymentStatus: "current"
+        };
+        
+        // Em uma aplicação real, os dados acima seriam preenchidos dinamicamente
+        // a partir de uma chamada API ou sistema de autenticação
+    </script>
+</body>
+</html>
