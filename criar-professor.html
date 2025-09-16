@@ -79,11 +79,8 @@
     </div>
 
 <script type="module">
-    import { initializeApp } from './assets/js/firebase-config.js';
+    import { app, db } from "./assets/js/firebase-config.js";
     import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-
-    const app = initializeApp();
-    const db = getFirestore(app);
 
     function generatePassword() {
         const length = 8;
