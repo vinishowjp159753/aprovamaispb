@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Resultado do Pagamento</title>
+<style>
+  body { font-family: Arial; text-align: center; padding: 50px; }
+  .success { color: green; }
+  .error { color: red; }
+</style>
+</head>
+<body>
+<h1>Resultado do Pagamento</h1>
+<p id="message"></p>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const status = params.get('transactionStatus'); // pagseguro retorna status ou transaction_id
+
+const messageEl = document.getElementById('message');
+
+if(status === '3'){ // Status 3 = pago
+  messageEl.textContent = "Pagamento aprovado! Matrícula confirmada.";
+  messageEl.classList.add('success');
+} else {
+  messageEl.textContent = "Pagamento pendente ou recusado. Tente novamente.";
+  messageEl.classList.add('error');
+}
+</script>
+</body>
+</html>
