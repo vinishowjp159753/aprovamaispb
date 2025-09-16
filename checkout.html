@@ -28,34 +28,13 @@ body {
     box-shadow:0 10px 30px rgba(0,0,0,0.3);
     overflow:hidden;
 }
-.header {
-    background: var(--primary);
-    color:white;
-    padding:20px;
-    text-align:center;
-}
+.header { background: var(--primary); color:white; padding:20px; text-align:center; }
 .logo { max-width:120px; margin-bottom:15px; }
 .header h1 { font-size:24px; margin-bottom:10px; }
 .content { padding:30px; }
 .alert { padding:15px; border-radius:6px; margin-bottom:20px; display:none; }
 .alert.success { background:#e8f5e9; color:#2e7d32; border:1px solid #c8e6c9; }
 .alert.error { background:#ffebee; color:#d32f2f; border:1px solid #ffcdd2; }
-.btn {
-    padding:14px 25px;
-    background: var(--primary);
-    color:white;
-    border:none;
-    border-radius:6px;
-    cursor:pointer;
-    font-size:16px;
-    font-weight:600;
-    width:100%;
-    transition: background 0.3s;
-    text-align:center;
-}
-.btn:hover { background:#2a3a9c; }
-.loading { display:inline-block; width:20px; height:20px; border:3px solid rgba(255,255,255,.3); border-radius:50%; border-top-color:#fff; animation:spin 1s linear infinite; margin-right:10px; }
-@keyframes spin { to { transform:rotate(360deg); } }
 </style>
 </head>
 <body>
@@ -64,21 +43,18 @@ body {
     <div class="header">
         <img src="assets/img/logo_aprovamaispb.png" alt="Logo AprovaMaisPB" class="logo" onerror="this.style.display='none'">
         <h1>Checkout - AprovaMaisPB</h1>
-        <p>Finalize seu pagamento de R$ 150,00</p>
+        <p>Finalize seu pagamento de <strong>R$ 150,00</strong></p>
     </div>
 
     <div class="content">
         <div class="alert success" id="successAlert"><i class="fas fa-check-circle"></i> Pagamento aprovado!</div>
         <div class="alert error" id="errorAlert"><i class="fas fa-exclamation-circle"></i> O pagamento não foi concluído.</div>
 
-        <button id="paypalBtn" class="btn">
-            <span id="btnText">Pagar com PayPal</span>
-            <span id="btnLoading" class="loading" style="display:none;"></span>
-        </button>
+        <!-- Container do botão PayPal -->
+        <div id="paypal-button-container"></div>
     </div>
 </div>
 
-<!-- Firebase -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getFirestore, doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
@@ -96,45 +72,45 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 const urlParams = new URLSearchParams(window.location.search);
-const matriculaId = urlParams.get("matriculaId");
-
-const paypalBtn = document.getElementById("paypalBtn");
-const btnText = document.getElementById("btnText");
-const btnLoading = document.getElementById("btnLoading");
+const matriculaId = urlParams.get("matriculaId"); // obrigatório para atualizar pagamento
 const successAlert = document.getElementById("successAlert");
 const errorAlert = document.getElementById("errorAlert");
 
-// PayPal Client ID
-const PAYPAL_CLIENT_ID = "AUF39hiK8lh_k7R4yY6jvg9LiMrIkjRXcry5_2iOWNAHKTgiiGK7haFrbTYN1blF2XtJNaRewiP6kcg9"; // Substitua pelo seu Client ID
+const PAYPAL_CLIENT_ID = "AUF39hiK8lh_k7R4yY6jvg9LiMrIkjRXcry5_2iOWNAHKTgiiGK7haFrbTYN1blF2XtJNaRewiP6kcg9";
 
-paypalBtn.addEventListener("click", async () => {
-    btnText.style.display = "none";
-    btnLoading.style.display = "inline-block";
-    paypalBtn.disabled = true;
-
-    // Redirecionar para pagamento PayPal
-    // Aqui usamos o link de checkout do PayPal
-    const paypalLink = `https://www.paypal.com/checkoutnow?token=TESTE123`; // substituir por integração real
-    
-    // Para teste, vamos simular aprovação:
-    setTimeout(async () => {
-        try {
-            // Atualiza Firebase com valorPago
-            const docRef = doc(db, "inscricoes", matriculaId);
-            await updateDoc(docRef, { valorPago: 150, status: "pago" });
-
-            successAlert.style.display = "block";
-            errorAlert.style.display = "none";
-        } catch (err) {
-            console.error(err);
-            errorAlert.style.display = "block";
-        } finally {
-            btnText.style.display = "block";
-            btnLoading.style.display = "none";
-            paypalBtn.disabled = false;
-        }
-    }, 2000); // simula processo de pagamento
-});
+// Carregar script PayPal dinamicamente
+const script = document.createElement("script");
+script.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&currency=BRL`;
+script.onload = () => {
+    paypal.Buttons({
+        style: { layout: 'vertical', color: 'blue', shape: 'rect', label: 'pay' },
+        createOrder: function(data, actions) {
+            return actions.order.create({
+                purchase_units: [{
+                    amount: { value: '150.00' },
+                    description: 'Mensalidade AprovaMaisPB'
+                }]
+            });
+        },
+        onApprove: async function(data, actions) {
+            return actions.order.capture().then(async function(details) {
+                try {
+                    if (!matriculaId) throw new Error("matriculaId não fornecido");
+                    const docRef = doc(db, "inscricoes", matriculaId);
+                    await updateDoc(docRef, { valorPago: 150, status: "pago" });
+                    successAlert.style.display = "block";
+                    errorAlert.style.display = "none";
+                } catch (err) {
+                    console.error(err);
+                    errorAlert.style.display = "block";
+                }
+            });
+        },
+        onCancel: function(data) { errorAlert.style.display = "block"; },
+        onError: function(err) { console.error(err); errorAlert.style.display = "block"; }
+    }).render('#paypal-button-container');
+};
+document.body.appendChild(script);
 </script>
 
 </body>
