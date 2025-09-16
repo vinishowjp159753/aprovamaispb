@@ -2,138 +2,79 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Matrícula - AprovaMaisPB</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>
-:root {
-    --primary: #1a2a6c;
-    --secondary: #b21f1f;
-    --accent: #fdbb2d;
-}
-* {margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;}
-body {background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d); min-height:100vh; display:flex; justify-content:center; align-items:center; padding:20px;}
-.container {width:100%; max-width:800px; background:rgba(255,255,255,0.95); border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.3); padding:30px;}
-.header {text-align:center; margin-bottom:20px;}
-.header h1 {color:var(--primary); margin-bottom:10px;}
-.form-group {margin-bottom:15px;}
-.form-group label {display:block; font-weight:600; margin-bottom:5px;}
-.form-group input, .form-group select, .form-group textarea {width:100%; padding:10px; border-radius:6px; border:1px solid #ddd; font-size:16px;}
-.form-group input:focus, .form-group select:focus, .form-group textarea:focus {border-color:var(--primary); outline:none;}
-.btn {padding:14px 25px; background: var(--primary); color:white; border:none; border-radius:6px; cursor:pointer; font-size:16px; font-weight:600; width:100%; transition:background 0.3s; text-align:center; margin-bottom:10px;}
-.btn:hover {background:#2a3a9c;}
-.alert {padding:15px; border-radius:6px; margin-bottom:20px; display:none;}
-.alert.success {background:#e8f5e9; color:#2e7d32; border:1px solid #c8e6c9;}
-.alert.error {background:#ffebee; color:#d32f2f; border:1px solid #ffcdd2;}
-</style>
+<link rel="stylesheet" href="assets/css/matricula.css">
 </head>
 <body>
+
 <div class="container">
-    <div class="header">
-        <h1>AprovaMaisPB - Matrícula</h1>
-        <p>Preencha seus dados para realizar a matrícula</p>
-    </div>
+  <h1>Matrícula AprovaMaisPB</h1>
 
-    <div class="alert success" id="successAlert">Matrícula realizada com sucesso!</div>
-    <div class="alert error" id="errorAlert">Erro: Preencha todos os campos obrigatórios.</div>
+  <form id="matriculaForm">
+    <label>Nome Completo *</label>
+    <input type="text" id="nomeCompleto" required>
 
-    <form id="matriculaForm">
-        <div class="form-group">
-            <label for="nomeCompleto">Nome Completo *</label>
-            <input type="text" id="nomeCompleto" required>
-        </div>
-        <div class="form-group">
-            <label for="email">E-mail *</label>
-            <input type="email" id="email" required>
-        </div>
-        <div class="form-group">
-            <label for="telefone">Telefone *</label>
-            <input type="tel" id="telefone" required>
-        </div>
-        <div class="form-group">
-            <label for="turma">Turma *</label>
-            <select id="turma" required>
-                <option value="">Selecione</option>
-                <option value="Turma A">Turma A</option>
-                <option value="Turma B">Turma B</option>
-                <option value="Turma C">Turma C</option>
-            </select>
-        </div>
+    <label>Email *</label>
+    <input type="email" id="email" required>
 
-        <button type="submit" class="btn" id="submitBtn">Realizar Matrícula</button>
-    </form>
+    <label>Turma *</label>
+    <select id="turma" required>
+      <option value="">Selecione</option>
+      <option value="Turma A - Manhã">Turma A - Manhã</option>
+      <option value="Turma B - Tarde">Turma B - Tarde</option>
+      <option value="Turma C - Noite">Turma C - Noite</option>
+    </select>
 
-    <button class="btn" id="finalizarPagamentoBtn" style="display:none;">Finalizar Pagamento R$150</button>
+    <button type="submit" class="btn">Realizar Matrícula e Pagar R$150</button>
+  </form>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <script>
-const firebaseConfig = {
-    apiKey: "AIzaSyAK3U35fipoWOOIJg0yrtgmVfQ7XQxZxqY",
-    authDomain: "aprovamaispb-d4e75.firebaseapp.com",
-    projectId: "aprovamaispb-d4e75",
-    storageBucket: "aprovamaispb-d4e75.firebasestorage.app",
-    messagingSenderId: "828577018900",
-    appId: "1:828577018900:web:473d8c3fc2685d3f192301"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+const matriculaForm = document.getElementById("matriculaForm");
+matriculaForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-const matriculaForm = document.getElementById('matriculaForm');
-const successAlert = document.getElementById('successAlert');
-const errorAlert = document.getElementById('errorAlert');
-const finalizarPagamentoBtn = document.getElementById('finalizarPagamentoBtn');
+  const nomeCompleto = document.getElementById("nomeCompleto").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const turma = document.getElementById("turma").value;
 
-let ultimaMatriculaId = null;
-let alunoNome = '';
-let alunoEmail = '';
+  if(!nomeCompleto || !email || !turma){
+    alert("Preencha todos os campos!");
+    return;
+  }
 
-matriculaForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    successAlert.style.display = 'none';
-    errorAlert.style.display = 'none';
+  // Criar ID de matrícula temporário
+  const matriculaId = Math.random().toString(36).substring(2,12);
 
-    const nome = document.getElementById('nomeCompleto').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const telefone = document.getElementById('telefone').value.trim();
-    const turma = document.getElementById('turma').value;
+  try {
+    // Chama backend no Render
+    const response = await fetch("https://SEUAPP.onrender.com/create-checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        nome: nomeCompleto,
+        email: email,
+        matriculaId: matriculaId,
+        valor: 150
+      })
+    });
 
-    if (!nome || !email || !telefone || !turma) {
-        errorAlert.style.display = 'block';
-        return;
-    }
+    const text = await response.text();
 
-    try {
-        const docRef = await db.collection('inscricoes').add({
-            nomeCompleto: nome,
-            email,
-            telefone,
-            turma,
-            valorPago: 0,
-            status: 'pendente',
-            criadoEm: new Date()
-        });
-        ultimaMatriculaId = docRef.id;
-        alunoNome = nome;
-        alunoEmail = email;
+    // Extrair URL de redirecionamento do PagSeguro
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(text,"text/xml");
+    const checkoutCode = xmlDoc.getElementsByTagName("code")[0].textContent;
 
-        successAlert.style.display = 'block';
-        finalizarPagamentoBtn.style.display = 'block';
-        matriculaForm.reset();
-    } catch (err) {
-        console.error(err);
-        errorAlert.textContent = "Erro ao processar matrícula.";
-        errorAlert.style.display = 'block';
-    }
-});
+    const redirectURL = `https://pagseguro.uol.com.br/v2/checkout/payment.html?code=${checkoutCode}`;
+    window.location.href = redirectURL;
 
-finalizarPagamentoBtn.addEventListener('click', () => {
-    if (!ultimaMatriculaId) return;
-    const valor = 150;
-    const checkoutUrl = `checkout.html?matriculaId=${ultimaMatriculaId}&nome=${encodeURIComponent(alunoNome)}&email=${encodeURIComponent(alunoEmail)}&valor=${valor}`;
-    window.location.href = checkoutUrl;
+  } catch (err) {
+    console.error(err);
+    alert("Erro ao criar checkout. Tente novamente.");
+  }
 });
 </script>
+
 </body>
 </html>
