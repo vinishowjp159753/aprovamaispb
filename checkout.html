@@ -4,77 +4,105 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Checkout - AprovaMaisPB</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="assets/css/checkout.css">
 <style>
-:root {
-    --primary: #1a2a6c;
-    --secondary: #b21f1f;
-    --accent: #fdbb2d;
-}
-* {margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;}
-body {background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d); min-height:100vh; display:flex; justify-content:center; align-items:center; padding:20px;}
-.container {width:100%; max-width:600px; background:rgba(255,255,255,0.95); border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.3); padding:30px;}
-h1 {text-align:center; margin-bottom:20px; color:var(--primary);}
-.summary {margin-bottom:20px; background:#f7f7f7; padding:15px; border-radius:8px;}
-.summary p {margin-bottom:10px;}
-.btn {padding:14px 25px; background: var(--primary); color:white; border:none; border-radius:6px; cursor:pointer; font-size:16px; font-weight:600; width:100%; transition:background 0.3s; text-align:center; margin-bottom:10px;}
-.btn:hover {background:#2a3a9c;}
-.alert {padding:15px; border-radius:6px; margin-bottom:20px; display:none;}
-.alert.success {background:#e8f5e9; color:#2e7d32; border:1px solid #c8e6c9;}
-.alert.error {background:#ffebee; color:#d32f2f; border:1px solid #ffcdd2;}
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+    .container {
+        width: 100%;
+        max-width: 500px;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 12px;
+        padding: 30px;
+        text-align: center;
+    }
+    h1 { color: #1a2a6c; margin-bottom: 20px; }
+    #status { margin-top: 20px; font-weight: bold; }
 </style>
 </head>
 <body>
+
 <div class="container">
-    <h1>Finalize seu Pagamento</h1>
-    <div class="summary" id="summary"></div>
-    <div class="alert success" id="successAlert">Pagamento realizado com sucesso!</div>
-    <div class="alert error" id="errorAlert">Erro ao processar o pagamento. Tente novamente.</div>
-    <button class="btn" id="payBtn">Pagar R$150</button>
+    <h1>Finalizar Pagamento</h1>
+    <p>Mensalidade: R$150,00</p>
+
+    <!-- Botão PayPal -->
+    <div id="paypal-button-container"></div>
+
+    <div id="status"></div>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-<script>
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getFirestore, doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+// Config Firebase (mesma do seu site)
 const firebaseConfig = {
-    apiKey: "AIzaSyAK3U35fipoWOOIJg0yrtgmVfQ7XQxZxqY",
-    authDomain: "aprovamaispb-d4e75.firebaseapp.com",
-    projectId: "aprovamaispb-d4e75",
-    storageBucket: "aprovamaispb-d4e75.firebasestorage.app",
-    messagingSenderId: "828577018900",
-    appId: "1:828577018900:web:473d8c3fc2685d3f192301"
+  apiKey: "AIzaSyAK3U35fipoWOOIJg0yrtgmVfQ7XQxZxqY",
+  authDomain: "aprovamaispb-d4e75.firebaseapp.com",
+  projectId: "aprovamaispb-d4e75",
+  storageBucket: "aprovamaispb-d4e75.firebasestorage.app",
+  messagingSenderId: "828577018900",
+  appId: "1:828577018900:web:473d8c3fc2685d3f192301"
 };
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-const summary = document.getElementById('summary');
-const payBtn = document.getElementById('payBtn');
-const successAlert = document.getElementById('successAlert');
-const errorAlert = document.getElementById('errorAlert');
-
-// Pega os dados da URL
+// Captura ID da matrícula via URL
 const urlParams = new URLSearchParams(window.location.search);
 const matriculaId = urlParams.get('matriculaId');
-const nome = urlParams.get('nome');
-const email = urlParams.get('email');
-const valor = urlParams.get('valor');
 
-summary.innerHTML = `<p><strong>Nome:</strong> ${nome}</p>
-<p><strong>E-mail:</strong> ${email}</p>
-<p><strong>Valor a Pagar:</strong> R$ ${valor}</p>`;
-
-// Função para redirecionar para PagSeguro
-payBtn.addEventListener('click', () => {
-    // Link do PagSeguro com pagamento via redirecionamento
-    const token = "f3f24edd-dabd-4975-994b-77f6b75f3ab6a55011fb48d1968bf0ad13c7a36660cd64ad-d06e-4ffa-8b30-87a340f7d72c";
-    const redirectUrl = `checkout-success.html?matriculaId=${matriculaId}`;
-
-    // Parâmetros do PagSeguro
-    const pagSeguroUrl = `https://pagseguro.uol.com.br/v2/checkout/payment.html?token=${token}&email=${email}&valor=${valor}&redirectURL=${encodeURIComponent(redirectUrl)}`;
-
-    // Redireciona
-    window.location.href = pagSeguroUrl;
-});
 </script>
+
+<!-- SDK do PayPal -->
+<script src="https://www.paypal.com/sdk/js?client-id=AUF39hiK8lh_k7R4yY6jvg9LiMrIkjRXcry5_2iOWNAHKTgiiGK7haFrbTYN1blF2XtJNaRewiP6kcg9&currency=BRL"></script>
+
+<script type="module">
+import { doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+const statusDiv = document.getElementById('status');
+
+paypal.Buttons({
+    createOrder: function(data, actions) {
+        return actions.order.create({
+            purchase_units: [{
+                amount: { value: '150.00' },
+                description: 'Mensalidade AprovaMaisPB'
+            }]
+        });
+    },
+    onApprove: async function(data, actions) {
+        const order = await actions.order.capture();
+        console.log(order);
+        statusDiv.textContent = 'Pagamento aprovado! Atualizando matrícula...';
+
+        try {
+            // Atualiza campo valorPago no Firebase
+            const alunoRef = doc(db, "inscricoes", matriculaId);
+            await updateDoc(alunoRef, { valorPago: 150, status: 'ativo' });
+            statusDiv.textContent = 'Pagamento confirmado! Matrícula ativa.';
+        } catch (err) {
+            console.error('Erro ao atualizar matrícula:', err);
+            statusDiv.textContent = 'Pagamento aprovado, mas houve erro ao atualizar matrícula.';
+        }
+    },
+    onCancel: function(data) {
+        statusDiv.textContent = 'Pagamento cancelado.';
+    },
+    onError: function(err) {
+        console.error(err);
+        statusDiv.textContent = 'Erro no pagamento. Tente novamente.';
+    }
+}).render('#paypal-button-container');
+</script>
+
 </body>
 </html>
