@@ -11,37 +11,78 @@
         --secondary: #b21f1f;
         --accent: #fdbb2d;
     }
+    
+    * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    
+    body {
+        background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+        min-height:100vh;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        padding:20px;
+    }
+    
+    .container {
+        width:100%;
+        max-width:800px;
+        background: rgba(255,255,255,0.95);
+        border-radius:12px;
+        box-shadow:0 10px 30px rgba(0,0,0,0.3);
+        overflow:hidden;
+    }
+    
+    .header {
+        background: var(--primary);
+        color:white;
+        padding:20px;
+        text-align:center;
+    }
+    
+    .logo { max-width:120px; margin-bottom:15px; }
+    .header h1 { font-size:24px; margin-bottom:10px; }
+    .content { padding:30px; }
+    
+    .form-row { display:flex; gap:20px; margin-bottom:20px; }
+    .form-group { flex:1; margin-bottom:20px; }
+    .form-group label { display:block; margin-bottom:8px; font-weight:600; color:#555; }
+    .form-group input, .form-group select, .form-group textarea {
+        width:100%; padding:12px 15px; border:1px solid #ddd; border-radius:6px; font-size:16px;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color:var(--primary); outline:none; }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    body { background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; color: #333; }
+    .btn {
+        padding:14px 25px;
+        background: var(--primary);
+        color:white;
+        border:none;
+        border-radius:6px;
+        cursor:pointer;
+        font-size:16px;
+        font-weight:600;
+        width:100%;
+        transition: background 0.3s;
+        text-align:center;
+    }
+    .btn:hover { background:#2a3a9c; }
+    .btn:disabled { background:#cccccc; cursor:not-allowed; }
 
-    .container { width: 100%; max-width: 800px; background: rgba(255,255,255,0.95); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); overflow: hidden; }
-    .header { background: var(--primary); color: #fff; padding: 20px; text-align: center; }
-    .header .logo { max-width: 120px; margin-bottom: 15px; }
-    .header h1 { font-size: 24px; margin-bottom: 10px; }
-    .content { padding: 30px; }
+    .alert {
+        padding:15px;
+        border-radius:6px;
+        margin-bottom:20px;
+        display:none;
+    }
+    .alert.success { background:#e8f5e9; color:#2e7d32; border:1px solid #c8e6c9; }
+    .alert.error { background:#ffebee; color:#d32f2f; border:1px solid #ffcdd2; }
 
-    .form-row { display: flex; gap: 20px; margin-bottom: 20px; }
-    .form-group { flex: 1; }
-    .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #555; }
-    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 16px; }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); outline: none; }
+    .back-btn { display:inline-flex; align-items:center; padding:10px 15px; background:var(--primary); color:white; text-decoration:none; border-radius:5px; font-weight:500; margin-bottom:20px; }
+    .back-btn i { margin-right:8px; }
+    
+    .loading { display:inline-block; width:20px; height:20px; border:3px solid rgba(255,255,255,.3); border-radius:50%; border-top-color:#fff; animation:spin 1s linear infinite; margin-right:10px; }
+    @keyframes spin { to { transform:rotate(360deg); } }
 
-    .btn { padding: 14px 25px; background: var(--primary); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: 600; width: 100%; transition: background 0.3s; text-align: center; display: inline-flex; justify-content: center; align-items: center; gap: 10px; }
-    .btn:hover { background: #2a3a9c; }
-    .btn:disabled { background: #cccccc; cursor: not-allowed; }
-
-    .alert { padding: 15px; border-radius: 6px; margin-bottom: 20px; display: none; }
-    .alert.success { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
-    .alert.error { background: #ffebee; color: #d32f2f; border: 1px solid #ffcdd2; }
-
-    .back-btn { display: inline-flex; align-items: center; padding: 10px 15px; background: var(--primary); color: white; text-decoration: none; border-radius: 5px; font-weight: 500; margin-bottom: 20px; }
-    .back-btn i { margin-right: 8px; }
-
-    .loading { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    @media (max-width: 768px) { .form-row { flex-direction: column; gap: 0; } }
+    @media (max-width:768px){ .form-row{flex-direction:column; gap:0;} }
 </style>
 </head>
 <body>
@@ -91,9 +132,9 @@
                     <label for="turma">Turma *</label>
                     <select id="turma" required>
                         <option value="">Selecione uma turma</option>
-                        <option value="Turma A - Manhã">Turma A - Manhã (08:00 às 12:00)</option>
-                        <option value="Turma B - Tarde">Turma B - Tarde (14:00 às 18:00)</option>
-                        <option value="Turma C - Noite">Turma C - Noite (19:00 às 22:00)</option>
+                        <option value="Turma A - Manhã">Turma A - Manhã</option>
+                        <option value="Turma B - Tarde">Turma B - Tarde</option>
+                        <option value="Turma C - Noite">Turma C - Noite</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -141,13 +182,29 @@
 
             <button type="submit" class="btn" id="submitBtn">
                 <span id="btnText">Realizar Matrícula</span>
-                <span id="btnLoading" class="loading" style="display: none;"></span>
+                <span id="btnLoading" class="loading" style="display:none;"></span>
             </button>
         </form>
     </div>
 </div>
 
-<script>
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAK3U35fipoWOOIJg0yrtgmVfQ7XQxZxqY",
+  authDomain: "aprovamaispb-d4e75.firebaseapp.com",
+  projectId: "aprovamaispb-d4e75",
+  storageBucket: "aprovamaispb-d4e75.firebasestorage.app",
+  messagingSenderId: "828577018900",
+  appId: "1:828577018900:web:473d8c3fc2685d3f192301"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 const matriculaForm = document.getElementById('matriculaForm');
 const submitBtn = document.getElementById('submitBtn');
 const btnText = document.getElementById('btnText');
@@ -155,86 +212,59 @@ const btnLoading = document.getElementById('btnLoading');
 const successAlert = document.getElementById('successAlert');
 const errorAlert = document.getElementById('errorAlert');
 
-// Funções de máscara
-document.getElementById('cpf').addEventListener('input', e => {
-    let value = e.target.value.replace(/\D/g,'');
-    if(value.length>11) value=value.slice(0,11);
-    if(value.length>9) value=value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4');
-    else if(value.length>6) value=value.replace(/(\d{3})(\d{3})(\d+)/,'$1.$2.$3');
-    else if(value.length>3) value=value.replace(/(\d{3})(\d+)/,'$1.$2');
-    e.target.value=value;
-});
-
-document.getElementById('telefone').addEventListener('input', e => {
-    let value = e.target.value.replace(/\D/g,'');
-    if(value.length>11) value=value.slice(0,11);
-    if(value.length>10) value=value.replace(/(\d{2})(\d{5})(\d{4})/,'($1) $2-$3');
-    else if(value.length>6) value=value.replace(/(\d{2})(\d{4})(\d+)/,'($1) $2-$3');
-    else if(value.length>2) value=value.replace(/(\d{2})(\d+)/,'($1) $2');
-    e.target.value=value;
-});
-
-matriculaForm.addEventListener('submit', async e => {
+matriculaForm.addEventListener('submit', async function(e){
     e.preventDefault();
-    const nomeCompleto = document.getElementById('nomeCompleto').value.trim();
-    const dataNascimento = document.getElementById('dataNascimento').value;
-    const cpf = document.getElementById('cpf').value.trim();
-    const telefone = document.getElementById('telefone').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const turma = document.getElementById('turma').value;
-    const turno = document.getElementById('turno').value;
-    const endereco = document.getElementById('endereco').value.trim();
-    const cidade = document.getElementById('cidade').value.trim();
-    const estado = document.getElementById('estado').value;
-    const observacoes = document.getElementById('observacoes').value.trim();
 
-    if(!nomeCompleto||!dataNascimento||!cpf||!telefone||!email||!turma||!turno||!endereco||!cidade||!estado){
-        errorAlert.style.display='block';
-        successAlert.style.display='none';
+    const dados = {
+        nomeCompleto: document.getElementById('nomeCompleto').value.trim(),
+        dataNascimento: document.getElementById('dataNascimento').value,
+        cpf: document.getElementById('cpf').value.trim(),
+        telefone: document.getElementById('telefone').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        turma: document.getElementById('turma').value,
+        turno: document.getElementById('turno').value,
+        endereco: document.getElementById('endereco').value.trim(),
+        cidade: document.getElementById('cidade').value.trim(),
+        estado: document.getElementById('estado').value,
+        observacoes: document.getElementById('observacoes').value.trim(),
+        status: "pendente",
+        valorPago: 0,
+        criadoEm: new Date()
+    };
+
+    if(!dados.nomeCompleto || !dados.dataNascimento || !dados.cpf || !dados.telefone || !dados.email || !dados.turma || !dados.turno || !dados.endereco || !dados.cidade || !dados.estado){
+        errorAlert.style.display = 'block';
+        successAlert.style.display = 'none';
         return;
     }
 
     try{
-        btnText.style.display='none';
-        btnLoading.style.display='inline-block';
-        submitBtn.disabled=true;
+        btnText.style.display = 'none';
+        btnLoading.style.display = 'inline-block';
+        submitBtn.disabled = true;
 
-        // Aqui você poderia salvar no Firebase, mas vamos direto para PagSeguro
-        const checkoutData = {
-            nome: nomeCompleto,
-            email: email,
-            referencia: `${cpf}_${new Date().getTime()}`
-        };
+        const docRef = await addDoc(collection(db, "inscricoes"), dados);
 
-        const response = await fetch('https://pagseguro-checkout.onrender.com/create-checkout',{
-            method:'POST',
-            headers:{'Content-Type':'application/json'},
-            body: JSON.stringify(checkoutData)
-        });
+        successAlert.style.display = 'block';
+        errorAlert.style.display = 'none';
 
-        if(!response.ok) throw new Error('Erro ao criar checkout');
+        // Redirecionar para checkout PayPal
+        setTimeout(()=>{
+            window.location.href = `checkout.html?matriculaId=${docRef.id}`;
+        }, 1000);
 
-        const data = await response.json();
-        if(!data.code) throw new Error('Código de checkout não retornado');
-
-        // Redireciona para PagSeguro
-        const isSandbox = false; // ajuste se quiser sandbox
-        const pagseguroURL = isSandbox
-            ? `https://sandbox.pagseguro.uol.com.br/v2/checkout/payment.html?code=${data.code}`
-            : `https://pagseguro.uol.com.br/v2/checkout/payment.html?code=${data.code}`;
-
-        window.location.href = pagseguroURL;
-
-    }catch(err){
+    } catch(err){
         console.error(err);
-        errorAlert.textContent = 'Erro ao processar matrícula. Tente novamente.';
-        errorAlert.style.display='block';
-        successAlert.style.display='none';
-        btnText.style.display='block';
-        btnLoading.style.display='none';
-        submitBtn.disabled=false;
+        errorAlert.textContent = "Erro ao processar matrícula. Tente novamente.";
+        errorAlert.style.display = 'block';
+        successAlert.style.display = 'none';
+    } finally{
+        btnText.style.display = 'block';
+        btnLoading.style.display = 'none';
+        submitBtn.disabled = false;
     }
 });
 </script>
+
 </body>
 </html>
