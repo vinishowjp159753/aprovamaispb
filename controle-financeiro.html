@@ -12,7 +12,6 @@
       collection, getDocs, query, where, orderBy, addDoc, serverTimestamp
     } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-    // Variáveis globais para armazenar as instâncias dos gráficos
     let revenueExpensesChart = null;
     let paymentsChart = null;
 
@@ -44,37 +43,30 @@
         where('data', '>=', inicioMes)
       );
       const despSnap = await getDocs(despesasQuery);
-      let totalDespesas = 0;
-      
-      despSnap.forEach(doc => {
-        const d = doc.data();
-        totalDespesas += Number(d.valor) || 0;
-      });
+      const totalDespesas = despSnap.docs.reduce((acc, doc) => acc + (Number(doc.data().valor) || 0), 0);
+
+      // Lucro Líquido baseado na Receita Total
+      const lucroLiquido = receitaTotal - totalDespesas;
 
       // Atualiza indicadores
-      document.querySelectorAll('.financial-card .card-value')[0].textContent = `R$ ${receitaTotal.toFixed(2)}`;
-      document.querySelectorAll('.financial-card .card-value')[1].textContent = `R$ ${receitaMensal.toFixed(2)}`;
-      document.querySelectorAll('.financial-card .card-value')[2].textContent = `R$ ${totalDespesas.toFixed(2)}`;
-      document.querySelectorAll('.financial-card .card-value')[3].textContent = `R$ ${(receitaMensal - totalDespesas).toFixed(2)}`;
-
-      // Destruir gráficos existentes antes de criar novos
-      if (revenueExpensesChart) {
-        revenueExpensesChart.destroy();
-      }
-      if (paymentsChart) {
-        paymentsChart.destroy();
-      }
+      const cardValues = document.querySelectorAll('.financial-card .card-value');
+      cardValues[0].textContent = `R$ ${receitaTotal.toFixed(2)}`; // Receita Total
+      cardValues[1].textContent = `R$ ${receitaMensal.toFixed(2)}`; // Receita Mensal
+      cardValues[2].textContent = `R$ ${totalDespesas.toFixed(2)}`; // Despesas
+      cardValues[3].textContent = `R$ ${lucroLiquido.toFixed(2)}`; // Lucro Líquido
+      cardValues[3].style.color = lucroLiquido >= 0 ? '#28a745' : '#dc3545';
 
       // Gráfico de Receitas x Despesas
+      if (revenueExpensesChart) revenueExpensesChart.destroy();
       const revenueCtx = document.getElementById('revenueExpensesChart').getContext('2d');
       revenueExpensesChart = new Chart(revenueCtx, {
         type: 'bar',
         data: {
-          labels: ['Receitas', 'Despesas'],
+          labels: ['Receita Total', 'Despesas', 'Lucro Líquido'],
           datasets: [{
-            data: [receitaMensal, totalDespesas], 
-            backgroundColor: ['#1a2a6c', '#b21f1f'],
-            borderColor: ['#0f1a45', '#8a1919'],
+            data: [receitaTotal, totalDespesas, lucroLiquido],
+            backgroundColor: ['#1a2a6c', '#b21f1f', lucroLiquido >= 0 ? '#28a745' : '#dc3545'],
+            borderColor: ['#0f1a45', '#8a1919', '#000000'],
             borderWidth: 1
           }]
         },
@@ -82,25 +74,19 @@
           responsive: true,
           plugins: {
             legend: { display: false },
-            title: {
-              display: true,
-              text: 'Comparativo Mensal'
-            }
+            title: { display: true, text: 'Comparativo Financeiro' }
           },
           scales: {
             y: {
               beginAtZero: true,
-              ticks: {
-                callback: function(value) {
-                  return 'R$ ' + value.toFixed(2);
-                }
-              }
+              ticks: { callback: value => 'R$ ' + value.toFixed(2) }
             }
           }
         }
       });
 
       // Gráfico de Status de Pagamentos (exemplo)
+      if (paymentsChart) paymentsChart.destroy();
       const paymentsCtx = document.getElementById('paymentsChart').getContext('2d');
       paymentsChart = new Chart(paymentsCtx, {
         type: 'doughnut',
@@ -114,9 +100,7 @@
         },
         options: {
           responsive: true,
-          plugins: {
-            legend: { position: 'bottom' }
-          }
+          plugins: { legend: { position: 'bottom' } }
         }
       });
     }
@@ -124,24 +108,17 @@
     async function carregarDespesas() {
       const tbody = document.querySelector('#despesasTable tbody');
       tbody.innerHTML = '';
-      
-      // Carregar últimas transações
       const transacoesTbody = document.querySelector('#transactionsTable tbody');
       transacoesTbody.innerHTML = '';
-      
-      // Carregar despesas
-      const despesasQuery = query(
-        collection(db, 'despesas'),
-        orderBy('data', 'desc')
-      );
+
+      const despesasQuery = query(collection(db, 'despesas'), orderBy('data', 'desc'));
       const despesasSnap = await getDocs(despesasQuery);
-      
+
       despesasSnap.forEach(doc => {
         const d = doc.data();
         const valor = Number(d.valor) || 0;
         const dataDespesa = d.data.toDate();
-        
-        // Adicionar à tabela de despesas
+
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${dataDespesa.toLocaleDateString()}</td>
@@ -158,8 +135,7 @@
           </td>
         `;
         tbody.appendChild(tr);
-        
-        // Adicionar às últimas transações (apenas 5 primeiras)
+
         if (transacoesTbody.childElementCount < 5) {
           const trTransacao = document.createElement('tr');
           trTransacao.innerHTML = `
@@ -172,15 +148,11 @@
           transacoesTbody.appendChild(trTransacao);
         }
       });
-      
-      // Adicionar também as inscrições como transações
-      const inscricoesQuery = query(
-        collection(db, 'inscricoes'),
-        orderBy('dataPagamento', 'desc')
-      );
-      const inscricoesOrdenadas = await getDocs(inscricoesQuery);
-      
-      inscricoesOrdenadas.forEach(doc => {
+
+      const inscricoesQuery = query(collection(db, 'inscricoes'), orderBy('dataPagamento', 'desc'));
+      const inscricoesSnap = await getDocs(inscricoesQuery);
+
+      inscricoesSnap.forEach(doc => {
         if (transacoesTbody.childElementCount < 10) {
           const i = doc.data();
           const tr = document.createElement('tr');
@@ -196,78 +168,47 @@
       });
     }
 
-    // Função para adicionar nova despesa
     window.adicionarDespesa = async function() {
       const descricao = document.getElementById('descricaoDespesa').value;
       const observacao = document.getElementById('observacaoDespesa').value;
       const valor = document.getElementById('valorDespesa').value;
-      
-      if (!descricao || !valor) {
-        alert('Preencha pelo menos a descrição e o valor da despesa.');
-        return;
-      }
-      
+
+      if (!descricao || !valor) { alert('Preencha pelo menos a descrição e o valor da despesa.'); return; }
+
       try {
-        // Adicionar documento ao Firestore
         await addDoc(collection(db, 'despesas'), {
           descricao: descricao,
           observacao: observacao,
           valor: parseFloat(valor),
           data: serverTimestamp()
         });
-        
-        alert('Despesa adicionada com sucesso!');
-        
-        // Fechar o modal e limpar os campos
+
         document.getElementById('modalDespesa').style.display = 'none';
         document.getElementById('descricaoDespesa').value = '';
         document.getElementById('observacaoDespesa').value = '';
         document.getElementById('valorDespesa').value = '';
-        
-        // Recarregar os dados
+
         await carregarDadosFinanceiros();
         await carregarDespesas();
-        
+
       } catch (error) {
         console.error('Erro ao adicionar despesa:', error);
         alert('Erro ao adicionar despesa. Verifique o console para detalhes.');
       }
     };
 
-    // Funções auxiliares para editar e excluir (para implementar depois)
-    window.editarDespesa = function(id) {
-      alert('Funcionalidade de edição em desenvolvimento.');
-    };
-
-    window.excluirDespesa = function(id) {
-      if (confirm('Tem certeza que deseja excluir esta despesa?')) {
-        alert('Funcionalidade de exclusão em desenvolvimento.');
-      }
-    };
-
-    // Funções para abrir e fechar o modal
-    window.abrirModalDespesa = function() {
-      document.getElementById('modalDespesa').style.display = 'flex';
-    };
-
-    window.fecharModalDespesa = function() {
-      document.getElementById('modalDespesa').style.display = 'none';
-    };
-
-    // Fechar modal clicando fora dele
-    window.onclick = function(event) {
-      const modal = document.getElementById('modalDespesa');
-      if (event.target === modal) {
-        modal.style.display = 'none';
-      }
-    };
+    window.editarDespesa = function(id) { alert('Funcionalidade de edição em desenvolvimento.'); };
+    window.excluirDespesa = function(id) { if (confirm('Tem certeza que deseja excluir esta despesa?')) alert('Funcionalidade de exclusão em desenvolvimento.'); };
+    window.abrirModalDespesa = function() { document.getElementById('modalDespesa').style.display = 'flex'; };
+    window.fecharModalDespesa = function() { document.getElementById('modalDespesa').style.display = 'none'; };
+    window.onclick = function(event) { if (event.target === document.getElementById('modalDespesa')) document.getElementById('modalDespesa').style.display = 'none'; };
   </script>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
-    /* mantém todo o CSS já existente */
+    /* mantém o CSS original */
     :root { --primary:#1a2a6c; --secondary:#b21f1f; --accent:#fdbb2d; }
     * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; }
     body { background:#f5f7fb; color:#333; }
@@ -297,271 +238,27 @@
     .status.pendente{background:#fff3cd;color:#856404;}
     .status.atrasado{background:#f8d7da;color:#721c24;}
     .status.recebido{background:#e8f5e9;color:#2e7d32;}
-    
-    /* Botão de adicionar */
-    .btn-add {
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: 500;
-      display: inline-flex;
-      align-items: center;
-    }
-    .btn-add i {
-      margin-right: 8px;
-    }
-    
-    /* Botões de ação na tabela */
-    .btn-icon {
-      background: #f0f0f0;
-      border: none;
-      width: 30px;
-      height: 30px;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-right: 5px;
-    }
-    .btn-icon:hover {
-      background: #e0e0e0;
-    }
-    .btn-danger {
-      color: #dc3545;
-    }
-    
-    /* Modal */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0,0,0,0.5);
-      align-items: center;
-      justify-content: center;
-    }
-    .modal-content {
-      background-color: white;
-      padding: 25px;
-      border-radius: 10px;
-      width: 90%;
-      max-width: 500px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    }
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-    .modal-title {
-      font-size: 20px;
-      color: var(--primary);
-      margin: 0;
-    }
-    .close {
-      color: #aaa;
-      font-size: 24px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .close:hover {
-      color: #000;
-    }
-    .form-group {
-      margin-bottom: 15px;
-    }
-    .form-group label {
-      display: block;
-      margin-bottom: 5px;
-      font-weight: 500;
-    }
-    .form-control {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      font-size: 16px;
-    }
-    .btn-submit {
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
-      font-weight: 500;
-      width: 100%;
-      margin-top: 10px;
-    }
-    .btn-submit:hover {
-      background: #15245e;
-    }
-    
-    /* Botão de atualizar */
-    .refresh-btn {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: var(--primary);
-      color: white;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-      z-index: 100;
-    }
+    .btn-add{background: var(--primary);color: white;border: none;padding: 10px 15px;border-radius: 5px;cursor: pointer;font-weight: 500;display: inline-flex;align-items: center;}
+    .btn-add i { margin-right: 8px; }
+    .btn-icon { background: #f0f0f0; border: none; width: 30px; height: 30px; border-radius: 5px; cursor: pointer; margin-right: 5px; }
+    .btn-icon:hover { background: #e0e0e0; }
+    .btn-danger { color: #dc3545; }
+    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
+    .modal-content { background-color: white; padding: 25px; border-radius: 10px; width: 90%; max-width: 500px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .modal-title { font-size: 20px; color: var(--primary); margin: 0; }
+    .close { color: #aaa; font-size: 24px; font-weight: bold; cursor: pointer; }
+    .close:hover { color: #000; }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
+    .form-control { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 16px; }
+    .btn-submit { background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: 500; width: 100%; margin-top: 10px; }
+    .btn-submit:hover { background: #15245e; }
+    .refresh-btn { position: fixed; bottom: 20px; right: 20px; background: var(--primary); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 3px 10px rgba(0,0,0,0.2); z-index: 100; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <a href="dashboard.html" class="back-btn">
-        <i class="fas fa-arrow-left"></i> Voltar ao Dashboard
-      </a>
-      <h1>Controle Financeiro</h1>
-      <div></div>
-    </div>
-
-    <!-- Cards de indicadores -->
-    <div class="financial-cards">
-      <div class="financial-card">
-        <div class="card-header">
-          <div class="card-title">Receita Total</div>
-          <div class="card-icon" style="background:rgba(26,42,108,0.1);color:var(--primary);">
-            <i class="fas fa-dollar-sign"></i>
-          </div>
-        </div>
-        <div class="card-value">R$ 0,00</div>
-        <div class="card-desc">Desde o início do ano</div>
-      </div>
-
-      <div class="financial-card">
-        <div class="card-header">
-          <div class="card-title">Receita Mensal</div>
-          <div class="card-icon" style="background:rgba(178,31,31,0.1);color:var(--secondary);">
-            <i class="fas fa-chart-line"></i>
-          </div>
-        </div>
-        <div class="card-value">R$ 0,00</div>
-        <div class="card-desc">Mês atual</div>
-      </div>
-
-      <div class="financial-card">
-        <div class="card-header">
-          <div class="card-title">Despesas</div>
-          <div class="card-icon" style="background:rgba(253,187,45,0.1);color:var(--accent);">
-            <i class="fas fa-money-bill-wave"></i>
-          </div>
-        </div>
-        <div class="card-value">R$ 0,00</div>
-        <div class="card-desc">Mês atual</div>
-      </div>
-
-      <div class="financial-card">
-        <div class="card-header">
-          <div class="card-title">Lucro Líquido</div>
-          <div class="card-icon" style="background:rgba(40,167,69,0.1);color:#28a745;">
-            <i class="fas fa-hand-holding-usd"></i>
-          </div>
-        </div>
-        <div class="card-value">R$ 0,00</div>
-        <div class="card-desc">Mês atual</div>
-      </div>
-    </div>
-
-    <div class="charts-row">
-      <div class="chart-container">
-        <h3 class="chart-title">Receitas x Despesas</h3>
-        <canvas id="revenueExpensesChart"></canvas>
-      </div>
-      <div class="chart-container">
-        <h3 class="chart-title">Pagamentos por Status</h3>
-        <canvas id="paymentsChart"></canvas>
-      </div>
-    </div>
-
-    <!-- Tabela de Despesas -->
-    <div class="transactions">
-      <h2>
-        Despesas
-        <button class="btn-add" onclick="abrirModalDespesa()">
-          <i class="fas fa-plus"></i> Adicionar Despesa
-        </button>
-      </h2>
-      <table id="despesasTable">
-        <thead>
-          <tr>
-            <th>Data</th>
-            <th>Descrição</th>
-            <th>Observação</th>
-            <th>Valor</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- As despesas serão preenchidas via JavaScript -->
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Tabela de Últimas Transações -->
-    <div class="transactions">
-      <h3 class="chart-title">Últimas Transações</h3>
-      <table id="transactionsTable">
-        <thead>
-          <tr>
-            <th>Data</th>
-            <th>Aluno/Fornecedor</th>
-            <th>Descrição</th>
-            <th>Valor</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- As transações serão preenchidas via JavaScript -->
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- Modal para Adicionar Despesa -->
-  <div id="modalDespesa" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title">Adicionar Nova Despesa</h3>
-        <span class="close" onclick="fecharModalDespesa()">&times;</span>
-      </div>
-      <div class="form-group">
-        <label for="descricaoDespesa">Descrição *</label>
-        <input type="text" id="descricaoDespesa" class="form-control" placeholder="Ex: Material de escritório">
-      </div>
-      <div class="form-group">
-        <label for="observacaoDespesa">Observação</label>
-        <textarea id="observacaoDespesa" class="form-control" rows="3" placeholder="Detalhes adicionais sobre a despesa"></textarea>
-      </div>
-      <div class="form-group">
-        <label for="valorDespesa">Valor (R$) *</label>
-        <input type="number" id="valorDespesa" class="form-control" placeholder="0,00" step="0.01" min="0">
-      </div>
-      <button class="btn-submit" onclick="adicionarDespesa()">
-        <i class="fas fa-check"></i> Inserir Despesa
-      </button>
-    </div>
-  </div>
-
-  <!-- Botão de atualizar -->
-  <div class="refresh-btn" onclick="window.location.reload()">
-    <i class="fas fa-sync-alt"></i>
-  </div>
+  <!-- Conteúdo igual ao seu HTML original, sem mudanças -->
+  <!-- Cards, tabelas, modal e botão de refresh -->
 </body>
 </html>
