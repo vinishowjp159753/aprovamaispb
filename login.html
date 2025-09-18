@@ -8,8 +8,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="firebase-config.js"></script>
-    <link rel="stylesheet" href="notification-system.css">
     <style>
         * {
             margin: 0;
@@ -255,6 +253,16 @@
             <div class="success-message" id="successMessage">
                 Autenticação bem-sucedida! Conectando ao sistema...
             </div>
+            
+            <div class="info-box">
+                <h3>Credenciais de Teste</h3>
+                <p>Use estas credenciais para testar o sistema:</p>
+                <div class="credentials">
+                    <summary>Mostrar credenciais</summary>
+                    <p><strong>Professor:</strong> usuario: professor / senha: 123456</p>
+                    <p><strong>Administrador:</strong> usuario: admin / senha: admin123</p>
+                </div>
+            </div>
         </div>
         
         <div class="footer">
@@ -317,18 +325,18 @@
                 }
                 
                 // Fallback para credenciais padrão
-                if (usuario === "administrador" && senha === "159753") {
+                if (usuario === "professor" && senha === "123456") {
                     // Verificar se o professor padrão existe, se não, criar
                     const professorPadrao = await db.collection("professores")
-                        .where("usuario", "==", "administrador")
+                        .where("usuario", "==", "professor")
                         .get();
                         
                     if (professorPadrao.empty) {
                         await db.collection("professores").add({
-                            usuario: "administrador",
-                            senha: "159753",
-                            nome: "Professor Administrador",
-                            email: "admin@aprovamaispb.com",
+                            usuario: "professor",
+                            senha: "123456",
+                            nome: "Professor Exemplo",
+                            email: "professor@aprovamaispb.com",
                             status: "ativo",
                             criadoEm: firebase.firestore.FieldValue.serverTimestamp()
                         });
@@ -392,16 +400,6 @@
          */
         function estaLogado() {
             return localStorage.getItem('usuarioLogado') !== null;
-        }
-        
-        /**
-         * Faz logout do usuário
-         */
-        function logout() {
-            localStorage.removeItem('usuarioLogado');
-            localStorage.removeItem('tipoAcesso');
-            localStorage.removeItem('timestampLogin');
-            window.location.href = 'login.html';
         }
         
         /**
@@ -486,9 +484,13 @@
             localStorage.setItem('tipoAcesso', accessType);
             localStorage.setItem('timestampLogin', new Date().getTime());
             
-            // Redirecionar para o dashboard
+            // Redirecionar para a página correta baseada no tipo de acesso
             setTimeout(() => {
-                window.location.href = 'dashboard.html';
+                if (accessType === 'professor') {
+                    window.location.href = 'professores.html';
+                } else {
+                    window.location.href = 'dashboard.html';
+                }
             }, 1500);
         }
         
@@ -503,7 +505,12 @@
             
             // Verificar se já está logado e redirecionar
             if (estaLogado()) {
-                window.location.href = 'dashboard.html';
+                const tipoAcesso = localStorage.getItem('tipoAcesso');
+                if (tipoAcesso === 'professor') {
+                    window.location.href = 'professores.html';
+                } else {
+                    window.location.href = 'dashboard.html';
+                }
             }
             
             // Focar no campo de senha ao pressionar Enter no usuário
@@ -521,7 +528,5 @@
             });
         });
     </script>
-    <script src="notification-system.js"></script>
-    <script src="firebase-integration.js"></script>
 </body>
 </html>
