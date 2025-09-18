@@ -6,6 +6,7 @@
     <title>Portal do Aluno - Aprova Mais PB</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
     <style>
         :root {
             --primary-color: #2c3e50;
@@ -13,6 +14,8 @@
             --accent-color: #e74c3c;
             --light-color: #ecf0f1;
             --dark-color: #2c3e50;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
         }
         
         body {
@@ -125,11 +128,110 @@
             color: black;
         }
         
+        .progress-container {
+            margin: 20px 0;
+        }
+        
+        .progress {
+            height: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        .material-item {
+            padding: 10px 15px;
+            border-left: 4px solid var(--secondary-color);
+            margin-bottom: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        
+        .material-item:hover {
+            background-color: #e9ecef;
+            transform: translateX(5px);
+        }
+        
+        .calendar-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--accent-color);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .notification-item {
+            padding: 10px 15px;
+            border-left: 4px solid var(--secondary-color);
+            margin-bottom: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        
+        .notification-item.unread {
+            border-left-color: var(--accent-color);
+            background-color: #fff;
+        }
+        
         footer {
             background-color: var(--dark-color);
             color: white;
             padding: 2rem 0;
             margin-top: 2rem;
+        }
+        
+        /* Tabs personalizadas */
+        .nav-tabs .nav-link {
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: #495057;
+            font-weight: 500;
+        }
+        
+        .nav-tabs .nav-link.active {
+            border-bottom: 3px solid var(--secondary-color);
+            color: var(--secondary-color);
+            background: transparent;
+        }
+        
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .portal-header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .card {
+                margin-bottom: 15px;
+            }
+            
+            .code-box {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .btn-copy {
+                margin-top: 10px;
+            }
         }
     </style>
 </head>
@@ -158,6 +260,49 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#">Contato</a>
                     </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle me-1"></i>João Silva
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#changePasswordModal"><i class="fas fa-key me-2"></i>Alterar Senha</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i>Sair</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item position-relative">
+                        <a class="nav-link" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge">3</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown" style="width: 300px;">
+                            <li class="dropdown-header">Notificações</li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <div class="notification-item unread">
+                                    <div class="fw-bold">Nova aula disponível</div>
+                                    <div class="small">Matemática - Funções</div>
+                                    <div class="text-muted small">Há 2 horas</div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="notification-item unread">
+                                    <div class="fw-bold">Simulado marcado</div>
+                                    <div class="small">Dia 25/10 às 14h</div>
+                                    <div class="text-muted small">Há 1 dia</div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="notification-item">
+                                    <div class="fw-bold">Material complementar</div>
+                                    <div class="small">Redação - Modelos ENEM</div>
+                                    <div class="text-muted small">Há 3 dias</div>
+                                </div>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-center" href="#">Ver todas</a></li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -167,82 +312,357 @@
     <div class="portal-header">
         <div class="container text-center">
             <h1>Portal do Aluno</h1>
-            <p class="lead">Bem-vindo ao seu painel de controle</p>
+            <p class="lead">Bem-vindo ao seu painel de controle, João</p>
         </div>
     </div>
 
     <div class="container">
-        <div class="row">
-            <!-- Dados da Inscrição -->
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <i class="fas fa-user-graduate me-2"></i>Dados da Inscrição
+        <!-- Abas de navegação -->
+        <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Visão Geral</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="progress-tab" data-bs-toggle="tab" data-bs-target="#progress" type="button" role="tab" aria-controls="progress" aria-selected="false">Meu Progresso</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="materials-tab" data-bs-toggle="tab" data-bs-target="#materials" type="button" role="tab" aria-controls="materials" aria-selected="false">Materiais</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="calendar-tab" data-bs-toggle="tab" data-bs-target="#calendar" type="button" role="tab" aria-controls="calendar" aria-selected="false">Calendário</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="myTabContent">
+            <!-- Visão Geral -->
+            <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                <div class="row">
+                    <!-- Dados da Inscrição -->
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-user-graduate me-2"></i>Dados da Inscrição
+                            </div>
+                            <div class="card-body">
+                                <div class="info-item">
+                                    <span>Nome:</span>
+                                    <strong>João Silva Santos</strong>
+                                </div>
+                                <div class="info-item">
+                                    <span>Curso:</span>
+                                    <strong>Pré-Enem 2023</strong>
+                                </div>
+                                <div class="info-item">
+                                    <span>Data de Inscrição:</span>
+                                    <strong>15/03/2023</strong>
+                                </div>
+                                <div class="info-item">
+                                    <span>Status:</span>
+                                    <span class="status-badge status-active">Ativo</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <div class="info-item">
-                            <span>Nome:</span>
-                            <strong>João Silva Santos</strong>
+
+                    <!-- Informações de Pagamento -->
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-credit-card me-2"></i>Informações de Pagamento
+                            </div>
+                            <div class="card-body">
+                                <div class="info-item">
+                                    <span>Último Pagamento:</span>
+                                    <strong>10/08/2023</strong>
+                                </div>
+                                <div class="info-item">
+                                    <span>Próximo Vencimento:</span>
+                                    <strong>10/09/2023</strong>
+                                </div>
+                                <div class="info-item">
+                                    <span>Valor da Mensalidade:</span>
+                                    <strong>R$ 299,90</strong>
+                                </div>
+                                <div class="info-item">
+                                    <span>Status do Pagamento:</span>
+                                    <span class="status-badge status-active">Em dia</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="info-item">
-                            <span>Curso:</span>
-                            <strong>Pré-Enem 2023</strong>
-                        </div>
-                        <div class="info-item">
-                            <span>Data de Inscrição:</span>
-                            <strong>15/03/2023</strong>
-                        </div>
-                        <div class="info-item">
-                            <span>Status:</span>
-                            <span class="status-badge status-active">Ativo</span>
+                    </div>
+
+                    <!-- Indique e Ganhe -->
+                    <div class="col-12 mt-4">
+                        <div class="card indication-box">
+                            <div class="card-body">
+                                <h3><i class="fas fa-gift me-2"></i>Indique e Ganhe 50% de Desconto</h3>
+                                <p>Indique um amigo e ganhe 50% de desconto na sua próxima mensalidade!</p>
+                                
+                                <div class="code-box">
+                                    <span id="referralCode">APROVA-JSANTOS-2023</span>
+                                    <button class="btn-copy" onclick="copyCode()">
+                                        <i class="fas fa-copy me-1"></i>Copiar
+                                    </button>
+                                </div>
+                                
+                                <p class="small">Seu amigo deve usar este código durante a matrícula para que você ganhe o desconto.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Informações de Pagamento -->
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <i class="fas fa-credit-card me-2"></i>Informações de Pagamento
+            <!-- Meu Progresso -->
+            <div class="tab-pane fade" id="progress" role="tabpanel" aria-labelledby="progress-tab">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-chart-line me-2"></i>Desempenho por Matéria
+                            </div>
+                            <div class="card-body">
+                                <div class="progress-container">
+                                    <div class="progress-label">
+                                        <span>Matemática</span>
+                                        <span>78%</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar" role="progressbar" style="width: 78%" aria-valuenow="78" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="progress-container">
+                                    <div class="progress-label">
+                                        <span>Português</span>
+                                        <span>85%</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar" role="progressbar" style="width: 85%" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="progress-container">
+                                    <div class="progress-label">
+                                        <span>História</span>
+                                        <span>65%</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar" role="progressbar" style="width: 65%" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="progress-container">
+                                    <div class="progress-label">
+                                        <span>Geografia</span>
+                                        <span>72%</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar" role="progressbar" style="width: 72%" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <div class="info-item">
-                            <span>Último Pagamento:</span>
-                            <strong>10/08/2023</strong>
+                    
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-trophy me-2"></i>Últimos Resultados
+                            </div>
+                            <div class="card-body">
+                                <div class="info-item">
+                                    <span>Simulado 05/09:</span>
+                                    <strong>720 pontos</strong>
+                                </div>
+                                <div class="info-item">
+                                    <span>Redação 01/09:</span>
+                                    <strong>880 pontos</strong>
+                                </div>
+                                <div class="info-item">
+                                    <span>Simulado 20/08:</span>
+                                    <strong>680 pontos</strong>
+                                </div>
+                                <div class="info-item">
+                                    <span>Média Geral:</span>
+                                    <strong>760 pontos</strong>
+                                </div>
+                            </div>
                         </div>
-                        <div class="info-item">
-                            <span>Próximo Vencimento:</span>
-                            <strong>10/09/2023</strong>
-                        </div>
-                        <div class="info-item">
-                            <span>Valor da Mensalidade:</span>
-                            <strong>R$ 299,90</strong>
-                        </div>
-                        <div class="info-item">
-                            <span>Status do Pagamento:</span>
-                            <span class="status-badge status-active">Em dia</span>
+                        
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <i class="fas fa-book me-2"></i>Frequência
+                            </div>
+                            <div class="card-body">
+                                <div class="progress-container">
+                                    <div class="progress-label">
+                                        <span>Presença nas Aulas</span>
+                                        <span>92%</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: 92%" aria-valuenow="92" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                                <p class="small text-muted mt-2">Você compareceu a 46 de 50 aulas</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Indique e Ganhe -->
-            <div class="col-12 mt-4">
-                <div class="card indication-box">
-                    <div class="card-body">
-                        <h3><i class="fas fa-gift me-2"></i>Indique e Ganhe 50% de Desconto</h3>
-                        <p>Indique um amigo e ganhe 50% de desconto na sua próxima mensalidade!</p>
-                        
-                        <div class="code-box">
-                            <span id="referralCode">APROVA-JSANTOS-2023</span>
-                            <button class="btn-copy" onclick="copyCode()">
-                                <i class="fas fa-copy me-1"></i>Copiar
-                            </button>
+            <!-- Materiais -->
+            <div class="tab-pane fade" id="materials" role="tabpanel" aria-labelledby="materials-tab">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-book me-2"></i>Materiais de Estudo
+                            </div>
+                            <div class="card-body">
+                                <div class="material-item">
+                                    <div class="fw-bold">Matemática - Funções</div>
+                                    <div class="small">PDF + Exercícios</div>
+                                    <div class="text-muted small">Disponível desde: 10/09/2023</div>
+                                </div>
+                                
+                                <div class="material-item">
+                                    <div class="fw-bold">Português - Análise Sintática</div>
+                                    <div class="small">PDF + Videoaula</div>
+                                    <div class="text-muted small">Disponível desde: 05/09/2023</div>
+                                </div>
+                                
+                                <div class="material-item">
+                                    <div class="fw-bold">História - Brasil Colônia</div>
+                                    <div class="small">PDF + Resumo</div>
+                                    <div class="text-muted small">Disponível desde: 03/09/2023</div>
+                                </div>
+                                
+                                <div class="material-item">
+                                    <div class="fw-bold">Redação - Modelos ENEM</div>
+                                    <div class="small">PDF + Temas</div>
+                                    <div class="text-muted small">Disponível desde: 01/09/2023</div>
+                                </div>
+                                
+                                <button class="btn btn-outline-primary mt-3 w-100">
+                                    <i class="fas fa-download me-2"></i>Baixar Todos os Materiais
+                                </button>
+                            </div>
                         </div>
-                        
-                        <p class="small">Seu amigo deve usar este código durante a matrícula para que você ganhe o desconto.</p>
                     </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-video me-2"></i>Videoaulas Recentes
+                            </div>
+                            <div class="card-body">
+                                <div class="material-item">
+                                    <div class="fw-bold">Matemática - Geometria Analítica</div>
+                                    <div class="small">Duração: 45 min</div>
+                                    <div class="text-muted small">Postada em: 12/09/2023</div>
+                                </div>
+                                
+                                <div class="material-item">
+                                    <div class="fw-bold">Química - Estequiometria</div>
+                                    <div class="small">Duração: 38 min</div>
+                                    <div class="text-muted small">Postada em: 10/09/2023</div>
+                                </div>
+                                
+                                <div class="material-item">
+                                    <div class="fw-bold">Biologia - Genética</div>
+                                    <div class="small">Duração: 52 min</div>
+                                    <div class="text-muted small">Postada em: 08/09/2023</div>
+                                </div>
+                                
+                                <div class="material-item">
+                                    <div class="fw-bold">Redação - Argumentação</div>
+                                    <div class="small">Duração: 40 min</div>
+                                    <div class="text-muted small">Postada em: 05/09/2023</div>
+                                </div>
+                                
+                                <button class="btn btn-outline-primary mt-3 w-100">
+                                    <i class="fas fa-play-circle me-2"></i>Acessar Todas as Videoaulas
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calendário -->
+            <div class="tab-pane fade" id="calendar" role="tabpanel" aria-labelledby="calendar-tab">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="calendar-container">
+                            <div id="calendar"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-calendar-check me-2"></i>Próximos Eventos
+                            </div>
+                            <div class="card-body">
+                                <div class="material-item">
+                                    <div class="fw-bold">Simulado ENEM</div>
+                                    <div class="small">25/09/2023 - 14h às 19h</div>
+                                    <div class="text-muted small">Local: Centro de Aulas</div>
+                                </div>
+                                
+                                <div class="material-item">
+                                    <div class="fw-bold">Aula de Revisão - Matemática</div>
+                                    <div class="small">20/09/2023 - 16h às 18h</div>
+                                    <div class="text-muted small">Professora: Carla Mendes</div>
+                                </div>
+                                
+                                <div class="material-item">
+                                    <div class="fw-bold">Entrega de Redações</div>
+                                    <div class="small">18/09/2023 - Até às 18h</div>
+                                    <div class="text-muted small">Tema: Mobilidade Urbana</div>
+                                </div>
+                                
+                                <div class="material-item">
+                                    <div class="fw-bold">Palestra: Como controlar a ansiedade</div>
+                                    <div class="small">15/09/2023 - 19h às 20h30</div>
+                                    <div class="text-muted small">Psicóloga: Dra. Ana Silva</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Alterar Senha -->
+    <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="changePasswordModalLabel">Alterar Senha</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="passwordForm">
+                        <div class="mb-3">
+                            <label for="currentPassword" class="form-label">Senha Atual</label>
+                            <input type="password" class="form-control" id="currentPassword" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newPassword" class="form-label">Nova Senha</label>
+                            <input type="password" class="form-control" id="newPassword" required>
+                            <div class="form-text">A senha deve ter pelo menos 8 caracteres, incluindo números e letras.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirmPassword" class="form-label">Confirmar Nova Senha</label>
+                            <input type="password" class="form-control" id="confirmPassword" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="changePassword()">Alterar Senha</button>
                 </div>
             </div>
         </div>
@@ -278,7 +698,43 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/pt-br.js"></script>
     <script>
+        // Inicialização do calendário
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'pt-br',
+                events: [
+                    {
+                        title: 'Simulado ENEM',
+                        start: '2023-09-25',
+                        color: '#e74c3c'
+                    },
+                    {
+                        title: 'Aula de Revisão - Matemática',
+                        start: '2023-09-20T16:00:00',
+                        end: '2023-09-20T18:00:00',
+                        color: '#3498db'
+                    },
+                    {
+                        title: 'Entrega de Redações',
+                        start: '2023-09-18',
+                        color: '#f39c12'
+                    },
+                    {
+                        title: 'Palestra: Controle de Ansiedade',
+                        start: '2023-09-15T19:00:00',
+                        end: '2023-09-15T20:30:00',
+                        color: '#27ae60'
+                    }
+                ]
+            });
+            calendar.render();
+        });
+
         // Função para copiar o código de indicação
         function copyCode() {
             const code = document.getElementById('referralCode').innerText;
@@ -293,12 +749,26 @@
             });
         }
         
-        // Lógica para gerar código de indicação (simulação)
-        function generateReferralCode(name, year) {
-            // Remove espaços e converte para maiúsculas
-            const formattedName = name.replace(/\s+/g, '').toUpperCase();
-            // Gera código no formato APROVA-NOME-ANO
-            return `APROVA-${formattedName}-${year}`;
+        // Função para alterar senha
+        function changePassword() {
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (newPassword !== confirmPassword) {
+                alert('As senhas não coincidem!');
+                return;
+            }
+            
+            if (newPassword.length < 8) {
+                alert('A senha deve ter pelo menos 8 caracteres!');
+                return;
+            }
+            
+            // Simulação de alteração de senha
+            alert('Senha alterada com sucesso!');
+            document.getElementById('passwordForm').reset();
+            bootstrap.Modal.getInstance(document.getElementById('changePasswordModal')).hide();
         }
         
         // Simulação de dados do aluno (em uma aplicação real, isso viria do backend)
@@ -307,14 +777,11 @@
             course: "Pré-Enem 2023",
             enrollmentDate: "15/03/2023",
             lastPayment: "10/08/2023",
-            nextDueDate: "10/09/2023", // 1 mês após o último pagamento
+            nextDueDate: "10/09/2023",
             monthlyFee: 299.90,
             status: "active",
             paymentStatus: "current"
         };
-        
-        // Em uma aplicação real, os dados acima seriam preenchidos dinamicamente
-        // a partir de uma chamada API ou sistema de autenticação
     </script>
 </body>
 </html>
