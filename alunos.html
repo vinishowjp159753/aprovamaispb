@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal do Aluno - Aprova Mais PB</title>
+    <title>Aprova Mais PB - O próximo aprovado pode ser você!</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
     <style>
         :root {
             --primary-color: #2c3e50;
@@ -14,774 +13,193 @@
             --accent-color: #e74c3c;
             --light-color: #ecf0f1;
             --dark-color: #2c3e50;
-            --success-color: #27ae60;
-            --warning-color: #f39c12;
         }
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
             color: #333;
+            line-height: 1.6;
         }
         
-        .navbar {
-            background-color: var(--primary-color);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        .portal-header {
+        .hero-section {
             background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
             color: white;
-            padding: 2rem 0;
-            margin-bottom: 2rem;
-            border-radius: 0 0 10px 10px;
-        }
-        
-        .card {
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            border: none;
-            transition: transform 0.3s;
-        }
-        
-        .card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .card-header {
-            background-color: var(--primary-color);
-            color: white;
-            border-radius: 10px 10px 0 0 !important;
-            font-weight: 600;
-        }
-        
-        .info-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .info-item:last-child {
-            border-bottom: none;
-        }
-        
-        .indication-box {
-            background: linear-gradient(135deg, #ff7e5f, #feb47b);
-            color: white;
-            border-radius: 10px;
-            padding: 20px;
+            padding: 4rem 0;
             text-align: center;
         }
         
-        .discount-badge {
+        .btn-primary {
             background-color: var(--accent-color);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-        
-        .code-box {
-            background-color: rgba(255, 255, 255, 0.2);
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            font-family: monospace;
-            font-size: 1.2rem;
-            letter-spacing: 2px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .btn-copy {
-            background-color: white;
-            color: var(--accent-color);
             border: none;
-            border-radius: 5px;
-            padding: 5px 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .btn-copy:hover {
-            background-color: var(--light-color);
-        }
-        
-        .status-badge {
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.8rem;
+            padding: 12px 30px;
             font-weight: bold;
-        }
-        
-        .status-active {
-            background-color: #28a745;
-            color: white;
-        }
-        
-        .status-pending {
-            background-color: #ffc107;
-            color: black;
-        }
-        
-        .progress-container {
-            margin: 20px 0;
-        }
-        
-        .progress {
-            height: 10px;
-            margin-bottom: 10px;
-        }
-        
-        .progress-label {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.85rem;
-            color: #666;
-        }
-        
-        .material-item {
-            padding: 10px 15px;
-            border-left: 4px solid var(--secondary-color);
-            margin-bottom: 10px;
-            background-color: #f8f9fa;
-            border-radius: 4px;
+            font-size: 1.2rem;
+            border-radius: 30px;
             transition: all 0.3s;
         }
         
-        .material-item:hover {
-            background-color: #e9ecef;
-            transform: translateX(5px);
+        .btn-primary:hover {
+            background-color: #c0392b;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
         
-        .calendar-container {
+        .features-section {
+            padding: 4rem 0;
+            background-color: #f8f9fa;
+        }
+        
+        .feature-box {
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            height: 100%;
+            transition: transform 0.3s;
+        }
+        
+        .feature-box:hover {
+            transform: translateY(-10px);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+        }
+        
+        .tips-section {
+            padding: 4rem 0;
+        }
+        
+        .tip-card {
             background-color: white;
             border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            border-left: 5px solid var(--secondary-color);
         }
         
-        .notification-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background-color: var(--accent-color);
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            font-size: 0.7rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .notification-item {
-            padding: 10px 15px;
-            border-left: 4px solid var(--secondary-color);
-            margin-bottom: 10px;
-            background-color: #f8f9fa;
-            border-radius: 4px;
-        }
-        
-        .notification-item.unread {
-            border-left-color: var(--accent-color);
-            background-color: #fff;
+        .tip-title {
+            color: var(--primary-color);
+            font-weight: bold;
+            margin-bottom: 15px;
         }
         
         footer {
             background-color: var(--dark-color);
             color: white;
             padding: 2rem 0;
-            margin-top: 2rem;
+            text-align: center;
         }
         
-        /* Tabs personalizadas */
-        .nav-tabs .nav-link {
-            border: none;
-            border-bottom: 3px solid transparent;
-            color: #495057;
-            font-weight: 500;
-        }
-        
-        .nav-tabs .nav-link.active {
-            border-bottom: 3px solid var(--secondary-color);
-            color: var(--secondary-color);
-            background: transparent;
-        }
-        
-        /* Responsividade */
-        @media (max-width: 768px) {
-            .portal-header h1 {
-                font-size: 1.8rem;
-            }
-            
-            .card {
-                margin-bottom: 15px;
-            }
-            
-            .code-box {
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .btn-copy {
-                margin-top: 10px;
-            }
+        .divider {
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--secondary-color), transparent);
+            width: 80%;
+            margin: 2rem auto;
         }
     </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
+    <!-- Hero Section -->
+    <section class="hero-section">
         <div class="container">
-            <a class="navbar-brand" href="#">
-                <img src="https://aprovamaispb-three.vercel.app/index.html" alt="Logo Aprova Mais PB" height="40" class="d-inline-block align-top">
-                Aprova Mais PB
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="https://aprovamaispb-three.vercel.app/index.html">Início</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#">Portal do Aluno</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Cursos</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Contato</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-user-circle me-1"></i>João Silva
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#changePasswordModal"><i class="fas fa-key me-2"></i>Alterar Senha</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i>Sair</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item position-relative">
-                        <a class="nav-link" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-bell"></i>
-                            <span class="notification-badge">3</span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown" style="width: 300px;">
-                            <li class="dropdown-header">Notificações</li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <div class="notification-item unread">
-                                    <div class="fw-bold">Nova aula disponível</div>
-                                    <div class="small">Matemática - Funções</div>
-                                    <div class="text-muted small">Há 2 horas</div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="notification-item unread">
-                                    <div class="fw-bold">Simulado marcado</div>
-                                    <div class="small">Dia 25/10 às 14h</div>
-                                    <div class="text-muted small">Há 1 dia</div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="notification-item">
-                                    <div class="fw-bold">Material complementar</div>
-                                    <div class="small">Redação - Modelos ENEM</div>
-                                    <div class="text-muted small">Há 3 dias</div>
-                                </div>
-                            </li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-center" href="#">Ver todas</a></li>
-                        </ul>
-                    </li>
-                </ul>
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <h1 class="display-4 fw-bold">O próximo aprovado pode ser você!</h1>
+                    <p class="lead mt-3">Prepare-se para o ENEM com o curso que mais aprova na Paraíba.</p>
+                    <a href="#matricula" class="btn btn-primary btn-lg mt-4">Quero me matricular</a>
+                </div>
             </div>
         </div>
-    </nav>
+    </section>
 
-    <!-- Header -->
-    <div class="portal-header">
-        <div class="container text-center">
-            <h1>Portal do Aluno</h1>
-            <p class="lead">Bem-vindo ao seu painel de controle, João</p>
-        </div>
-    </div>
-
-    <div class="container">
-        <!-- Abas de navegação -->
-        <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Visão Geral</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="progress-tab" data-bs-toggle="tab" data-bs-target="#progress" type="button" role="tab" aria-controls="progress" aria-selected="false">Meu Progresso</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="materials-tab" data-bs-toggle="tab" data-bs-target="#materials" type="button" role="tab" aria-controls="materials" aria-selected="false">Materiais</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="calendar-tab" data-bs-toggle="tab" data-bs-target="#calendar" type="button" role="tab" aria-controls="calendar" aria-selected="false">Calendário</button>
-            </li>
-        </ul>
-
-        <div class="tab-content" id="myTabContent">
-            <!-- Visão Geral -->
-            <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                <div class="row">
-                    <!-- Dados da Inscrição -->
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <i class="fas fa-user-graduate me-2"></i>Dados da Inscrição
-                            </div>
-                            <div class="card-body">
-                                <div class="info-item">
-                                    <span>Nome:</span>
-                                    <strong>João Silva Santos</strong>
-                                </div>
-                                <div class="info-item">
-                                    <span>Curso:</span>
-                                    <strong>Pré-Enem 2023</strong>
-                                </div>
-                                <div class="info-item">
-                                    <span>Data de Inscrição:</span>
-                                    <strong>15/03/2023</strong>
-                                </div>
-                                <div class="info-item">
-                                    <span>Status:</span>
-                                    <span class="status-badge status-active">Ativo</span>
-                                </div>
-                            </div>
+    <!-- Features Section -->
+    <section class="features-section">
+        <div class="container">
+            <h2 class="text-center mb-5">Por que escolher o AprovaMaisPB?</h2>
+            
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="feature-box">
+                        <div class="feature-icon">
+                            <i class="fas fa-book"></i>
                         </div>
+                        <h3>Material Atualizado</h3>
+                        <p>Conteúdo alinhado com o último edital do ENEM</p>
                     </div>
-
-                    <!-- Informações de Pagamento -->
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <i class="fas fa-credit-card me-2"></i>Informações de Pagamento
-                            </div>
-                            <div class="card-body">
-                                <div class="info-item">
-                                    <span>Último Pagamento:</span>
-                                    <strong>10/08/2023</strong>
-                                </div>
-                                <div class="info-item">
-                                    <span>Próximo Vencimento:</span>
-                                    <strong>10/09/2023</strong>
-                                </div>
-                                <div class="info-item">
-                                    <span>Valor da Mensalidade:</span>
-                                    <strong>R$ 299,90</strong>
-                                </div>
-                                <div class="info-item">
-                                    <span>Status do Pagamento:</span>
-                                    <span class="status-badge status-active">Em dia</span>
-                                </div>
-                            </div>
+                </div>
+                
+                <div class="col-md-4 mb-4">
+                    <div class="feature-box">
+                        <div class="feature-icon">
+                            <i class="fas fa-chalkboard-teacher"></i>
                         </div>
+                        <h3>Professores Qualificados</h3>
+                        <p>Equipe especializada em aprovação no ENEM</p>
                     </div>
-
-                    <!-- Indique e Ganhe -->
-                    <div class="col-12 mt-4">
-                        <div class="card indication-box">
-                            <div class="card-body">
-                                <h3><i class="fas fa-gift me-2"></i>Indique e Ganhe 50% de Desconto</h3>
-                                <p>Indique um amigo e ganhe 50% de desconto na sua próxima mensalidade!</p>
-                                
-                                <div class="code-box">
-                                    <span id="referralCode">APROVA-JSANTOS-2023</span>
-                                    <button class="btn-copy" onclick="copyCode()">
-                                        <i class="fas fa-copy me-1"></i>Copiar
-                                    </button>
-                                </div>
-                                
-                                <p class="small">Seu amigo deve usar este código durante a matrícula para que você ganhe o desconto.</p>
-                            </div>
+                </div>
+                
+                <div class="col-md-4 mb-4">
+                    <div class="feature-box">
+                        <div class="feature-icon">
+                            <i class="fas fa-clipboard-list"></i>
                         </div>
+                        <h3>Simulados Regulares</h3>
+                        <p>Teste seus conhecimentos com simulados mensais</p>
                     </div>
                 </div>
             </div>
+        </div>
+    </section>
 
-            <!-- Meu Progresso -->
-            <div class="tab-pane fade" id="progress" role="tabpanel" aria-labelledby="progress-tab">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <i class="fas fa-chart-line me-2"></i>Desempenho por Matéria
-                            </div>
-                            <div class="card-body">
-                                <div class="progress-container">
-                                    <div class="progress-label">
-                                        <span>Matemática</span>
-                                        <span>78%</span>
-                                    </div>
-                                    <div class="progress">
-                                        <div class="progress-bar" role="progressbar" style="width: 78%" aria-valuenow="78" aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
-                                </div>
-                                
-                                <div class="progress-container">
-                                    <div class="progress-label">
-                                        <span>Português</span>
-                                        <span>85%</span>
-                                    </div>
-                                    <div class="progress">
-                                        <div class="progress-bar" role="progressbar" style="width: 85%" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
-                                </div>
-                                
-                                <div class="progress-container">
-                                    <div class="progress-label">
-                                        <span>História</span>
-                                        <span>65%</span>
-                                    </div>
-                                    <div class="progress">
-                                        <div class="progress-bar" role="progressbar" style="width: 65%" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
-                                </div>
-                                
-                                <div class="progress-container">
-                                    <div class="progress-label">
-                                        <span>Geografia</span>
-                                        <span>72%</span>
-                                    </div>
-                                    <div class="progress">
-                                        <div class="progress-bar" role="progressbar" style="width: 72%" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+    <div class="divider"></div>
+
+    <!-- Tips Section -->
+    <section class="tips-section">
+        <div class="container">
+            <h2 class="text-center mb-5">Dicas rápidas para o ENEM</h2>
+            
+            <div class="row">
+                <div class="col-lg-10 mx-auto">
+                    <div class="tip-card">
+                        <h4 class="tip-title"><i class="fas fa-calendar-alt me-2"></i>Organize um cronograma</h4>
+                        <p>Separe horários de estudo para cada área do conhecimento.</p>
                     </div>
                     
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <i class="fas fa-trophy me-2"></i>Últimos Resultados
-                            </div>
-                            <div class="card-body">
-                                <div class="info-item">
-                                    <span>Simulado 05/09:</span>
-                                    <strong>720 pontos</strong>
-                                </div>
-                                <div class="info-item">
-                                    <span>Redação 01/09:</span>
-                                    <strong>880 pontos</strong>
-                                </div>
-                                <div class="info-item">
-                                    <span>Simulado 20/08:</span>
-                                    <strong>680 pontos</strong>
-                                </div>
-                                <div class="info-item">
-                                    <span>Média Geral:</span>
-                                    <strong>760 pontos</strong>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="card mt-4">
-                            <div class="card-header">
-                                <i class="fas fa-book me-2"></i>Frequência
-                            </div>
-                            <div class="card-body">
-                                <div class="progress-container">
-                                    <div class="progress-label">
-                                        <span>Presença nas Aulas</span>
-                                        <span>92%</span>
-                                    </div>
-                                    <div class="progress">
-                                        <div class="progress-bar bg-success" role="progressbar" style="width: 92%" aria-valuenow="92" aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
-                                </div>
-                                <p class="small text-muted mt-2">Você compareceu a 46 de 50 aulas</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Materiais -->
-            <div class="tab-pane fade" id="materials" role="tabpanel" aria-labelledby="materials-tab">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <i class="fas fa-book me-2"></i>Materiais de Estudo
-                            </div>
-                            <div class="card-body">
-                                <div class="material-item">
-                                    <div class="fw-bold">Matemática - Funções</div>
-                                    <div class="small">PDF + Exercícios</div>
-                                    <div class="text-muted small">Disponível desde: 10/09/2023</div>
-                                </div>
-                                
-                                <div class="material-item">
-                                    <div class="fw-bold">Português - Análise Sintática</div>
-                                    <div class="small">PDF + Videoaula</div>
-                                    <div class="text-muted small">Disponível desde: 05/09/2023</div>
-                                </div>
-                                
-                                <div class="material-item">
-                                    <div class="fw-bold">História - Brasil Colônia</div>
-                                    <div class="small">PDF + Resumo</div>
-                                    <div class="text-muted small">Disponível desde: 03/09/2023</div>
-                                </div>
-                                
-                                <div class="material-item">
-                                    <div class="fw-bold">Redação - Modelos ENEM</div>
-                                    <div class="small">PDF + Temas</div>
-                                    <div class="text-muted small">Disponível desde: 01/09/2023</div>
-                                </div>
-                                
-                                <button class="btn btn-outline-primary mt-3 w-100">
-                                    <i class="fas fa-download me-2"></i>Baixar Todos os Materiais
-                                </button>
-                            </div>
-                        </div>
+                    <div class="tip-card">
+                        <h4 class="tip-title"><i class="fas fa-file-alt me-2"></i>Resolva provas anteriores</h4>
+                        <p>Familiarize-se com o estilo das questões e tempo de prova.</p>
                     </div>
                     
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <i class="fas fa-video me-2"></i>Videoaulas Recentes
-                            </div>
-                            <div class="card-body">
-                                <div class="material-item">
-                                    <div class="fw-bold">Matemática - Geometria Analítica</div>
-                                    <div class="small">Duração: 45 min</div>
-                                    <div class="text-muted small">Postada em: 12/09/2023</div>
-                                </div>
-                                
-                                <div class="material-item">
-                                    <div class="fw-bold">Química - Estequiometria</div>
-                                    <div class="small">Duração: 38 min</div>
-                                    <div class="text-muted small">Postada em: 10/09/2023</div>
-                                </div>
-                                
-                                <div class="material-item">
-                                    <div class="fw-bold">Biologia - Genética</div>
-                                    <div class="small">Duração: 52 min</div>
-                                    <div class="text-muted small">Postada em: 08/09/2023</div>
-                                </div>
-                                
-                                <div class="material-item">
-                                    <div class="fw-bold">Redação - Argumentação</div>
-                                    <div class="small">Duração: 40 min</div>
-                                    <div class="text-muted small">Postada em: 05/09/2023</div>
-                                </div>
-                                
-                                <button class="btn btn-outline-primary mt-3 w-100">
-                                    <i class="fas fa-play-circle me-2"></i>Acessar Todas as Videoaulas
-                                </button>
-                            </div>
-                        </div>
+                    <div class="tip-card">
+                        <h4 class="tip-title"><i class="fas fa-pencil-alt me-2"></i>Redação</h4>
+                        <p>Pratique temas, aprenda estrutura (introdução, desenvolvimento, conclusão) e revise coesão e coerência.</p>
                     </div>
                 </div>
             </div>
-
-            <!-- Calendário -->
-            <div class="tab-pane fade" id="calendar" role="tabpanel" aria-labelledby="calendar-tab">
-                <div class="row">
-                    <div class="col-md-8">
-                        <div class="calendar-container">
-                            <div id="calendar"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-4">
-                        <div class="card">
-                            <div class="card-header">
-                                <i class="fas fa-calendar-check me-2"></i>Próximos Eventos
-                            </div>
-                            <div class="card-body">
-                                <div class="material-item">
-                                    <div class="fw-bold">Simulado ENEM</div>
-                                    <div class="small">25/09/2023 - 14h às 19h</div>
-                                    <div class="text-muted small">Local: Centro de Aulas</div>
-                                </div>
-                                
-                                <div class="material-item">
-                                    <div class="fw-bold">Aula de Revisão - Matemática</div>
-                                    <div class="small">20/09/2023 - 16h às 18h</div>
-                                    <div class="text-muted small">Professora: Carla Mendes</div>
-                                </div>
-                                
-                                <div class="material-item">
-                                    <div class="fw-bold">Entrega de Redações</div>
-                                    <div class="small">18/09/2023 - Até às 18h</div>
-                                    <div class="text-muted small">Tema: Mobilidade Urbana</div>
-                                </div>
-                                
-                                <div class="material-item">
-                                    <div class="fw-bold">Palestra: Como controlar a ansiedade</div>
-                                    <div class="small">15/09/2023 - 19h às 20h30</div>
-                                    <div class="text-muted small">Psicóloga: Dra. Ana Silva</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            
+            <div class="text-center mt-5">
+                <a href="#matricula" class="btn btn-primary btn-lg">Quero me matricular</a>
             </div>
         </div>
-    </div>
-
-    <!-- Modal Alterar Senha -->
-    <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="changePasswordModalLabel">Alterar Senha</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="passwordForm">
-                        <div class="mb-3">
-                            <label for="currentPassword" class="form-label">Senha Atual</label>
-                            <input type="password" class="form-control" id="currentPassword" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="newPassword" class="form-label">Nova Senha</label>
-                            <input type="password" class="form-control" id="newPassword" required>
-                            <div class="form-text">A senha deve ter pelo menos 8 caracteres, incluindo números e letras.</div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="confirmPassword" class="form-label">Confirmar Nova Senha</label>
-                            <input type="password" class="form-control" id="confirmPassword" required>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" onclick="changePassword()">Alterar Senha</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    </section>
 
     <!-- Footer -->
     <footer>
         <div class="container">
-            <div class="row">
-                <div class="col-md-4">
-                    <h5>Aprova Mais PB</h5>
-                    <p>Preparando você para conquistar seu lugar ao sol!</p>
-                </div>
-                <div class="col-md-4">
-                    <h5>Contato</h5>
-                    <p><i class="fas fa-phone me-2"></i>(83) 9 9999-9999</p>
-                    <p><i class="fas fa-envelope me-2"></i>contato@aprovamaispb.com.br</p>
-                </div>
-                <div class="col-md-4">
-                    <h5>Redes Sociais</h5>
-                    <div class="d-flex gap-3">
-                        <a href="#" class="text-white"><i class="fab fa-instagram fa-lg"></i></a>
-                        <a href="#" class="text-white"><i class="fab fa-facebook fa-lg"></i></a>
-                        <a href="#" class="text-white"><i class="fab fa-whatsapp fa-lg"></i></a>
-                    </div>
-                </div>
-            </div>
-            <hr class="mt-4 mb-4" style="background-color: rgba(255,255,255,0.2)">
-            <div class="text-center">
-                <p class="mb-0">© 2023 Aprova Mais PB. Todos os direitos reservados.</p>
+            <p>© 2023 Aprova Mais PB. Todos os direitos reservados.</p>
+            <div class="mt-3">
+                <a href="#" class="text-white mx-2"><i class="fab fa-instagram fa-lg"></i></a>
+                <a href="#" class="text-white mx-2"><i class="fab fa-facebook fa-lg"></i></a>
+                <a href="#" class="text-white mx-2"><i class="fab fa-whatsapp fa-lg"></i></a>
             </div>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/pt-br.js"></script>
-    <script>
-        // Inicialização do calendário
-        document.addEventListener('DOMContentLoaded', function() {
-            var calendarEl = document.getElementById('calendar');
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                locale: 'pt-br',
-                events: [
-                    {
-                        title: 'Simulado ENEM',
-                        start: '2023-09-25',
-                        color: '#e74c3c'
-                    },
-                    {
-                        title: 'Aula de Revisão - Matemática',
-                        start: '2023-09-20T16:00:00',
-                        end: '2023-09-20T18:00:00',
-                        color: '#3498db'
-                    },
-                    {
-                        title: 'Entrega de Redações',
-                        start: '2023-09-18',
-                        color: '#f39c12'
-                    },
-                    {
-                        title: 'Palestra: Controle de Ansiedade',
-                        start: '2023-09-15T19:00:00',
-                        end: '2023-09-15T20:30:00',
-                        color: '#27ae60'
-                    }
-                ]
-            });
-            calendar.render();
-        });
-
-        // Função para copiar o código de indicação
-        function copyCode() {
-            const code = document.getElementById('referralCode').innerText;
-            navigator.clipboard.writeText(code).then(() => {
-                const button = document.querySelector('.btn-copy');
-                const originalText = button.innerHTML;
-                button.innerHTML = '<i class="fas fa-check me-1"></i>Copiado!';
-                
-                setTimeout(() => {
-                    button.innerHTML = originalText;
-                }, 2000);
-            });
-        }
-        
-        // Função para alterar senha
-        function changePassword() {
-            const currentPassword = document.getElementById('currentPassword').value;
-            const newPassword = document.getElementById('newPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            
-            if (newPassword !== confirmPassword) {
-                alert('As senhas não coincidem!');
-                return;
-            }
-            
-            if (newPassword.length < 8) {
-                alert('A senha deve ter pelo menos 8 caracteres!');
-                return;
-            }
-            
-            // Simulação de alteração de senha
-            alert('Senha alterada com sucesso!');
-            document.getElementById('passwordForm').reset();
-            bootstrap.Modal.getInstance(document.getElementById('changePasswordModal')).hide();
-        }
-        
-        // Simulação de dados do aluno (em uma aplicação real, isso viria do backend)
-        const studentData = {
-            name: "João Silva Santos",
-            course: "Pré-Enem 2023",
-            enrollmentDate: "15/03/2023",
-            lastPayment: "10/08/2023",
-            nextDueDate: "10/09/2023",
-            monthlyFee: 299.90,
-            status: "active",
-            paymentStatus: "current"
-        };
-    </script>
 </body>
 </html>
