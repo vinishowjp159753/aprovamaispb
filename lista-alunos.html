@@ -5,16 +5,42 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lista de Alunos</title>
 <link rel="stylesheet" href="assets/css/lista-alunos.css">
+
+<style>
+/* === BOTÕES ESTILO DA TABELA === */
+.table-btn {
+    background-color: #f8f8f8;
+    border: 1px solid #ccc;
+    color: #333;
+    padding: 8px 14px;
+    margin-right: 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s, color 0.2s;
+}
+.table-btn:hover {
+    background-color: #e0e0e0;
+    color: #000;
+}
+.btn-container {
+    margin-bottom: 15px;
+}
+</style>
 </head>
 <body>
 
 <div class="container">
-    <button id="backBtn">← Voltar ao Dashboard</button>
-    <!-- NOVO BOTÃO DE DOWNLOAD -->
-    <button id="downloadBtn">⬇️ Baixar Lista</button>
+
+    <!-- BOTÕES NO MESMO ESTILO DA TABELA -->
+    <div class="btn-container">
+        <button id="backBtn" class="table-btn">← Voltar ao Dashboard</button>
+        <button id="downloadBtn" class="table-btn">⬇️ Baixar Lista</button>
+    </div>
 
     <h1>Lista de Alunos</h1>
     <input type="text" id="searchInput" placeholder="Buscar aluno...">
+
     <table>
         <thead>
             <tr>
@@ -35,8 +61,8 @@
     <div class="modal-content">
         <h3 id="modalTitle"></h3>
         <input type="text" id="modalInput" placeholder="">
-        <button id="saveModalBtn">Salvar</button>
-        <button id="closeModalBtn">Fechar</button>
+        <button id="saveModalBtn" class="table-btn">Salvar</button>
+        <button id="closeModalBtn" class="table-btn">Fechar</button>
     </div>
 </div>
  
@@ -46,14 +72,13 @@ import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc } from "ht
 
 const alunosTableBody = document.getElementById("alunosTableBody");
 const searchInput = document.getElementById("searchInput");
-
 const modal = document.getElementById("modal");
 const modalTitle = document.getElementById("modalTitle");
 const modalInput = document.getElementById("modalInput");
 const saveModalBtn = document.getElementById("saveModalBtn");
 const closeModalBtn = document.getElementById("closeModalBtn");
+const downloadBtn = document.getElementById("downloadBtn");
 
-const downloadBtn = document.getElementById("downloadBtn"); // NOVO
 let alunosData = [];
 let selectedAlunoId = null;
 let selectedField = null;
@@ -65,7 +90,6 @@ async function loadAlunos() {
     renderTable(alunosData);
 }
 
-// Renderizar tabela
 function renderTable(data) {
     alunosTableBody.innerHTML = "";
     data.forEach(aluno => {
@@ -77,24 +101,24 @@ function renderTable(data) {
             <td>${aluno.telefone || ""}</td>
             <td>${aluno.status || ""}</td>
             <td>
-                <button onclick="toggleStatus('${aluno.id}')">Status</button>
-                <button onclick="editField('${aluno.id}', 'valorPago', 'Atualizar Pagamento')">Pagamento</button>
-                <button onclick="editField('${aluno.id}', 'observacoes', 'Editar Observação')">Observação</button>
-                <button onclick="deleteAluno('${aluno.id}')">Excluir</button>
+                <button class="table-btn" onclick="toggleStatus('${aluno.id}')">Status</button>
+                <button class="table-btn" onclick="editField('${aluno.id}', 'valorPago', 'Atualizar Pagamento')">Pagamento</button>
+                <button class="table-btn" onclick="editField('${aluno.id}', 'observacoes', 'Editar Observação')">Observação</button>
+                <button class="table-btn" onclick="deleteAluno('${aluno.id}')">Excluir</button>
             </td>
         `;
         alunosTableBody.appendChild(tr);
     });
 }
 
-// Buscar alunos
+// Busca
 searchInput.addEventListener("input", () => {
     const term = searchInput.value.toLowerCase();
     const filtered = alunosData.filter(a => a.nomeCompleto?.toLowerCase().includes(term));
     renderTable(filtered);
 });
 
-// Toggle Status
+// Funções globais
 window.toggleStatus = async (id) => {
     const aluno = alunosData.find(a => a.id === id);
     if (!aluno) return;
@@ -103,7 +127,6 @@ window.toggleStatus = async (id) => {
     loadAlunos();
 };
 
-// Editar campo (pagamento ou observação)
 window.editField = (id, field, title) => {
     selectedAlunoId = id;
     selectedField = field;
@@ -113,7 +136,6 @@ window.editField = (id, field, title) => {
     modal.style.display = "flex";
 };
 
-// Salvar no modal
 saveModalBtn.addEventListener("click", async () => {
     if (!selectedAlunoId || !selectedField) return;
     const value = modalInput.value;
@@ -124,33 +146,30 @@ saveModalBtn.addEventListener("click", async () => {
     loadAlunos();
 });
 
-// Fechar modal
 closeModalBtn.addEventListener("click", () => {
     modal.style.display = "none";
     selectedAlunoId = null;
     selectedField = null;
 });
 
-// Excluir aluno
 window.deleteAluno = async (id) => {
     if (confirm("Tem certeza que deseja excluir este aluno?")) {
         await deleteDoc(doc(db, "inscricoes", id));
         loadAlunos();
     }
-};
+});
 
-// Botão de voltar ao dashboard
+// Voltar ao dashboard
 document.getElementById("backBtn").addEventListener("click", () => {
     window.location.href = "dashboard.html";
 });
 
-// ======= FUNÇÃO DE DOWNLOAD CSV =======
+// === Download CSV mais limpo ===
 function exportCSV() {
     if (alunosData.length === 0) {
         alert("Nenhum aluno para exportar.");
         return;
     }
-    // Cabeçalho
     const header = ["Nome","Turma","Número do Pedido","Telefone","Status"];
     const rows = alunosData.map(a => [
         a.nomeCompleto || "",
@@ -159,21 +178,20 @@ function exportCSV() {
         a.telefone || "",
         a.status || ""
     ]);
-    const csvContent = [header, ...rows]
-        .map(e => e.map(v => `"${(v || "").toString().replace(/"/g, '""')}"`).join(","))
-        .join("\n");
+
+    const csvLines = [header.join(","), ...rows.map(r => r.join(","))];
+    const csvContent = csvLines.join("\r\n"); // quebra de linha padrão Windows/Excel
 
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", "lista_alunos.csv");
+    link.href = url;
+    link.download = "lista_alunos.csv";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
 }
 
-// Evento do botão de download
 downloadBtn.addEventListener("click", exportCSV);
 
 loadAlunos();
