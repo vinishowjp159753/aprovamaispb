@@ -104,7 +104,7 @@
       </div>
     </div>
 
-    <!-- Gráficos e Tabelas (igual ao seu HTML original) -->
+    <!-- Gráficos e Tabelas -->
     <div class="charts-row">
       <div class="chart-container">
         <h3 class="chart-title">Receitas x Despesas</h3>
@@ -167,7 +167,7 @@
   <!-- SCRIPT CORRIGIDO -->
   <script type="module">
     import { db } from './assets/js/firebase-config.js';
-    import { collection, getDocs, query, where, orderBy, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+    import { collection, getDocs, query, where, orderBy, addDoc, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
     let revenueExpensesChart = null;
     let paymentsChart = null;
@@ -188,20 +188,52 @@
         throw new Error('Cards não encontrados no DOM.');
       }
 
-      // Receita Total
+      // Receita Total - todas as inscrições pagas
       const inscricoesSnap = await getDocs(collection(db, 'inscricoes'));
-      const receitaTotal = inscricoesSnap.docs.reduce((acc, d) => acc + (Number(d.data().valorPago) || 0), 0);
+      const receitaTotal = inscricoesSnap.docs.reduce((acc, d) => {
+        const data = d.data();
+        // Verificar se o pagamento foi confirmado
+        if (data.statusPagamento === 'pago' || data.statusPagamento === 'confirmado') {
+          return acc + (Number(data.valorPago) || 0);
+        }
+        return acc;
+      }, 0);
 
-      // Receita Mensal
+      // Receita Mensal - apenas pagamentos deste mês
       const now = new Date();
       const inicioMes = new Date(now.getFullYear(), now.getMonth(), 1);
-      const q = query(collection(db,'inscricoes'), where('dataPagamento','>=',inicioMes));
+      const fimMes = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+      
+      // Converter para Timestamp do Firebase
+      const inicioMesTimestamp = Timestamp.fromDate(inicioMes);
+      const fimMesTimestamp = Timestamp.fromDate(fimMes);
+      
+      // Query para buscar inscrições pagas no mês atual
+      const q = query(
+        collection(db, 'inscricoes'),
+        where('dataPagamento', '>=', inicioMesTimestamp),
+        where('dataPagamento', '<=', fimMesTimestamp)
+      );
+      
       const mensalSnap = await getDocs(q);
-      const receitaMensal = mensalSnap.docs.reduce((acc,d)=>acc + (Number(d.data().valorPago)||0),0);
+      const receitaMensal = mensalSnap.docs.reduce((acc, d) => {
+        const data = d.data();
+        // Verificar se o pagamento foi confirmado
+        if (data.statusPagamento === 'pago' || data.statusPagamento === 'confirmado') {
+          return acc + (Number(data.valorPago) || 0);
+        }
+        return acc;
+      }, 0);
 
       // Despesas do mês atual
-      const despSnap = await getDocs(query(collection(db, 'despesas'), where('data','>=',inicioMes)));
-      const totalDespesas = despSnap.docs.reduce((acc,d) => acc + (Number(d.data().valor)||0), 0);
+      const despQuery = query(
+        collection(db, 'despesas'), 
+        where('data', '>=', inicioMesTimestamp),
+        where('data', '<=', fimMesTimestamp)
+      );
+      
+      const despSnap = await getDocs(despQuery);
+      const totalDespesas = despSnap.docs.reduce((acc, d) => acc + (Number(d.data().valor) || 0), 0);
 
       // Atualiza indicadores
       cardValues[0].textContent = `R$ ${receitaTotal.toFixed(2)}`;
@@ -214,17 +246,71 @@
       const ctx = document.getElementById('revenueExpensesChart').getContext('2d');
       revenueExpensesChart = new Chart(ctx, {
         type: 'bar',
-        data: { labels:['Receitas','Despesas'], datasets:[{ data:[receitaMensal,totalDespesas], backgroundColor:['#1a2a6c','#b21f1f'] }]},
-        options:{ responsive:true, plugins:{legend:{display:false},title:{display:true,text:'Comparativo Mensal'}}, scales:{y:{beginAtZero:true,ticks:{callback:v=>'R$ '+v.toFixed(2)}}}}
+        data: { 
+          labels:['Receitas','Despesas'], 
+          datasets:[{ 
+            data:[receitaMensal,totalDespesas], 
+            backgroundColor:['#1a2a6c','#b21f1f'],
+            label: 'Valores em R$'
+          }]
+        },
+        options:{ 
+          responsive:true, 
+          plugins:{
+            legend:{display:false},
+            title:{display:true,text:'Comparativo Mensal'}
+          }, 
+          scales:{
+            y:{
+              beginAtZero:true,
+              ticks:{
+                callback: v => 'R$ ' + v.toFixed(2)
+              }
+            }
+          }
+        }
       });
 
-      // Gráfico Pagamentos (exemplo)
+      // Gráfico Pagamentos - calcular valores reais
+      // Buscar todas as inscrições para calcular status
+      const todasInscricoes = await getDocs(collection(db, 'inscricoes'));
+      let pagos = 0;
+      let pendentes = 0;
+      let atrasados = 0;
+      
+      const hoje = new Date();
+      todasInscricoes.forEach(doc => {
+        const data = doc.data();
+        const dataVencimento = data.dataVencimento ? data.dataVencimento.toDate() : null;
+        
+        if (data.statusPagamento === 'pago' || data.statusPagamento === 'confirmado') {
+          pagos++;
+        } else if (data.statusPagamento === 'pendente') {
+          if (dataVencimento && dataVencimento < hoje) {
+            atrasados++;
+          } else {
+            pendentes++;
+          }
+        }
+      });
+
       if (paymentsChart) paymentsChart.destroy();
       const ctx2 = document.getElementById('paymentsChart').getContext('2d');
       paymentsChart = new Chart(ctx2, {
         type: 'doughnut',
-        data: { labels:['Pagos','Pendentes','Atrasados'], datasets:[{ data:[60,25,15], backgroundColor:['#28a745','#ffc107','#dc3545'] }] },
-        options:{ responsive:true, plugins:{legend:{position:'bottom'}} }
+        data: { 
+          labels:['Pagos','Pendentes','Atrasados'], 
+          datasets:[{ 
+            data:[pagos, pendentes, atrasados], 
+            backgroundColor:['#28a745','#ffc107','#dc3545'] 
+          }] 
+        },
+        options:{ 
+          responsive:true, 
+          plugins:{
+            legend:{position:'bottom'}
+          } 
+        }
       });
     }
 
@@ -235,9 +321,9 @@
       transacoesTbody.innerHTML = '';
 
       const despesasSnap = await getDocs(query(collection(db, 'despesas'), orderBy('data','desc')));
-      despesasSnap.forEach(doc=>{
+      despesasSnap.forEach(doc => {
         const d = doc.data();
-        const valor = Number(d.valor)||0;
+        const valor = Number(d.valor) || 0;
         const dataDespesa = d.data.toDate();
         const tr = document.createElement('tr');
         tr.innerHTML = `<td>${dataDespesa.toLocaleDateString()}</td><td>${d.descricao||'Despesa'}</td><td>${d.observacao||'-'}</td><td>R$ ${valor.toFixed(2)}</td><td>
@@ -246,20 +332,25 @@
         </td>`;
         tbody.appendChild(tr);
 
-        if(transacoesTbody.childElementCount<5){
+        if(transacoesTbody.childElementCount < 5){
           const trTransacao = document.createElement('tr');
-          trTransacao.innerHTML=`<td>${dataDespesa.toLocaleDateString()}</td><td>-</td><td>${d.descricao||'Despesa'}</td><td>R$ ${valor.toFixed(2)}</td><td><span class="status pago">Pago</span></td>`;
+          trTransacao.innerHTML = `<td>${dataDespesa.toLocaleDateString()}</td><td>-</td><td>${d.descricao||'Despesa'}</td><td>R$ ${valor.toFixed(2)}</td><td><span class="status pago">Pago</span></td>`;
           transacoesTbody.appendChild(trTransacao);
         }
       });
 
       // Adicionar inscrições como transações
       const inscricoesSnap = await getDocs(query(collection(db,'inscricoes'), orderBy('dataPagamento','desc')));
-      inscricoesSnap.forEach(doc=>{
-        if(transacoesTbody.childElementCount<10){
-          const i=doc.data();
+      inscricoesSnap.forEach(doc => {
+        if(transacoesTbody.childElementCount < 10){
+          const i = doc.data();
+          const statusClass = i.statusPagamento === 'pago' || i.statusPagamento === 'confirmado' ? 'recebido' : 
+                             i.statusPagamento === 'pendente' ? 'pendente' : 'atrasado';
+          const statusText = i.statusPagamento === 'pago' || i.statusPagamento === 'confirmado' ? 'Recebido' : 
+                            i.statusPagamento === 'pendente' ? 'Pendente' : 'Atrasado';
+          
           const tr = document.createElement('tr');
-          tr.innerHTML=`<td>${i.dataPagamento.toDate().toLocaleDateString()}</td><td>${i.nomeAluno||'Aluno'}</td><td>Inscrição - ${i.curso||'Curso'}</td><td>R$ ${(Number(i.valorPago)||0).toFixed(2)}</td><td><span class="status recebido">Recebido</span></td>`;
+          tr.innerHTML = `<td>${i.dataPagamento ? i.dataPagamento.toDate().toLocaleDateString() : 'N/A'}</td><td>${i.nomeAluno||'Aluno'}</td><td>Inscrição - ${i.curso||'Curso'}</td><td>R$ ${(Number(i.valorPago)||0).toFixed(2)}</td><td><span class="status ${statusClass}">${statusText}</span></td>`;
           transacoesTbody.appendChild(tr);
         }
       });
@@ -267,26 +358,60 @@
 
     // Funções de modal e adicionar despesa
     window.adicionarDespesa = async function() {
-      const descricao=document.getElementById('descricaoDespesa').value;
-      const observacao=document.getElementById('observacaoDespesa').value;
-      const valor=document.getElementById('valorDespesa').value;
-      if(!descricao||!valor){alert('Preencha pelo menos a descrição e o valor da despesa.'); return;}
-      try{
-        await addDoc(collection(db,'despesas'),{descricao,observacao,valor:parseFloat(valor),data:serverTimestamp()});
+      const descricao = document.getElementById('descricaoDespesa').value;
+      const observacao = document.getElementById('observacaoDespesa').value;
+      const valor = document.getElementById('valorDespesa').value;
+      
+      if(!descricao || !valor) {
+        alert('Preencha pelo menos a descrição e o valor da despesa.'); 
+        return;
+      }
+      
+      try {
+        await addDoc(collection(db, 'despesas'), {
+          descricao, 
+          observacao, 
+          valor: parseFloat(valor), 
+          data: serverTimestamp()
+        });
+        
         alert('Despesa adicionada com sucesso!');
         fecharModalDespesa();
-        document.getElementById('descricaoDespesa').value='';
-        document.getElementById('observacaoDespesa').value='';
-        document.getElementById('valorDespesa').value='';
+        document.getElementById('descricaoDespesa').value = '';
+        document.getElementById('observacaoDespesa').value = '';
+        document.getElementById('valorDespesa').value = '';
+        
         await carregarDadosFinanceiros();
         await carregarDespesas();
-      }catch(err){console.error(err);alert('Erro ao adicionar despesa');}
+      } catch(err) {
+        console.error(err);
+        alert('Erro ao adicionar despesa');
+      }
     }
-    window.editarDespesa=function(id){alert('Funcionalidade de edição em desenvolvimento.')};
-    window.excluirDespesa=function(id){if(confirm('Tem certeza que deseja excluir esta despesa?')){alert('Funcionalidade de exclusão em desenvolvimento.')}};
-    window.abrirModalDespesa=function(){document.getElementById('modalDespesa').style.display='flex'};
-    window.fecharModalDespesa=function(){document.getElementById('modalDespesa').style.display='none'};
-    window.onclick=function(e){if(e.target===document.getElementById('modalDespesa'))window.fecharModalDespesa()};
+    
+    window.editarDespesa = function(id) {
+      alert('Funcionalidade de edição em desenvolvimento.');
+    };
+    
+    window.excluirDespesa = function(id) {
+      if(confirm('Tem certeza que deseja excluir esta despesa?')) {
+        alert('Funcionalidade de exclusão em desenvolvimento.');
+      }
+    };
+    
+    window.abrirModalDespesa = function() {
+      document.getElementById('modalDespesa').style.display = 'flex';
+    };
+    
+    window.fecharModalDespesa = function() {
+      document.getElementById('modalDespesa').style.display = 'none';
+    };
+    
+    window.onclick = function(e) {
+      if(e.target === document.getElementById('modalDespesa')) {
+        window.fecharModalDespesa();
+      }
+    };
   </script>
 </body>
 </html>
