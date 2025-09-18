@@ -90,6 +90,7 @@ async function loadAlunos() {
     renderTable(alunosData);
 }
 
+// Renderizar tabela
 function renderTable(data) {
     alunosTableBody.innerHTML = "";
     data.forEach(aluno => {
@@ -157,19 +158,20 @@ window.deleteAluno = async (id) => {
         await deleteDoc(doc(db, "inscricoes", id));
         loadAlunos();
     }
-});
+};
 
 // Voltar ao dashboard
 document.getElementById("backBtn").addEventListener("click", () => {
     window.location.href = "dashboard.html";
 });
 
-// === Download CSV mais limpo ===
+// === Download CSV limpo ===
 function exportCSV() {
     if (alunosData.length === 0) {
         alert("Nenhum aluno para exportar.");
         return;
     }
+
     const header = ["Nome","Turma","Número do Pedido","Telefone","Status"];
     const rows = alunosData.map(a => [
         a.nomeCompleto || "",
@@ -179,8 +181,10 @@ function exportCSV() {
         a.status || ""
     ]);
 
-    const csvLines = [header.join(","), ...rows.map(r => r.join(","))];
-    const csvContent = csvLines.join("\r\n"); // quebra de linha padrão Windows/Excel
+    let csvContent = header.join(",") + "\r\n"; // cabeçalho
+    rows.forEach(row => {
+        csvContent += row.join(",") + "\r\n";
+    });
 
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
@@ -192,8 +196,10 @@ function exportCSV() {
     document.body.removeChild(link);
 }
 
+// Evento botão download
 downloadBtn.addEventListener("click", exportCSV);
 
+// Inicializa
 loadAlunos();
 </script>
 
