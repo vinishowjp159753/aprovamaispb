@@ -10,6 +10,9 @@
 
 <div class="container">
     <button id="backBtn">← Voltar ao Dashboard</button>
+    <!-- NOVO BOTÃO DE DOWNLOAD -->
+    <button id="downloadBtn">⬇️ Baixar Lista</button>
+
     <h1>Lista de Alunos</h1>
     <input type="text" id="searchInput" placeholder="Buscar aluno...">
     <table>
@@ -50,6 +53,7 @@ const modalInput = document.getElementById("modalInput");
 const saveModalBtn = document.getElementById("saveModalBtn");
 const closeModalBtn = document.getElementById("closeModalBtn");
 
+const downloadBtn = document.getElementById("downloadBtn"); // NOVO
 let alunosData = [];
 let selectedAlunoId = null;
 let selectedField = null;
@@ -67,11 +71,11 @@ function renderTable(data) {
     data.forEach(aluno => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
-            <td>${aluno.nomeCompleto}</td>
-            <td>${aluno.turma}</td>
-            <td>${aluno.numeroPedido}</td>
-            <td>${aluno.telefone}</td>
-            <td>${aluno.status}</td>
+            <td>${aluno.nomeCompleto || ""}</td>
+            <td>${aluno.turma || ""}</td>
+            <td>${aluno.numeroPedido || ""}</td>
+            <td>${aluno.telefone || ""}</td>
+            <td>${aluno.status || ""}</td>
             <td>
                 <button onclick="toggleStatus('${aluno.id}')">Status</button>
                 <button onclick="editField('${aluno.id}', 'valorPago', 'Atualizar Pagamento')">Pagamento</button>
@@ -86,7 +90,7 @@ function renderTable(data) {
 // Buscar alunos
 searchInput.addEventListener("input", () => {
     const term = searchInput.value.toLowerCase();
-    const filtered = alunosData.filter(a => a.nomeCompleto.toLowerCase().includes(term));
+    const filtered = alunosData.filter(a => a.nomeCompleto?.toLowerCase().includes(term));
     renderTable(filtered);
 });
 
@@ -96,7 +100,7 @@ window.toggleStatus = async (id) => {
     if (!aluno) return;
     const newStatus = aluno.status === "ativo" ? "pendente" : "ativo";
     await updateDoc(doc(db, "inscricoes", id), { status: newStatus });
-    loadAlunos(); // Recarrega a tabela
+    loadAlunos();
 };
 
 // Editar campo (pagamento ou observação)
@@ -136,10 +140,41 @@ window.deleteAluno = async (id) => {
 };
 
 // Botão de voltar ao dashboard
-const backBtn = document.getElementById("backBtn");
-backBtn.addEventListener("click", () => {
-    window.location.href = "dashboard.html"; // substitua pelo caminho correto do seu dashboard
+document.getElementById("backBtn").addEventListener("click", () => {
+    window.location.href = "dashboard.html";
 });
+
+// ======= FUNÇÃO DE DOWNLOAD CSV =======
+function exportCSV() {
+    if (alunosData.length === 0) {
+        alert("Nenhum aluno para exportar.");
+        return;
+    }
+    // Cabeçalho
+    const header = ["Nome","Turma","Número do Pedido","Telefone","Status"];
+    const rows = alunosData.map(a => [
+        a.nomeCompleto || "",
+        a.turma || "",
+        a.numeroPedido || "",
+        a.telefone || "",
+        a.status || ""
+    ]);
+    const csvContent = [header, ...rows]
+        .map(e => e.map(v => `"${(v || "").toString().replace(/"/g, '""')}"`).join(","))
+        .join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "lista_alunos.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// Evento do botão de download
+downloadBtn.addEventListener("click", exportCSV);
 
 loadAlunos();
 </script>
