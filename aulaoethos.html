@@ -33,17 +33,15 @@ body {
 .content { padding:30px; }
 .form-group { margin-bottom:20px; }
 .form-group label { display:block; margin-bottom:8px; font-weight:600; color:#555; }
-.form-group input, .form-group select {
-    width:100%; padding:12px 15px; border:1px solid #ddd; border-radius:6px; font-size:16px;
-}
-.form-group input:focus, .form-group select:focus { border-color: var(--primary); outline:none; }
+.form-group input { width:100%; padding:12px 15px; border:1px solid #ddd; border-radius:6px; font-size:16px; }
+.form-group input:focus { border-color: var(--primary); outline:none; }
 .btn {
     padding:14px 25px; background: var(--primary); color:white; border:none; border-radius:6px;
     cursor:pointer; font-size:16px; font-weight:600; width:100%; transition: background 0.3s; text-align:center;
 }
 .btn:hover { background:#2a3a9c; }
 
-/* Novo estilo para Aluno Ethos */
+/* Estilo dos radio buttons Aluno Ethos */
 .radio-group {
     display:flex;
     gap:20px;
@@ -72,6 +70,11 @@ body {
     border-radius:6px;
     display:inline-block;
 }
+
+/* Alerts */
+.alert { padding:15px; border-radius:6px; margin-bottom:20px; display:none; }
+.alert.success { background:#e8f5e9; color:#2e7d32; border:1px solid #c8e6c9; }
+.alert.error { background:#ffebee; color:#d32f2f; border:1px solid #ffcdd2; }
 </style>
 </head>
 <body>
@@ -83,6 +86,9 @@ body {
     </div>
 
     <div class="content">
+        <div class="alert success" id="successAlert"><i class="fas fa-check-circle"></i> Matrícula realizada com sucesso!</div>
+        <div class="alert error" id="errorAlert"><i class="fas fa-exclamation-circle"></i> Preencha todos os campos obrigatórios.</div>
+
         <form id="matriculaForm">
             <div class="form-group">
                 <label for="nome">Nome Completo *</label>
@@ -115,28 +121,76 @@ body {
                 </div>
             </div>
 
-            <button type="submit" class="btn">Enviar</button>
+            <button type="submit" class="btn">Realizar Matrícula</button>
         </form>
     </div>
 </div>
 
-<script>
-// Máscara simples para CPF
-const cpfInput = document.getElementById('cpf');
-cpfInput.addEventListener('input', function() {
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+// Config Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyAK3U35fipoWOOIJg0yrtgmVfQ7XQxZxqY",
+  authDomain: "aprovamaispb-d4e75.firebaseapp.com",
+  projectId: "aprovamaispb-d4e75",
+  storageBucket: "aprovamaispb-d4e75.firebasestorage.app",
+  messagingSenderId: "828577018900",
+  appId: "1:828577018900:web:473d8c3fc2685d3f192301"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const form = document.getElementById('matriculaForm');
+const successAlert = document.getElementById('successAlert');
+const errorAlert = document.getElementById('errorAlert');
+
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    successAlert.style.display = 'none';
+    errorAlert.style.display = 'none';
+
+    const nome = document.getElementById('nome').value.trim();
+    const cpf = document.getElementById('cpf').value.trim();
+    const telefone = document.getElementById('telefone').value.trim();
+    const alunoEthos = document.querySelector('input[name="alunoEthos"]:checked')?.value;
+
+    if (!nome || !cpf || !telefone || !alunoEthos) {
+        errorAlert.style.display = 'block';
+        return;
+    }
+
+    try {
+        await addDoc(collection(db, "inscricoes"), {
+            nome, cpf, telefone, alunoEthos, criadoEm:new Date()
+        });
+
+        successAlert.style.display = 'block';
+        form.reset();
+
+    } catch(err) {
+        console.error(err);
+        errorAlert.textContent = "Erro ao salvar matrícula";
+        errorAlert.style.display = 'block';
+    }
+});
+
+// Máscara simples CPF
+document.getElementById('cpf').addEventListener('input', function(){
     let v = this.value.replace(/\D/g,'');
-    if(v.length > 3 && v.length <= 6) v = v.replace(/(\d{3})(\d+)/,'$1.$2');
-    else if(v.length > 6 && v.length <= 9) v = v.replace(/(\d{3})(\d{3})(\d+)/,'$1.$2.$3');
-    else if(v.length > 9) v = v.replace(/(\d{3})(\d{3})(\d{3})(\d+)/,'$1.$2.$3-$4');
+    if(v.length>3 && v.length<=6) v=v.replace(/(\d{3})(\d+)/,'$1.$2');
+    else if(v.length>6 && v.length<=9) v=v.replace(/(\d{3})(\d{3})(\d+)/,'$1.$2.$3');
+    else if(v.length>9) v=v.replace(/(\d{3})(\d{3})(\d{3})(\d+)/,'$1.$2.$3-$4');
     this.value = v;
 });
 
-// Máscara simples para telefone
-const telInput = document.getElementById('telefone');
-telInput.addEventListener('input', function() {
+// Máscara simples Telefone
+document.getElementById('telefone').addEventListener('input', function(){
     let v = this.value.replace(/\D/g,'');
-    if(v.length > 2 && v.length <= 7) v = v.replace(/(\d{2})(\d+)/,'($1) $2');
-    else if(v.length > 7) v = v.replace(/(\d{2})(\d{5})(\d+)/,'($1) $2-$3');
+    if(v.length>2 && v.length<=7) v=v.replace(/(\d{2})(\d+)/,'($1) $2');
+    else if(v.length>7) v=v.replace(/(\d{2})(\d{5})(\d+)/,'($1) $2-$3');
     this.value = v;
 });
 </script>
