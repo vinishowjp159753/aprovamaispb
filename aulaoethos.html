@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscrição - Aulão ENEM Colégio Ethos</title>
+    <style>
+        :root {
+            --azul-escuro: #0a2463;
+            --azul-medio: #1e40af;
+            --azul-claro: #3b82f6;
+            --laranja: #f97316;
+            --branco: #ffffff;
+            --cinza-claro: #f3f4f6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--azul-escuro) 0%, var(--azul-medio) 100%);
+            color: var(--branco);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-top: 2rem;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--laranja);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            color: var(--branco);
+        }
+        
+        .event-info {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .info-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .info-icon {
+            margin-right: 1rem;
+            font-size: 1.5rem;
+            color: var(--laranja);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        input[type="text"],
+        input[type="tel"] {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--azul-escuro);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px var(--laranja);
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 2rem;
+            margin-top: 0.5rem;
+        }
+        
+        .radio-option {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .radio-option input {
+            display: none;
+        }
+        
+        .radio-custom {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--branco);
+            border-radius: 50%;
+            margin-right: 0.5rem;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .radio-option input:checked + .radio-custom {
+            border-color: var(--laranja);
+        }
+        
+        .radio-option input:checked + .radio-custom::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 14px;
+            height: 14px;
+            background: var(--laranja);
+            border-radius: 50%;
+        }
+        
+        .btn-submit {
+            width: 100%;
+            padding: 1rem;
+            background: var(--laranja);
+            color: var(--branco);
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+        
+        .btn-submit:hover {
+            background: #ea580c;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+        
+        footer {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 1.5rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .radio-group {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>AULÃO ENEM</h1>
+            <p class="subtitle">Aulão especial AprovaMaisPB em parceria com o colégio Ethos</p>
+        </header>
+        
+        <div class="event-info">
+            <div class="info-item">
+                <div class="info-icon">📅</div>
+                <div>18 de out de 2025</div>
+            </div>
+            <div class="info-item">
+                <div class="info-icon">⏰</div>
+                <div>8:00 - 12:00</div>
+            </div>
+            <div class="info-item">
+                <div class="info-icon">📍</div>
+                <div>Sense. Rv. Dom Pedro I, 389 - Centro</div>
+            </div>
+        </div>
+        
+        <form id="subscription-form">
+            <div class="form-group">
+                <label for="name">Nome completo</label>
+                <input type="text" id="name" name="name" required placeholder="Digite seu nome completo">
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">Telefone</label>
+                <input type="tel" id="phone" name="phone" required placeholder="(00) 00000-0000">
+            </div>
+            
+            <div class="form-group">
+                <label>É aluno do Colégio Ethos?</label>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="student" value="sim" required>
+                        <span class="radio-custom"></span>
+                        Sim
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="student" value="nao">
+                        <span class="radio-custom"></span>
+                        Não
+                    </label>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn-submit">Realizar Inscrição</button>
+        </form>
+    </div>
+    
+    <footer>
+        <p>Uma manhã de aprendizado intensivo para turbinar seus estudos para o ENEM!</p>
+    </footer>
+
+    <script>
+        document.getElementById('subscription-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validação básica
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            const isStudent = document.querySelector('input[name="student"]:checked');
+            
+            if (!name || !phone || !isStudent) {
+                alert('Por favor, preencha todos os campos obrigatórios.');
+                return;
+            }
+            
+            // Simulação de envio (substitua por código real de envio para seu backend)
+            alert('Inscrição realizada com sucesso! Entraremos em contato em breve.');
+            this.reset();
+        });
+        
+        // Formatação do telefone
+        document.getElementById('phone').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 11) value = value.slice(0, 11);
+            
+            if (value.length > 6) {
+                value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+            } else if (value.length > 2) {
+                value = value.replace(/(\d{2})(\d{0,5})/, '($1) $2');
+            } else if (value.length > 0) {
+                value = value.replace(/(\d{0,2})/, '($1');
+            }
+            
+            e.target.value = value;
+        });
+    </script>
+</body>
+</html>
