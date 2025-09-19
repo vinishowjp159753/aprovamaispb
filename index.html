@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AprovaMaisPB – Aulão Gratuito ENEM</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
@@ -12,9 +12,20 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 body{
   font-family:'Roboto',sans-serif;
-  background:radial-gradient(circle at top left,#0f2027,#203a43,#2c5364);
+  background:#0f2027;
   color:#fff;
   overflow-x:hidden;
+  position:relative;
+}
+
+/* CANVAS BACKGROUND */
+#bg-canvas{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  z-index:-1;
 }
 
 /* NAV */
@@ -28,6 +39,11 @@ nav{
   position:fixed;
   width:100%;
   z-index:1000;
+  transition: all .3s ease;
+}
+nav.scrolled{
+  background:rgba(0,0,0,0.85);
+  backdrop-filter:blur(12px);
 }
 nav .brand{
   display:flex;
@@ -55,9 +71,10 @@ nav a::after{
   position:absolute;
   left:0;bottom:-5px;
   width:0%;
-  height:3px;
-  background:#00ffe0;
+  height:4px;
+  background:linear-gradient(90deg,#00ffe0,#00bfff);
   transition:width .3s;
+  border-radius:2px;
 }
 nav a:hover::after{width:100%;}
 
@@ -71,21 +88,24 @@ nav a:hover::after{width:100%;}
   text-align:center;
   padding:0 2rem;
   position:relative;
+  overflow:hidden;
 }
 .hero h1{
   font-family:'Orbitron',sans-serif;
-  font-size:4rem;
+  font-size:clamp(2.5rem,5vw,4rem);
   color:#00ffe0;
-  text-shadow:0 0 30px #00ffe0;
+  text-shadow:0 0 20px #00ffe0,0 0 40px #00bfff;
   margin-bottom:1.5rem;
+  line-height:1.2;
 }
 .hero p{
   max-width:700px;
-  font-size:1.5rem;
+  font-size:clamp(1rem,2.5vw,1.5rem);
   margin-bottom:2.5rem;
   color:#d7faff;
 }
 .cta{
+  position:relative;
   background:linear-gradient(45deg,#00ffe0,#00bfff);
   padding:1.2rem 3rem;
   border-radius:50px;
@@ -93,31 +113,49 @@ nav a:hover::after{width:100%;}
   color:#0f2027;
   font-weight:700;
   text-decoration:none;
-  transition:all .3s;
   box-shadow:0 0 20px #00ffe0;
+  overflow:hidden;
+  transition: all .3s ease;
+}
+.cta::before{
+  content:'';
+  position:absolute;
+  top:-50%;
+  left:-50%;
+  width:200%;
+  height:200%;
+  background:radial-gradient(circle,#00fff0,transparent 70%);
+  transform:rotate(45deg);
+  opacity:0;
+  transition: all .7s;
+}
+.cta:hover::before{
+  opacity:0.5;
+  transform:rotate(0deg);
 }
 .cta:hover{
-  background:linear-gradient(45deg,#00bfff,#00ffe0);
   box-shadow:0 0 40px #00ffe0;
 }
 
-/* ABOUT SECTION */
+/* ABOUT */
 .about{
   padding:6rem 3rem;
   text-align:center;
-  background:rgba(0,0,0,0.3);
+  background:rgba(0,0,0,0.25);
 }
 .about h2{
   font-family:'Orbitron',sans-serif;
-  font-size:3rem;
+  font-size:clamp(2rem,4vw,3rem);
   color:#00ffe0;
   margin-bottom:1.5rem;
+  text-shadow:0 0 10px #00ffe0;
 }
 .about p{
   max-width:800px;
   margin:0 auto;
-  font-size:1.3rem;
+  font-size:clamp(1rem,2vw,1.3rem);
   color:#e0f7fa;
+  line-height:1.6;
 }
 
 /* AGENDA */
@@ -127,7 +165,7 @@ nav a:hover::after{width:100%;}
 .agenda h2{
   text-align:center;
   font-family:'Orbitron',sans-serif;
-  font-size:3rem;
+  font-size:clamp(2rem,4vw,3rem);
   color:#00ffe0;
   margin-bottom:3rem;
 }
@@ -143,19 +181,25 @@ nav a:hover::after{width:100%;}
   margin-bottom:1.2rem;
   border-left:4px solid #00ffe0;
   border-radius:8px;
+  transition: all .3s;
+}
+.timeline li:hover{
+  transform:translateX(10px);
+  box-shadow:0 0 20px #00ffe0;
 }
 
 /* FEATURES */
 .features{
   padding:6rem 3rem;
-  background:rgba(0,0,0,0.3);
+  background:rgba(0,0,0,0.25);
 }
 .features h2{
   text-align:center;
   font-family:'Orbitron',sans-serif;
-  font-size:3rem;
+  font-size:clamp(2rem,4vw,3rem);
   margin-bottom:3rem;
   color:#00ffe0;
+  text-shadow:0 0 10px #00ffe0;
 }
 .features-grid{
   display:grid;
@@ -169,7 +213,19 @@ nav a:hover::after{width:100%;}
   text-align:center;
   transition:transform .3s,box-shadow .3s;
   font-size:1.2rem;
+  position:relative;
+  overflow:hidden;
 }
+.feature-card::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;width:100%;height:100%;
+  background:linear-gradient(120deg,#00ffe0,#00bfff,#00ffe0);
+  opacity:0;
+  transition: opacity .5s;
+  border-radius:20px;
+}
+.feature-card:hover::before{opacity:0.15;}
 .feature-card:hover{
   transform:translateY(-10px);
   box-shadow:0 0 25px #00ffe0;
@@ -178,6 +234,10 @@ nav a:hover::after{width:100%;}
   font-size:3rem;
   margin-bottom:1rem;
   color:#00ffe0;
+  transition:transform .5s;
+}
+.feature-card:hover .feature-icon{
+  transform:scale(1.2) rotate(15deg);
 }
 
 /* FINAL CALL */
@@ -187,12 +247,13 @@ nav a:hover::after{width:100%;}
 }
 .call h2{
   font-family:'Orbitron',sans-serif;
-  font-size:3.5rem;
+  font-size:clamp(2rem,4vw,3.5rem);
   color:#00ffe0;
   margin-bottom:2rem;
+  text-shadow:0 0 20px #00ffe0;
 }
 .call p{
-  font-size:1.4rem;
+  font-size:clamp(1rem,2vw,1.4rem);
   margin-bottom:2.5rem;
 }
 .call a{
@@ -219,20 +280,46 @@ footer{
   color:#bbb;
 }
 
-/* BACKGROUND SHAPES */
-.bg-shapes span{
-  position:absolute;
-  border-radius:50%;
-  background:rgba(0,255,224,0.15);
-  animation:move 30s linear infinite;
+/* RESPONSIVE */
+@media (max-width:1024px){
+  nav ul{gap:1.5rem;}
+  .hero h1{font-size:clamp(2rem,6vw,3.5rem);}
+  .hero p{font-size:clamp(0.9rem,3vw,1.3rem);}
+  .cta{padding:1rem 2rem;font-size:1.3rem;}
+  .about h2, .agenda h2, .features h2, .call h2{font-size:clamp(1.8rem,5vw,2.8rem);}
 }
-@keyframes move{
-  from{transform:translateY(0) rotate(0deg);}
-  to{transform:translateY(-1500px) rotate(360deg);}
+@media (max-width:768px){
+  nav{padding:1rem 1.5rem;}
+  nav ul{
+    flex-direction:column;
+    background:rgba(0,0,0,0.85);
+    position:absolute;
+    top:100%;
+    right:0;
+    width:200px;
+    padding:1rem;
+    display:none;
+    border-radius:8px;
+  }
+  nav ul.active{display:flex;}
+  .hero h1{font-size:2.5rem;}
+  .hero p{font-size:1rem;}
+  .cta{padding:0.9rem 1.8rem;font-size:1.2rem;}
+  .features-grid{grid-template-columns:1fr;}
+  .timeline li{font-size:1rem;}
+}
+@media(max-width:480px){
+  .hero h1{font-size:2rem;}
+  .hero p{font-size:0.95rem;}
+  .cta{padding:0.8rem 1.5rem;font-size:1.1rem;}
+  .about p, .call p{font-size:0.95rem;}
+  .timeline li{padding:1rem;}
 }
 </style>
 </head>
 <body>
+
+<canvas id="bg-canvas"></canvas>
 
 <nav>
   <div class="brand">
@@ -247,74 +334,6 @@ footer{
 
 <section class="hero" id="hero">
   <h1>AULÃO GRATUITO<br>Bora ser o próximo aprovado?</h1>
-  <p>O evento que vai turbinar sua preparação para o ENEM com professores renomados e recursos interativos.</p>
-  <a class="cta" href="aulaoethos.html">GARANTIR MINHA VAGA 🚀</a>
-</section>
+  <p>O evento que vai turbinar sua preparação para o ENEM com professores renomados e recursos inter
 
-<section class="about">
-  <h2>Sobre o Aulão</h2>
-  <p>
-    Um dia inteiro de conteúdo focado no ENEM, com revisões intensivas,
-    estratégias de prova, material exclusivo e muito mais.
-    Venha viver uma experiência imersiva, repleta de tecnologia e conhecimento.
-  </p>
-</section>
-
-<section class="agenda">
-  <h2>Agenda do Evento</h2>
-  <ul class="timeline">
-    <li>08:00 - Abertura e boas-vindas</li>
-    <li>08:30 - Aula de Redação de Impacto</li>
-    <li>10:30 - Intervalo interativo com quiz</li>
-    <li>11:00 - Ciências da Natureza - Dicas finais</li>
-    <li>13:30 - Matemática sem medo</li>
-    <li>16:00 - Encerramento com sorteios</li>
-  </ul>
-</section>
-
-<section class="features">
-  <h2>Por que participar?</h2>
-  <div class="features-grid">
-    <div class="feature-card">
-      <div class="feature-icon">⚡</div>
-      <h3>Energia e Inovação</h3>
-      <p>Aulão com tecnologia de ponta e recursos multimídia.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">🎯</div>
-      <h3>Foco no ENEM</h3>
-      <p>Conteúdo 100% direcionado para sua aprovação.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">🤝</div>
-      <h3>Networking</h3>
-      <p>Conecte-se a colegas e professores incríveis.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">📊</div>
-      <h3>Simulados</h3>
-      <p>Pratique com questões comentadas e receba feedback instantâneo.</p>
-    </div>
-  </div>
-</section>
-
-<section class="call">
-  <h2>Garanta sua vaga agora!</h2>
-  <p>As vagas são limitadas. Clique e faça sua inscrição em poucos segundos.</p>
-  <a href="matricula.html">Inscreva-se Já 💡</a>
-</section>
-
-<footer>
-  © 2025 AprovaMaisPB – Todos os direitos reservados
-</footer>
-
-<!-- Animated background shapes -->
-<div class="bg-shapes">
-  <span style="width:100px;height:100px;left:10%;bottom:-120px;"></span>
-  <span style="width:150px;height:150px;left:40%;bottom:-200px;"></span>
-  <span style="width:80px;height:80px;left:70%;bottom:-100px;"></span>
-  <span style="width:120px;height:120px;left:85%;bottom:-150px;"></span>
-</div>
-
-</body>
-</html>
+    
