@@ -5,9 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lista de Alunos</title>
 <link rel="stylesheet" href="assets/css/lista-alunos.css">
-
 <style>
-/* === BOTÕES ESTILO DA TABELA === */
 .table-btn {
     background-color: #f8f8f8;
     border: 1px solid #ccc;
@@ -23,16 +21,22 @@
     background-color: #e0e0e0;
     color: #000;
 }
-.btn-container {
-    margin-bottom: 15px;
+.btn-container { margin-bottom: 15px; }
+table { width:100%; border-collapse:collapse; margin-top:10px; }
+th, td { padding:10px; border:1px solid #ddd; text-align:left; }
+th { background:#f2f2f2; }
+.modal {
+    display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+    background:rgba(0,0,0,0.4); justify-content:center; align-items:center;
+}
+.modal-content {
+    background:#fff; padding:20px; border-radius:6px; max-width:400px; width:90%;
 }
 </style>
 </head>
 <body>
 
 <div class="container">
-
-    <!-- BOTÕES NO MESMO ESTILO DA TABELA -->
     <div class="btn-container">
         <button id="backBtn" class="table-btn">← Voltar ao Dashboard</button>
         <button id="downloadBtn" class="table-btn">⬇️ Baixar Lista</button>
@@ -44,9 +48,10 @@
     <table>
         <thead>
             <tr>
+                <th>Data</th>
                 <th>Nome</th>
-                <th>Turma</th>
-                <th>Número do Pedido</th>
+                <th>CPF</th>
+                <th>N° de Inscrição</th>
                 <th>Telefone</th>
                 <th>Status</th>
                 <th>Ações</th>
@@ -65,10 +70,10 @@
         <button id="closeModalBtn" class="table-btn">Fechar</button>
     </div>
 </div>
- 
+
 <script type="module">
 import { app, db } from "./assets/js/firebase-config.js";
-import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 const alunosTableBody = document.getElementById("alunosTableBody");
 const searchInput = document.getElementById("searchInput");
@@ -90,15 +95,23 @@ async function loadAlunos() {
     renderTable(alunosData);
 }
 
+// Formatar data
+function formatDate(firebaseDate) {
+    if (!firebaseDate) return "";
+    const d = firebaseDate.toDate ? firebaseDate.toDate() : new Date(firebaseDate);
+    return d.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+
 // Renderizar tabela
 function renderTable(data) {
     alunosTableBody.innerHTML = "";
     data.forEach(aluno => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
+            <td>${formatDate(aluno.criadoEm)}</td>
             <td>${aluno.nomeCompleto || ""}</td>
-            <td>${aluno.turma || ""}</td>
-            <td>${aluno.numeroPedido || ""}</td>
+            <td>${aluno.cpf || ""}</td>
+            <td>${aluno.cupom || ""}</td>
             <td>${aluno.telefone || ""}</td>
             <td>${aluno.status || ""}</td>
             <td>
@@ -115,7 +128,11 @@ function renderTable(data) {
 // Busca
 searchInput.addEventListener("input", () => {
     const term = searchInput.value.toLowerCase();
-    const filtered = alunosData.filter(a => a.nomeCompleto?.toLowerCase().includes(term));
+    const filtered = alunosData.filter(a =>
+        a.nomeCompleto?.toLowerCase().includes(term) ||
+        a.cpf?.toLowerCase().includes(term) ||
+        a.cupom?.toLowerCase().includes(term)
+    );
     renderTable(filtered);
 });
 
@@ -165,27 +182,23 @@ document.getElementById("backBtn").addEventListener("click", () => {
     window.location.href = "dashboard.html";
 });
 
-// === Download CSV limpo ===
+// Download CSV
 function exportCSV() {
     if (alunosData.length === 0) {
         alert("Nenhum aluno para exportar.");
         return;
     }
-
-    const header = ["Nome","Turma","Número do Pedido","Telefone","Status"];
+    const header = ["Data","Nome","CPF","N° de Inscrição","Telefone","Status"];
     const rows = alunosData.map(a => [
+        formatDate(a.criadoEm),
         a.nomeCompleto || "",
-        a.turma || "",
-        a.numeroPedido || "",
+        a.cpf || "",
+        a.cupom || "",
         a.telefone || "",
         a.status || ""
     ]);
-
-    let csvContent = header.join(",") + "\r\n"; // cabeçalho
-    rows.forEach(row => {
-        csvContent += row.join(",") + "\r\n";
-    });
-
+    let csvContent = header.join(",") + "\r\n";
+    rows.forEach(row => csvContent += row.join(",") + "\r\n");
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -195,13 +208,10 @@ function exportCSV() {
     link.click();
     document.body.removeChild(link);
 }
-
-// Evento botão download
 downloadBtn.addEventListener("click", exportCSV);
 
 // Inicializa
 loadAlunos();
 </script>
-
 </body>
 </html>
