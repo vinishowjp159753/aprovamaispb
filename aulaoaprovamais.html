@@ -5,51 +5,96 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lista de Alunos</title>
 
-<!-- CSS principal -->
-<link rel="stylesheet" href="assets/css/lista-alunos.css">
-
+<!-- CSS Principal -->
 <style>
-/* ====== Botões superiores ====== */
+/* ====== Reset e Tipografia ====== */
+body {
+    font-family: "Segoe UI", Roboto, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: #fff;
+}
+.container {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 20px;
+}
+
+/* ====== Botões ====== */
 .table-btn {
-    background-color: #f8f8f8;
-    border: 1px solid #ccc;
-    color: #333;
-    padding: 8px 14px;
+    background: linear-gradient(90deg,#1a2a6c,#3b5fc7);
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
     margin-right: 6px;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
     font-size: 14px;
-    transition: background 0.2s, color 0.2s;
+    font-weight: 500;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 .table-btn:hover {
-    background-color: #e0e0e0;
-    color: #000;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+}
+.table-btn.delete {
+    background: #ff4d4d;
+}
+.table-btn.delete:hover {
+    background: #ff1a1a;
 }
 
-.btn-container { margin-bottom: 15px; }
+/* ====== Input Busca ====== */
+#searchInput {
+    width: 100%;
+    padding: 10px 12px;
+    margin: 15px 0;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    outline: none;
+    transition: box-shadow 0.2s, border-color 0.2s;
+}
+#searchInput:focus {
+    border-color: #1a2a6c;
+    box-shadow: 0 0 8px rgba(26,42,108,0.7);
+}
 
 /* ====== Tabela ====== */
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 10px;
-    background: #fff;
+    background: rgba(255,255,255,0.05);
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    font-size: 14px;
 }
 thead th {
-    background: #1a2a6c;         /* Azul forte */
-    color: #fff;                 /* Texto branco */
+    background: linear-gradient(90deg,#1a2a6c,#3b5fc7);
+    color: #fff;
     padding: 12px;
     text-align: left;
 }
 tbody td {
     padding: 10px;
-    border: 1px solid #ddd;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 tbody tr:nth-child(even) {
-    background: #f9f9f9;
+    background: rgba(255,255,255,0.05);
+}
+tbody tr:hover {
+    background: rgba(59,95,199,0.2);
+}
+.status-ativo {
+    color: #00ff99;
+    font-weight: bold;
+}
+.status-pendente {
+    color: #ffcc00;
+    font-weight: bold;
 }
 
 /* ====== Modal ====== */
@@ -58,17 +103,46 @@ tbody tr:nth-child(even) {
     position: fixed;
     top: 0; left: 0;
     width: 100%; height: 100%;
-    background: rgba(0,0,0,0.4);
+    background: rgba(0,0,0,0.6);
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    animation: fadeIn 0.3s ease forwards;
 }
+@keyframes fadeIn { from {opacity:0} to {opacity:1} }
 .modal-content {
-    background: #fff;
-    padding: 20px;
-    border-radius: 6px;
+    background: #1a2a6c;
+    padding: 25px;
+    border-radius: 10px;
     max-width: 400px;
     width: 90%;
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    animation: slideDown 0.3s ease forwards;
+}
+@keyframes slideDown { from {transform: translateY(-20px); opacity:0} to {transform:translateY(0);opacity:1} }
+.modal-content input {
+    width: 100%;
+    padding: 10px;
+    margin: 15px 0;
+    border-radius: 6px;
+    border: none;
+    font-size: 14px;
+}
+.modal-content button {
+    margin-right: 8px;
+}
+
+/* ====== Cabeçalho ====== */
+h1 {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 15px;
+}
+.btn-container {
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
 }
 </style>
 </head>
@@ -99,17 +173,18 @@ tbody tr:nth-child(even) {
     </table>
 </div>
 
-<!-- Modal para Pagamento / Observações -->
+<!-- Modal -->
 <div id="modal" class="modal">
     <div class="modal-content">
         <h3 id="modalTitle"></h3>
         <input type="text" id="modalInput" placeholder="">
         <button id="saveModalBtn" class="table-btn">Salvar</button>
-        <button id="closeModalBtn" class="table-btn">Fechar</button>
+        <button id="closeModalBtn" class="table-btn delete">Fechar</button>
     </div>
 </div>
 
-<script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>    
+<!-- Scripts -->
+<script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
 <script type="module">
 import { db } from "./assets/js/firebase-config.js";
 import { collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
@@ -123,9 +198,9 @@ const saveModalBtn     = document.getElementById("saveModalBtn");
 const closeModalBtn    = document.getElementById("closeModalBtn");
 const downloadBtn      = document.getElementById("downloadBtn");
 
-let alunosData   = [];
-let selectedId   = null;
-let selectedField= null;
+let alunosData = [];
+let selectedId = null;
+let selectedField = null;
 
 // ---------- Carregar alunos ----------
 async function loadAlunos() {
@@ -138,10 +213,7 @@ async function loadAlunos() {
 function formatDate(firebaseDate) {
     if (!firebaseDate) return "";
     const d = firebaseDate.toDate ? firebaseDate.toDate() : new Date(firebaseDate);
-    return d.toLocaleDateString("pt-BR", {
-        day: "2-digit", month: "2-digit", year: "numeric",
-        hour: "2-digit", minute: "2-digit"
-    });
+    return d.toLocaleDateString("pt-BR", { day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit" });
 }
 
 // ---------- Montar tabela ----------
@@ -149,40 +221,46 @@ function renderTable(data) {
     alunosTableBody.innerHTML = "";
     data.forEach(aluno => {
         const tr = document.createElement("tr");
+        const statusClass = aluno.status === "ativo" ? "status-ativo" : "status-pendente";
         tr.innerHTML = `
             <td>${formatDate(aluno.criadoEm)}</td>
-            <td>${aluno.nomeCompleto || ""}</td>
-            <td>${aluno.cpf || ""}</td>
-            <td>${aluno.cupom || ""}</td>
-            <td>${aluno.telefone || ""}</td>
-            <td>${aluno.status || ""}</td>
+            <td>${aluno.nomeCompleto||""}</td>
+            <td>${aluno.cpf||""}</td>
+            <td>${aluno.cupom||""}</td>
+            <td>${aluno.telefone||""}</td>
+            <td class="${statusClass}">${aluno.status||""}</td>
             <td>
                 <button class="table-btn" onclick="toggleStatus('${aluno.id}')">Status</button>
                 <button class="table-btn" onclick="editField('${aluno.id}','valorPago','Atualizar Pagamento')">Pagamento</button>
                 <button class="table-btn" onclick="editField('${aluno.id}','observacoes','Editar Observação')">Observação</button>
-                <button class="table-btn" onclick="deleteAluno('${aluno.id}')">Excluir</button>
-            </td>`;
+                <button class="table-btn delete" onclick="deleteAluno('${aluno.id}')">Excluir</button>
+            </td>
+        `;
         alunosTableBody.appendChild(tr);
     });
 }
 
-// ---------- Busca ----------
+// ---------- Busca com debounce ----------
+let debounceTimer;
 searchInput.addEventListener("input", () => {
-    const term = searchInput.value.toLowerCase();
-    const filtered = alunosData.filter(a =>
-        a.nomeCompleto?.toLowerCase().includes(term) ||
-        a.cpf?.toLowerCase().includes(term) ||
-        a.cupom?.toLowerCase().includes(term)
-    );
-    renderTable(filtered);
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+        const term = searchInput.value.toLowerCase();
+        const filtered = alunosData.filter(a =>
+            a.nomeCompleto?.toLowerCase().includes(term) ||
+            a.cpf?.toLowerCase().includes(term) ||
+            a.cupom?.toLowerCase().includes(term)
+        );
+        renderTable(filtered);
+    }, 250);
 });
 
 // ---------- Funções globais ----------
 window.toggleStatus = async (id) => {
-    const aluno = alunosData.find(a => a.id === id);
+    const aluno = alunosData.find(a => a.id===id);
     if (!aluno) return;
-    const newStatus = aluno.status === "ativo" ? "pendente" : "ativo";
-    await updateDoc(doc(db, "inscricoes", id), { status: newStatus });
+    const newStatus = aluno.status==="ativo"?"pendente":"ativo";
+    await updateDoc(doc(db,"inscricoes",id),{ status:newStatus });
     loadAlunos();
 };
 
@@ -190,14 +268,14 @@ window.editField = (id, field, title) => {
     selectedId = id;
     selectedField = field;
     modalTitle.textContent = title;
-    const aluno = alunosData.find(a => a.id === id);
+    const aluno = alunosData.find(a => a.id===id);
     modalInput.value = aluno[field] || "";
     modal.style.display = "flex";
 };
 
 saveModalBtn.addEventListener("click", async () => {
     if (!selectedId || !selectedField) return;
-    await updateDoc(doc(db, "inscricoes", selectedId), { [selectedField]: modalInput.value });
+    await updateDoc(doc(db,"inscricoes",selectedId), { [selectedField]: modalInput.value });
     modal.style.display = "none";
     selectedId = selectedField = null;
     loadAlunos();
@@ -209,48 +287,31 @@ closeModalBtn.addEventListener("click", () => {
 });
 
 window.deleteAluno = async (id) => {
-    if (confirm("Tem certeza que deseja excluir este aluno?")) {
-        await deleteDoc(doc(db, "inscricoes", id));
+    if(confirm("Tem certeza que deseja excluir este aluno?")) {
+        await deleteDoc(doc(db,"inscricoes",id));
         loadAlunos();
     }
 };
 
 // ---------- Voltar ao dashboard ----------
-document.getElementById("backBtn").addEventListener("click", () => {
-    window.location.href = "dashboard.html";
-});
+document.getElementById("backBtn").addEventListener("click", ()=>window.location.href="dashboard.html");
 
 // ---------- Exportar Excel ----------
 function exportExcel() {
     const header = ["Data","Nome","CPF","N° de Inscrição","Telefone","Status"];
-    const rows   = alunosData.map(a => [
+    const rows = alunosData.map(a=>[
         formatDate(a.criadoEm),
-        a.nomeCompleto || "",
-        a.cpf || "",
-        a.cupom || "",
-        a.telefone || "",
-        a.status || ""
+        a.nomeCompleto||"",
+        a.cpf||"",
+        a.cupom||"",
+        a.telefone||"",
+        a.status||""
     ]);
-
-    const worksheet = XLSX.utils.aoa_to_sheet([header, ...rows]);
-    worksheet['!cols'] = header.map(() => ({ wch: 25 }));
-
-    header.forEach((_, i) => {
-        const cell = XLSX.utils.encode_cell({ r: 0, c: i });
-        worksheet[cell].s = {
-            fill: { fgColor: { rgb: "1A2A6C" } },
-            font: { color: { rgb: "FFFFFF" }, bold: true },
-            alignment: { horizontal: "center", vertical: "center" },
-            border: { top: { style: "thin" }, bottom: { style: "thin" },
-                      left: { style: "thin" }, right: { style: "thin" } }
-        };
-    });
-
+    const worksheet = XLSX.utils.aoa_to_sheet([header,...rows]);
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, worksheet, "Lista Alunos");
-    XLSX.writeFile(wb, "lista_alunos.xlsx");
+    XLSX.utils.book_append_sheet(wb, worksheet,"Lista Alunos");
+    XLSX.writeFile(wb,"lista_alunos.xlsx");
 }
-
 downloadBtn.addEventListener("click", exportExcel);
 
 // ---------- Inicialização ----------
