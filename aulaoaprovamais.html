@@ -109,10 +109,10 @@ tbody tr:nth-child(even) {
     </div>
 </div>
 
+<script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>    
 <script type="module">
 import { db } from "./assets/js/firebase-config.js";
 import { collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-import * as XLSX from "https://cdn.jsdelivr.net/npm/xlsx@0.19.3/+esm";  // SheetJS para Excel
 
 const alunosTableBody = document.getElementById("alunosTableBody");
 const searchInput      = document.getElementById("searchInput");
@@ -222,12 +222,8 @@ document.getElementById("backBtn").addEventListener("click", () => {
 
 // ---------- Exportar Excel ----------
 function exportExcel() {
-    if (!alunosData.length) {
-        alert("Nenhum aluno para exportar.");
-        return;
-    }
     const header = ["Data","Nome","CPF","N° de Inscrição","Telefone","Status"];
-    const rows = alunosData.map(a => [
+    const rows   = alunosData.map(a => [
         formatDate(a.criadoEm),
         a.nomeCompleto || "",
         a.cpf || "",
@@ -237,18 +233,16 @@ function exportExcel() {
     ]);
 
     const worksheet = XLSX.utils.aoa_to_sheet([header, ...rows]);
-
-    // Ajustar largura de colunas
     worksheet['!cols'] = header.map(() => ({ wch: 25 }));
 
-    // Estilo de cabeçalho
-    header.forEach((_,i)=>{
-        const cell = XLSX.utils.encode_cell({r:0,c:i});
+    header.forEach((_, i) => {
+        const cell = XLSX.utils.encode_cell({ r: 0, c: i });
         worksheet[cell].s = {
-            fill:{ fgColor:{rgb:"1A2A6C"} },
-            font:{ color:{rgb:"FFFFFF"}, bold:true },
-            alignment:{ horizontal:"center", vertical:"center" },
-            border:{ top:{style:"thin"}, bottom:{style:"thin"}, left:{style:"thin"}, right:{style:"thin"} }
+            fill: { fgColor: { rgb: "1A2A6C" } },
+            font: { color: { rgb: "FFFFFF" }, bold: true },
+            alignment: { horizontal: "center", vertical: "center" },
+            border: { top: { style: "thin" }, bottom: { style: "thin" },
+                      left: { style: "thin" }, right: { style: "thin" } }
         };
     });
 
