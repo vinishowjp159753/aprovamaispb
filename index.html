@@ -334,6 +334,154 @@ footer{
 
 <section class="hero" id="hero">
   <h1>AULÃO GRATUITO<br>Bora ser o próximo aprovado?</h1>
-  <p>O evento que vai turbinar sua preparação para o ENEM com professores renomados e recursos inter
+  <p>O evento que vai turbinar sua preparação para o ENEM com professores renomados e recursos interativos.</p>
+  <a class="cta" href="aulaoethos.html">GARANTIR MINHA VAGA 🚀</a>
+</section>
 
-    
+<section class="about">
+  <h2>Sobre o Aulão</h2>
+  <p>
+    Um dia inteiro de conteúdo focado no ENEM, com revisões intensivas,
+    estratégias de prova, material exclusivo e muito mais.
+    Venha viver uma experiência imersiva, repleta de tecnologia e conhecimento.
+  </p>
+</section>
+
+<section class="agenda">
+  <h2>Agenda do Evento</h2>
+  <ul class="timeline">
+    <li>08:00 - Abertura e boas-vindas</li>
+    <li>08:30 - Aula de Redação de Impacto</li>
+    <li>10:30 - Intervalo interativo com quiz</li>
+    <li>11:00 - Ciências da Natureza - Dicas finais</li>
+    <li>13:30 - Matemática sem medo</li>
+    <li>16:00 - Encerramento com sorteios</li>
+  </ul>
+</section>
+
+<section class="features">
+  <h2>Por que participar?</h2>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">⚡</div>
+      <h3>Energia e Inovação</h3>
+      <p>Aulão com tecnologia de ponta e recursos multimídia.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🎯</div>
+      <h3>Foco no ENEM</h3>
+      <p>Conteúdo 100% direcionado para sua aprovação.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🤝</div>
+      <h3>Networking</h3>
+      <p>Conecte-se a colegas e professores incríveis.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📊</div>
+      <h3>Simulados</h3>
+      <p>Pratique com questões comentadas e receba feedback instantâneo.</p>
+    </div>
+  </div>
+</section>
+
+<section class="call">
+  <h2>Garanta sua vaga agora!</h2>
+  <p>As vagas são limitadas. Clique e faça sua inscrição em poucos segundos.</p>
+  <a href="matricula.html">Inscreva-se Já 💡</a>
+</section>
+
+<footer>
+  © 2025 AprovaMaisPB – Todos os direitos reservados
+</footer>
+
+<script>
+// Mobile Nav Toggle
+const navToggle = document.createElement('div');
+navToggle.innerHTML = '☰';
+navToggle.style.fontSize = '1.8rem';
+navToggle.style.cursor = 'pointer';
+navToggle.style.color = '#00ffe0';
+navToggle.style.userSelect = 'none';
+document.querySelector('nav').appendChild(navToggle);
+
+navToggle.addEventListener('click',()=>{
+  document.querySelector('nav ul').classList.toggle('active');
+});
+
+// Navbar scroll
+window.addEventListener('scroll', function(){
+  const nav = document.querySelector('nav');
+  if(window.scrollY > 50){
+    nav.classList.add('scrolled');
+  } else {
+    nav.classList.remove('scrolled');
+  }
+});
+
+// Particles Background
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let particles = [];
+const colors = ['#00ffe0','#00bfff','#0ff','#0bf'];
+
+for(let i=0;i<100;i++){
+  particles.push({
+    x: Math.random()*canvas.width,
+    y: Math.random()*canvas.height,
+    radius: Math.random()*3+1,
+    color: colors[Math.floor(Math.random()*colors.length)],
+    dx: (Math.random()-0.5)*0.5,
+    dy: (Math.random()-0.5)*0.5
+  });
+}
+
+let mouse = {x:null,y:null};
+canvas.addEventListener('mousemove', e => { mouse.x=e.x; mouse.y=e.y; });
+
+function animate(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p=>{
+    p.x += p.dx; p.y += p.dy;
+
+    if(p.x<0)p.x=canvas.width;
+    if(p.x>canvas.width)p.x=0;
+    if(p.y<0)p.y=canvas.height;
+    if(p.y>canvas.height)p.y=0;
+
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.radius,0,Math.PI*2,false);
+    ctx.fillStyle=p.color;
+    ctx.shadowColor=p.color;
+    ctx.shadowBlur=10;
+    ctx.fill();
+    ctx.closePath();
+
+    if(mouse.x && mouse.y){
+      let dist=Math.hypot(p.x-mouse.x,p.y-mouse.y);
+      if(dist<100){
+        ctx.beginPath();
+        ctx.moveTo(p.x,p.y);
+        ctx.lineTo(mouse.x,mouse.y);
+        ctx.strokeStyle=p.color;
+        ctx.lineWidth=0.5;
+        ctx.stroke();
+        ctx.closePath();
+      }
+    }
+  });
+  requestAnimationFrame(animate);
+}
+animate();
+
+window.addEventListener('resize',()=>{
+  canvas.width=window.innerWidth;
+  canvas.height=window.innerHeight;
+});
+</script>
+
+</body>
+</html>
