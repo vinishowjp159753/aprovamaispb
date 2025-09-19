@@ -87,19 +87,17 @@ body {
 
     <div class="content">
         <div class="alert success" id="successAlert"><i class="fas fa-check-circle"></i> Matrícula realizada com sucesso!</div>
-        <div class="alert error" id="errorAlert"><i class="fas fa-exclamation-circle"></i> Preencha todos os campos obrigatórios.</div>
+        <div class="alert error" id="errorAlert"><i class="fas fa-exclamation-circle"></i> Preencha todos os campos corretamente.</div>
 
         <form id="matriculaForm">
             <div class="form-group">
-                <label for="nome">Nome Completo *</label>
-                <input type="text" id="nome" required placeholder="Digite seu nome completo">
+                <label for="nomeCompleto">Nome Completo *</label>
+                <input type="text" id="nomeCompleto" required placeholder="Digite seu nome completo">
             </div>
 
             <div class="form-group">
                 <label for="cpf">CPF *</label>
-                <input type="text" id="cpf" required placeholder="000.000.000-00"
-                       pattern="\d{3}\.\d{3}\.\d{3}-\d{2}"
-                       title="Digite o CPF no formato 000.000.000-00">
+                <input type="text" id="cpf" required placeholder="000.000.000-00">
             </div>
 
             <div class="form-group">
@@ -147,29 +145,49 @@ const form = document.getElementById('matriculaForm');
 const successAlert = document.getElementById('successAlert');
 const errorAlert = document.getElementById('errorAlert');
 
+// Função de validação de CPF
+function validarCPF(cpf) {
+    cpf = cpf.replace(/[^\d]+/g,'');
+    if(cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false;
+    let soma = 0, resto;
+    for (let i=1; i<=9; i++) soma += parseInt(cpf.substring(i-1,i)) * (11-i);
+    resto = (soma * 10) % 11; if(resto===10 || resto===11) resto=0;
+    if(resto !== parseInt(cpf.substring(9,10))) return false;
+    soma = 0;
+    for(let i=1;i<=10;i++) soma += parseInt(cpf.substring(i-1,i))*(12-i);
+    resto = (soma*10)%11; if(resto===10 || resto===11) resto=0;
+    if(resto !== parseInt(cpf.substring(10,11))) return false;
+    return true;
+}
+
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
     successAlert.style.display = 'none';
     errorAlert.style.display = 'none';
 
-    const nome = document.getElementById('nome').value.trim();
+    const nomeCompleto = document.getElementById('nomeCompleto').value.trim();
     const cpf = document.getElementById('cpf').value.trim();
     const telefone = document.getElementById('telefone').value.trim();
     const alunoEthos = document.querySelector('input[name="alunoEthos"]:checked')?.value;
 
-    if (!nome || !cpf || !telefone || !alunoEthos) {
+    if (!nomeCompleto || !cpf || !telefone || !alunoEthos) {
+        errorAlert.style.display = 'block';
+        return;
+    }
+
+    if (!validarCPF(cpf)) {
+        errorAlert.textContent = "CPF inválido.";
         errorAlert.style.display = 'block';
         return;
     }
 
     try {
         await addDoc(collection(db, "inscricoes"), {
-            nome, cpf, telefone, alunoEthos, criadoEm:new Date()
+            nomeCompleto, cpf, telefone, alunoEthos, criadoEm:new Date()
         });
 
         successAlert.style.display = 'block';
         form.reset();
-
     } catch(err) {
         console.error(err);
         errorAlert.textContent = "Erro ao salvar matrícula";
