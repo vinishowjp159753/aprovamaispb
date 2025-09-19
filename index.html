@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AprovaMaisPB – Aulão Gratuito ENEM</title>
 
-<!-- Fontes modernas e legíveis -->
+<!-- Fontes -->
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
@@ -13,10 +13,29 @@
 * { margin:0; padding:0; box-sizing:border-box; }
 body {
   font-family: 'Roboto', sans-serif;
-  background: linear-gradient(135deg, #0b1a28, #0f2027);
+  background: #0b1a28; /* fundo escuro sólido */
   color: #fff;
   overflow-x: hidden;
   position: relative;
+}
+
+/* TECNOLOGICAL GRID */
+#tech-lines {
+  position: fixed; top:0; left:0;
+  width:100%; height:100%;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(0,170,255,0.05),
+    rgba(0,170,255,0.05) 1px,
+    transparent 2px,
+    transparent 4px
+  );
+  animation: gridMove 10s linear infinite;
+  z-index:-2;
+}
+@keyframes gridMove {
+  0% { background-position:0 0; }
+  100% { background-position:400px 400px; }
 }
 
 /* SCANLINES */
@@ -33,30 +52,11 @@ body {
   );
   animation: moveLines 1.5s linear infinite;
   pointer-events:none;
-  z-index:0;
+  z-index:-1;
 }
 @keyframes moveLines {
   0% { background-position:0 0; }
   100% { background-position:0 4px; }
-}
-
-/* TECNOLOGICAL GRID */
-#tech-lines {
-  position: fixed; top:0; left:0;
-  width:100%; height:100%;
-  background: repeating-linear-gradient(
-    45deg,
-    rgba(0,170,255,0.05),
-    rgba(0,170,255,0.05) 1px,
-    transparent 2px,
-    transparent 4px
-  );
-  animation: gridMove 8s linear infinite;
-  z-index:-1;
-}
-@keyframes gridMove {
-  0% { background-position:0 0; }
-  100% { background-position:400px 400px; }
 }
 
 /* NAVBAR */
@@ -109,7 +109,29 @@ nav a:hover::after { width:100%; }
   overflow:hidden;
 }
 
-/* Hero title com efeito de brilho animado */
+/* Hero linhas de energia animadas */
+.hero::before {
+  content:'';
+  position:absolute;
+  top:0; left:0;
+  width:100%; height:100%;
+  background: repeating-linear-gradient(
+    120deg,
+    rgba(0,255,255,0.05),
+    rgba(0,255,255,0.05) 2px,
+    transparent 2px,
+    transparent 4px
+  );
+  z-index:0;
+  animation: energyLines 5s linear infinite;
+  pointer-events:none;
+}
+@keyframes energyLines {
+  0% { background-position:0 0; }
+  100% { background-position:200px 200px; }
+}
+
+/* Hero título com brilho animado */
 .hero h1 {
   font-family:'Montserrat', sans-serif;
   font-size:clamp(2.5rem,5vw,3.5rem);
@@ -141,8 +163,10 @@ nav a:hover::after { width:100%; }
   margin-bottom:2.5rem;
   color:#cceeff;
 }
+
+/* CTA botão pulsante */
 .cta {
-  position:relative;
+  position: relative;
   background: linear-gradient(45deg,#00aaff,#00d4ff);
   padding:1rem 2.5rem;
   border-radius:50px;
@@ -150,12 +174,28 @@ nav a:hover::after { width:100%; }
   color:#0b1a28;
   font-weight:700;
   text-decoration:none;
-  box-shadow:0 0 20px #00aaff, 0 0 40px #00d4ff;
-  transition: all .3s ease;
+  box-shadow: 0 0 20px #00aaff, 0 0 40px #00d4ff;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  animation: pulseCTA 2s infinite;
 }
-.cta:hover {
-  transform:scale(1.05) rotate(-1deg);
-  box-shadow:0 0 40px #00aaff, 0 0 60px #00d4ff;
+.cta::before {
+  content:'';
+  position: absolute;
+  top:-50%; left:-50%;
+  width:200%; height:200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.4), transparent 70%);
+  transform: rotate(45deg);
+  opacity: 0;
+  transition: all 0.7s;
+}
+.cta:hover::before {
+  opacity: 0.5;
+  transform: rotate(0deg);
+}
+@keyframes pulseCTA {
+  0%,100% { transform: scale(1); box-shadow: 0 0 20px #00aaff, 0 0 40px #00d4ff; }
+  50% { transform: scale(1.05); box-shadow: 0 0 40px #00aaff, 0 0 60px #00d4ff; }
 }
 
 /* ABOUT */
@@ -241,8 +281,8 @@ html{scroll-behavior:smooth;}
 </head>
 <body>
 
-<div id="scanlines"></div>
 <div id="tech-lines"></div>
+<div id="scanlines"></div>
 
 <nav>
   <div class="brand">
