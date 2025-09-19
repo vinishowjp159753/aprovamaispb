@@ -166,6 +166,7 @@ h1 {
                 <th>N° de Inscrição</th>
                 <th>Telefone</th>
                 <th>Status</th>
+                <th>Aluno Ethos</th>
                 <th>Ações</th>
             </tr>
         </thead>
@@ -220,8 +221,8 @@ function formatDate(firebaseDate) {
 function renderTable(data) {
     alunosTableBody.innerHTML = "";
     data.forEach(aluno => {
-        const tr = document.createElement("tr");
         const statusClass = aluno.status === "ativo" ? "status-ativo" : "status-pendente";
+        const tr = document.createElement("tr");
         tr.innerHTML = `
             <td>${formatDate(aluno.criadoEm)}</td>
             <td>${aluno.nomeCompleto||""}</td>
@@ -229,6 +230,7 @@ function renderTable(data) {
             <td>${aluno.cupom||""}</td>
             <td>${aluno.telefone||""}</td>
             <td class="${statusClass}">${aluno.status||""}</td>
+            <td>${aluno.alunoEthos||""}</td>
             <td>
                 <button class="table-btn" onclick="toggleStatus('${aluno.id}')">Status</button>
                 <button class="table-btn" onclick="editField('${aluno.id}','valorPago','Atualizar Pagamento')">Pagamento</button>
@@ -249,7 +251,8 @@ searchInput.addEventListener("input", () => {
         const filtered = alunosData.filter(a =>
             a.nomeCompleto?.toLowerCase().includes(term) ||
             a.cpf?.toLowerCase().includes(term) ||
-            a.cupom?.toLowerCase().includes(term)
+            a.cupom?.toLowerCase().includes(term) ||
+            a.alunoEthos?.toLowerCase().includes(term)
         );
         renderTable(filtered);
     }, 250);
@@ -298,14 +301,15 @@ document.getElementById("backBtn").addEventListener("click", ()=>window.location
 
 // ---------- Exportar Excel ----------
 function exportExcel() {
-    const header = ["Data","Nome","CPF","N° de Inscrição","Telefone","Status"];
+    const header = ["Data","Nome","CPF","N° de Inscrição","Telefone","Status","Aluno Ethos"];
     const rows = alunosData.map(a=>[
         formatDate(a.criadoEm),
         a.nomeCompleto||"",
         a.cpf||"",
         a.cupom||"",
         a.telefone||"",
-        a.status||""
+        a.status||"",
+        a.alunoEthos||""
     ]);
     const worksheet = XLSX.utils.aoa_to_sheet([header,...rows]);
     const wb = XLSX.utils.book_new();
