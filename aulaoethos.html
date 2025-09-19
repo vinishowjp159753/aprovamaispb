@@ -1,147 +1,26 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Matrícula - AprovaMaisPB</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>
-:root {
-    --primary: #1a2a6c;
-    --secondary: #b21f1f;
-    --accent: #fdbb2d;
-}
-* { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-body {
-    background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
-    min-height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    padding:20px;
-}
-.container {
-    width:100%;
-    max-width:500px;
-    background: rgba(255,255,255,0.95);
-    border-radius:12px;
-    box-shadow:0 10px 30px rgba(0,0,0,0.3);
-    overflow:hidden;
-}
-.header { background: var(--primary); color:white; padding:20px; text-align:center; }
-.logo { max-width:120px; margin-bottom:15px; }
-.header h1 { font-size:22px; margin-bottom:10px; }
-.content { padding:30px; }
-.form-group { margin-bottom:20px; }
-.form-group label { display:block; margin-bottom:8px; font-weight:600; color:#555; }
-.form-group input[type="text"],
-.form-group input[type="tel"] {
-    width:100%; padding:12px 15px; border:1px solid #ddd; border-radius:6px; font-size:16px;
-}
-.form-group input:focus { border-color: var(--primary); outline:none; }
-.radio-group { display:flex; gap:20px; align-items:center; }
-.radio-group label { font-weight:normal; }
-.btn {
-    padding:14px 25px; background: var(--primary); color:white; border:none; border-radius:6px;
-    cursor:pointer; font-size:16px; font-weight:600; width:100%; transition: background 0.3s;
-}
-.btn:hover { background:#2a3a9c; }
-.alert { padding:15px; border-radius:6px; margin-bottom:20px; display:none; }
-.alert.success { background:#e8f5e9; color:#2e7d32; border:1px solid #c8e6c9; }
-.alert.error { background:#ffebee; color:#d32f2f; border:1px solid #ffcdd2; }
-</style>
-</head>
-<body>
+<script>
+// Máscara simples de CPF
+document.getElementById('cpfAluno').addEventListener('input', function (e) {
+    let v = e.target.value.replace(/\D/g, '');
+    v = v.replace(/(\d{3})(\d)/, '$1.$2');
+    v = v.replace(/(\d{3})(\d)/, '$1.$2');
+    v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    e.target.value = v;
+});
 
-<div class="container">
-    <div class="header">
-        <img src="assets/img/logo_aprovamaispb.png" alt="Logo AprovaMaisPB" class="logo" onerror="this.style.display='none'">
-        <h1>AprovaMaisPB - Matrícula</h1>
-        <p>Preencha os dados para se matricular</p>
-    </div>
-
-    <div class="content">
-        <div class="alert success" id="successAlert"><i class="fas fa-check-circle"></i> Matrícula realizada com sucesso!</div>
-        <div class="alert error" id="errorAlert"><i class="fas fa-exclamation-circle"></i> Preencha todos os campos obrigatórios.</div>
-
-        <form id="matriculaForm">
-            <div class="form-group">
-                <label for="nomeCompleto">Nome Completo *</label>
-                <input type="text" id="nomeCompleto" required>
-            </div>
-
-            <div class="form-group">
-                <label for="telefone">Telefone *</label>
-                <input type="tel" id="telefone" required placeholder="(00) 00000-0000">
-            </div>
-
-            <div class="form-group">
-                <label>Aluno Ethos? *</label>
-                <div class="radio-group">
-                    <label><input type="radio" name="ethos" value="sim" required> Sim</label>
-                    <label><input type="radio" name="ethos" value="nao"> Não</label>
-                </div>
-            </div>
-
-            <button type="submit" class="btn" id="submitBtn">Realizar Matrícula</button>
-        </form>
-    </div>
-</div>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyAK3U35fipoWOOIJg0yrtgmVfQ7XQxZxqY",
-  authDomain: "aprovamaispb-d4e75.firebaseapp.com",
-  projectId: "aprovamaispb-d4e75",
-  storageBucket: "aprovamaispb-d4e75.firebasestorage.app",
-  messagingSenderId: "828577018900",
-  appId: "1:828577018900:web:473d8c3fc2685d3f192301"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-const form = document.getElementById('matriculaForm');
-const successAlert = document.getElementById('successAlert');
-const errorAlert = document.getElementById('errorAlert');
-
-form.addEventListener('submit', async (e) => {
+// Captura dos dados ao enviar
+document.getElementById('formCadastroAluno').addEventListener('submit', function (e) {
     e.preventDefault();
-    successAlert.style.display = 'none';
-    errorAlert.style.display = 'none';
 
-    const nomeCompleto = document.getElementById('nomeCompleto').value.trim();
-    const telefone = document.getElementById('telefone').value.trim();
-    const ethosValue = document.querySelector('input[name="ethos"]:checked');
+    const nome       = document.getElementById('nomeAluno').value.trim();
+    const cpf        = document.getElementById('cpfAluno').value.trim();
+    const alunoEthos = document.querySelector('input[name="alunoEthos"]:checked').value;
 
-    if(!nomeCompleto || !telefone || !ethosValue){
-        errorAlert.style.display = 'block';
-        return;
-    }
+    // Aqui você integra com seu backend/Firestore
+    console.log({ nome, cpf, alunoEthos });
 
-    // true se "sim", false se "nao"
-    const ethos = ethosValue.value === "sim";
-
-    try {
-        await addDoc(collection(db, "inscricoes"), {
-            nomeCompleto,
-            telefone,
-            ethos,
-            status: "pendente",
-            criadoEm: new Date()
-        });
-        successAlert.style.display = 'block';
-        form.reset();
-    } catch(err){
-        console.error(err);
-        errorAlert.textContent = "Erro ao processar matrícula.";
-        errorAlert.style.display = 'block';
-    }
+    // Exemplo de feedback
+    alert('Cadastro salvo:\n' +
+          `Nome: ${nome}\nCPF: ${cpf}\nAluno Ethos: ${alunoEthos}`);
 });
 </script>
-
-</body>
-</html>
