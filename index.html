@@ -6,115 +6,72 @@
 <title>AprovaMaisPB – Aulão Gratuito ENEM</title>
 
 <!-- Fontes -->
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
 /* RESET */
 * { margin:0; padding:0; box-sizing:border-box; }
 body {
   font-family: 'Roboto', sans-serif;
-  background: #0b1a28; /* fundo escuro sólido */
+  background: #0b1a28;
   color: #fff;
   overflow-x: hidden;
   position: relative;
 }
 
-/* TECNOLOGICAL GRID */
-#tech-lines {
-  position: fixed; top:0; left:0;
+/* FUNDO TECNOLÓGICO */
+#tech-background {
+  position: fixed;
+  top:0; left:0;
   width:100%; height:100%;
-  background: repeating-linear-gradient(
-    45deg,
-    rgba(0,170,255,0.05),
-    rgba(0,170,255,0.05) 1px,
-    transparent 2px,
-    transparent 4px
-  );
-  animation: gridMove 10s linear infinite;
+  background: linear-gradient(135deg, rgba(0,170,255,0.05), rgba(0,255,255,0.05));
   z-index:-2;
+  pointer-events:none;
+  animation: subtleGlow 12s infinite alternate;
 }
-@keyframes gridMove {
-  0% { background-position:0 0; }
-  100% { background-position:400px 400px; }
+@keyframes subtleGlow {
+  0% { opacity:0.6; transform: scale(1); }
+  50% { opacity:0.8; transform: scale(1.02); }
+  100% { opacity:0.6; transform: scale(1); }
 }
 
-/* SCANLINES */
-#scanlines {
+/* LINHAS DISCRETAS */
+#tech-lines {
   position: fixed;
   top:0; left:0;
   width:100%; height:100%;
   background: repeating-linear-gradient(
-    180deg,
-    rgba(255,255,255,0.02),
-    rgba(255,255,255,0.02) 1px,
-    transparent 2px,
-    transparent 4px
+    45deg,
+    rgba(0,170,255,0.03),
+    rgba(0,170,255,0.03) 1px,
+    transparent 2px
   );
-  animation: moveLines 1.5s linear infinite;
-  pointer-events:none;
   z-index:-1;
-}
-@keyframes moveLines {
-  0% { background-position:0 0; }
-  100% { background-position:0 4px; }
+  pointer-events:none;
 }
 
 /* NAVBAR */
 nav {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:1rem 3rem;
-  background:rgba(0,0,0,0.5);
-  backdrop-filter: blur(6px);
-  position:fixed;
-  width:100%;
-  z-index:1000;
-  transition: all .3s ease;
+  display:flex; justify-content:space-between; align-items:center;
+  padding:1rem 3rem; background: rgba(0,0,0,0.5); backdrop-filter: blur(6px);
+  position: fixed; width:100%; z-index:1000; transition: all .3s ease;
 }
-nav.scrolled {
-  background: rgba(0,0,0,0.85);
-  box-shadow:0 0 20px #00aaff;
-}
-nav .brand {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 1.8rem;
-  color: #00aaff;
-  font-weight: 700;
-  display:flex; align-items:center; gap:0.7rem;
-}
+nav.scrolled { background: rgba(0,0,0,0.85); box-shadow:0 0 20px #00aaff; }
+nav .brand { font-family: 'Montserrat', sans-serif; font-size: 1.8rem; color: #00aaff; font-weight: 700; display:flex; align-items:center; gap:0.7rem; }
 nav .brand img { width:45px; }
-nav ul {
-  display:flex; gap:2rem; list-style:none;
-}
-nav a {
-  color:#fff; text-decoration:none; font-weight:700;
-  font-size:1rem; position:relative;
-}
-nav a::after {
-  content:''; position:absolute; left:0; bottom:-4px;
-  width:0%; height:3px;
-  background: linear-gradient(90deg,#00aaff,#00d4ff);
-  transition: width .3s; border-radius:2px;
-}
+nav ul { display:flex; gap:2rem; list-style:none; }
+nav a { color:#fff; text-decoration:none; font-weight:700; font-size:1rem; position:relative; }
+nav a::after { content:''; position:absolute; left:0; bottom:-4px; width:0%; height:3px; background: linear-gradient(90deg,#00aaff,#00d4ff); transition: width .3s; border-radius:2px; }
 nav a:hover::after { width:100%; }
 
 /* HERO */
 .hero {
-  min-height:100vh;
-  display:flex; flex-direction:column;
-  justify-content:center; align-items:center;
-  text-align:center; padding:0 2rem;
-  position:relative; z-index:1;
-  overflow:hidden;
+  min-height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center;
+  text-align:center; padding:0 2rem; position:relative; z-index:1; overflow:hidden;
 }
-
-/* Hero linhas de energia animadas */
 .hero::before {
   content:'';
-  position:absolute;
-  top:0; left:0;
-  width:100%; height:100%;
+  position:absolute; top:0; left:0; width:100%; height:100%;
   background: repeating-linear-gradient(
     120deg,
     rgba(0,255,255,0.05),
@@ -122,49 +79,26 @@ nav a:hover::after { width:100%; }
     transparent 2px,
     transparent 4px
   );
-  z-index:0;
-  animation: energyLines 5s linear infinite;
-  pointer-events:none;
+  z-index:0; animation: energyLines 6s linear infinite; pointer-events:none;
 }
 @keyframes energyLines {
   0% { background-position:0 0; }
   100% { background-position:200px 200px; }
 }
-
-/* Hero título com brilho animado */
 .hero h1 {
   font-family:'Montserrat', sans-serif;
   font-size:clamp(2.5rem,5vw,3.5rem);
-  color:#00aaff;
-  text-shadow: 0 0 5px #00aaff, 0 0 15px #00d4ff;
+  color:#00d4ff;
+  text-shadow: 0 0 5px rgba(0,212,255,0.3);
   margin-bottom:1.5rem;
-  position: relative;
-  display: inline-block;
 }
-.hero h1::after {
-  content: '';
-  position: absolute;
-  top:0; left:-75%;
-  width:50%;
-  height:100%;
-  background: linear-gradient(120deg, rgba(255,255,255,0.1), rgba(255,255,255,0.6), rgba(255,255,255,0.1));
-  transform: skewX(-25deg);
-  animation: shine 2s infinite;
-}
-@keyframes shine {
-  0% { left: -75%; }
-  50% { left: 125%; }
-  100% { left: -75%; }
-}
-
 .hero p {
   max-width:700px;
   font-size:clamp(1rem,2.5vw,1.3rem);
   margin-bottom:2.5rem;
   color:#cceeff;
 }
-
-/* CTA botão pulsante */
+/* CTA BOTÃO */
 .cta {
   position: relative;
   background: linear-gradient(45deg,#00aaff,#00d4ff);
@@ -182,75 +116,35 @@ nav a:hover::after { width:100%; }
 .cta::before {
   content:'';
   position: absolute;
-  top:-50%; left:-50%;
-  width:200%; height:200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.4), transparent 70%);
-  transform: rotate(45deg);
-  opacity: 0;
-  transition: all 0.7s;
+  top:-50%; left:-50%; width:200%; height:200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.3), transparent 70%);
+  transform: rotate(45deg); opacity:0; transition: all 0.7s;
 }
-.cta:hover::before {
-  opacity: 0.5;
-  transform: rotate(0deg);
-}
+.cta:hover::before { opacity:0.5; transform: rotate(0deg); }
 @keyframes pulseCTA {
-  0%,100% { transform: scale(1); box-shadow: 0 0 20px #00aaff, 0 0 40px #00d4ff; }
-  50% { transform: scale(1.05); box-shadow: 0 0 40px #00aaff, 0 0 60px #00d4ff; }
+  0%,100% { transform: scale(1); box-shadow:0 0 20px #00aaff,0 0 40px #00d4ff; }
+  50% { transform: scale(1.05); box-shadow:0 0 40px #00aaff,0 0 60px #00d4ff; }
 }
+
+/* Canvas para partículas no CTA */
+#cta-canvas { position:absolute; pointer-events:none; z-index:0; }
 
 /* ABOUT */
-.about {
-  padding:6rem 3rem; text-align:center;
-  background: rgba(0,0,0,0.2);
-}
-.about h2 {
-  font-family:'Montserrat',sans-serif;
-  font-size:clamp(2rem,4vw,2.8rem);
-  color:#00aaff;
-  margin-bottom:1.5rem;
-}
-.about p {
-  max-width:800px; margin:0 auto;
-  font-size:clamp(1rem,2vw,1.2rem);
-  color:#cceeff;
-  line-height:1.6;
-}
+.about { padding:6rem 3rem; text-align:center; background: rgba(0,0,0,0.15); }
+.about h2 { font-family:'Montserrat',sans-serif; font-size:clamp(2rem,4vw,2.8rem); color:#00aaff; margin-bottom:1.5rem; }
+.about p { max-width:800px; margin:0 auto; font-size:clamp(1rem,2vw,1.2rem); color:#cceeff; line-height:1.6; }
 
 /* FEATURES */
-.features {
-  padding:6rem 3rem;
-  background: rgba(0,0,0,0.15);
-}
-.features h2 {
-  text-align:center;
-  font-family:'Montserrat',sans-serif;
-  font-size:clamp(2rem,4vw,2.8rem);
-  margin-bottom:3rem;
-  color:#00aaff;
-}
-.features-grid {
-  display:grid;
-  gap:2rem;
-  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-}
-.feature-card {
-  background:rgba(255,255,255,0.05);
-  padding:2rem; border-radius:15px;
-  text-align:center; transition: transform .3s, box-shadow .3s;
-  position:relative; overflow:hidden;
-}
-.feature-card:hover {
-  transform:translateY(-8px); box-shadow:0 0 20px #00aaff;
-}
+.features { padding:6rem 3rem; background: rgba(0,0,0,0.1); }
+.features h2 { text-align:center; font-family:'Montserrat',sans-serif; font-size:clamp(2rem,4vw,2.8rem); margin-bottom:3rem; color:#00aaff; }
+.features-grid { display:grid; gap:2rem; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); }
+.feature-card { background:rgba(255,255,255,0.05); padding:2rem; border-radius:15px; text-align:center; transition: transform .3s, box-shadow .3s; position:relative; overflow:hidden; }
+.feature-card:hover { transform:translateY(-8px); box-shadow:0 0 20px #00aaff; }
 .feature-icon { font-size:2.5rem; margin-bottom:1rem; color:#00aaff; }
 .feature-card:hover .feature-icon { transform:scale(1.2); }
 
 /* FOOTER */
-footer {
-  background: rgba(0,0,0,0.5);
-  padding:2rem; text-align:center;
-  color:#bbb; font-size:1rem;
-}
+footer { background: rgba(0,0,0,0.5); padding:2rem; text-align:center; color:#bbb; font-size:1rem; }
 
 /* RESPONSIVE */
 @media (max-width:1024px){
@@ -261,11 +155,7 @@ footer {
 }
 @media (max-width:768px){
   nav{ padding:1rem 1.5rem; }
-  nav ul {
-    flex-direction:column; background:rgba(0,0,0,0.85);
-    position:absolute; top:100%; right:0; width:200px; padding:1rem;
-    display:none; border-radius:8px;
-  }
+  nav ul { flex-direction:column; background:rgba(0,0,0,0.85); position:absolute; top:100%; right:0; width:200px; padding:1rem; display:none; border-radius:8px; }
   nav ul.active{ display:flex; }
   .features-grid{ grid-template-columns:1fr; }
 }
@@ -281,8 +171,8 @@ html{scroll-behavior:smooth;}
 </head>
 <body>
 
+<div id="tech-background"></div>
 <div id="tech-lines"></div>
-<div id="scanlines"></div>
 
 <nav>
   <div class="brand">
@@ -299,7 +189,9 @@ html{scroll-behavior:smooth;}
 <section class="hero" id="hero">
   <h1>AULÃO GRATUITO APROVAMAISPB<br>Bora ser o próximo aprovado?</h1>
   <p>O evento que vai turbinar sua preparação para o ENEM com professores renomados e recursos interativos.</p>
-  <a class="cta" href="aulaoethos.html">QUERO GARANTIR MINHA VAGA 🚀</a>
+  <a class="cta" href="aulaoethos.html" id="cta-btn">QUERO GARANTIR MINHA VAGA 🚀</a>
+  <canvas id="energy-canvas"></canvas>
+  <canvas id="cta-canvas"></canvas>
 </section>
 
 <section class="about" id="about">
@@ -333,7 +225,7 @@ html{scroll-behavior:smooth;}
 </footer>
 
 <script>
-// Mobile Nav Toggle
+// NAV TOGGLE
 const navToggle = document.createElement('div');
 navToggle.innerHTML = '☰';
 navToggle.style.fontSize = '1.8rem';
@@ -341,18 +233,86 @@ navToggle.style.cursor = 'pointer';
 navToggle.style.color = '#00aaff';
 navToggle.style.userSelect = 'none';
 document.querySelector('nav').appendChild(navToggle);
-
 navToggle.addEventListener('click', ()=>{
   document.querySelector('nav ul').classList.toggle('active');
 });
 
-// Navbar scroll
+// SCROLL NAVBAR
 window.addEventListener('scroll', function(){
   const nav = document.querySelector('nav');
   if(window.scrollY > 50){ nav.classList.add('scrolled'); }
   else{ nav.classList.remove('scrolled'); }
 });
-</script>
 
+// HERO LINES DE ENERGIA
+const energyCanvas = document.getElementById('energy-canvas');
+const eCtx = energyCanvas.getContext('2d');
+energyCanvas.width = window.innerWidth;
+energyCanvas.height = window.innerHeight;
+let energyLines = [];
+for(let i=0;i<25;i++){
+  energyLines.push({x:Math.random()*energyCanvas.width,y:Math.random()*energyCanvas.height,dx:(Math.random()-0.5)*2,dy:(Math.random()-0.5)*2,length:Math.random()*100+50,alpha:Math.random()*0.5+0.3});
+}
+function animateEnergyLines(){
+  eCtx.clearRect(0,0,energyCanvas.width,energyCanvas.height);
+  energyLines.forEach(l=>{
+    l.x+=l.dx;l.y+=l.dy;
+    if(l.x<0||l.x>energyCanvas.width)l.dx*=-1;
+    if(l.y<0||l.y>energyCanvas.height)l.dy*=-1;
+    eCtx.beginPath();
+    eCtx.moveTo(l.x,l.y);
+    eCtx.lineTo(l.x-l.length*l.dx*0.02,l.y-l.length*l.dy*0.02);
+    eCtx.strokeStyle=`rgba(0,212,255,${l.alpha})`;
+    eCtx.lineWidth=2;
+    eCtx.shadowBlur=10;
+    eCtx.shadowColor='rgba(0,212,255,0.5)';
+    eCtx.stroke();
+  });
+  requestAnimationFrame(animateEnergyLines);
+}
+animateEnergyLines();
+
+// PARTICULAS NO CTA
+const ctaCanvas = document.getElementById('cta-canvas');
+const ctaCtx = ctaCanvas.getContext('2d');
+const ctaBtn = document.getElementById('cta-btn');
+function resizeCTACanvas() {
+  const rect = ctaBtn.getBoundingClientRect();
+  ctaCanvas.width = rect.width;
+  ctaCanvas.height = rect.height;
+  ctaCanvas.style.top = rect.top + window.scrollY + 'px';
+  ctaCanvas.style.left = rect.left + 'px';
+}
+resizeCTACanvas();
+window.addEventListener('resize', resizeCTACanvas);
+
+let particles = [];
+for(let i=0;i<15;i++){
+  particles.push({x:Math.random()*ctaCanvas.width,y:Math.random()*ctaCanvas.height,radius:Math.random()*2+1,dx:(Math.random()-0.5)*0.5,dy:(Math.random()-0.5)*0.5,alpha:Math.random()*0.7+0.3});
+}
+
+function animateParticles() {
+  ctaCtx.clearRect(0,0,ctaCanvas.width,ctaCanvas.height);
+  particles.forEach(p=>{
+    p.x+=p.dx;p.y+=p.dy;
+    if(p.x<0)p.x=ctaCanvas.width;
+    if(p.x>ctaCanvas.width)p.x=0;
+    if(p.y<0)p.y=ctaCanvas.height;
+    if(p.y>ctaCanvas.height)p.y=0;
+    ctaCtx.beginPath();
+    ctaCtx.arc(p.x,p.y,p.radius,0,Math.PI*2);
+    ctaCtx.fillStyle=`rgba(0,212,255,${p.alpha})`;
+    ctaCtx.shadowBlur=6;
+    ctaCtx.shadowColor='rgba(0,212,255,0.7)';
+    ctaCtx.fill();
+  });
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+ctaBtn.addEventListener('mouseenter', () => { particles.forEach(p=>{p.dx*=4;p.dy*=4;}); });
+ctaBtn.addEventListener('mouseleave', () => { particles.forEach(p=>{p.dx/=4;p.dy/=4;}); });
+
+</script>
 </body>
 </html>
