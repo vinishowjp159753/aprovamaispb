@@ -112,6 +112,7 @@ tbody tr:nth-child(even) {
 <script type="module">
 import { db } from "./assets/js/firebase-config.js";
 import { collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import * as XLSX from "https://cdn.jsdelivr.net/npm/xlsx@0.19.3/+esm";  // SheetJS para Excel
 
 const alunosTableBody = document.getElementById("alunosTableBody");
 const searchInput      = document.getElementById("searchInput");
@@ -126,14 +127,14 @@ let alunosData   = [];
 let selectedId   = null;
 let selectedField= null;
 
-// --------- Carregar dados ---------
+// ---------- Carregar alunos ----------
 async function loadAlunos() {
     const snapshot = await getDocs(collection(db, "inscricoes"));
     alunosData = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
     renderTable(alunosData);
 }
 
-// --------- Formatador de data ---------
+// ---------- Formatador ----------
 function formatDate(firebaseDate) {
     if (!firebaseDate) return "";
     const d = firebaseDate.toDate ? firebaseDate.toDate() : new Date(firebaseDate);
@@ -143,7 +144,7 @@ function formatDate(firebaseDate) {
     });
 }
 
-// --------- Montar tabela ---------
+// ---------- Montar tabela ----------
 function renderTable(data) {
     alunosTableBody.innerHTML = "";
     data.forEach(aluno => {
@@ -160,13 +161,12 @@ function renderTable(data) {
                 <button class="table-btn" onclick="editField('${aluno.id}','valorPago','Atualizar Pagamento')">Pagamento</button>
                 <button class="table-btn" onclick="editField('${aluno.id}','observacoes','Editar Observação')">Observação</button>
                 <button class="table-btn" onclick="deleteAluno('${aluno.id}')">Excluir</button>
-            </td>
-        `;
+            </td>`;
         alunosTableBody.appendChild(tr);
     });
 }
 
-// --------- Busca ---------
+// ---------- Busca ----------
 searchInput.addEventListener("input", () => {
     const term = searchInput.value.toLowerCase();
     const filtered = alunosData.filter(a =>
@@ -177,7 +177,7 @@ searchInput.addEventListener("input", () => {
     renderTable(filtered);
 });
 
-// --------- Funções globais ---------
+// ---------- Funções globais ----------
 window.toggleStatus = async (id) => {
     const aluno = alunosData.find(a => a.id === id);
     if (!aluno) return;
@@ -215,13 +215,13 @@ window.deleteAluno = async (id) => {
     }
 };
 
-// --------- Voltar ao dashboard ---------
+// ---------- Voltar ao dashboard ----------
 document.getElementById("backBtn").addEventListener("click", () => {
     window.location.href = "dashboard.html";
 });
 
-// --------- Exportar CSV ---------
-function exportCSV() {
+// ---------- Exportar Excel ----------
+function exportExcel() {
     if (!alunosData.length) {
         alert("Nenhum aluno para exportar.");
         return;
@@ -235,19 +235,31 @@ function exportCSV() {
         a.telefone || "",
         a.status || ""
     ]);
-    const csv = [header.join(","), ...rows.map(r => r.join(","))].join("\r\n");
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = Object.assign(document.createElement("a"), {
-        href: url, download: "lista_alunos.csv"
-    });
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-downloadBtn.addEventListener("click", exportCSV);
 
-// --------- Inicialização ---------
+    const worksheet = XLSX.utils.aoa_to_sheet([header, ...rows]);
+
+    // Ajustar largura de colunas
+    worksheet['!cols'] = header.map(() => ({ wch: 25 }));
+
+    // Estilo de cabeçalho
+    header.forEach((_,i)=>{
+        const cell = XLSX.utils.encode_cell({r:0,c:i});
+        worksheet[cell].s = {
+            fill:{ fgColor:{rgb:"1A2A6C"} },
+            font:{ color:{rgb:"FFFFFF"}, bold:true },
+            alignment:{ horizontal:"center", vertical:"center" },
+            border:{ top:{style:"thin"}, bottom:{style:"thin"}, left:{style:"thin"}, right:{style:"thin"} }
+        };
+    });
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, worksheet, "Lista Alunos");
+    XLSX.writeFile(wb, "lista_alunos.xlsx");
+}
+
+downloadBtn.addEventListener("click", exportExcel);
+
+// ---------- Inicialização ----------
 loadAlunos();
 </script>
 </body>
