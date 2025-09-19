@@ -1,1 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lista de Alunos</title>
+<link rel="stylesheet" href="assets/css/lista-alunos.css">
 
+<style>
+/* === BOTÕES ESTILO DA TABELA === */
+.table-btn {
+    background-color: #f8f8f8;
+    border: 1px solid #ccc;
+    color: #333;
+    padding: 8px 14px;
+    margin-right: 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s, color 0.2s;
+}
+.table-btn:hover {
+    background-color: #e0e0e0;
+    color: #000;
+}
+.btn-container {
+    margin-bottom: 15px;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- BOTÕES NO MESMO ESTILO DA TABELA -->
+    <div class="btn-container">
+        <button id="backBtn" class="table-btn">← Voltar ao Dashboard</button>
+        <button id="downloadBtn" class="table-btn">⬇️ Baixar Lista</button>
+    </div>
+
+    <h1>Lista de Alunos</h1>
+    <input type="text" id="searchInput" placeholder="Buscar aluno...">
+
+    <table>
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Turma</th>
+                <th>Número do Pedido</th>
+                <th>Telefone</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody id="alunosTableBody"></tbody>
+    </table>
+</div>
+
+<!-- Modal para Pagamento / Observações -->
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <h3 id="modalTitle"></h3>
+        <input type="text" id="modalInput" placeholder="">
+        <button id="saveModalBtn" class="table-btn">Salvar</button>
+        <button id="closeModalBtn" class="table-btn">Fechar</button>
+    </div>
+</div>
+ 
+<script type="module">
+import { app, db } from "./assets/js/firebase-config.js";
+import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+const alunosTableBody = document.getElementById("alunosTableBody");
+const searchInput = document.getElementById("searchInput");
+const modal = document.getElementById("modal");
+const modalTitle = document.getElementById("modalTitle");
+const modalInput = document.getElementById("modalInput");
+const saveModalBtn = document.getElementById("saveModalBtn");
+const closeModalBtn = document.getElementById("closeModalBtn");
+const downloadBtn = document.getElementById("downloadBtn");
+
+let alunosData = [];
+let selectedAlunoId = null;
+let selectedField = null;
+
+// Carregar alunos
+async function loadAlunos() {
+    const snapshot = await getDocs(collection(db, "inscricoes"));
+    alunosData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    renderTable(alunosData);
+}
+
+// Renderizar tabela
+function renderTable(data) {
+    alunosTableBody.innerHTML = "";
+    data.forEach(aluno => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${aluno.nomeCompleto || ""}</td>
+            <td>${aluno.turma || ""}</td>
+            <td>${aluno.numeroPedido || ""}</td>
+            <td>${aluno.telefone || ""}</td>
+            <td>${aluno.status || ""}</td>
+            <td>
+                <button class="table-btn" onclick="toggleStatus('${aluno.id}')">Status</button>
+                <button class="table-btn" onclick="editField('${aluno.id}', 'valorPago', 'Atualizar Pagamento')">Pagamento</button>
+                <button class="table-btn" onclick="editField('${aluno.id}', 'observacoes', 'Editar Observação')">Observação</button>
+                <button class="table-btn" onclick="deleteAluno('${aluno.id}')">Excluir</button>
+            </td>
+        `;
+        alunosTableBody.appendChild(tr);
+    });
+}
+
+// Busca
+searchInput.addEventListener("input", () => {
+    const term = searchInput.value.toLowerCase();
+    const filtered = alunosData.filter(a => a.nomeCompleto?.toLowerCase().includes(term));
+    renderTable(filtered);
+});
+
+// Funções globais
+window.toggleStatus = async (id) => {
+    const aluno = alunosData.find(a => a.id === id);
+    if (!aluno) return;
+    const newStatus = aluno.status === "ativo" ? "pendente" : "ativo";
+    await updateDoc(doc(db, "inscricoes", id), { status: newStatus });
+    loadAlunos();
+};
+
+window.editField = (id, field, title) => {
+    selectedAlunoId = id;
+    selectedField = field;
+    modalTitle.textContent = title;
+    const aluno = alunosData.find(a => a.id === id);
+    modalInput.value = aluno[field] || "";
+    modal.style.display = "flex";
+};
+
+saveModalBtn.addEventListener("click", async () => {
+    if (!selectedAlunoId || !selectedField) return;
+    const value = modalInput.value;
+    await updateDoc(doc(db, "inscricoes", selectedAlunoId), { [selectedField]: value });
+    modal.style.display = "none";
+    selectedAlunoId = null;
+    selectedField = null;
+    loadAlunos();
+});
+
+closeModalBtn.addEventListener("click", () => {
+    modal.style.display = "none";
+    selectedAlunoId = null;
+    selectedField = null;
+});
+
+window.deleteAluno = async (id) => {
+    if (confirm("Tem certeza que deseja excluir este aluno?")) {
+        await deleteDoc(doc(db, "inscricoes", id));
+        loadAlunos();
+    }
+};
+
+// Voltar ao dashboard
+document.getElementById("backBtn").addEventListener("click", () => {
+    window.location.href = "dashboard.html";
+});
+
+// === Download CSV limpo ===
+function exportCSV() {
+    if (alunosData.length === 0) {
+        alert("Nenhum aluno para exportar.");
+        return;
+    }
+
+    const header = ["Nome","Turma","Número do Pedido","Telefone","Status"];
+    const rows = alunosData.map(a => [
+        a.nomeCompleto || "",
+        a.turma || "",
+        a.numeroPedido || "",
+        a.telefone || "",
+        a.status || ""
+    ]);
+
+    let csvContent = header.join(",") + "\r\n"; // cabeçalho
+    rows.forEach(row => {
+        csvContent += row.join(",") + "\r\n";
+    });
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "lista_alunos.csv";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// Evento botão download
+downloadBtn.addEventListener("click", exportCSV);
+
+// Inicializa
+loadAlunos();
+</script>
+
+</body>
+</html>
