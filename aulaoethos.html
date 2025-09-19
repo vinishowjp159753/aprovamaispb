@@ -39,7 +39,8 @@ body {
     width:100%; padding:12px 15px; border:1px solid #ddd; border-radius:6px; font-size:16px;
 }
 .form-group input:focus { border-color: var(--primary); outline:none; }
-.checkbox-group { display:flex; align-items:center; gap:10px; }
+.radio-group { display:flex; gap:20px; align-items:center; }
+.radio-group label { font-weight:normal; }
 .btn {
     padding:14px 25px; background: var(--primary); color:white; border:none; border-radius:6px;
     cursor:pointer; font-size:16px; font-weight:600; width:100%; transition: background 0.3s;
@@ -74,9 +75,12 @@ body {
                 <input type="tel" id="telefone" required placeholder="(00) 00000-0000">
             </div>
 
-            <div class="form-group checkbox-group">
-                <input type="checkbox" id="ethos" />
-                <label for="ethos">É do Colégio Ethos</label>
+            <div class="form-group">
+                <label>Aluno Ethos? *</label>
+                <div class="radio-group">
+                    <label><input type="radio" name="ethos" value="sim" required> Sim</label>
+                    <label><input type="radio" name="ethos" value="nao"> Não</label>
+                </div>
             </div>
 
             <button type="submit" class="btn" id="submitBtn">Realizar Matrícula</button>
@@ -111,12 +115,15 @@ form.addEventListener('submit', async (e) => {
 
     const nomeCompleto = document.getElementById('nomeCompleto').value.trim();
     const telefone = document.getElementById('telefone').value.trim();
-    const ethos = document.getElementById('ethos').checked;
+    const ethosValue = document.querySelector('input[name="ethos"]:checked');
 
-    if(!nomeCompleto || !telefone){
+    if(!nomeCompleto || !telefone || !ethosValue){
         errorAlert.style.display = 'block';
         return;
     }
+
+    // true se "sim", false se "nao"
+    const ethos = ethosValue.value === "sim";
 
     try {
         await addDoc(collection(db, "inscricoes"), {
