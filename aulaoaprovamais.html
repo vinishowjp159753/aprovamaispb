@@ -7,7 +7,6 @@
 
 <!-- CSS Principal -->
 <style>
-/* ====== Reset e Tipografia ====== */
 body {
     font-family: "Segoe UI", Roboto, sans-serif;
     margin: 0;
@@ -21,7 +20,7 @@ body {
     padding: 20px;
 }
 
-/* ====== Botões ====== */
+/* Botões */
 .table-btn {
     background: linear-gradient(90deg,#1a2a6c,#3b5fc7);
     color: #fff;
@@ -34,6 +33,9 @@ body {
     font-weight: 500;
     box-shadow: 0 4px 6px rgba(0,0,0,0.2);
     transition: transform 0.2s, box-shadow 0.2s;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
 }
 .table-btn:hover {
     transform: translateY(-2px);
@@ -46,7 +48,7 @@ body {
     background: #ff1a1a;
 }
 
-/* ====== Input Busca ====== */
+/* Input Busca */
 #searchInput {
     width: 100%;
     padding: 10px 12px;
@@ -62,7 +64,7 @@ body {
     box-shadow: 0 0 8px rgba(26,42,108,0.7);
 }
 
-/* ====== Tabela ====== */
+/* Tabela */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -97,7 +99,7 @@ tbody tr:hover {
     font-weight: bold;
 }
 
-/* ====== Modal ====== */
+/* Modal */
 .modal {
     display: none;
     position: fixed;
@@ -133,7 +135,7 @@ tbody tr:hover {
     margin-right: 8px;
 }
 
-/* ====== Cabeçalho ====== */
+/* Cabeçalho */
 h1 {
     text-align: center;
     font-size: 28px;
@@ -168,6 +170,7 @@ h1 {
                 <th>Status</th>
                 <th>Aluno Ethos</th>
                 <th>Ações</th>
+                <th>WhatsApp</th>
             </tr>
         </thead>
         <tbody id="alunosTableBody"></tbody>
@@ -222,6 +225,27 @@ function renderTable(data) {
     alunosTableBody.innerHTML = "";
     data.forEach(aluno => {
         const statusClass = aluno.status === "ativo" ? "status-ativo" : "status-pendente";
+
+        // Mensagem personalizada de confirmação
+        const mensagem = `
+Olá ${aluno.nomeCompleto},
+
+Sua inscrição para o MEGA AULÃO Aprova+ & Colégio Ethos está CONFIRMADA! 🚀
+
+📅 Data: 18/10/2025
+⏰ Horário: 8h às 12h
+📍 Local: Senac – Av. Dom Pedro I, 389 – Centro
+
+Número de inscrição: ${aluno.cupom}
+CPF: ${aluno.cpf}
+
+Prepare-se para uma manhã inteira de revisão focada no ENEM!
+        `.trim();
+
+        // Link do WhatsApp (codificado)
+        const phone = (aluno.telefone || "").replace(/\D/g,"");
+        const linkWhats = `https://api.whatsapp.com/send?phone=55${phone}&text=${encodeURIComponent(mensagem)}`;
+
         const tr = document.createElement("tr");
         tr.innerHTML = `
             <td>${formatDate(aluno.criadoEm)}</td>
@@ -236,6 +260,9 @@ function renderTable(data) {
                 <button class="table-btn" onclick="editField('${aluno.id}','valorPago','Atualizar Pagamento')">Pagamento</button>
                 <button class="table-btn" onclick="editField('${aluno.id}','observacoes','Editar Observação')">Observação</button>
                 <button class="table-btn delete" onclick="deleteAluno('${aluno.id}')">Excluir</button>
+            </td>
+            <td>
+                <a class="table-btn" target="_blank" href="${linkWhats}">WhatsApp</a>
             </td>
         `;
         alunosTableBody.appendChild(tr);
