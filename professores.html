@@ -37,6 +37,10 @@
     .stats-card { background:white; padding:20px; border-radius:12px; flex:1; min-width:150px; text-align:center; box-shadow:0 4px 12px rgba(0,0,0,0.1); }
     .stats-number { font-size:1.5em; font-weight:bold; }
     .stats-label { color:#6b7280; }
+    .status-badge { padding:4px 8px; border-radius:12px; font-size:0.7em; font-weight:bold; }
+    .status-ativo { background:#10b981; color:white; }
+    .status-pendente { background:#f59e0b; color:white; }
+    .status-inativo { background:#ef4444; color:white; }
   </style>
 </head>
 <body>
@@ -94,13 +98,17 @@
     </div>
 
     <div class="dashboard-grid">
-      <div class="stats-card"><div class="stats-number" id="total-alunos">0</div><div class="stats-label">Alunos</div></div>
-      <div class="stats-card"><div class="stats-number" id="total-turmas">0</div><div class="stats-label">Turmas</div></div>
-      <div class="stats-card"><div class="stats-number" id="aulas-hoje">0</div><div class="stats-label">Aulas Hoje</div></div>
+      <div class="stats-card"><div class="stats-number" id="total-alunos">0</div><div class="stats-label">Total de Alunos</div></div>
+      <div class="stats-card"><div class="stats-number" id="total-turmas">0</div><div class="stats-label">Turmas Ativas</div></div>
+      <div class="stats-card"><div class="stats-number" id="alunos-ativos">0</div><div class="stats-label">Alunos Ativos</div></div>
     </div>
 
     <h2>Minhas Turmas</h2>
-    <div class="turmas-container" id="turmas-list"></div>
+    <div class="turmas-container" id="turmas-list">
+      <div style="text-align:center; padding:40px; color:#6b7280;">
+        Carregando turmas...
+      </div>
+    </div>
 
     <div style="margin-top:40px; padding:20px; background:#f8fafc; border-radius:12px;">
       <h3>📞 Suporte</h3>
@@ -112,8 +120,9 @@
 </div>
 
 <!-- SCRIPTS -->
-<script src="./assets/js/firebase-config.js"></script>
-<script src="./assets/js/firebase-integration.js"></script>
+<script type="module" src="./assets/js/firebase-config.js"></script>
+<script type="module" src="./assets/js/firebase-integration.js"></script>
+<script type="module" src="./assets/js/professores-auth.js"></script>
 <script src="./assets/js/notification-system.js"></script>
 
 <script>
@@ -126,102 +135,154 @@
     errorElement.style.display = 'none';
 
     try {
-      const logado = await window.firebaseApp.autenticarProfessor(usuario, senha);
+      const logado = await window.professoresAuth.autenticarProfessor(usuario, senha);
       if(logado){
-        localStorage.setItem('professorLogado', usuario);
         document.getElementById('login-section').style.display='none';
         document.getElementById('professor-panel').style.display='block';
-        document.getElementById('professor-name').textContent = usuario;
-        carregarDadosProfessor(usuario);
+        
+        const professor = window.professoresAuth.getProfessorLogado();
+        document.getElementById('professor-name').textContent = professor.nome;
+        
+        await carregarDadosProfessor(professor.id);
       } else {
         errorElement.style.display='block';
       }
-    } catch(err){ console.error(err); errorElement.style.display='block'; }
+    } catch(err){ 
+      console.error('Erro no login:', err); 
+      errorElement.style.display='block'; 
+    }
   });
 
   // CARREGAR TURMAS E ALUNOS
-  async function carregarDadosProfessor(usuario){
+  async function carregarDadosProfessor(professorId){
     try{
-      const turmas = await window.firebaseApp.buscarTurmasProfessor(usuario);
+      const turmas = await window.professoresAuth.buscarTurmasProfessor(professorId);
       document.getElementById('total-turmas').textContent = turmas.length;
+      
       let totalAlunos = 0;
+      let alunosAtivos = 0;
       const turmasContainer = document.getElementById('turmas-list');
-      turmasContainer.innerHTML='';
+      
+      if (turmas.length === 0) {
+        turmasContainer.innerHTML = `
+          <div style="text-align:center; padding:40px; color:#6b7280; width:100%;">
+            <h3>Nenhuma turma encontrada</h3>
+            <p>Entre em contato com a administração para ser designado a uma turma.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      turmasContainer.innerHTML = '';
 
       for(const turma of turmas){
-        const alunos = await window.firebaseApp.buscarInscricoesPorTurma(turma.turma || turma.nome);
+        const alunos = await window.professoresAuth.buscarInscricoesPorTurma(turma.turma);
         totalAlunos += alunos.length;
+        alunosAtivos += alunos.filter(a => a.status === 'ativo').length;
 
         const turmaHTML = `
           <div class="turma-card">
             <div class="turma-header">
-              <div class="turma-title">Turma ${turma.turma || turma.nome}</div>
+              <div class="turma-title">${turma.turma}</div>
               <div class="turma-badge">${alunos.length} alunos</div>
             </div>
             <div class="turma-info">
-              <p><strong>Horário:</strong> ${turma.horario||'08:00 - 12:00'}</p>
-              <p><strong>Dias:</strong> ${turma.dias||'Segunda a Sexta'}</p>
+              <p><strong>Disciplina:</strong> ${turma.disciplina || 'Não informada'}</p>
+              <p><strong>Período:</strong> ${turma.periodo || 'Não informado'}</p>
             </div>
-            <h4>Alunos:</h4>
+            <h4>Alunos (${alunos.length}):</h4>
             <ul class="aluno-list">
-              ${alunos.slice(0,5).map(a=>`
+              ${alunos.slice(0, 5).map(aluno => `
                 <li class="aluno-item">
                   <div class="aluno-info">
-                    <span class="aluno-name">${a.nome || a.name}</span>
-                    <span class="aluno-contact">${a.telefone || a.phone} - ${a.email}</span>
+                    <span class="aluno-name">${aluno.nomeCompleto}</span>
+                    <span class="aluno-contact">
+                      ${aluno.telefone} | 
+                      <span class="status-badge status-${aluno.status}">${aluno.status}</span> |
+                      ${aluno.alunoEthos ? 'Ethos: ' + aluno.alunoEthos : 'Sem Ethos'}
+                    </span>
                   </div>
-                  <button class="btn-small" onclick="contatarAluno('${a.telefone || a.phone}')">📞 Contatar</button>
+                  <button class="btn-small" onclick="contatarAluno('${aluno.telefone}')">📞 Contatar</button>
                 </li>
               `).join('')}
             </ul>
-            ${alunos.length>5?`<p>+ ${alunos.length-5} outros alunos</p>`:''}
-            <button class="btn-small" onclick="baixarLista('${turma.turma || turma.nome}')">💾 Baixar Lista</button>
+            ${alunos.length > 5 ? `<p style="text-align:center; margin-top:10px;">+ ${alunos.length - 5} outros alunos</p>` : ''}
+            <button class="btn-small" onclick="baixarLista('${turma.turma}')" style="margin-top:10px; width:100%;">
+              💾 Baixar Lista Completa (CSV)
+            </button>
           </div>
         `;
         turmasContainer.innerHTML += turmaHTML;
       }
 
       document.getElementById('total-alunos').textContent = totalAlunos;
-      document.getElementById('aulas-hoje').textContent = turmas.length;
-    } catch(err){ console.error(err); }
+      document.getElementById('alunos-ativos').textContent = alunosAtivos;
+      
+    } catch(err){ 
+      console.error('Erro ao carregar dados:', err);
+      notifications.error('Erro ao carregar dados das turmas');
+    }
   }
 
-  function contatarAluno(telefone){ window.open(`https://wa.me/55${telefone.replace(/\D/g,'')}`,'_blank'); }
+  function contatarAluno(telefone){ 
+    if (telefone) {
+      const numeroLimpo = telefone.replace(/\D/g, '');
+      window.open(`https://wa.me/55${numeroLimpo}`, '_blank');
+    } else {
+      notifications.error('Número de telefone não disponível');
+    }
+  }
 
   function fazerLogout(){
-    localStorage.removeItem('professorLogado');
+    window.professoresAuth.logout();
     window.location.reload();
   }
 
   // DOWNLOAD CSV
   async function baixarLista(turmaNome){
-    const alunos = await window.firebaseApp.buscarInscricoesPorTurma(turmaNome);
-    if(alunos.length===0){ alert('Nenhum aluno encontrado'); return; }
+    try {
+      const alunos = await window.professoresAuth.buscarInscricoesPorTurma(turmaNome);
+      if(alunos.length === 0){ 
+        notifications.error('Nenhum aluno encontrado nesta turma');
+        return; 
+      }
 
-    let csv = 'Nome,Telefone,Email\n';
-    alunos.forEach(a=>{ csv+=`${a.nome || a.name},${a.telefone || a.phone},${a.email}\n`; });
+      let csv = 'Nome Completo,CPF,Telefone,Aluno Ethos,Status,Cupom,Data Inscrição\n';
+      alunos.forEach(aluno => { 
+        csv += `"${aluno.nomeCompleto}","${aluno.cpf}","${aluno.telefone}","${aluno.alunoEthos}","${aluno.status}","${aluno.cupom}","${aluno.criadoEm}"\n`; 
+      });
 
-    const blob = new Blob([csv],{type:'text/csv'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Turma_${turmaNome}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Turma_${turmaNome.replace(/[^a-zA-Z0-9]/g, '_')}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      notifications.success('Lista baixada com sucesso!');
+    } catch (error) {
+      console.error('Erro ao baixar lista:', error);
+      notifications.error('Erro ao baixar lista de alunos');
+    }
   }
 
   // VERIFICAR SE JÁ ESTÁ LOGADO
-  document.addEventListener('DOMContentLoaded',()=>{
-    const professorLogado = localStorage.getItem('professorLogado');
-    if(professorLogado){
-      document.getElementById('login-section').style.display='none';
-      document.getElementById('professor-panel').style.display='block';
-      document.getElementById('professor-name').textContent = professorLogado;
-      carregarDadosProfessor(professorLogado);
+  document.addEventListener('DOMContentLoaded', () => {
+    if (window.professoresAuth.isProfessorLogado()) {
+      const professor = window.professoresAuth.getProfessorLogado();
+      document.getElementById('login-section').style.display = 'none';
+      document.getElementById('professor-panel').style.display = 'block';
+      document.getElementById('professor-name').textContent = professor.nome;
+      carregarDadosProfessor(professor.id);
     }
   });
 
-  function toggleMenu(){ document.querySelector('.menu').classList.toggle('open'); }
+  function toggleMenu(){ 
+    document.querySelector('.menu').classList.toggle('open'); 
+  }
 </script>
 
 </body>
