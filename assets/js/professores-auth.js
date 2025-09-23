@@ -29,7 +29,8 @@ class ProfessoresAuth {
                     id: professorDoc.id,
                     usuario: professorData.usuario,
                     nome: professorData.nome || professorData.usuario,
-                    email: professorData.email || ''
+                    email: professorData.email || '',
+                    materia: professorData.materia || ''
                 }));
                 
                 return true;
@@ -41,20 +42,23 @@ class ProfessoresAuth {
         }
     }
 
-    // Buscar turmas do professor usando a coleção designacoes
-    async buscarTurmasProfessor(professorId) {
+    // Buscar turmas do professor (baseado na matéria do professor)
+    async buscarTurmasProfessor(professorId, materiaProfessor) {
         try {
-            const designacoesRef = collection(db, "designacoes");
-            const q = query(designacoesRef, where("professorId", "==", professorId));
+            // Buscar todas as inscrições para encontrar as turmas únicas da matéria do professor
+            const inscricoesRef = collection(db, "inscricoes");
+            const q = query(inscricoesRef, where("materia", "==", materiaProfessor));
             const querySnapshot = await getDocs(q);
             
-            const turmas = [];
-            querySnapshot.forEach((doc) => {
-                turmas.push({
-                    id: doc.id,
-                    ...doc.data()
-                });
-            });
+            // Extrair turmas únicas
+            const turmasUnicas = [...new Set(querySnapshot.docs.map(doc => doc.data().turma || 'Geral'))];
+            
+            const turmas = turmasUnicas.map(turma => ({
+                id: turma,
+                turma: turma,
+                materia: materiaProfessor,
+                quantidadeAlunos: querySnapshot.docs.filter(doc => doc.data().turma === turma).length
+            }));
             
             return turmas;
         } catch (error) {
@@ -63,11 +67,22 @@ class ProfessoresAuth {
         }
     }
 
-    // Buscar inscrições por turma
-    async buscarInscricoesPorTurma(turmaNome) {
+    // Buscar alunos por matéria (e opcionalmente por turma)
+    async buscarAlunosPorMateria(materia, turma = null) {
         try {
             const inscricoesRef = collection(db, "inscricoes");
-            const q = query(inscricoesRef, where("turma", "==", turmaNome));
+            let q;
+            
+            if (turma && turma !== 'Geral') {
+                q = query(
+                    inscricoesRef, 
+                    where("materia", "==", materia),
+                    where("turma", "==", turma)
+                );
+            } else {
+                q = query(inscricoesRef, where("materia", "==", materia));
+            }
+            
             const querySnapshot = await getDocs(q);
             
             const alunos = [];
@@ -75,30 +90,34 @@ class ProfessoresAuth {
                 const data = doc.data();
                 alunos.push({
                     id: doc.id,
-                    nomeCompleto: data.nomeCompleto || '',
-                    cpf: data.cpf || '',
+                    nome: data.nome || '',
+                    email: data.email || '',
                     telefone: data.telefone || '',
-                    alunoEthos: data.alunoEthos || '',
+                    usuario: data.usuario || '',
                     status: data.status || 'pendente',
-                    cupom: data.cupom || '',
-                    criadoEm: data.criadoEm ? this.formatarData(data.criadoEm) : '',
-                    turma: data.turma || ''
+                    materia: data.materia || '',
+                    turma: data.turma || 'Geral',
+                    criadoEm: data.criadoEm ? this.formatarDataString(data.criadoEm) : '',
+                    senha: data.senha || ''
                 });
             });
             
             return alunos;
         } catch (error) {
-            console.error('Erro ao buscar inscrições:', error);
+            console.error('Erro ao buscar alunos:', error);
             return [];
         }
     }
 
-    // Formatar data do Firebase
-    formatarData(timestamp) {
-        if (timestamp && timestamp.toDate) {
-            return timestamp.toDate().toLocaleDateString('pt-BR');
+    // Formatar data string (seu formato atual)
+    formatarDataString(dataString) {
+        try {
+            if (!dataString) return '';
+            const data = new Date(dataString);
+            return data.toLocaleDateString('pt-BR');
+        } catch (error) {
+            return dataString;
         }
-        return '';
     }
 
     // Verificar se professor está logado
