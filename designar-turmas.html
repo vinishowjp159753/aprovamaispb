@@ -5,19 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Designar Turmas - AprovaMaisPB</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="assets/css/designar-turmas.css">
+<link rel="stylesheet" href="./assets/css/designar-turmas.css">
 </head>
 <body>
+
 <div class="container">
     <h1>Designar Turmas</h1>
 
+    <!-- Formulário de designação -->
     <div class="form-group">
         <label for="selectProfessor">Selecionar Professor</label>
         <select id="selectProfessor">
-            <option value="">Selecione um professor</option>
+            <option value="">Carregando professores...</option>
         </select>
     </div>
-
     <div class="form-group">
         <label for="selectTurma">Selecionar Turma</label>
         <select id="selectTurma">
@@ -27,18 +28,20 @@
             <option value="Turma C - Noite">Turma C - Noite</option>
         </select>
     </div>
+    <button class="btn assign-btn" id="designarTurmaBtn"><i class="fas fa-plus"></i> Designar Turma</button>
 
-    <button class="btn assign-btn" id="designarTurmaBtn">Designar Turma</button>
-
-    <h2 style="margin-top:30px;">Designações Ativas</h2>
+    <!-- Lista de designações -->
+    <h2>Designações Ativas</h2>
     <table>
         <thead>
             <tr><th>Professor</th><th>Turma</th><th>Ação</th></tr>
         </thead>
-        <tbody id="designacoesBody"></tbody>
+        <tbody id="designacoesBody">
+            <tr><td colspan="3">Carregando...</td></tr>
+        </tbody>
     </table>
 </div>
 
-<script type="module" src="assets/js/designar-turmas.js"></script>
+<script type="module" src="./assets/js/designar-turmas.js"></script>
 </body>
 </html>
