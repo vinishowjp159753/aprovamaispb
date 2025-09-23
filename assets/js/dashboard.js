@@ -10,7 +10,8 @@ async function updateDashboard() {
 
         // --- Alunos Ativos ---
         const ativos = alunosSnapshot.docs.filter(doc => doc.data().status === "ativo").length;
-        document.getElementById("alunosAtivos").textContent = ativos;
+        const alunosElem = document.getElementById("alunosAtivos");
+        if (alunosElem) alunosElem.textContent = ativos;
 
         // --- Turmas Ativas e Receita Mensal ---
         const turmasSet = new Set();
@@ -26,10 +27,8 @@ async function updateDashboard() {
             let dateObj = null;
             if (data.criadoEm) {
                 if (typeof data.criadoEm === "object" && data.criadoEm.toDate) {
-                    // Firebase Timestamp
-                    dateObj = data.criadoEm.toDate();
+                    dateObj = data.criadoEm.toDate(); // Timestamp Firebase
                 } else {
-                    // String ou outro formato
                     dateObj = new Date(data.criadoEm);
                 }
             }
@@ -42,11 +41,15 @@ async function updateDashboard() {
             }
         });
 
-        document.getElementById("turmasAtivas").textContent = turmasSet.size;
-        document.getElementById("receitaMensal").textContent = `R$ ${receitaMensal.toFixed(2)}`;
+        const turmasElem = document.getElementById("turmasAtivas");
+        if (turmasElem) turmasElem.textContent = turmasSet.size;
+
+        const receitaElem = document.getElementById("receitaMensal");
+        if (receitaElem) receitaElem.textContent = `R$ ${receitaMensal.toFixed(2)}`;
 
         // --- Professores Ativos ---
-        document.getElementById("totalProfessores").textContent = professoresSnapshot.size;
+        const professoresElem = document.getElementById("totalProfessores");
+        if (professoresElem) professoresElem.textContent = professoresSnapshot.size;
 
         // --- Atualiza gráficos ---
         updateCharts(alunosSnapshot);
@@ -87,37 +90,45 @@ function updateCharts(alunosSnapshot) {
     });
 
     // --- Gráfico Matrículas ---
-    const ctx1 = document.getElementById('enrollmentsChart').getContext('2d');
-    if (window.enrollmentsChartInstance) window.enrollmentsChartInstance.destroy();
-    window.enrollmentsChartInstance = new Chart(ctx1, {
-        type: 'bar',
-        data: {
-            labels: months,
-            datasets: [{
-                label: 'Matrículas',
-                data: matriculasPorMes,
-                backgroundColor:'rgba(26,42,108,0.7)'
-            }]
-        },
-        options: { responsive:true, maintainAspectRatio:false }
-    });
+    const enrollCanvas = document.getElementById('enrollmentsChart');
+    if (enrollCanvas) {
+        const ctx1 = enrollCanvas.getContext('2d');
+        if (window.enrollmentsChartInstance) window.enrollmentsChartInstance.destroy();
+        window.enrollmentsChartInstance = new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: months,
+                datasets: [{
+                    label: 'Matrículas',
+                    data: matriculasPorMes,
+                    backgroundColor:'rgba(26,42,108,0.7)'
+                }]
+            },
+            options: { responsive:true, maintainAspectRatio:false }
+        });
+    }
 
     // --- Gráfico Distribuição de Turmas ---
-    const ctx2 = document.getElementById('classesChart').getContext('2d');
-    if (window.classesChartInstance) window.classesChartInstance.destroy();
-    window.classesChartInstance = new Chart(ctx2, {
-        type: 'pie',
-        data: {
-            labels: Object.keys(cursosMap),
-            datasets: [{
-                data: Object.values(cursosMap),
-                backgroundColor:['#1a2a6c','#b21f1f','#fdba2d','#28a745','#17a2b8']
-            }]
-        },
-        options: { responsive:true, maintainAspectRatio:false }
-    });
+    const classesCanvas = document.getElementById('classesChart');
+    if (classesCanvas) {
+        const ctx2 = classesCanvas.getContext('2d');
+        if (window.classesChartInstance) window.classesChartInstance.destroy();
+        window.classesChartInstance = new Chart(ctx2, {
+            type: 'pie',
+            data: {
+                labels: Object.keys(cursosMap),
+                datasets: [{
+                    data: Object.values(cursosMap),
+                    backgroundColor:['#1a2a6c','#b21f1f','#fdba2d','#28a745','#17a2b8']
+                }]
+            },
+            options: { responsive:true, maintainAspectRatio:false }
+        });
+    }
 }
 
-// Inicializa dashboard e atualiza a cada 10 segundos
-updateDashboard();
-setInterval(updateDashboard, 10000);
+// Inicializa dashboard após DOM carregado
+document.addEventListener("DOMContentLoaded", () => {
+    updateDashboard();
+    setInterval(updateDashboard, 10000);
+});
