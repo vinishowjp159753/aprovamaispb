@@ -41,6 +41,7 @@
     .status-ativo { background:#10b981; color:white; }
     .status-pendente { background:#f59e0b; color:white; }
     .status-inativo { background:#ef4444; color:white; }
+    .materia-badge { background:#8b5cf6; color:white; padding:4px 8px; border-radius:12px; font-size:0.8em; }
   </style>
 </head>
 <body>
@@ -93,17 +94,17 @@
   <main class="container" style="max-width:1200px; margin:0 auto; padding:20px;">
     <div class="welcome-header">
       <h1>Bem-vindo, Professor <span id="professor-name">!</span></h1>
-      <p>Painel de controle das suas turmas e alunos</p>
+      <p>Painel de controle dos seus alunos de <span id="professor-materia" class="materia-badge"></span></p>
       <button class="btn-modern" onclick="fazerLogout()" style="margin-top:15px;">🚪 Sair</button>
     </div>
 
     <div class="dashboard-grid">
       <div class="stats-card"><div class="stats-number" id="total-alunos">0</div><div class="stats-label">Total de Alunos</div></div>
-      <div class="stats-card"><div class="stats-number" id="total-turmas">0</div><div class="stats-label">Turmas Ativas</div></div>
+      <div class="stats-card"><div class="stats-number" id="total-turmas">0</div><div class="stats-label">Turmas</div></div>
       <div class="stats-card"><div class="stats-number" id="alunos-ativos">0</div><div class="stats-label">Alunos Ativos</div></div>
     </div>
 
-    <h2>Minhas Turmas</h2>
+    <h2>Minhas Turmas - <span id="materia-titulo"></span></h2>
     <div class="turmas-container" id="turmas-list">
       <div style="text-align:center; padding:40px; color:#6b7280;">
         Carregando turmas...
@@ -142,8 +143,10 @@
         
         const professor = window.professoresAuth.getProfessorLogado();
         document.getElementById('professor-name').textContent = professor.nome;
+        document.getElementById('professor-materia').textContent = professor.materia;
+        document.getElementById('materia-titulo').textContent = professor.materia;
         
-        await carregarDadosProfessor(professor.id);
+        await carregarDadosProfessor(professor.id, professor.materia);
       } else {
         errorElement.style.display='block';
       }
@@ -154,9 +157,9 @@
   });
 
   // CARREGAR TURMAS E ALUNOS
-  async function carregarDadosProfessor(professorId){
+  async function carregarDadosProfessor(professorId, materiaProfessor){
     try{
-      const turmas = await window.professoresAuth.buscarTurmasProfessor(professorId);
+      const turmas = await window.professoresAuth.buscarTurmasProfessor(professorId, materiaProfessor);
       document.getElementById('total-turmas').textContent = turmas.length;
       
       let totalAlunos = 0;
@@ -166,8 +169,8 @@
       if (turmas.length === 0) {
         turmasContainer.innerHTML = `
           <div style="text-align:center; padding:40px; color:#6b7280; width:100%;">
-            <h3>Nenhuma turma encontrada</h3>
-            <p>Entre em contato com a administração para ser designado a uma turma.</p>
+            <h3>Nenhum aluno encontrado para a matéria ${materiaProfessor}</h3>
+            <p>Os alunos aparecerão aqui quando se matricularem na sua matéria.</p>
           </div>
         `;
         return;
@@ -176,30 +179,30 @@
       turmasContainer.innerHTML = '';
 
       for(const turma of turmas){
-        const alunos = await window.professoresAuth.buscarInscricoesPorTurma(turma.turma);
+        const alunos = await window.professoresAuth.buscarAlunosPorMateria(materiaProfessor, turma.turma);
         totalAlunos += alunos.length;
         alunosAtivos += alunos.filter(a => a.status === 'ativo').length;
 
         const turmaHTML = `
           <div class="turma-card">
             <div class="turma-header">
-              <div class="turma-title">${turma.turma}</div>
+              <div class="turma-title">${turma.turma || 'Turma Geral'}</div>
               <div class="turma-badge">${alunos.length} alunos</div>
             </div>
             <div class="turma-info">
-              <p><strong>Disciplina:</strong> ${turma.disciplina || 'Não informada'}</p>
-              <p><strong>Período:</strong> ${turma.periodo || 'Não informado'}</p>
+              <p><strong>Matéria:</strong> ${materiaProfessor}</p>
+              <p><strong>Alunos ativos:</strong> ${alunos.filter(a => a.status === 'ativo').length}</p>
             </div>
             <h4>Alunos (${alunos.length}):</h4>
             <ul class="aluno-list">
               ${alunos.slice(0, 5).map(aluno => `
                 <li class="aluno-item">
                   <div class="aluno-info">
-                    <span class="aluno-name">${aluno.nomeCompleto}</span>
+                    <span class="aluno-name">${aluno.nome}</span>
                     <span class="aluno-contact">
                       ${aluno.telefone} | 
                       <span class="status-badge status-${aluno.status}">${aluno.status}</span> |
-                      ${aluno.alunoEthos ? 'Ethos: ' + aluno.alunoEthos : 'Sem Ethos'}
+                      ${aluno.usuario}
                     </span>
                   </div>
                   <button class="btn-small" onclick="contatarAluno('${aluno.telefone}')">📞 Contatar</button>
@@ -207,8 +210,8 @@
               `).join('')}
             </ul>
             ${alunos.length > 5 ? `<p style="text-align:center; margin-top:10px;">+ ${alunos.length - 5} outros alunos</p>` : ''}
-            <button class="btn-small" onclick="baixarLista('${turma.turma}')" style="margin-top:10px; width:100%;">
-              💾 Baixar Lista Completa (CSV)
+            <button class="btn-small" onclick="baixarLista('${materiaProfessor}', '${turma.turma}')" style="margin-top:10px; width:100%;">
+              💾 Baixar Lista da Turma (CSV)
             </button>
           </div>
         `;
@@ -220,7 +223,9 @@
       
     } catch(err){ 
       console.error('Erro ao carregar dados:', err);
-      notifications.error('Erro ao carregar dados das turmas');
+      if (window.notifications) {
+        window.notifications.error('Erro ao carregar dados dos alunos');
+      }
     }
   }
 
@@ -229,7 +234,9 @@
       const numeroLimpo = telefone.replace(/\D/g, '');
       window.open(`https://wa.me/55${numeroLimpo}`, '_blank');
     } else {
-      notifications.error('Número de telefone não disponível');
+      if (window.notifications) {
+        window.notifications.error('Número de telefone não disponível');
+      }
     }
   }
 
@@ -239,44 +246,53 @@
   }
 
   // DOWNLOAD CSV
-  async function baixarLista(turmaNome){
+  async function baixarLista(materia, turma){
     try {
-      const alunos = await window.professoresAuth.buscarInscricoesPorTurma(turmaNome);
+      const alunos = await window.professoresAuth.buscarAlunosPorMateria(materia, turma);
       if(alunos.length === 0){ 
-        notifications.error('Nenhum aluno encontrado nesta turma');
+        if (window.notifications) {
+          window.notifications.error('Nenhum aluno encontrado');
+        }
         return; 
       }
 
-      let csv = 'Nome Completo,CPF,Telefone,Aluno Ethos,Status,Cupom,Data Inscrição\n';
+      let csv = 'Nome,Email,Telefone,Usuário,Status,Matéria,Turma,Data Inscrição\n';
       alunos.forEach(aluno => { 
-        csv += `"${aluno.nomeCompleto}","${aluno.cpf}","${aluno.telefone}","${aluno.alunoEthos}","${aluno.status}","${aluno.cupom}","${aluno.criadoEm}"\n`; 
+        csv += `"${aluno.nome}","${aluno.email}","${aluno.telefone}","${aluno.usuario}","${aluno.status}","${aluno.materia}","${aluno.turma}","${aluno.criadoEm}"\n`; 
       });
 
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `Turma_${turmaNome.replace(/[^a-zA-Z0-9]/g, '_')}.csv`;
+      const nomeArquivo = turma ? `Turma_${turma}_${materia}` : `Alunos_${materia}`;
+      a.download = `${nomeArquivo.replace(/[^a-zA-Z0-9]/g, '_')}.csv`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
       
-      notifications.success('Lista baixada com sucesso!');
+      if (window.notifications) {
+        window.notifications.success('Lista baixada com sucesso!');
+      }
     } catch (error) {
       console.error('Erro ao baixar lista:', error);
-      notifications.error('Erro ao baixar lista de alunos');
+      if (window.notifications) {
+        window.notifications.error('Erro ao baixar lista de alunos');
+      }
     }
   }
 
   // VERIFICAR SE JÁ ESTÁ LOGADO
   document.addEventListener('DOMContentLoaded', () => {
-    if (window.professoresAuth.isProfessorLogado()) {
+    if (window.professoresAuth && window.professoresAuth.isProfessorLogado()) {
       const professor = window.professoresAuth.getProfessorLogado();
       document.getElementById('login-section').style.display = 'none';
       document.getElementById('professor-panel').style.display = 'block';
       document.getElementById('professor-name').textContent = professor.nome;
-      carregarDadosProfessor(professor.id);
+      document.getElementById('professor-materia').textContent = professor.materia;
+      document.getElementById('materia-titulo').textContent = professor.materia;
+      carregarDadosProfessor(professor.id, professor.materia);
     }
   });
 
