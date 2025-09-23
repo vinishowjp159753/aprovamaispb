@@ -1,78 +1,44 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gerenciar Designações de Turmas</title>
-
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Designar Turmas - AprovaMaisPB</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="assets/css/designar-turmas.css">
 </head>
-<body class="bg-gray-100 text-gray-800">
-  <header class="bg-blue-600 text-white p-5 shadow-md">
-    <h1 class="text-2xl font-bold text-center">Gerenciar Designações de Turmas</h1>
-  </header>
+<body>
+<div class="container">
+    <h1>Designar Turmas</h1>
 
-  <main class="max-w-6xl mx-auto p-6">
-    <!-- Formulário de nova designação -->
-    <section class="bg-white p-6 rounded-lg shadow-md mb-6">
-      <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
-        <i class="fa fa-plus-circle text-blue-600"></i> Nova Designação
-      </h2>
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <input id="professorInput" type="text" placeholder="Nome do professor"
-               class="border rounded p-2 focus:outline-none focus:ring focus:ring-blue-300">
-        <input id="turmaInput" type="text" placeholder="Turma"
-               class="border rounded p-2 focus:outline-none focus:ring focus:ring-blue-300">
-        <select id="statusInput"
-                class="border rounded p-2 focus:outline-none focus:ring focus:ring-blue-300">
-          <option value="ativo">Ativo</option>
-          <option value="inativo">Inativo</option>
+    <div class="form-group">
+        <label for="selectProfessor">Selecionar Professor</label>
+        <select id="selectProfessor">
+            <option value="">Selecione um professor</option>
         </select>
-        <button id="addBtn"
-                class="bg-blue-600 hover:bg-blue-700 text-white rounded p-2 font-semibold transition">
-          Adicionar
-        </button>
-      </div>
-    </section>
+    </div>
 
-    <!-- Filtros -->
-    <section class="flex flex-wrap gap-3 mb-6">
-      <input id="searchProfessor" type="text" placeholder="Buscar professor..."
-             class="border rounded p-2 flex-1 min-w-[180px] focus:ring focus:ring-blue-300">
-      <input id="filterTurma" type="text" placeholder="Filtrar por turma..."
-             class="border rounded p-2 flex-1 min-w-[140px] focus:ring focus:ring-blue-300">
-      <select id="filterStatus"
-              class="border rounded p-2 min-w-[140px] focus:ring focus:ring-blue-300">
-        <option value="">Todos os Status</option>
-        <option value="ativo">Ativo</option>
-        <option value="inativo">Inativo</option>
-      </select>
-    </section>
+    <div class="form-group">
+        <label for="selectTurma">Selecionar Turma</label>
+        <select id="selectTurma">
+            <option value="">Selecione uma turma</option>
+            <option value="Turma A - Manhã">Turma A - Manhã</option>
+            <option value="Turma B - Tarde">Turma B - Tarde</option>
+            <option value="Turma C - Noite">Turma C - Noite</option>
+        </select>
+    </div>
 
-    <!-- Tabela -->
-    <section class="bg-white rounded-lg shadow-md overflow-x-auto">
-      <table class="min-w-full border-collapse">
-        <thead class="bg-blue-600 text-white">
-          <tr>
-            <th class="text-left py-3 px-4">Professor</th>
-            <th class="text-left py-3 px-4">Turma</th>
-            <th class="text-left py-3 px-4">Alunos Vinculados</th>
-            <th class="text-left py-3 px-4">Status</th>
-            <th class="text-left py-3 px-4">Ações</th>
-          </tr>
+    <button class="btn assign-btn" id="designarTurmaBtn">Designar Turma</button>
+
+    <h2 style="margin-top:30px;">Designações Ativas</h2>
+    <table>
+        <thead>
+            <tr><th>Professor</th><th>Turma</th><th>Ação</th></tr>
         </thead>
-        <tbody id="designacoesBody" class="divide-y">
-          <!-- Populado via JS -->
-        </tbody>
-      </table>
-    </section>
-  </main>
+        <tbody id="designacoesBody"></tbody>
+    </table>
+</div>
 
-  <script type="module" src="assets/js/designar-turmas.js"></script>
+<script type="module" src="assets/js/designar-turmas.js"></script>
 </body>
 </html>
