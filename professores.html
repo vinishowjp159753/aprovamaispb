@@ -351,10 +351,44 @@
       text-align: center;
     }
 
+    /* ===== LOADING ===== */
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: var(--gray-600);
+    }
+
+    .loading-spinner {
+      border: 4px solid var(--gray-200);
+      border-left: 4px solid var(--primary);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
     /* ===== RESPONSIVIDADE ===== */
     @media (max-width: 768px) {
       .menu {
         display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        padding: 1rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      }
+
+      .menu.show {
+        display: flex;
       }
 
       .hamburger {
@@ -383,7 +417,7 @@
       <img src="./assets/img/logo_aprovamaispb.png" alt="Logo" />
       <span>AprovaMaisPB</span>
     </div>
-    <ul class="menu">
+    <ul class="menu" id="main-menu">
       <li><a href="index.html">Início</a></li>
       <li><a href="matricula.html">Matricule-se</a></li>
       <li><a href="professores.html" class="active">Área do Professor</a></li>
@@ -414,7 +448,7 @@
         ❌ Usuário ou senha incorretos!
       </div>
       
-      <button type="submit" class="btn-modern">🚀 Acessar Portal</button>
+      <button type="submit" class="btn-modern" id="login-btn">🚀 Acessar Portal</button>
     </form>
     
     <div style="margin-top: 2rem; padding: 1.5rem; background: var(--gray-100); border-radius: var(--radius);">
@@ -462,10 +496,9 @@
     <p style="color: var(--gray-600); margin-bottom: 2rem;">Turmas sob sua responsabilidade</p>
     
     <div class="turmas-container" id="turmas-list">
-      <div style="text-align: center; padding: 3rem; color: var(--gray-600); grid-column: 1 / -1;">
-        <div style="font-size: 3rem; margin-bottom: 1rem;">⏳</div>
-        <h3>Carregando turmas...</h3>
-        <p>Aguarde enquanto buscamos suas designações</p>
+      <div class="loading">
+        <div class="loading-spinner"></div>
+        <p>Carregando suas turmas...</p>
       </div>
     </div>
 
@@ -491,44 +524,140 @@
   </div>
 </div>
 
-<script>
-  // Simulação do Firebase enquanto testa
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { 
+    getFirestore, 
+    collection, 
+    getDocs, 
+    query, 
+    where 
+  } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+  // Sua configuração do Firebase
+  const firebaseConfig = {
+    apiKey: "sua-api-key",
+    authDomain: "seu-projeto.firebaseapp.com",
+    projectId: "seu-projeto-id",
+    storageBucket: "seu-projeto.appspot.com",
+    messagingSenderId: "seu-sender-id",
+    appId: "seu-app-id"
+  };
+
+  // Inicializar Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
   class ProfessoresAuth {
     async autenticarProfessor(usuario, senha) {
-      // Simulação - remover quando conectar com Firebase real
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      if (usuario === "professor" && senha === "123") {
-        localStorage.setItem('professorLogado', JSON.stringify({
-          id: "1",
-          usuario: usuario,
-          nome: "Professor Teste",
-          materia: "Matemática"
-        }));
-        return true;
+      try {
+        console.log('Autenticando professor:', usuario);
+        
+        const professoresRef = collection(db, "professores");
+        const q = query(
+          professoresRef, 
+          where("usuario", "==", usuario),
+          where("senha", "==", senha)
+        );
+        
+        const querySnapshot = await getDocs(q);
+        
+        if (!querySnapshot.empty) {
+          const professorDoc = querySnapshot.docs[0];
+          const professorData = professorDoc.data();
+          
+          console.log('Professor autenticado:', professorData);
+          
+          localStorage.setItem('professorLogado', JSON.stringify({
+            id: professorDoc.id,
+            usuario: professorData.usuario,
+            nome: professorData.nome || professorData.usuario,
+            email: professorData.email || '',
+            materia: professorData.materia || ''
+          }));
+          
+          return true;
+        }
+        console.log('Professor não encontrado');
+        return false;
+      } catch (error) {
+        console.error('Erro na autenticação:', error);
+        return false;
       }
-      return false;
     }
 
     async buscarTurmasProfessor(professorId) {
-      // Simulação - remover quando conectar com Firebase real
-      await new Promise(resolve => setTimeout(resolve, 500));
-      return [
-        { id: "1", turma: "Turma A - Manhã", disciplina: "Matemática", periodo: "2024/1" },
-        { id: "2", turma: "Turma B - Tarde", disciplina: "Matemática", periodo: "2024/1" }
-      ];
+      try {
+        console.log('Buscando turmas para professor:', professorId);
+        
+        const designacoesRef = collection(db, "designacoes");
+        const q = query(designacoesRef, where("professorId", "==", professorId));
+        const querySnapshot = await getDocs(q);
+        
+        const turmas = [];
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          turmas.push({
+            id: doc.id,
+            turma: data.turma,
+            professorId: data.professorId,
+            disciplina: data.disciplina || 'Não informada',
+            periodo: data.periodo || 'Não informado'
+          });
+        });
+        
+        console.log('Turmas encontradas:', turmas);
+        return turmas;
+      } catch (error) {
+        console.error('Erro ao buscar turmas:', error);
+        return [];
+      }
     }
 
     async buscarAlunosPorTurma(turma) {
-      // Simulação - remover quando conectar com Firebase real
-      await new Promise(resolve => setTimeout(resolve, 500));
-      if (turma === "Turma A - Manhã") {
-        return [
-          { nome: "João Silva", telefone: "83999999999", status: "ativo", usuario: "joao123" },
-          { nome: "Maria Santos", telefone: "83988888888", status: "ativo", usuario: "maria456" }
-        ];
+      try {
+        console.log('Buscando alunos da turma:', turma);
+        
+        const inscricoesRef = collection(db, "inscricoes");
+        const q = query(inscricoesRef, where("turma", "==", turma));
+        const querySnapshot = await getDocs(q);
+        
+        const alunos = [];
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          alunos.push({
+            id: doc.id,
+            nome: data.nome || data.nomeCompleto || 'Nome não informado',
+            email: data.email || 'Email não informado',
+            telefone: data.telefone || 'Telefone não informado',
+            usuario: data.usuario || 'Usuário não informado',
+            status: data.status || 'pendente',
+            materia: data.materia || 'Não informada',
+            turma: data.turma || turma,
+            criadoEm: data.criadoEm ? this.formatarData(data.criadoEm) : 'Data não informada'
+          });
+        });
+        
+        console.log('Alunos encontrados:', alunos.length);
+        return alunos;
+      } catch (error) {
+        console.error('Erro ao buscar alunos:', error);
+        return [];
       }
-      return [];
+    }
+
+    formatarData(data) {
+      try {
+        if (typeof data === 'string') {
+          return new Date(data).toLocaleDateString('pt-BR');
+        } else if (data && data.seconds) {
+          return new Date(data.seconds * 1000).toLocaleDateString('pt-BR');
+        }
+        return 'Data não informada';
+      } catch (error) {
+        return 'Data inválida';
+      }
     }
 
     isProfessorLogado() {
@@ -545,16 +674,23 @@
     }
   }
 
-  // Inicializar
+  // Expor para escopo global
   window.professoresAuth = new ProfessoresAuth();
+  window.db = db;
+</script>
 
+<script>
   // LOGIN
   document.getElementById('login-form').addEventListener('submit', async function(e){
     e.preventDefault();
     const usuario = document.getElementById('usuario').value;
     const senha = document.getElementById('senha').value;
     const errorElement = document.getElementById('login-error');
+    const loginBtn = document.getElementById('login-btn');
+    
     errorElement.style.display = 'none';
+    loginBtn.disabled = true;
+    loginBtn.textContent = '⏳ Autenticando...';
 
     try {
       const logado = await window.professoresAuth.autenticarProfessor(usuario, senha);
@@ -571,20 +707,32 @@
       }
     } catch(err){ 
       console.error('Erro no login:', err); 
-      errorElement.style.display = 'block'; 
+      errorElement.style.display = 'block';
+      errorElement.textContent = '❌ Erro de conexão. Tente novamente.';
+    } finally {
+      loginBtn.disabled = false;
+      loginBtn.textContent = '🚀 Acessar Portal';
     }
   });
 
-  // CARREGAR DADOS
+  // CARREGAR DADOS REAIS DO FIREBASE
   async function carregarDadosProfessor(professorId){
-    try{
+    try {
+      const turmasContainer = document.getElementById('turmas-list');
+      turmasContainer.innerHTML = `
+        <div class="loading">
+          <div class="loading-spinner"></div>
+          <p>Carregando suas turmas...</p>
+        </div>
+      `;
+
+      // Buscar turmas designadas ao professor
       const turmasDesignadas = await window.professoresAuth.buscarTurmasProfessor(professorId);
       document.getElementById('total-turmas').textContent = turmasDesignadas.length;
       
       let totalAlunos = 0;
       let alunosAtivos = 0;
-      const turmasContainer = document.getElementById('turmas-list');
-      
+
       if (turmasDesignadas.length === 0) {
         turmasContainer.innerHTML = `
           <div style="text-align:center; padding:3rem; color:var(--gray-600); grid-column:1/-1;">
@@ -598,6 +746,7 @@
       
       turmasContainer.innerHTML = '';
 
+      // Para cada turma designada, buscar os alunos
       for(const turma of turmasDesignadas){
         const alunos = await window.professoresAuth.buscarAlunosPorTurma(turma.turma);
         totalAlunos += alunos.length;
@@ -624,20 +773,27 @@
                       <span class="aluno-contact">
                         📱 ${aluno.telefone} | 
                         <span class="status-badge status-${aluno.status}">${aluno.status}</span>
-                        | 👤 ${aluno.usuario}
+                        | 📧 ${aluno.email}
                       </span>
                     </div>
-                    <button class="btn-small" onclick="contatarAluno('${aluno.telefone}')">📞</button>
+                    <button class="btn-small" onclick="contatarAluno('${aluno.telefone}')" title="Contatar aluno">
+                      📞
+                    </button>
                   </li>
                 `).join('')}
               </ul>
             ` : `
-              <p style="text-align:center; color:var(--gray-600); padding:2rem;">Nenhum aluno matriculado nesta turma</p>
+              <p style="text-align:center; color:var(--gray-600); padding:2rem;">
+                Nenhum aluno matriculado nesta turma
+              </p>
             `}
             
             <div style="display: flex; gap: 10px; margin-top: 1rem;">
               <button class="btn-small" onclick="baixarListaTurma('${turma.turma}')" style="flex: 1;">
                 💾 Baixar Lista CSV
+              </button>
+              <button class="btn-small" onclick="visualizarDetalhesTurma('${turma.turma}')" style="flex: 1;">
+                📊 Ver Estatísticas
               </button>
             </div>
           </div>
@@ -645,24 +801,67 @@
         turmasContainer.innerHTML += turmaHTML;
       }
 
+      // Atualizar estatísticas
       document.getElementById('total-alunos').textContent = totalAlunos;
       document.getElementById('alunos-ativos').textContent = alunosAtivos;
       
     } catch(err){ 
       console.error('Erro ao carregar dados:', err);
-      alert('Erro ao carregar turmas designadas');
+      const turmasContainer = document.getElementById('turmas-list');
+      turmasContainer.innerHTML = `
+        <div style="text-align:center; padding:3rem; color:var(--danger); grid-column:1/-1;">
+          <div style="font-size:4rem; margin-bottom:1rem;">❌</div>
+          <h3>Erro ao carregar dados</h3>
+          <p>Verifique sua conexão e tente novamente</p>
+          <button class="btn-modern" onclick="location.reload()" style="margin-top:1rem;">
+            🔄 Tentar Novamente
+          </button>
+        </div>
+      `;
     }
   }
 
   function contatarAluno(telefone){ 
-    if (telefone) {
+    if (telefone && telefone !== 'Telefone não informado') {
       const numeroLimpo = telefone.replace(/\D/g, '');
       window.open(`https://wa.me/55${numeroLimpo}`, '_blank');
+    } else {
+      alert('Telefone não disponível para contato');
     }
   }
 
-  function baixarListaTurma(turma){
-    alert(`Download da lista da turma: ${turma}\n\nEsta funcionalidade será implementada com o Firebase real.`);
+  async function baixarListaTurma(turma){
+    try {
+      const alunos = await window.professoresAuth.buscarAlunosPorTurma(turma);
+      if(alunos.length === 0){ 
+        alert('Nenhum aluno encontrado nesta turma');
+        return; 
+      }
+
+      let csv = 'Nome,Email,Telefone,Usuário,Status,Matéria,Turma,Data Inscrição\n';
+      alunos.forEach(aluno => { 
+        csv += `"${aluno.nome}","${aluno.email}","${aluno.telefone}","${aluno.usuario}","${aluno.status}","${aluno.materia}","${aluno.turma}","${aluno.criadoEm}"\n`; 
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Turma_${turma.replace(/[^a-zA-Z0-9]/g, '_')}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      alert('✅ Lista baixada com sucesso!');
+    } catch (error) {
+      console.error('Erro ao baixar lista:', error);
+      alert('❌ Erro ao baixar lista de alunos');
+    }
+  }
+
+  function visualizarDetalhesTurma(turma) {
+    alert(`Estatísticas da turma: ${turma}\n\nEsta funcionalidade pode ser expandida para mostrar gráficos e relatórios detalhados.`);
   }
 
   function fazerLogout(){
@@ -671,22 +870,22 @@
   }
 
   function toggleMenu(){ 
-    const menu = document.querySelector('.menu');
-    menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+    const menu = document.getElementById('main-menu');
+    menu.classList.toggle('show');
   }
 
   // VERIFICAR LOGIN AO CARREGAR
   document.addEventListener('DOMContentLoaded', () => {
-    if (window.professoresAuth.isProfessorLogado()) {
+    // Esconder mensagem de erro inicialmente
+    document.getElementById('login-error').style.display = 'none';
+    
+    if (window.professoresAuth && window.professoresAuth.isProfessorLogado()) {
       const professor = window.professoresAuth.getProfessorLogado();
       document.getElementById('login-section').style.display = 'none';
       document.getElementById('professor-panel').style.display = 'block';
       document.getElementById('professor-name').textContent = professor.nome;
       carregarDadosProfessor(professor.id);
     }
-    
-    // Esconder mensagem de erro inicialmente
-    document.getElementById('login-error').style.display = 'none';
   });
 </script>
 
