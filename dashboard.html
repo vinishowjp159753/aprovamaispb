@@ -142,7 +142,7 @@
       logoutBtn.addEventListener("click", async () => {
           try {
               await auth.signOut();
-              window.location.href = "login.html"; // redireciona para login
+              window.location.href = "login.html";
           } catch (err) {
               console.error("Erro ao sair:", err);
               alert("Não foi possível sair. Tente novamente.");
