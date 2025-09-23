@@ -58,11 +58,11 @@
       </button>
     </form>
     
-    <div class="support-info">
-      <h4>💡 Informações Importantes</h4>
-      <p>• Credenciais fornecidas pela administração</p>
-      <p>• Em caso de problemas, contate o suporte</p>
-      <p>• Acesso restrito aos professores autorizados</p>
+    <div style="margin-top: 2rem; padding: 1.5rem; background: var(--gray-100); border-radius: var(--radius);">
+      <h4 style="color: var(--dark); margin-bottom: 1rem;">💡 Informações Importantes</h4>
+      <p style="color: var(--gray-600); margin-bottom: 0.5rem;">• Credenciais fornecidas pela administração</p>
+      <p style="color: var(--gray-600); margin-bottom: 0.5rem;">• Em caso de problemas, contate o suporte</p>
+      <p style="color: var(--gray-600);">• Acesso restrito aos professores autorizados</p>
     </div>
   </main>
 </div>
@@ -73,7 +73,7 @@
   <div class="welcome-header">
     <div class="container">
       <h1>Bem-vindo, <span id="professor-name">Professor</span>! 👋</h1>
-      <p>Gerencie suas turmas e alunos de <span id="professor-materia" class="materia-badge"></span></p>
+      <p>Gerencie suas turmas designadas</p>
       <button class="btn-modern" onclick="fazerLogout()" style="max-width: 200px; margin: 0 auto;">
         🚪 Sair do Sistema
       </button>
@@ -89,7 +89,7 @@
     
     <div class="stats-card fade-in">
       <div class="stats-number" id="total-turmas">0</div>
-      <div class="stats-label">🏫 Turmas Ativas</div>
+      <div class="stats-label">🏫 Turmas Designadas</div>
     </div>
     
     <div class="stats-card fade-in">
@@ -100,15 +100,15 @@
 
   <!-- Turmas -->
   <div class="container">
-    <h2 style="color: var(--dark); margin-bottom: 1rem;">📚 Minhas Turmas</h2>
-    <p style="color: var(--gray-600); margin-bottom: 2rem;">Gerencie os alunos da disciplina de <strong id="materia-titulo"></strong></p>
+    <h2 style="color: var(--dark); margin-bottom: 1rem;">📚 Minhas Turmas Designadas</h2>
+    <p style="color: var(--gray-600); margin-bottom: 2rem;">Turmas sob sua responsabilidade</p>
     
     <div class="turmas-container" id="turmas-list">
       <div class="loading-state">
         <div style="text-align: center; padding: 3rem; color: var(--gray-600);">
           <div style="font-size: 3rem; margin-bottom: 1rem;">⏳</div>
           <h3>Carregando turmas...</h3>
-          <p>Aguarde enquanto buscamos suas informações</p>
+          <p>Aguarde enquanto buscamos suas designações</p>
         </div>
       </div>
     </div>
@@ -144,8 +144,7 @@
 <script src="./assets/js/notification-system.js"></script>
 
 <script>
-  // [O MESMO JAVASCRIPT ANTERIOR PERMANECE]
-  // LOGIN, CARREGAR DADOS, FUNÇÕES, ETC.
+  // LOGIN
   document.getElementById('login-form').addEventListener('submit', async function(e){
     e.preventDefault();
     const usuario = document.getElementById('usuario').value;
@@ -161,10 +160,8 @@
         
         const professor = window.professoresAuth.getProfessorLogado();
         document.getElementById('professor-name').textContent = professor.nome;
-        document.getElementById('professor-materia').textContent = professor.materia;
-        document.getElementById('materia-titulo').textContent = professor.materia;
         
-        await carregarDadosProfessor(professor.id, professor.materia);
+        await carregarDadosProfessor(professor.id);
       } else {
         errorElement.style.display='block';
       }
@@ -174,21 +171,23 @@
     }
   });
 
-  async function carregarDadosProfessor(professorId, materiaProfessor){
+  // CARREGAR TURMAS REAIS DA COLEÇÃO DESIGNACOES
+  async function carregarDadosProfessor(professorId){
     try{
-      const turmas = await window.professoresAuth.buscarTurmasProfessor(professorId, materiaProfessor);
-      document.getElementById('total-turmas').textContent = turmas.length;
+      // Buscar turmas designadas ao professor
+      const turmasDesignadas = await window.professoresAuth.buscarTurmasProfessor(professorId);
+      document.getElementById('total-turmas').textContent = turmasDesignadas.length;
       
       let totalAlunos = 0;
       let alunosAtivos = 0;
       const turmasContainer = document.getElementById('turmas-list');
       
-      if (turmas.length === 0) {
+      if (turmasDesignadas.length === 0) {
         turmasContainer.innerHTML = `
           <div style="text-align:center; padding:3rem; color:var(--gray-600); width:100%;">
             <div style="font-size:4rem; margin-bottom:1rem;">📚</div>
-            <h3>Nenhum aluno encontrado</h3>
-            <p>Os alunos aparecerão aqui quando se matricularem na sua matéria</p>
+            <h3>Nenhuma turma designada</h3>
+            <p>Entre em contato com a administração para ser designado a uma turma</p>
           </div>
         `;
         return;
@@ -196,40 +195,56 @@
       
       turmasContainer.innerHTML = '';
 
-      for(const turma of turmas){
-        const alunos = await window.professoresAuth.buscarAlunosPorMateria(materiaProfessor, turma.turma);
+      for(const turma of turmasDesignadas){
+        // Buscar alunos específicos desta turma
+        const alunos = await window.professoresAuth.buscarAlunosPorTurma(turma.turma);
         totalAlunos += alunos.length;
         alunosAtivos += alunos.filter(a => a.status === 'ativo').length;
 
         const turmaHTML = `
           <div class="turma-card fade-in">
             <div class="turma-header">
-              <div class="turma-title">${turma.turma || 'Turma Geral'}</div>
+              <div class="turma-title">${turma.turma}</div>
               <div class="turma-badge">${alunos.length} alunos</div>
             </div>
             <div class="turma-info">
-              <p><strong>Matéria:</strong> ${materiaProfessor}</p>
-              <p><strong>Alunos ativos:</strong> ${alunos.filter(a => a.status === 'ativo').length}</p>
+              <p><strong>Disciplina:</strong> ${turma.disciplina || 'Não informada'}</p>
+              <p><strong>Período:</strong> ${turma.periodo || 'Não informado'}</p>
             </div>
-            <h4>👥 Alunos (${alunos.length})</h4>
-            <ul class="aluno-list">
-              ${alunos.slice(0, 5).map(aluno => `
-                <li class="aluno-item">
-                  <div class="aluno-info">
-                    <span class="aluno-name">${aluno.nome}</span>
-                    <span class="aluno-contact">
-                      📱 ${aluno.telefone} | 
-                      <span class="status-badge status-${aluno.status}">${aluno.status}</span>
-                    </span>
-                  </div>
-                  <button class="btn-small" onclick="contatarAluno('${aluno.telefone}')">📞 Contatar</button>
-                </li>
-              `).join('')}
-            </ul>
-            ${alunos.length > 5 ? `<p style="text-align:center; margin-top:1rem; color:var(--gray-600);">+ ${alunos.length - 5} outros alunos</p>` : ''}
-            <button class="btn-small" onclick="baixarLista('${materiaProfessor}', '${turma.turma}')" style="margin-top:1rem; width:100%;">
-              💾 Baixar Lista Completa (CSV)
-            </button>
+            <h4>👥 Lista de Alunos (${alunos.length})</h4>
+            
+            ${alunos.length > 0 ? `
+              <ul class="aluno-list">
+                ${alunos.slice(0, 5).map(aluno => `
+                  <li class="aluno-item">
+                    <div class="aluno-info">
+                      <span class="aluno-name">${aluno.nome}</span>
+                      <span class="aluno-contact">
+                        📱 ${aluno.telefone} | 
+                        <span class="status-badge status-${aluno.status}">${aluno.status}</span>
+                        ${aluno.usuario ? '| 👤 ' + aluno.usuario : ''}
+                      </span>
+                    </div>
+                    <button class="btn-small" onclick="contatarAluno('${aluno.telefone}')" title="Contatar aluno">
+                      📞
+                    </button>
+                  </li>
+                `).join('')}
+              </ul>
+              ${alunos.length > 5 ? `<p style="text-align:center; margin-top:1rem; color:var(--gray-600);">+ ${alunos.length - 5} outros alunos</p>` : ''}
+            ` : `
+              <p style="text-align:center; color:var(--gray-600); padding:2rem;">Nenhum aluno matriculado nesta turma</p>
+            `}
+            
+            <!-- BOTÃO DE DOWNLOAD ADICIONADO -->
+            <div style="display: flex; gap: 10px; margin-top: 1rem;">
+              <button class="btn-small" onclick="baixarListaTurma('${turma.turma}')" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                💾 Baixar Lista CSV
+              </button>
+              <button class="btn-small" onclick="visualizarTodosAlunos('${turma.turma}')" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                👁️ Ver Todos
+              </button>
+            </div>
           </div>
         `;
         turmasContainer.innerHTML += turmaHTML;
@@ -240,6 +255,9 @@
       
     } catch(err){ 
       console.error('Erro ao carregar dados:', err);
+      if (window.notifications) {
+        window.notifications.error('Erro ao carregar turmas designadas');
+      }
     }
   }
 
@@ -250,15 +268,16 @@
     }
   }
 
-  function fazerLogout(){
-    window.professoresAuth.logout();
-    window.location.reload();
-  }
-
-  async function baixarLista(materia, turma){
+  // FUNÇÃO DE DOWNLOAD CORRIGIDA
+  async function baixarListaTurma(turma){
     try {
-      const alunos = await window.professoresAuth.buscarAlunosPorMateria(materia, turma);
-      if(alunos.length === 0) return; 
+      const alunos = await window.professoresAuth.buscarAlunosPorTurma(turma);
+      if(alunos.length === 0){ 
+        if (window.notifications) {
+          window.notifications.error('Nenhum aluno encontrado nesta turma');
+        }
+        return; 
+      }
 
       let csv = 'Nome,Email,Telefone,Usuário,Status,Matéria,Turma,Data Inscrição\n';
       alunos.forEach(aluno => { 
@@ -269,16 +288,30 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      const nomeArquivo = turma ? `Turma_${turma}_${materia}` : `Alunos_${materia}`;
-      a.download = `${nomeArquivo.replace(/[^a-zA-Z0-9]/g, '_')}.csv`;
+      a.download = `Turma_${turma.replace(/[^a-zA-Z0-9]/g, '_')}.csv`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
       
+      if (window.notifications) {
+        window.notifications.success('Lista baixada com sucesso!');
+      }
     } catch (error) {
       console.error('Erro ao baixar lista:', error);
+      if (window.notifications) {
+        window.notifications.error('Erro ao baixar lista de alunos');
+      }
     }
+  }
+
+  function visualizarTodosAlunos(turma) {
+    alert(`Visualizar todos os alunos da turma: ${turma}\n\nEsta funcionalidade pode ser expandida para mostrar uma modal com a lista completa.`);
+  }
+
+  function fazerLogout(){
+    window.professoresAuth.logout();
+    window.location.reload();
   }
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -287,9 +320,7 @@
       document.getElementById('login-section').style.display = 'none';
       document.getElementById('professor-panel').style.display = 'block';
       document.getElementById('professor-name').textContent = professor.nome;
-      document.getElementById('professor-materia').textContent = professor.materia;
-      document.getElementById('materia-titulo').textContent = professor.materia;
-      carregarDadosProfessor(professor.id, professor.materia);
+      carregarDadosProfessor(professor.id);
     }
   });
 
