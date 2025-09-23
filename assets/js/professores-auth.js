@@ -1,4 +1,4 @@
-// assets/js/professores-auth.js
+// assets/js/professores-auth.js - VERSÃO CORRIGIDA
 import { 
     collection, 
     getDocs, 
@@ -42,23 +42,25 @@ class ProfessoresAuth {
         }
     }
 
-    // Buscar turmas do professor (baseado na matéria do professor)
-    async buscarTurmasProfessor(professorId, materiaProfessor) {
+    // Buscar turmas do professor na coleção designacoes
+    async buscarTurmasProfessor(professorId) {
         try {
-            // Buscar todas as inscrições para encontrar as turmas únicas da matéria do professor
-            const inscricoesRef = collection(db, "inscricoes");
-            const q = query(inscricoesRef, where("materia", "==", materiaProfessor));
+            const designacoesRef = collection(db, "designacoes");
+            const q = query(designacoesRef, where("professorId", "==", professorId));
             const querySnapshot = await getDocs(q);
             
-            // Extrair turmas únicas
-            const turmasUnicas = [...new Set(querySnapshot.docs.map(doc => doc.data().turma || 'Geral'))];
-            
-            const turmas = turmasUnicas.map(turma => ({
-                id: turma,
-                turma: turma,
-                materia: materiaProfessor,
-                quantidadeAlunos: querySnapshot.docs.filter(doc => doc.data().turma === turma).length
-            }));
+            const turmas = [];
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                turmas.push({
+                    id: doc.id,
+                    turma: data.turma,
+                    professorId: data.professorId,
+                    // Outros campos que possam existir
+                    disciplina: data.disciplina || '',
+                    periodo: data.periodo || ''
+                });
+            });
             
             return turmas;
         } catch (error) {
@@ -67,21 +69,11 @@ class ProfessoresAuth {
         }
     }
 
-    // Buscar alunos por matéria (e opcionalmente por turma)
-    async buscarAlunosPorMateria(materia, turma = null) {
+    // Buscar alunos por turma (agora usando a turma real da designacao)
+    async buscarAlunosPorTurma(turma) {
         try {
             const inscricoesRef = collection(db, "inscricoes");
-            let q;
-            
-            if (turma && turma !== 'Geral') {
-                q = query(
-                    inscricoesRef, 
-                    where("materia", "==", materia),
-                    where("turma", "==", turma)
-                );
-            } else {
-                q = query(inscricoesRef, where("materia", "==", materia));
-            }
+            const q = query(inscricoesRef, where("turma", "==", turma));
             
             const querySnapshot = await getDocs(q);
             
@@ -96,7 +88,7 @@ class ProfessoresAuth {
                     usuario: data.usuario || '',
                     status: data.status || 'pendente',
                     materia: data.materia || '',
-                    turma: data.turma || 'Geral',
+                    turma: data.turma || '',
                     criadoEm: data.criadoEm ? this.formatarDataString(data.criadoEm) : '',
                     senha: data.senha || ''
                 });
@@ -109,7 +101,7 @@ class ProfessoresAuth {
         }
     }
 
-    // Formatar data string (seu formato atual)
+    // Formatar data string
     formatarDataString(dataString) {
         try {
             if (!dataString) return '';
