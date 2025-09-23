@@ -1,4 +1,4 @@
-// assets/js/professores-auth.js - VERSÃO CORRIGIDA
+// assets/js/professores-auth.js - VERSÃO REAL
 import { 
     collection, 
     getDocs, 
@@ -8,7 +8,6 @@ import {
 import { db } from './firebase-config.js';
 
 class ProfessoresAuth {
-    // Autenticar professor usando a coleção professores
     async autenticarProfessor(usuario, senha) {
         try {
             const professoresRef = collection(db, "professores");
@@ -24,7 +23,6 @@ class ProfessoresAuth {
                 const professorDoc = querySnapshot.docs[0];
                 const professorData = professorDoc.data();
                 
-                // Salvar informações do professor no localStorage
                 localStorage.setItem('professorLogado', JSON.stringify({
                     id: professorDoc.id,
                     usuario: professorData.usuario,
@@ -42,7 +40,6 @@ class ProfessoresAuth {
         }
     }
 
-    // Buscar turmas do professor na coleção designacoes
     async buscarTurmasProfessor(professorId) {
         try {
             const designacoesRef = collection(db, "designacoes");
@@ -56,7 +53,6 @@ class ProfessoresAuth {
                     id: doc.id,
                     turma: data.turma,
                     professorId: data.professorId,
-                    // Outros campos que possam existir
                     disciplina: data.disciplina || '',
                     periodo: data.periodo || ''
                 });
@@ -69,7 +65,6 @@ class ProfessoresAuth {
         }
     }
 
-    // Buscar alunos por turma (agora usando a turma real da designacao)
     async buscarAlunosPorTurma(turma) {
         try {
             const inscricoesRef = collection(db, "inscricoes");
@@ -101,7 +96,6 @@ class ProfessoresAuth {
         }
     }
 
-    // Formatar data string
     formatarDataString(dataString) {
         try {
             if (!dataString) return '';
@@ -112,22 +106,18 @@ class ProfessoresAuth {
         }
     }
 
-    // Verificar se professor está logado
     isProfessorLogado() {
         return localStorage.getItem('professorLogado') !== null;
     }
 
-    // Obter dados do professor logado
     getProfessorLogado() {
         const professor = localStorage.getItem('professorLogado');
         return professor ? JSON.parse(professor) : null;
     }
 
-    // Logout
     logout() {
         localStorage.removeItem('professorLogado');
     }
 }
 
-// Inicializar e expor globalmente
 window.professoresAuth = new ProfessoresAuth();
