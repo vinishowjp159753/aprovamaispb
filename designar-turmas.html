@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerenciar Designações de Turmas</title>
+
+  <!-- Estilos -->
+  <link rel="stylesheet" href="designar-turmas.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <header>
+    <h1>Gerenciamento de Designações de Turmas</h1>
+  </header>
+
+  <main>
+    <!-- Filtros -->
+    <section class="filtros">
+      <input type="text" id="searchProfessor" placeholder="Buscar professor..." oninput="carregarDesignacoes()">
+      
+      <select id="filterTurma" onchange="carregarDesignacoes()">
+        <option value="">Todas as Turmas</option>
+        <option value="Turma A">Turma A</option>
+        <option value="Turma B">Turma B</option>
+        <option value="Turma C">Turma C</option>
+      </select>
+
+      <select id="filterStatus" onchange="carregarDesignacoes()">
+        <option value="">Todos os Status</option>
+        <option value="ativo">Ativo</option>
+        <option value="inativo">Inativo</option>
+      </select>
+    </section>
+
+    <!-- Lista de Designações -->
+    <section class="tabela">
+      <table>
+        <thead>
+          <tr>
+            <th>Professor</th>
+            <th>Turma</th>
+            <th>Alunos Vinculados</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="designacoesBody">
+          <!-- Preenchido via JS -->
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <script type="module" src="designar-turmas.js"></script>
+</body>
+</html>
