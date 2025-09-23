@@ -6,7 +6,7 @@
   <title>AprovaMaisPB - Dashboard</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="assets/css/dashboard.css">
+  <link rel="stylesheet" href="dashboard.css">
 </head>
 <body>
   <!-- Botão de menu (mobile) -->
@@ -36,18 +36,94 @@
 
       <!-- Dashboard Cards -->
       <div class="dashboard-cards">
-          <!-- Cards aqui (Alunos, Turmas, Professores, Receita) -->
+          <div class="card">
+              <div class="card-header">
+                  <div class="card-title">Alunos Ativos</div>
+                  <div class="card-icon" style="background: rgba(26, 42, 108, 0.1); color: var(--primary);">
+                      <i class="fas fa-user-graduate"></i>
+                  </div>
+              </div>
+              <div class="card-content">
+                  <div class="card-value" id="alunosAtivos">0</div>
+                  <div class="card-desc" id="alunosVariacao">Carregando...</div>
+              </div>
+          </div>
+          
+          <div class="card">
+              <div class="card-header">
+                  <div class="card-title">Turmas Ativas</div>
+                  <div class="card-icon" style="background: rgba(178, 31, 31, 0.1); color: var(--secondary);">
+                      <i class="fas fa-users"></i>
+                  </div>
+              </div>
+              <div class="card-content">
+                  <div class="card-value" id="turmasAtivas">0</div>
+                  <div class="card-desc" id="turmasVariacao">Carregando...</div>
+              </div>
+          </div>
+          
+          <div class="card">
+              <div class="card-header">
+                  <div class="card-title">Professores</div>
+                  <div class="card-icon" style="background: rgba(253, 187, 45, 0.1); color: var(--accent);">
+                      <i class="fas fa-chalkboard-teacher"></i>
+                  </div>
+              </div>
+              <div class="card-content">
+                  <div class="card-value" id="totalProfessores">0</div>
+                  <div class="card-desc" id="professoresVariacao">Carregando...</div>
+              </div>
+          </div>
+          
+          <div class="card">
+              <div class="card-header">
+                  <div class="card-title">Receita Mensal</div>
+                  <div class="card-icon" style="background: rgba(40, 167, 69, 0.1); color: var(--success);">
+                      <i class="fas fa-dollar-sign"></i>
+                  </div>
+              </div>
+              <div class="card-content">
+                  <div class="card-value" id="receitaMensal">R$ 0,00</div>
+                  <div class="card-desc" id="receitaVariacao">Carregando...</div>
+              </div>
+          </div>
       </div>
 
       <!-- Quick Actions -->
       <div class="quick-actions">
           <h2 class="section-title">Ações Rápidas</h2>
           <div class="actions-grid">
-              <!-- Action cards aqui -->
+              <div class="action-card" onclick="location.href='aulaoaprovamais.html'">
+                  <div class="action-icon" style="background: rgba(26, 42, 108, 0.1); color: var(--primary);">
+                      <i class="fas fa-list"></i>
+                  </div>
+                  <h3 class="action-title">Lista Completa de Alunos</h3>
+              </div>
+              
+              <div class="action-card" onclick="location.href='criar-professor.html'">
+                  <div class="action-icon" style="background: rgba(178, 31, 31, 0.1); color: var(--secondary);">
+                      <i class="fas fa-user-plus"></i>
+                  </div>
+                  <h3 class="action-title">Criar Acesso Professor</h3>
+              </div>
+              
+              <div class="action-card" onclick="location.href='gerenciar-professores.html'">
+                  <div class="action-icon" style="background: rgba(253, 187, 45, 0.1); color: var(--accent);">
+                      <i class="fas fa-cogs"></i>
+                  </div>
+                  <h3 class="action-title">Gerenciar Professores</h3>
+              </div>
+              
+              <div class="action-card" onclick="location.href='controle-financeiro.html'">
+                  <div class="action-icon" style="background: rgba(40, 167, 69, 0.1); color: var(--success);">
+                      <i class="fas fa-chart-line"></i>
+                  </div>
+                  <h3 class="action-title">Controle Financeiro</h3>
+              </div>
           </div>
       </div>
 
-      <!-- Dashboard Charts -->
+      <!-- Charts -->
       <div class="dashboard-charts">
           <h2 class="section-title">Gráficos</h2>
           <div class="charts-grid">
@@ -58,7 +134,7 @@
                   </div>
               </div>
               <div class="chart-card">
-                  <h3>Distribuição de Turmas</h3>
+                  <h3>Distribuição de Alunos por Turma</h3>
                   <div class="chart-container">
                       <canvas id="classesChart" aria-label="Distribuição de turmas" role="img"></canvas>
                   </div>
@@ -68,36 +144,35 @@
   </div>
 
   <!-- Scripts -->
-  <script type="module" src="assets/js/dashboard.js"></script>
-  <script type="module">
-      import { auth } from "./assets/js/firebase-config.js";
+  <script type="module" src="dashboard.js"></script>
+  <script>
+    // Menu mobile
+    const toggleBtn = document.querySelector('.menu-toggle');
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.querySelector('.overlay');
 
-      // Botão Sair
-      const logoutBtn = document.getElementById("logoutBtn");
-      logoutBtn.addEventListener("click", async () => {
-          try {
-              await auth.signOut();
-              window.location.href = "login.html";
-          } catch (err) {
-              console.error("Erro ao sair:", err);
-              alert("Não foi possível sair. Tente novamente.");
-          }
-      });
+    toggleBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+        overlay.classList.toggle('active');
+    });
 
-      // Menu mobile
-      const toggleBtn = document.querySelector('.menu-toggle');
-      const sidebar = document.querySelector('.sidebar');
-      const overlay = document.querySelector('.overlay');
+    overlay.addEventListener('click', () => {
+        sidebar.classList.remove('active');
+        overlay.classList.remove('active');
+    });
 
-      toggleBtn.addEventListener('click', () => {
-          sidebar.classList.toggle('active');
-          overlay.classList.toggle('active');
-      });
-
-      overlay.addEventListener('click', () => {
-          sidebar.classList.remove('active');
-          overlay.classList.remove('active');
-      });
+    // Logout (Firebase)
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+            try {
+                await auth.signOut();
+                window.location.href = "login.html";
+            } catch (err) {
+                console.error("Erro ao sair:", err);
+            }
+        });
+    }
   </script>
 </body>
 </html>
