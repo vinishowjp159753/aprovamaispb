@@ -1,539 +1,848 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Área do Professor - AprovaMaisPB</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Área do Professor - AprovaMaisPB</title>
+    <style>
+        /* ===== RESET E VARIÁVEIS ===== */
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --white: #ffffff;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-600: #4b5563;
+            --gray-800: #1f2937;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --radius: 8px;
+            --radius-lg: 12px;
+        }
 
-  <style>
-    /* [TODO O CSS ANTERIOR PERMANECE IGUAL] */
-    :root {
-      --primary: #2563eb;
-      --primary-dark: #1e40af;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --dark: #1e293b;
-      --light: #f8fafc;
-      --white: #ffffff;
-      --gray-100: #f3f4f6;
-      --gray-200: #e5e7eb;
-      --gray-600: #4b5563;
-      --gray-800: #1f2937;
-      --shadow: 0 4px 12px rgba(0,0,0,0.1);
-      --shadow-lg: 0 8px 24px rgba(0,0,0,0.15);
-      --radius: 8px;
-      --radius-lg: 12px;
-    }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--dark);
+            line-height: 1.6;
+        }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      color: #333;
-      line-height: 1.5;
-      font-size: 14px;
-    }
+        /* ===== HEADER ===== */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: var(--shadow);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
 
-    /* [RESTANTE DO CSS PERMANECE IGUAL] */
-    /* ... */
-  </style>
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .logo img {
+            height: 40px;
+            width: auto;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--gray-800);
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            margin-top: 80px;
+            min-height: calc(100vh - 80px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        /* ===== LOGIN CARD ===== */
+        .login-card {
+            background: white;
+            padding: 3rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .login-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .login-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+
+        .login-subtitle {
+            color: var(--gray-600);
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background: var(--gray-200);
+            color: var(--gray-800);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-300);
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        .error-message {
+            background: var(--danger);
+            color: white;
+            padding: 1rem;
+            border-radius: var(--radius);
+            margin: 1rem 0;
+            display: none;
+        }
+
+        .info-box {
+            background: var(--gray-100);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            margin-top: 2rem;
+            text-align: left;
+        }
+
+        .info-box h4 {
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+
+        .info-box p {
+            margin-bottom: 0.5rem;
+            color: var(--gray-600);
+        }
+
+        /* ===== DASHBOARD ===== */
+        .dashboard {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .welcome-section {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 3rem 2rem;
+            border-radius: var(--radius-lg);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .welcome-title {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+            border-left: 4px solid var(--primary);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--gray-600);
+            font-weight: 600;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+
+        .turmas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .turma-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border-top: 4px solid var(--success);
+        }
+
+        .turma-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .turma-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .turma-badge {
+            background: var(--success);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .turma-info {
+            margin-bottom: 1rem;
+        }
+
+        .turma-info p {
+            margin-bottom: 0.5rem;
+            color: var(--gray-600);
+        }
+
+        .alunos-list {
+            list-style: none;
+            margin: 1rem 0;
+        }
+
+        .aluno-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .aluno-info {
+            flex: 1;
+        }
+
+        .aluno-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .aluno-details {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-ativo {
+            background: var(--success);
+            color: white;
+        }
+
+        .status-pendente {
+            background: var(--warning);
+            color: white;
+        }
+
+        .status-inativo {
+            background: var(--danger);
+            color: white;
+        }
+
+        .support-section {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .support-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .support-item {
+            text-align: center;
+        }
+
+        /* ===== UTILITY CLASSES ===== */
+        .hidden {
+            display: none;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mb-2 {
+            margin-bottom: 2rem;
+        }
+
+        .mt-2 {
+            margin-top: 2rem;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+            }
+
+            .nav {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .main-content {
+                padding: 1rem;
+                margin-top: 120px;
+            }
+
+            .login-card {
+                padding: 2rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .turmas-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .welcome-section {
+                padding: 2rem 1rem;
+            }
+
+            .welcome-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
 </head>
 <body>
+    <!-- HEADER -->
+    <header class="header">
+        <nav class="nav">
+            <a href="index.html" class="logo">
+                <img src="./assets/img/logo_aprovamaispb.png" alt="AprovaMaisPB">
+                <span>AprovaMaisPB</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Início</a></li>
+                <li><a href="matricula.html">Matricule-se</a></li>
+                <li><a href="professores.html" class="active">Área do Professor</a></li>
+                <li><a href="login.html">Login Admin</a></li>
+            </ul>
+        </nav>
+    </header>
 
-<header>
-  <nav class="nav">
-    <div class="brand">
-      <img src="./assets/img/logo_aprovamaispb.png" alt="Logo" />
-      <span>AprovaMaisPB</span>
-    </div>
-    <ul class="menu" id="main-menu">
-      <li><a href="index.html">Início</a></li>
-      <li><a href="matricula.html">Matricule-se</a></li>
-      <li><a href="professores.html" class="active">Área do Professor</a></li>
-      <li><a href="login.html">Login Admin</a></li>
-    </ul>
-    <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">
-      <span>☰</span>
-    </button>
-  </nav>
-</header>
+    <!-- LOGIN SECTION -->
+    <main class="main-content" id="login-section">
+        <div class="login-card">
+            <div class="login-icon">👨‍🏫</div>
+            <h1 class="login-title">Área do Professor</h1>
+            <p class="login-subtitle">Entre com suas credenciais de acesso</p>
 
-<!-- LOGIN SECTION -->
-<div id="login-section">
-  <main class="login-container">
-    <h2>👨‍🏫 Área do Professor</h2>
-    <p>Entre com suas credenciais de acesso</p>
-    
-    <form id="login-form">
-      <div class="form-group">
-        <label for="usuario">Usuário:</label>
-        <input type="text" id="usuario" required placeholder="Digite seu usuário">
-      </div>
-      
-      <div class="form-group">
-        <label for="senha">Senha:</label>
-        <input type="password" id="senha" required placeholder="Digite sua senha">
-      </div>
-      
-      <div class="error-message" id="login-error">
-        ❌ Usuário ou senha incorretos!
-      </div>
-      
-      <button type="submit" class="btn-modern" id="login-btn">
-        <span>🚀</span>
-        <span>Acessar Portal</span>
-      </button>
-    </form>
-    
-    <div class="mt-2 p-1" style="background: var(--gray-100); border-radius: var(--radius);">
-      <h4 class="mb-1">💡 Informações Importantes</h4>
-      <p class="text-small">• Credenciais fornecidas pela administração</p>
-      <p class="text-small">• Em caso de problemas, contate o suporte</p>
-      <p class="text-small">• Acesso restrito aos professores autorizados</p>
-    </div>
-  </main>
-</div>
-
-<!-- PAINEL DO PROFESSOR -->
-<div id="professor-panel" class="hidden">
-  <div class="welcome-header">
-    <div class="container">
-      <h1>Bem-vindo, <span id="professor-name">Professor</span>! 👋</h1>
-      <p>Gerencie suas turmas designadas</p>
-      <button class="btn-modern" onclick="fazerLogout()" style="max-width: 200px; margin: 1rem auto 0;">
-        <span>🚪</span>
-        <span>Sair do Sistema</span>
-      </button>
-    </div>
-  </div>
-
-  <div class="container">
-    <!-- Dashboard Stats -->
-    <div class="dashboard-grid">
-      <div class="stats-card">
-        <div class="stats-number" id="total-alunos">0</div>
-        <div class="stats-label">👥 Total de Alunos</div>
-      </div>
-      
-      <div class="stats-card">
-        <div class="stats-number" id="total-turmas">0</div>
-        <div class="stats-label">🏫 Turmas Designadas</div>
-      </div>
-      
-      <div class="stats-card">
-        <div class="stats-number" id="alunos-ativos">0</div>
-        <div class="stats-label">✅ Alunos Ativos</div>
-      </div>
-    </div>
-
-    <!-- Turmas -->
-    <h2 class="section-title">📚 Minhas Turmas Designadas</h2>
-    <p class="section-subtitle">Turmas sob sua responsabilidade</p>
-    
-    <div class="turmas-container" id="turmas-list">
-      <div class="loading">
-        <div class="loading-spinner"></div>
-        <p>Carregando suas turmas...</p>
-      </div>
-    </div>
-
-    <!-- Suporte -->
-    <div class="support-section">
-      <h3>📞 Precisa de Ajuda?</h3>
-      <p>Nossa equipe de suporte está sempre disponível para ajudar você</p>
-      <div class="support-grid">
-        <div class="support-item">
-          <strong>📱 Telefone:</strong><br>
-          (83) 99999-9999
-        </div>
-        <div class="support-item">
-          <strong>✉️ Email:</strong><br>
-          suporte@aprovamaispb.com
-        </div>
-        <div class="support-item">
-          <strong>🕒 Horário:</strong><br>
-          08:00 - 18:00 (Seg-Sex)
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- SIMULAÇÃO PARA TESTE (REMOVA QUANDO O FIREBASE ESTIVER FUNCIONANDO) -->
-<script>
-  // Sistema de simulação para teste rápido
-  class ProfessoresAuthSimulado {
-    async autenticarProfessor(usuario, senha) {
-      console.log('🔐 Tentando login:', usuario, senha);
-      
-      // Simular delay de rede
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Dados de teste
-      const professoresTeste = [
-        { usuario: "admin", senha: "123456", nome: "Professor Admin", materia: "Matemática" },
-        { usuario: "professor", senha: "123456", nome: "João Silva", materia: "Português" },
-        { usuario: "teste", senha: "teste123", nome: "Professor Teste", materia: "História" }
-      ];
-      
-      const professor = professoresTeste.find(p => p.usuario === usuario && p.senha === senha);
-      
-      if (professor) {
-        console.log('✅ Login bem-sucedido');
-        localStorage.setItem('professorLogado', JSON.stringify({
-          id: 'simulado-' + Date.now(),
-          ...professor
-        }));
-        return true;
-      }
-      
-      console.log('❌ Login falhou');
-      return false;
-    }
-
-    async buscarTurmasProfessor(professorId) {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      return [
-        { 
-          id: "1", 
-          turma: "Turma A - Manhã", 
-          disciplina: "Matemática", 
-          periodo: "2024/1",
-          professorId: professorId
-        },
-        { 
-          id: "2", 
-          turma: "Turma B - Tarde", 
-          disciplina: "Português", 
-          periodo: "2024/1",
-          professorId: professorId
-        }
-      ];
-    }
-
-    async buscarAlunosPorTurma(turma) {
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
-      const alunosBase = [
-        {
-          nome: "Ana Silva Santos",
-          telefone: "83999111111",
-          email: "ana.silva@email.com",
-          status: "ativo",
-          usuario: "ana123",
-          turma: turma,
-          criadoEm: "24/09/2024"
-        },
-        {
-          nome: "Carlos Oliveira Lima",
-          telefone: "83999222222", 
-          email: "carlos.lima@email.com",
-          status: "ativo",
-          usuario: "carlos456",
-          turma: turma,
-          criadoEm: "23/09/2024"
-        },
-        {
-          nome: "Mariana Costa Pereira",
-          telefone: "83999333333",
-          email: "mariana.pereira@email.com",
-          status: "pendente",
-          usuario: "mariana789",
-          turma: turma,
-          criadoEm: "22/09/2024"
-        }
-      ];
-      
-      return turma.includes('A') ? alunosBase : alunosBase.slice(0, 2);
-    }
-
-    isProfessorLogado() {
-      return localStorage.getItem('professorLogado') !== null;
-    }
-
-    getProfessorLogado() {
-      const professor = localStorage.getItem('professorLogado');
-      return professor ? JSON.parse(professor) : null;
-    }
-
-    logout() {
-      localStorage.removeItem('professorLogado');
-    }
-  }
-
-  // Inicializar sistema de simulação
-  window.professoresAuth = new ProfessoresAuthSimulado();
-  console.log('🔧 Modo de simulação ativado para testes');
-</script>
-
-<script>
-  // FUNÇÕES PRINCIPAIS - CORRIGIDAS
-  function inicializarLogin() {
-    const loginForm = document.getElementById('login-form');
-    const errorElement = document.getElementById('login-error');
-    
-    console.log('🔧 Inicializando sistema de login...');
-    console.log('📝 Elemento login-form:', loginForm);
-    console.log('📝 Elemento login-error:', errorElement);
-    
-    if (!loginForm) {
-      console.error('❌ Elemento login-form não encontrado!');
-      return;
-    }
-    
-    loginForm.addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const usuario = document.getElementById('usuario').value;
-      const senha = document.getElementById('senha').value;
-      const loginBtn = document.getElementById('login-btn');
-      
-      console.log('🔄 Processando login...');
-      
-      errorElement.style.display = 'none';
-      loginBtn.disabled = true;
-      loginBtn.innerHTML = '<span>⏳</span><span>Autenticando...</span>';
-
-      try {
-        const logado = await window.professoresAuth.autenticarProfessor(usuario, senha);
-        
-        if(logado){
-          console.log('✅ Login bem-sucedido!');
-          document.getElementById('login-section').classList.add('hidden');
-          document.getElementById('professor-panel').classList.remove('hidden');
-          
-          const professor = window.professoresAuth.getProfessorLogado();
-          document.getElementById('professor-name').textContent = professor.nome;
-          
-          await carregarDadosProfessor(professor.id);
-        } else {
-          console.log('❌ Login falhou');
-          errorElement.style.display = 'block';
-          errorElement.textContent = '❌ Usuário ou senha incorretos!';
-        }
-      } catch(err) { 
-        console.error('💥 Erro no login:', err); 
-        errorElement.style.display = 'block';
-        errorElement.textContent = '❌ Erro de conexão. Tente novamente.';
-      } finally {
-        loginBtn.disabled = false;
-        loginBtn.innerHTML = '<span>🚀</span><span>Acessar Portal</span>';
-      }
-    });
-    
-    console.log('✅ Sistema de login inicializado com sucesso!');
-  }
-
-  async function carregarDadosProfessor(professorId) {
-    try {
-      console.log('📊 Carregando dados do professor...');
-      
-      const turmasContainer = document.getElementById('turmas-list');
-      turmasContainer.innerHTML = `
-        <div class="loading">
-          <div class="loading-spinner"></div>
-          <p>Carregando suas turmas...</p>
-        </div>
-      `;
-
-      const turmasDesignadas = await window.professoresAuth.buscarTurmasProfessor(professorId);
-      document.getElementById('total-turmas').textContent = turmasDesignadas.length;
-      
-      let totalAlunos = 0;
-      let alunosAtivos = 0;
-
-      if (turmasDesignadas.length === 0) {
-        turmasContainer.innerHTML = `
-          <div class="text-center" style="padding: 2rem; color: var(--gray-600); grid-column: 1 / -1;">
-            <div style="font-size: 3rem; margin-bottom: 1rem;">📚</div>
-            <h3 class="mb-1">Nenhuma turma designada</h3>
-            <p>Entre em contato com a administração</p>
-          </div>
-        `;
-        return;
-      }
-      
-      turmasContainer.innerHTML = '';
-
-      for(const turma of turmasDesignadas) {
-        const alunos = await window.professoresAuth.buscarAlunosPorTurma(turma.turma);
-        totalAlunos += alunos.length;
-        alunosAtivos += alunos.filter(a => a.status === 'ativo').length;
-
-        const alunosHTML = alunos.length > 0 ? `
-          <ul class="aluno-list">
-            ${alunos.slice(0, 3).map(aluno => `
-              <li class="aluno-item">
-                <div class="aluno-info">
-                  <div class="aluno-name">${aluno.nome}</div>
-                  <div class="aluno-contact">
-                    <span>📱 ${aluno.telefone}</span>
-                    <span class="status-badge status-${aluno.status}">${aluno.status}</span>
-                  </div>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="usuario" class="form-label">Usuário</label>
+                    <input type="text" id="usuario" class="form-input" placeholder="Digite seu usuário" required>
                 </div>
-                <button class="btn-small" onclick="contatarAluno('${aluno.telefone}')" title="Contatar">
-                  📞
+
+                <div class="form-group">
+                    <label for="senha" class="form-label">Senha</label>
+                    <input type="password" id="senha" class="form-input" placeholder="Digite sua senha" required>
+                </div>
+
+                <div class="error-message" id="login-error">
+                    Usuário ou senha incorretos!
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="login-btn">
+                    <span>🚀</span>
+                    Acessar Portal
                 </button>
-              </li>
-            `).join('')}
-            ${alunos.length > 3 ? `
-              <li class="text-center text-small" style="padding: 1rem; color: var(--gray-600);">
-                + ${alunos.length - 3} outros alunos
-              </li>
-            ` : ''}
-          </ul>
-        ` : `
-          <p class="text-center text-small" style="padding: 2rem; color: var(--gray-600);">
-            Nenhum aluno matriculado nesta turma
-          </p>
-        `;
+            </form>
 
-        const turmaHTML = `
-          <div class="turma-card">
-            <div class="turma-header">
-              <div class="turma-title">${turma.turma}</div>
-              <div class="turma-badge">${alunos.length} alunos</div>
+            <div class="info-box">
+                <h4>💡 Informações Importantes</h4>
+                <p>• Credenciais fornecidas pela administração</p>
+                <p>• Em caso de problemas, contate o suporte</p>
+                <p>• Acesso restrito aos professores autorizados</p>
             </div>
-            <div class="turma-info">
-              <p><strong>Disciplina:</strong> ${turma.disciplina}</p>
-              <p><strong>Período:</strong> ${turma.periodo}</p>
-            </div>
-            <h4 style="font-size: 1rem; margin-bottom: 0.5rem;">👥 Alunos (${alunos.length})</h4>
-            ${alunosHTML}
-            <div class="btn-group">
-              <button class="btn-small" onclick="baixarListaTurma('${turma.turma}')">
-                💾 Baixar CSV
-              </button>
-              <button class="btn-small" onclick="visualizarTurma('${turma.turma}')">
-                👁️ Ver Todos
-              </button>
-            </div>
-          </div>
-        `;
-        
-        turmasContainer.innerHTML += turmaHTML;
-      }
-
-      document.getElementById('total-alunos').textContent = totalAlunos;
-      document.getElementById('alunos-ativos').textContent = alunosAtivos;
-      
-      console.log('✅ Dados carregados com sucesso!');
-      
-    } catch(err) { 
-      console.error('💥 Erro ao carregar dados:', err);
-      const turmasContainer = document.getElementById('turmas-list');
-      turmasContainer.innerHTML = `
-        <div class="text-center" style="padding: 2rem; color: var(--danger); grid-column: 1 / -1;">
-          <div style="font-size: 3rem; margin-bottom: 1rem;">❌</div>
-          <h3 class="mb-1">Erro ao carregar dados</h3>
-          <button class="btn-small" onclick="carregarDadosProfessor('${professorId}')" style="margin: 0 auto;">
-            🔄 Tentar Novamente
-          </button>
         </div>
-      `;
-    }
-  }
+    </main>
 
-  function contatarAluno(telefone) { 
-    if (telefone && telefone !== 'Telefone não informado') {
-      const numeroLimpo = telefone.replace(/\D/g, '');
-      window.open(`https://wa.me/55${numeroLimpo}`, '_blank');
-    } else {
-      alert('Telefone não disponível para contato');
-    }
-  }
+    <!-- DASHBOARD SECTION -->
+    <main class="main-content hidden" id="dashboard-section">
+        <div class="dashboard">
+            <!-- Welcome Section -->
+            <div class="welcome-section">
+                <h1 class="welcome-title">Bem-vindo, <span id="professor-name">Professor</span>! 👋</h1>
+                <p>Gerencie suas turmas designadas</p>
+                <button class="btn btn-secondary mt-2" onclick="fazerLogout()">
+                    <span>🚪</span>
+                    Sair do Sistema
+                </button>
+            </div>
 
-  async function baixarListaTurma(turma) {
-    try {
-      const alunos = await window.professoresAuth.buscarAlunosPorTurma(turma);
-      if(alunos.length === 0) { 
-        alert('Nenhum aluno encontrado nesta turma');
-        return; 
-      }
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="total-alunos">0</div>
+                    <div class="stat-label">Total de Alunos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="total-turmas">0</div>
+                    <div class="stat-label">Turmas Designadas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="alunos-ativos">0</div>
+                    <div class="stat-label">Alunos Ativos</div>
+                </div>
+            </div>
 
-      let csv = 'Nome,Email,Telefone,Usuário,Status,Turma,Data Inscrição\n';
-      alunos.forEach(aluno => { 
-        csv += `"${aluno.nome}","${aluno.email}","${aluno.telefone}","${aluno.usuario}","${aluno.status}","${aluno.turma}","${aluno.criadoEm}"\n`; 
-      });
+            <!-- Turmas Section -->
+            <h2 class="section-title">📚 Minhas Turmas Designadas</h2>
+            <div class="turmas-grid" id="turmas-container">
+                <div class="text-center">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">⏳</div>
+                    <p>Carregando suas turmas...</p>
+                </div>
+            </div>
 
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `Turma_${turma.replace(/[^a-zA-Z0-9]/g, '_')}.csv`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      
-      alert('✅ Lista baixada com sucesso!');
-    } catch (error) {
-      console.error('Erro ao baixar lista:', error);
-      alert('❌ Erro ao baixar lista de alunos');
-    }
-  }
+            <!-- Support Section -->
+            <div class="support-section">
+                <h3>📞 Precisa de Ajuda?</h3>
+                <p>Nossa equipe de suporte está sempre disponível para ajudar você</p>
+                <div class="support-grid">
+                    <div class="support-item">
+                        <strong>📱 Telefone</strong><br>
+                        (83) 99999-9999
+                    </div>
+                    <div class="support-item">
+                        <strong>✉️ Email</strong><br>
+                        suporte@aprovamaispb.com
+                    </div>
+                    <div class="support-item">
+                        <strong>🕒 Horário</strong><br>
+                        08:00 - 18:00 (Seg-Sex)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
 
-  function visualizarTurma(turma) {
-    alert(`Visualizando turma: ${turma}\n\nEm uma versão futura, esta função mostrará todos os alunos em uma modal.`);
-  }
+    <script>
+        // ===== SISTEMA DE AUTENTICAÇÃO =====
+        class ProfessorAuthSystem {
+            constructor() {
+                this.professores = [
+                    { usuario: "admin", senha: "123456", nome: "Professor Admin", materia: "Matemática" },
+                    { usuario: "maria", senha: "123456", nome: "Maria Silva", materia: "Português" },
+                    { usuario: "carlos", senha: "123456", nome: "Carlos Santos", materia: "História" }
+                ];
+            }
 
-  function fazerLogout() {
-    window.professoresAuth.logout();
-    window.location.reload();
-  }
+            async fazerLogin(usuario, senha) {
+                // Simular delay de rede
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                const professor = this.professores.find(p => 
+                    p.usuario === usuario && p.senha === senha
+                );
+                
+                if (professor) {
+                    localStorage.setItem('professorLogado', JSON.stringify(professor));
+                    return true;
+                }
+                return false;
+            }
 
-  function toggleMenu() { 
-    const menu = document.getElementById('main-menu');
-    if (menu) {
-      menu.classList.toggle('show');
-    }
-  }
+            estaLogado() {
+                return localStorage.getItem('professorLogado') !== null;
+            }
 
-  // INICIALIZAÇÃO DA PÁGINA - CORRIGIDA
-  document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 Página carregada, inicializando...');
-    
-    // Inicializar sistema de login
-    inicializarLogin();
-    
-    // Esconder mensagem de erro inicialmente
-    const errorElement = document.getElementById('login-error');
-    if (errorElement) {
-      errorElement.style.display = 'none';
-    }
-    
-    // Verificar se já está logado
-    if (window.professoresAuth && window.professoresAuth.isProfessorLogado()) {
-      const professor = window.professoresAuth.getProfessorLogado();
-      console.log('👤 Professor já logado:', professor.nome);
-      
-      document.getElementById('login-section').classList.add('hidden');
-      document.getElementById('professor-panel').classList.remove('hidden');
-      document.getElementById('professor-name').textContent = professor.nome;
-      
-      carregarDadosProfessor(professor.id);
-    } else {
-      console.log('🔒 Nenhum professor logado');
-    }
-    
-    console.log('✅ Página inicializada com sucesso!');
-  });
+            getProfessor() {
+                return JSON.parse(localStorage.getItem('professorLogado'));
+            }
 
-  // Exportar funções para uso global
-  window.contatarAluno = contatarAluno;
-  window.baixarListaTurma = baixarListaTurma;
-  window.visualizarTurma = visualizarTurma;
-  window.fazerLogout = fazerLogout;
-  window.toggleMenu = toggleMenu;
-  window.carregarDadosProfessor = carregarDadosProfessor;
-</script>
+            fazerLogout() {
+                localStorage.removeItem('professorLogado');
+            }
+        }
 
+        // ===== SISTEMA DE DADOS =====
+        class TurmasSystem {
+            constructor() {
+                this.turmas = [
+                    {
+                        id: 1,
+                        nome: "Turma A - Manhã",
+                        disciplina: "Matemática",
+                        periodo: "2024/1",
+                        professor: "admin",
+                        alunos: [
+                            { nome: "Ana Silva", telefone: "83999111111", status: "ativo", email: "ana@email.com" },
+                            { nome: "Carlos Santos", telefone: "83999222222", status: "ativo", email: "carlos@email.com" },
+                            { nome: "Mariana Lima", telefone: "83999333333", status: "pendente", email: "mariana@email.com" },
+                            { nome: "João Pereira", telefone: "83999444444", status: "ativo", email: "joao@email.com" }
+                        ]
+                    },
+                    {
+                        id: 2,
+                        nome: "Turma B - Tarde", 
+                        disciplina: "Português",
+                        periodo: "2024/1",
+                        professor: "admin",
+                        alunos: [
+                            { nome: "Pedro Costa", telefone: "83999555555", status: "ativo", email: "pedro@email.com" },
+                            { nome: "Juliana Alves", telefone: "83999666666", status: "inativo", email: "juliana@email.com" }
+                        ]
+                    },
+                    {
+                        id: 3,
+                        nome: "Turma C - Noite",
+                        disciplina: "História", 
+                        periodo: "2024/1",
+                        professor: "carlos",
+                        alunos: [
+                            { nome: "Lucas Mendes", telefone: "83999777777", status: "ativo", email: "lucas@email.com" },
+                            { nome: "Fernanda Rocha", telefone: "83999888888", status: "ativo", email: "fernanda@email.com" },
+                            { nome: "Ricardo Oliveira", telefone: "83999999999", status: "pendente", email: "ricardo@email.com" }
+                        ]
+                    }
+                ];
+            }
+
+            async getTurmasProfessor(usuario) {
+                await new Promise(resolve => setTimeout(resolve, 500));
+                return this.turmas.filter(turma => turma.professor === usuario);
+            }
+
+            async getAlunosTurma(turmaId) {
+                await new Promise(resolve => setTimeout(resolve, 300));
+                const turma = this.turmas.find(t => t.id === turmaId);
+                return turma ? turma.alunos : [];
+            }
+        }
+
+        // ===== INICIALIZAÇÃO =====
+        const authSystem = new ProfessorAuthSystem();
+        const turmasSystem = new TurmasSystem();
+
+        // ===== FUNÇÕES PRINCIPAIS =====
+        function inicializarSistema() {
+            // Configurar formulário de login
+            const loginForm = document.getElementById('login-form');
+            const loginError = document.getElementById('login-error');
+            const loginBtn = document.getElementById('login-btn');
+
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const usuario = document.getElementById('usuario').value;
+                const senha = document.getElementById('senha').value;
+
+                // Mostrar loading
+                loginBtn.disabled = true;
+                loginBtn.innerHTML = '<span>⏳</span> Autenticando...';
+                loginError.style.display = 'none';
+
+                try {
+                    const sucesso = await authSystem.fazerLogin(usuario, senha);
+                    
+                    if (sucesso) {
+                        mostrarDashboard();
+                    } else {
+                        loginError.style.display = 'block';
+                    }
+                } catch (error) {
+                    loginError.textContent = 'Erro de conexão. Tente novamente.';
+                    loginError.style.display = 'block';
+                } finally {
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = '<span>🚀</span> Acessar Portal';
+                }
+            });
+
+            // Verificar se já está logado
+            if (authSystem.estaLogado()) {
+                mostrarDashboard();
+            }
+        }
+
+        async function mostrarDashboard() {
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('dashboard-section').classList.remove('hidden');
+
+            const professor = authSystem.getProfessor();
+            document.getElementById('professor-name').textContent = professor.nome;
+
+            await carregarTurmas(professor.usuario);
+        }
+
+        async function carregarTurmas(usuario) {
+            const turmasContainer = document.getElementById('turmas-container');
+            turmasContainer.innerHTML = '<div class="text-center"><p>Carregando turmas...</p></div>';
+
+            try {
+                const turmas = await turmasSystem.getTurmasProfessor(usuario);
+                
+                if (turmas.length === 0) {
+                    turmasContainer.innerHTML = `
+                        <div class="text-center" style="grid-column: 1 / -1;">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">📚</div>
+                            <h3>Nenhuma turma designada</h3>
+                            <p>Entre em contato com a administração</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Atualizar estatísticas
+                const totalAlunos = turmas.reduce((total, turma) => total + turma.alunos.length, 0);
+                const alunosAtivos = turmas.reduce((total, turma) => 
+                    total + turma.alunos.filter(a => a.status === 'ativo').length, 0
+                );
+
+                document.getElementById('total-turmas').textContent = turmas.length;
+                document.getElementById('total-alunos').textContent = totalAlunos;
+                document.getElementById('alunos-ativos').textContent = alunosAtivos;
+
+                // Renderizar turmas
+                turmasContainer.innerHTML = turmas.map(turma => `
+                    <div class="turma-card">
+                        <div class="turma-header">
+                            <h3 class="turma-title">${turma.nome}</h3>
+                            <span class="turma-badge">${turma.alunos.length} alunos</span>
+                        </div>
+                        
+                        <div class="turma-info">
+                            <p><strong>Disciplina:</strong> ${turma.disciplina}</p>
+                            <p><strong>Período:</strong> ${turma.periodo}</p>
+                            <p><strong>Alunos ativos:</strong> ${turma.alunos.filter(a => a.status === 'ativo').length}</p>
+                        </div>
+
+                        <h4 style="margin: 1rem 0 0.5rem 0;">Lista de Alunos</h4>
+                        <ul class="alunos-list">
+                            ${turma.alunos.slice(0, 3).map(aluno => `
+                                <li class="aluno-item">
+                                    <div class="aluno-info">
+                                        <div class="aluno-name">${aluno.nome}</div>
+                                        <div class="aluno-details">
+                                            📱 ${aluno.telefone} • 
+                                            <span class="status-badge status-${aluno.status}">${aluno.status}</span>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-small btn-secondary" onclick="contatarAluno('${aluno.telefone}')">
+                                        📞
+                                    </button>
+                                </li>
+                            `).join('')}
+                        </ul>
+
+                        ${turma.alunos.length > 3 ? `
+                            <p style="text-align: center; color: var(--gray-600); margin: 1rem 0;">
+                                + ${turma.alunos.length - 3} outros alunos
+                            </p>
+                        ` : ''}
+
+                        <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                            <button class="btn btn-primary btn-small" style="flex: 1;" onclick="baixarLista(${turma.id})">
+                                💾 Baixar Lista
+                            </button>
+                            <button class="btn btn-secondary btn-small" style="flex: 1;" onclick="verTurma(${turma.id})">
+                                👁️ Ver Todos
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                turmasContainer.innerHTML = `
+                    <div class="text-center" style="grid-column: 1 / -1; color: var(--danger);">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">❌</div>
+                        <h3>Erro ao carregar turmas</h3>
+                        <p>Tente novamente mais tarde</p>
+                    </div>
+                `;
+            }
+        }
+
+        function contatarAluno(telefone) {
+            if (telefone) {
+                const numeroLimpo = telefone.replace(/\D/g, '');
+                window.open(`https://wa.me/55${numeroLimpo}`, '_blank');
+            }
+        }
+
+        function baixarLista(turmaId) {
+            alert(`📋 Lista da turma ${turmaId} será baixada em formato CSV`);
+            // Implementar download real aqui
+        }
+
+        function verTurma(turmaId) {
+            alert(`👁️ Visualizando todos os alunos da turma ${turmaId}`);
+            // Implementar modal de visualização aqui
+        }
+
+        function fazerLogout() {
+            authSystem.fazerLogout();
+            document.getElementById('dashboard-section').classList.add('hidden');
+            document.getElementById('login-section').classList.remove('hidden');
+            document.getElementById('login-form').reset();
+        }
+
+        // ===== INICIALIZAR QUANDO A PÁGINA CARREGAR =====
+        document.addEventListener('DOMContentLoaded', inicializarSistema);
+
+        // ===== TORNAR FUNÇÕES GLOBAIS =====
+        window.contatarAluno = contatarAluno;
+        window.baixarLista = baixarLista;
+        window.verTurma = verTurma;
+        window.fazerLogout = fazerLogout;
+    </script>
 </body>
 </html>
