@@ -1,104 +1,74 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Designar Turmas - AprovaMaisPB</title>
-
   <link rel="stylesheet" href="assets/css/designar-turmas.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
   <header class="header">
-    <h1>Designar Turmas</h1>
-    <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Voltar</a>
+    <h1>Gerenciamento de Turmas</h1>
   </header>
 
   <main class="container">
-    <!-- ===================== PROFESSORES ===================== -->
+    <!-- Seção Designar -->
     <section class="section">
-      <h2 class="section-title">Designar Professores</h2>
+      <h2 class="section-title">Designar Alunos e Professores</h2>
 
-      <label for="selectProfessor">Professor:</label>
-      <select id="selectProfessor" class="form-control"></select>
+      <label>Selecionar Professor</label>
+      <select id="selectProfessor" class="form-control">
+        <option value="">Selecione um professor</option>
+      </select>
 
-      <label for="selectTurmaProfessor">Turma:</label>
-      <select id="selectTurmaProfessor" class="form-control">
-        <option value="">Selecione a turma</option>
+      <label>Selecionar Aluno</label>
+      <select id="selectAluno" class="form-control">
+        <option value="">Selecione um aluno</option>
+      </select>
+
+      <label>Selecionar Turma</label>
+      <select id="selectTurma" class="form-control">
+        <option value="">Selecione uma turma</option>
         <option value="Turma A - Manhã">Turma A - Manhã</option>
         <option value="Turma B - Tarde">Turma B - Tarde</option>
         <option value="Turma C - Noite">Turma C - Noite</option>
       </select>
 
-      <button id="designarProfessorBtn" class="btn primary">
-        <i class="fas fa-user-plus"></i> Designar Professor
-      </button>
+      <button class="btn primary" id="designarBtn">Designar</button>
 
-      <h3>Designações de Professores</h3>
+      <h3 class="section-title" style="margin-top:30px;">Designações Ativas</h3>
       <table class="table">
         <thead>
-          <tr><th>Professor</th><th>Turma</th><th>Ação</th></tr>
+          <tr><th>Professor</th><th>Aluno</th><th>Turma</th><th>Ação</th></tr>
         </thead>
-        <tbody id="designacoesProfessoresBody">
-          <tr><td colspan="3">Nenhum professor designado</td></tr>
-        </tbody>
+        <tbody id="designacoesBody"></tbody>
       </table>
     </section>
 
-    <!-- ===================== ALUNOS ===================== -->
-    <section class="section">
-      <h2 class="section-title">Designar Alunos</h2>
-
-      <label for="selectAluno">Aluno:</label>
-      <select id="selectAluno" class="form-control"></select>
-
-      <label for="selectTurmaAluno">Turma:</label>
-      <select id="selectTurmaAluno" class="form-control">
-        <option value="">Selecione a turma</option>
-        <option value="Turma A - Manhã">Turma A - Manhã</option>
-        <option value="Turma B - Tarde">Turma B - Tarde</option>
-        <option value="Turma C - Noite">Turma C - Noite</option>
-      </select>
-
-      <button id="designarAlunoBtn" class="btn primary">
-        <i class="fas fa-user-plus"></i> Designar Aluno
-      </button>
-
-      <h3>Designações de Alunos</h3>
-      <table class="table">
-        <thead>
-          <tr><th>Aluno</th><th>Turma</th><th>Ação</th></tr>
-        </thead>
-        <tbody id="designacoesAlunosBody">
-          <tr><td colspan="3">Nenhum aluno designado</td></tr>
-        </tbody>
-      </table>
-    </section>
-
-    <!-- ===================== TURMAS ===================== -->
+    <!-- Seção Turmas -->
     <section class="section">
       <h2 class="section-title">Turmas</h2>
-      <div class="turmas-container">
-        <label for="selectTurmaListar">Selecione uma Turma:</label>
-        <select id="selectTurmaListar" class="form-control">
-          <option value="">Escolha a turma</option>
-        </select>
-        <button id="baixarTurmaBtn" class="btn export-btn">
-          <i class="fas fa-download"></i> Baixar Lista
-        </button>
-      </div>
+      <label>Selecionar Turma</label>
+      <select id="selectTurmaListar" class="form-control">
+        <option value="">Selecione uma turma</option>
+        <option value="Turma A - Manhã">Turma A - Manhã</option>
+        <option value="Turma B - Tarde">Turma B - Tarde</option>
+        <option value="Turma C - Noite">Turma C - Noite</option>
+      </select>
 
-      <table class="table" id="turmaTable">
+      <button class="btn export-btn" id="baixarTurmaBtn">Baixar Lista</button>
+
+      <table class="table" style="margin-top:20px;">
         <thead>
           <tr><th>Aluno</th><th>Email</th></tr>
         </thead>
-        <tbody id="turmaAlunosBody">
-          <tr><td colspan="2">Selecione uma turma para ver os alunos</td></tr>
-        </tbody>
+        <tbody id="turmaAlunosBody"></tbody>
       </table>
     </section>
   </main>
 
+  <!-- Firebase + SheetJS + Script -->
+  <script type="module" src="assets/js/firebase-config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.19.3/dist/xlsx.full.min.js"></script>
   <script type="module" src="assets/js/designar-turmas.js"></script>
 </body>
