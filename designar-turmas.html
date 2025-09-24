@@ -1,52 +1,101 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gerenciamento de Turmas</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Gerenciar Designações - AprovaMaisPB</title>
   <link rel="stylesheet" href="assets/css/designar-turmas.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+  <header class="header">
+    <h1>Gerenciar Designações</h1>
+  </header>
+
   <main class="container">
-    <h1>Gerenciamento de Turmas</h1>
+    <!-- PROFESSORES -->
+    <section class="card">
+      <h2>Designar Professor</h2>
 
-    <!-- ==================== PROFESSORES ==================== -->
-    <section class="bloco">
-      <h2>Designar Professores</h2>
-      <label for="professorSelect">Selecione o Professor:</label>
-      <select id="professorSelect"></select>
+      <label for="selectProfessor">Professor (ativo)</label>
+      <select id="selectProfessor" class="form-control">
+        <option value="">Carregando...</option>
+      </select>
 
-      <label for="turmaProfessor">Turma:</label>
-      <input id="turmaProfessor" type="text" placeholder="Ex: Turma A" />
-      <button id="designarProfessor">Designar Professor</button>
+      <label for="selectTurmaProfessor">Turma</label>
+      <select id="selectTurmaProfessor" class="form-control">
+        <option value="">Selecione a turma</option>
+        <option value="Turma A - Manhã">Turma A - Manhã</option>
+        <option value="Turma B - Tarde">Turma B - Tarde</option>
+        <option value="Turma C - Noite">Turma C - Noite</option>
+      </select>
+
+      <button id="btnDesignarProfessor" class="btn primary"><i class="fas fa-user-plus"></i> Designar Professor</button>
+
+      <h3 style="margin-top:18px;">Designações de Professores</h3>
+      <table class="table">
+        <thead><tr><th>Professor</th><th>Turma</th><th>Ação</th></tr></thead>
+        <tbody id="designacoesProfBody">
+          <tr><td colspan="3">Carregando...</td></tr>
+        </tbody>
+      </table>
     </section>
 
-    <!-- ==================== ALUNOS ==================== -->
-    <section class="bloco">
-      <h2>Designar Alunos</h2>
-      <div class="aluno-header">
-        <input type="text" id="filtroAluno" placeholder="Filtrar por nome..." />
+    <!-- ALUNOS -->
+    <section class="card">
+      <h2>Designar Alunos (seleção em massa)</h2>
+
+      <label for="filtroAluno">Pesquisar aluno</label>
+      <input id="filtroAluno" type="search" class="form-control" placeholder="Digite nome do aluno...">
+
+      <div id="alunosCheckboxList" class="checkbox-list">
+        <!-- checkbox items gerados aqui -->
       </div>
-      <div id="alunoListaCheckbox" class="aluno-checkbox-list"></div>
 
-      <label for="turmaAlunos">Turma para os selecionados:</label>
-      <input id="turmaAlunos" type="text" placeholder="Ex: Turma A" />
-      <button id="designarAlunosEmMassa">Designar Selecionados</button>
+      <label for="selectTurmaAluno">Turma para os selecionados</label>
+      <select id="selectTurmaAluno" class="form-control">
+        <option value="">Selecione a turma</option>
+        <option value="Turma A - Manhã">Turma A - Manhã</option>
+        <option value="Turma B - Tarde">Turma B - Tarde</option>
+        <option value="Turma C - Noite">Turma C - Noite</option>
+      </select>
+
+      <button id="btnDesignarAlunos" class="btn primary"><i class="fas fa-users"></i> Designar Selecionados</button>
+
+      <h3 style="margin-top:18px;">Designações de Alunos</h3>
+      <table class="table">
+        <thead><tr><th>Aluno</th><th>Turma</th><th>Ação</th></tr></thead>
+        <tbody id="designacoesAlunosBody">
+          <tr><td colspan="3">Carregando...</td></tr>
+        </tbody>
+      </table>
     </section>
 
-    <!-- ==================== TURMAS ==================== -->
-    <section class="bloco">
+    <!-- TURMAS -->
+    <section class="card">
       <h2>Turmas</h2>
-      <label for="turmaListSelect">Escolha uma Turma:</label>
-      <select id="turmaListSelect"></select>
-      <button id="baixarTurma">Baixar Lista (XLSX)</button>
 
-      <div id="listaAlunosTurma" class="lista"></div>
+      <label for="selectTurmaListar">Selecionar Turma</label>
+      <select id="selectTurmaListar" class="form-control">
+        <option value="">Carregando turmas...</option>
+      </select>
+
+      <button id="baixarTurmaBtn" class="btn export"><i class="fas fa-download"></i> Baixar lista (XLSX)</button>
+
+      <h3 style="margin-top:18px;">Alunos na Turma</h3>
+      <table class="table">
+        <thead><tr><th>Aluno</th><th>Email</th></tr></thead>
+        <tbody id="turmaAlunosBody">
+          <tr><td colspan="2">Selecione uma turma para listar alunos</td></tr>
+        </tbody>
+      </table>
     </section>
   </main>
 
-  <!-- Bibliotecas: XLSX antes do JS principal -->
-  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <!-- SheetJS (XLSX) precisa vir antes do module script -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <!-- script principal (module) -->
   <script type="module" src="assets/js/designar-turmas.js"></script>
 </body>
 </html>
