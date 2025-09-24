@@ -1,122 +1,70 @@
-import { app, db } from './firebase-config.js';
-import { 
-  collection, getDocs, doc, updateDoc 
-} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { db } from "./firebase-config.js";
+import { collection, getDocs, query, where, updateDoc, doc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-const professorSelect      = document.getElementById('professorSelect');
-const alunoContainer       = document.getElementById('alunoCheckboxContainer');
-const turmaInput           = document.getElementById('turmaInput');
-const btnDesignar          = document.getElementById('btnDesignar');
-const turmaSelect          = document.getElementById('turmaSelect');
-const listaAlunosTurma     = document.getElementById('listaAlunosTurma');
-const btnBaixar            = document.getElementById('btnBaixar');
+// Seletores
+const selectProfessor = document.getElementById("selectProfessor");
+const selectTurmaProfessor = document.getElementById("selectTurmaProfessor");
+const designarTurmaProfessorBtn = document.getElementById("designarTurmaProfessorBtn");
 
-// Carrega professores ativos
-async function carregarProfessores() {
-  const snap = await getDocs(collection(db, 'professores'));
-  professorSelect.innerHTML = '<option value="">Selecione</option>';
-  snap.forEach(d => {
-    const data = d.data();
-    if (data.status === 'ativo') {
-      const opt = document.createElement('option');
-      opt.value = d.id;
-      opt.textContent = data.nome;
-      professorSelect.appendChild(opt);
-    }
-  });
+const selectAlunosDiv = document.getElementById("selectAlunos");
+const selectTurmaAluno = document.getElementById("selectTurmaAluno");
+const designarTurmaAlunoBtn = document.getElementById("designarTurmaAlunoBtn");
+
+const turmasSelect = document.getElementById("turmasSelect");
+const alunosTurmaUl = document.getElementById("alunosTurma");
+const exportTurmaBtn = document.getElementById("exportTurmaBtn");
+
+// Carregar Professores
+async function carregarProfessores(){
+    const snapshot = await getDocs(collection(db,"professores"));
+    selectProfessor.innerHTML = '<option value="">Selecione um professor</option>';
+    snapshot.forEach(docSnap => {
+        const p = docSnap.data();
+        if(p.status === "ativo"){
+            const opt = document.createElement("option");
+            opt.value = docSnap.id;
+            opt.textContent = `${p.nome} - ${p.materia}`;
+            selectProfessor.appendChild(opt);
+        }
+    });
 }
 
-// Carrega alunos sem turma
-async function carregarAlunosSemTurma() {
-  const snap = await getDocs(collection(db, 'inscricoes'));
-  alunoContainer.innerHTML = '';
-  snap.forEach(d => {
-    const data = d.data();
-    if (!data.turma) { // apenas quem não tem turma
-      const lbl = document.createElement('label');
-      lbl.innerHTML = `<input type="checkbox" value="${d.id}"> ${data.nomeCompleto || 'Sem nome'}`;
-      alunoContainer.appendChild(lbl);
-    }
-  });
+// Carregar Alunos sem turma
+async function carregarAlunos(){
+    const snapshot = await getDocs(query(collection(db,"inscricoes"), where("turma","==", null)));
+    selectAlunosDiv.innerHTML = "";
+    snapshot.forEach(docSnap => {
+        const aluno = docSnap.data();
+        const label = document.createElement("label");
+        label.innerHTML = `<input type="checkbox" value="${docSnap.id}"> ${aluno.nomeCompleto}`;
+        selectAlunosDiv.appendChild(label);
+    });
 }
 
-// Designar turma
-btnDesignar.addEventListener('click', async () => {
-  const profId = professorSelect.value;
-  const turma  = turmaInput.value.trim();
-  const alunosMarcados = [...alunoContainer.querySelectorAll('input:checked')].map(cb => cb.value);
+// Designar turma para professor
+designarTurmaProfessorBtn.onclick = async () => {
+    const profId = selectProfessor.value;
+    const turma = selectTurmaProfessor.value;
+    if(!profId || !turma){ alert("Selecione professor e turma"); return; }
+    await updateDoc(doc(db,"professores",profId), { turma });
+    alert("Turma designada ao professor!");
+    selectProfessor.value = "";
+    selectTurmaProfessor.value = "";
+};
 
-  if (!profId || !turma || alunosMarcados.length === 0) {
-    alert('Selecione professor, turma e pelo menos um aluno.');
-    return;
-  }
+// Designar turma para alunos
+designarTurmaAlunoBtn.onclick = async () => {
+    const turma = selectTurmaAluno.value;
+    if(!turma){ alert("Selecione uma turma"); return; }
 
-  // Atualiza professor
-  await updateDoc(doc(db, 'professores', profId), { turma });
+    const checkboxes = selectAlunosDiv.querySelectorAll("input[type='checkbox']:checked");
+    if(checkboxes.length === 0){ alert("Selecione pelo menos um aluno"); return; }
 
-  // Atualiza alunos selecionados
-  for (const alunoId of alunosMarcados) {
-    await updateDoc(doc(db, 'inscricoes', alunoId), { turma });
-  }
-
-  alert('Turma designada com sucesso!');
-  turmaInput.value = '';
-  await carregarAlunosSemTurma();
-  await carregarTurmas();
-});
-
-// Carrega turmas existentes
-async function carregarTurmas() {
-  const snap = await getDocs(collection(db, 'inscricoes'));
-  const turmas = new Set();
-  snap.forEach(d => { if (d.data().turma) turmas.add(d.data().turma); });
-  turmaSelect.innerHTML = '<option value="">Selecione</option>';
-  turmas.forEach(t => {
-    const opt = document.createElement('option');
-    opt.value = t;
-    opt.textContent = t;
-    turmaSelect.appendChild(opt);
-  });
-}
-
-// Lista alunos da turma + contagem
-turmaSelect.addEventListener('change', async () => {
-  listaAlunosTurma.innerHTML = '';
-  if (!turmaSelect.value) return;
-
-  const snap = await getDocs(collection(db, 'inscricoes'));
-  let count = 1;
-  snap.forEach(d => {
-    const data = d.data();
-    if (data.turma === turmaSelect.value) {
-      const li = document.createElement('li');
-      li.textContent = `${count++}. ${data.nomeCompleto || 'Sem nome'}`;
-      listaAlunosTurma.appendChild(li);
+    for(const cb of checkboxes){
+        await updateDoc(doc(db,"inscricoes",cb.value), { turma });
     }
-  });
-});
 
-// Exportar Excel (cada nome em coluna separada)
-btnBaixar.addEventListener('click', async () => {
-  if (!turmaSelect.value) {
-    alert('Selecione uma turma para exportar.');
-    return;
-  }
-  const XLSX = await import("https://cdn.jsdelivr.net/npm/xlsx@0.19.3/+esm");
-  const snap = await getDocs(collection(db, 'inscricoes'));
-  const alunos = [];
-  snap.forEach(d => {
-    const data = d.data();
-    if (data.turma === turmaSelect.value) alunos.push(data.nomeCompleto);
-  });
-
-  const ws = XLSX.utils.aoa_to_sheet([alunos]); // uma linha, várias colunas
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, turmaSelect.value);
-  XLSX.writeFile(wb, `turma-${turmaSelect.value}.xlsx`);
-});
-
-// Inicializa
-carregarProfessores();
-carregarAlunosSemTurma();
-carregarTurmas();
+    alert("Alunos designados!");
+    selectTurmaAluno.value = "";
+    carregarAlunos();
+    if(turmasSelect.value) carregarTurmaSelecionada();
