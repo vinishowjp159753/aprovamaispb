@@ -1,99 +1,50 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Designar Turmas - AprovaMaisPB</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="assets/css/dashboard.css"> <!-- mantém o estilo do site -->
-<script type="module" src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
-<style>
-/* Pequenas adaptações para o layout da aba */
-.form-group label { font-weight: 600; display:block; margin-bottom:5px; }
-#alunosList, #turmaAlunosList { max-height: 200px; overflow-y:auto; border:1px solid #ddd; padding:10px; border-radius:8px; background:#fff; margin-bottom:15px; }
-#alunosList label { display:block; margin-bottom:5px; cursor:pointer; }
-#turmaAlunosList li { list-style:none; padding:5px; border-bottom:1px solid #eee; }
-.export-btn { margin-top:10px; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Designar Turmas</title>
+  <link rel="stylesheet" href="assets/css/designar-turmas.css" />
 </head>
 <body>
+  <main class="container">
+    <h1>Designar Turmas</h1>
 
-<div class="main-content">
-    <div class="header">
-        <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Voltar ao Dashboard</a>
-        <h1>Designar Turmas</h1>
-        <div></div>
-    </div>
+    <section class="form-section">
+      <div class="form-group">
+        <label for="professorSelect">Selecionar Professor:</label>
+        <select id="professorSelect"></select>
+      </div>
 
-    <div class="dashboard-cards">
-        <div class="card">
-            <div class="card-header"><span class="card-title">Selecionar Professor</span></div>
-            <div class="card-content">
-                <div class="form-group">
-                    <select id="selectProfessor">
-                        <option value="">Selecione um professor</option>
-                    </select>
-                </div>
-            </div>
+      <div class="form-group">
+        <label>Selecionar Alunos (sem turma):</label>
+        <div id="alunoCheckboxContainer" class="checkbox-container">
+          <!-- Checkboxes inseridos via JS -->
         </div>
+      </div>
 
-        <div class="card">
-            <div class="card-header"><span class="card-title">Selecionar Turma</span></div>
-            <div class="card-content">
-                <div class="form-group">
-                    <select id="selectTurma">
-                        <option value="">Selecione uma turma</option>
-                        <option value="Turma A - Manhã">Turma A - Manhã</option>
-                        <option value="Turma B - Tarde">Turma B - Tarde</option>
-                        <option value="Turma C - Noite">Turma C - Noite</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-    </div>
+      <div class="form-group">
+        <label for="turmaInput">Nome da Turma:</label>
+        <input type="text" id="turmaInput" placeholder="Ex.: Turma A"/>
+      </div>
 
-    <div class="card">
-        <div class="card-header"><span class="card-title">Selecionar Alunos</span></div>
-        <div class="card-content">
-            <div id="alunosList"></div>
-            <button class="btn assign-btn" id="designarTurmaBtn"><i class="fas fa-check"></i> Designar Turma</button>
-        </div>
-    </div>
+      <button id="btnDesignar" class="btn-primary">Designar</button>
+    </section>
 
-    <div class="card">
-        <div class="card-header"><span class="card-title">Designações Ativas</span></div>
-        <div class="card-content">
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Professor</th>
-                            <th>Turma</th>
-                            <th>Aluno</th>
-                            <th>Ação</th>
-                        </tr>
-                    </thead>
-                    <tbody id="designacoesBody"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+    <hr>
 
-    <div class="card">
-        <div class="card-header"><span class="card-title">Turmas</span></div>
-        <div class="card-content">
-            <div class="form-group">
-                <label for="turmasSelect">Selecionar Turma</label>
-                <select id="turmasSelect">
-                    <option value="">Selecione uma turma</option>
-                </select>
-            </div>
-            <ul id="turmaAlunosList"></ul>
-            <button class="btn export-btn" id="exportTurmaBtn"><i class="fas fa-download"></i> Baixar Turma</button>
-        </div>
-    </div>
-</div>
+    <section class="turmas-list">
+      <h2>Turmas</h2>
+      <div class="form-group">
+        <label for="turmaSelect">Selecione uma Turma:</label>
+        <select id="turmaSelect"></select>
+      </div>
+      <button id="btnBaixar" class="btn-secondary">Baixar Excel</button>
 
-<script type="module" src="assets/js/designar-turmas.js"></script>
+      <ul id="listaAlunosTurma"></ul>
+    </section>
+  </main>
+
+  <script type="module" src="assets/js/designar-turmas.js"></script>
 </body>
 </html>
