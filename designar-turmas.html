@@ -13,16 +13,14 @@
     <section class="form-section">
       <div class="form-group">
         <label for="professorSelect">Selecionar Professor:</label>
-        <select id="professorSelect">
-          <option value="">Carregando...</option>
-        </select>
+        <select id="professorSelect"></select>
       </div>
 
       <div class="form-group">
-        <label for="alunoSelect">Selecionar Aluno:</label>
-        <select id="alunoSelect" multiple>
-          <!-- Carregado pelo JS -->
-        </select>
+        <label>Selecionar Alunos (sem turma):</label>
+        <div id="alunoCheckboxContainer" class="checkbox-container">
+          <!-- Checkboxes inseridos via JS -->
+        </div>
       </div>
 
       <div class="form-group">
@@ -39,9 +37,7 @@
       <h2>Turmas</h2>
       <div class="form-group">
         <label for="turmaSelect">Selecione uma Turma:</label>
-        <select id="turmaSelect">
-          <option value="">Carregando...</option>
-        </select>
+        <select id="turmaSelect"></select>
       </div>
       <button id="btnBaixar" class="btn-secondary">Baixar Excel</button>
 
@@ -49,7 +45,6 @@
     </section>
   </main>
 
-  <!-- Firebase -->
   <script type="module" src="assets/js/designar-turmas.js"></script>
 </body>
 </html>
