@@ -196,7 +196,7 @@ matriculaForm.addEventListener('submit', async (e) => {
     }
 
     try {
-        const docRef = await addDoc(collection(db, "inscricoes"), {
+        const docRef = await addDoc(collection(db, "inscricoes_aula_vip"), {
             nomeCompleto, dataNascimento, cpf, telefone, email, turma, turno, endereco,
             valorPago: 0, status:"pendente", criadoEm: new Date()
         });
