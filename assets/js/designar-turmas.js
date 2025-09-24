@@ -147,20 +147,21 @@ async function listarAlunosTurma(turma) {
   }
 }
 
-function exportarTurmaCSV() {
+function exportarTurmaXLSX() {
   const turma = document.getElementById("selectTurmaListar").value;
   if (!turma) return alert("Selecione uma turma!");
-  const rows = [["Aluno","Email"]];
+
+  const rows = [["Aluno", "Email"]];
   document.querySelectorAll("#turmaAlunosBody tr").forEach(tr => {
     const cols = Array.from(tr.querySelectorAll("td")).map(td => td.textContent);
     if (cols.length === 2) rows.push(cols);
   });
-  const csv = rows.map(r => r.join(",")).join("\n");
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = `turma-${turma}.csv`;
-  link.click();
+
+  // Cria uma planilha XLSX real
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, turma);
+  XLSX.writeFile(wb, `turma-${turma}.xlsx`);
 }
 
 // ===================== INIT =====================
