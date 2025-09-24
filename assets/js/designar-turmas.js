@@ -125,7 +125,7 @@ btnBaixar.addEventListener('click', async () => {
     alert('Selecione uma turma para exportar.');
     return;
   }
-  const XLSX = await import("https://cdn.jsdelivr.net/npm/xlsx@0.19.3/+esm");
+
   const snap = await getDocs(collection(db, 'inscricoes'));
   const alunos = [];
   snap.forEach(d => {
