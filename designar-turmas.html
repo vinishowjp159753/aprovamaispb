@@ -1,101 +1,55 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Gerenciar Designações - AprovaMaisPB</title>
-  <link rel="stylesheet" href="assets/css/designar-turmas.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Designar Turmas</title>
+  <link rel="stylesheet" href="assets/css/designar-turmas.css" />
 </head>
 <body>
-  <header class="header">
-    <h1>Gerenciar Designações</h1>
-  </header>
-
   <main class="container">
-    <!-- PROFESSORES -->
-    <section class="card">
-      <h2>Designar Professor</h2>
+    <h1>Designar Turmas</h1>
 
-      <label for="selectProfessor">Professor (ativo)</label>
-      <select id="selectProfessor" class="form-control">
-        <option value="">Carregando...</option>
-      </select>
-
-      <label for="selectTurmaProfessor">Turma</label>
-      <select id="selectTurmaProfessor" class="form-control">
-        <option value="">Selecione a turma</option>
-        <option value="Turma A - Manhã">Turma A - Manhã</option>
-        <option value="Turma B - Tarde">Turma B - Tarde</option>
-        <option value="Turma C - Noite">Turma C - Noite</option>
-      </select>
-
-      <button id="btnDesignarProfessor" class="btn primary"><i class="fas fa-user-plus"></i> Designar Professor</button>
-
-      <h3 style="margin-top:18px;">Designações de Professores</h3>
-      <table class="table">
-        <thead><tr><th>Professor</th><th>Turma</th><th>Ação</th></tr></thead>
-        <tbody id="designacoesProfBody">
-          <tr><td colspan="3">Carregando...</td></tr>
-        </tbody>
-      </table>
-    </section>
-
-    <!-- ALUNOS -->
-    <section class="card">
-      <h2>Designar Alunos (seleção em massa)</h2>
-
-      <label for="filtroAluno">Pesquisar aluno</label>
-      <input id="filtroAluno" type="search" class="form-control" placeholder="Digite nome do aluno...">
-
-      <div id="alunosCheckboxList" class="checkbox-list">
-        <!-- checkbox items gerados aqui -->
+    <section class="form-section">
+      <div class="form-group">
+        <label for="professorSelect">Selecionar Professor:</label>
+        <select id="professorSelect">
+          <option value="">Carregando...</option>
+        </select>
       </div>
 
-      <label for="selectTurmaAluno">Turma para os selecionados</label>
-      <select id="selectTurmaAluno" class="form-control">
-        <option value="">Selecione a turma</option>
-        <option value="Turma A - Manhã">Turma A - Manhã</option>
-        <option value="Turma B - Tarde">Turma B - Tarde</option>
-        <option value="Turma C - Noite">Turma C - Noite</option>
-      </select>
+      <div class="form-group">
+        <label for="alunoSelect">Selecionar Aluno:</label>
+        <select id="alunoSelect" multiple>
+          <!-- Carregado pelo JS -->
+        </select>
+      </div>
 
-      <button id="btnDesignarAlunos" class="btn primary"><i class="fas fa-users"></i> Designar Selecionados</button>
+      <div class="form-group">
+        <label for="turmaInput">Nome da Turma:</label>
+        <input type="text" id="turmaInput" placeholder="Ex.: Turma A"/>
+      </div>
 
-      <h3 style="margin-top:18px;">Designações de Alunos</h3>
-      <table class="table">
-        <thead><tr><th>Aluno</th><th>Turma</th><th>Ação</th></tr></thead>
-        <tbody id="designacoesAlunosBody">
-          <tr><td colspan="3">Carregando...</td></tr>
-        </tbody>
-      </table>
+      <button id="btnDesignar" class="btn-primary">Designar</button>
     </section>
 
-    <!-- TURMAS -->
-    <section class="card">
+    <hr>
+
+    <section class="turmas-list">
       <h2>Turmas</h2>
+      <div class="form-group">
+        <label for="turmaSelect">Selecione uma Turma:</label>
+        <select id="turmaSelect">
+          <option value="">Carregando...</option>
+        </select>
+      </div>
+      <button id="btnBaixar" class="btn-secondary">Baixar Excel</button>
 
-      <label for="selectTurmaListar">Selecionar Turma</label>
-      <select id="selectTurmaListar" class="form-control">
-        <option value="">Carregando turmas...</option>
-      </select>
-
-      <button id="baixarTurmaBtn" class="btn export"><i class="fas fa-download"></i> Baixar lista (XLSX)</button>
-
-      <h3 style="margin-top:18px;">Alunos na Turma</h3>
-      <table class="table">
-        <thead><tr><th>Aluno</th><th>Email</th></tr></thead>
-        <tbody id="turmaAlunosBody">
-          <tr><td colspan="2">Selecione uma turma para listar alunos</td></tr>
-        </tbody>
-      </table>
+      <ul id="listaAlunosTurma"></ul>
     </section>
   </main>
 
-  <!-- SheetJS (XLSX) precisa vir antes do module script -->
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-
-  <!-- script principal (module) -->
+  <!-- Firebase -->
   <script type="module" src="assets/js/designar-turmas.js"></script>
 </body>
 </html>
