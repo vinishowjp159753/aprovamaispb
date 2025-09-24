@@ -1,50 +1,75 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Designar Turmas</title>
-  <link rel="stylesheet" href="assets/css/designar-turmas.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Designar Turmas - AprovaMaisPB</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="assets/css/designar-turmas.css">
+<!-- XLSX -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.19.3/dist/xlsx.full.min.js"></script>
 </head>
 <body>
-  <main class="container">
-    <h1>Designar Turmas</h1>
+<div class="container">
+  <h1>Designar Turmas</h1>
 
-    <section class="form-section">
-      <div class="form-group">
-        <label for="professorSelect">Selecionar Professor:</label>
-        <select id="professorSelect"></select>
-      </div>
+  <!-- Seção Professores -->
+  <section>
+    <h2>Designar Turma para Professor</h2>
+    <div class="form-group">
+      <label for="selectProfessor">Selecionar Professor</label>
+      <select id="selectProfessor">
+        <option value="">Selecione um professor</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="selectTurmaProfessor">Selecionar Turma</label>
+      <select id="selectTurmaProfessor">
+        <option value="">Selecione uma turma</option>
+        <option value="Turma A - Manhã">Turma A - Manhã</option>
+        <option value="Turma B - Tarde">Turma B - Tarde</option>
+        <option value="Turma C - Noite">Turma C - Noite</option>
+      </select>
+    </div>
+    <button class="btn" id="designarTurmaProfessorBtn">Designar Turma</button>
+  </section>
 
-      <div class="form-group">
-        <label>Selecionar Alunos (sem turma):</label>
-        <div id="alunoCheckboxContainer" class="checkbox-container">
-          <!-- Checkboxes inseridos via JS -->
-        </div>
-      </div>
+  <!-- Seção Alunos -->
+  <section>
+    <h2>Designar Turmas para Alunos</h2>
+    <div class="form-group">
+      <label for="selectAlunos">Selecionar Alunos</label>
+      <div id="selectAlunos" class="alunos-list"></div>
+    </div>
+    <div class="form-group">
+      <label for="selectTurmaAluno">Selecionar Turma</label>
+      <select id="selectTurmaAluno">
+        <option value="">Selecione uma turma</option>
+        <option value="Turma A - Manhã">Turma A - Manhã</option>
+        <option value="Turma B - Tarde">Turma B - Tarde</option>
+        <option value="Turma C - Noite">Turma C - Noite</option>
+      </select>
+    </div>
+    <button class="btn" id="designarTurmaAlunoBtn">Designar Turma</button>
+  </section>
 
-      <div class="form-group">
-        <label for="turmaInput">Nome da Turma:</label>
-        <input type="text" id="turmaInput" placeholder="Ex.: Turma A"/>
-      </div>
+  <!-- Lista de Turmas -->
+  <section>
+    <h2>Turmas</h2>
+    <div class="form-group">
+      <label for="turmasSelect">Selecionar Turma</label>
+      <select id="turmasSelect">
+        <option value="">Selecione uma turma</option>
+        <option value="Turma A - Manhã">Turma A - Manhã</option>
+        <option value="Turma B - Tarde">Turma B - Tarde</option>
+        <option value="Turma C - Noite">Turma C - Noite</option>
+      </select>
+    </div>
+    <ul id="alunosTurma" class="lista-turma"></ul>
+    <button class="btn" id="exportTurmaBtn">Baixar Turma (Excel)</button>
+  </section>
+</div>
 
-      <button id="btnDesignar" class="btn-primary">Designar</button>
-    </section>
-
-    <hr>
-
-    <section class="turmas-list">
-      <h2>Turmas</h2>
-      <div class="form-group">
-        <label for="turmaSelect">Selecione uma Turma:</label>
-        <select id="turmaSelect"></select>
-      </div>
-      <button id="btnBaixar" class="btn-secondary">Baixar Excel</button>
-
-      <ul id="listaAlunosTurma"></ul>
-    </section>
-  </main>
-
-  <script type="module" src="assets/js/designar-turmas.js"></script>
+<script type="module" src="assets/js/designar-turmas.js"></script>
 </body>
 </html>
