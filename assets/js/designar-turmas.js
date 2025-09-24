@@ -3,6 +3,9 @@ import {
   collection, getDocs, doc, updateDoc, getDoc 
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
+// Import ESM XLSX compatível
+import * as XLSX from "https://cdn.sheetjs.com/xlsx-latest/package/xlsx.mjs";
+
 const professorSelect      = document.getElementById('professorSelect');
 const alunoContainer       = document.getElementById('alunoCheckboxContainer');
 const turmaInput           = document.getElementById('turmaInput');
@@ -11,7 +14,7 @@ const turmaSelect          = document.getElementById('turmaSelect');
 const listaAlunosTurma     = document.getElementById('listaAlunosTurma');
 const btnBaixar            = document.getElementById('btnBaixar');
 
-// Carrega professores ativos
+// ===== Carrega professores ativos =====
 async function carregarProfessores() {
   const snap = await getDocs(collection(db, 'professores'));
   professorSelect.innerHTML = '<option value="">Selecione</option>';
@@ -26,7 +29,7 @@ async function carregarProfessores() {
   });
 }
 
-// Carrega alunos sem turma
+// ===== Carrega alunos sem turma =====
 async function carregarAlunosSemTurma() {
   const snap = await getDocs(collection(db, 'inscricoes'));
   alunoContainer.innerHTML = '';
@@ -40,7 +43,7 @@ async function carregarAlunosSemTurma() {
   });
 }
 
-// Designar turma
+// ===== Designar turma =====
 btnDesignar.addEventListener('click', async () => {
   const profId = professorSelect.value;
   const turma  = turmaInput.value.trim();
@@ -74,7 +77,7 @@ btnDesignar.addEventListener('click', async () => {
   btnDesignar.disabled = false;
 });
 
-// Carrega turmas existentes
+// ===== Carrega turmas existentes =====
 async function carregarTurmas() {
   const snap = await getDocs(collection(db, 'inscricoes'));
   const turmas = new Set();
@@ -88,7 +91,7 @@ async function carregarTurmas() {
   });
 }
 
-// Lista alunos da turma + botão remover
+// ===== Lista alunos da turma + botão remover =====
 turmaSelect.addEventListener('change', async () => {
   listaAlunosTurma.innerHTML = '';
   if (!turmaSelect.value) return;
@@ -119,7 +122,7 @@ turmaSelect.addEventListener('change', async () => {
   });
 });
 
-// Exportar Excel (cada aluno em linha)
+// ===== Exportar Excel (cada aluno em linha) =====
 btnBaixar.addEventListener('click', async () => {
   if (!turmaSelect.value) {
     alert('Selecione uma turma para exportar.');
@@ -144,7 +147,7 @@ btnBaixar.addEventListener('click', async () => {
   XLSX.writeFile(wb, `turma-${turmaSelect.value}.xlsx`);
 });
 
-// Inicializa
+// ===== Inicializa =====
 carregarProfessores();
 carregarAlunosSemTurma();
 carregarTurmas();
