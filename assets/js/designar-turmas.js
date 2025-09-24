@@ -1,70 +1,30 @@
-import { db } from "./firebase-config.js";
+import { db } from './firebase-config.js';
 import {
-  collection, getDocs, addDoc, deleteDoc, doc,
-  query, where
-} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+  collection, getDocs, addDoc, deleteDoc, doc, query, where
+} from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
 
-// ===================== VARIÁVEIS =====================
-let professores = [];
-let alunos = [];
+const professores = [];
+const alunos = [];
+const designacoes = [];
 
-// ===================== PROFESSORES =====================
 async function carregarProfessores() {
-  const snap = await getDocs(collection(db, "professores"));
-  professores = [];
-  snap.forEach(d => professores.push({ id: d.id, ...d.data() }));
-
+  const snapshot = await getDocs(collection(db, "professores"));
+  snapshot.forEach(d => professores.push({ id: d.id, ...d.data() }));
   const select = document.getElementById("selectProfessor");
-  select.innerHTML = `<option value="">Selecione um professor</option>`;
-  professores.filter(p => p.status === "ativo").forEach(p => {
-    const opt = document.createElement("option");
-    opt.value = p.id;
-    opt.textContent = `${p.nome} - ${p.materia}`;
-    select.appendChild(opt);
-  });
-}
-
-async function designarProfessor() {
-  const profId = document.getElementById("selectProfessor").value;
-  const turma = document.getElementById("selectTurmaProfessor").value;
-  if (!profId || !turma) return alert("Selecione professor e turma!");
-
-  const q = query(collection(db,"designacoes"), where("professorId","==",profId), where("turma","==",turma));
-  if (!(await getDocs(q)).empty) return alert("Esta designação já existe!");
-
-  await addDoc(collection(db,"designacoes"), { professorId: profId, turma });
-  carregarDesignacoesProf();
-}
-
-async function carregarDesignacoesProf() {
-  const snap = await getDocs(collection(db,"designacoes"));
-  const tbody = document.getElementById("designacoesProfessoresBody");
-  tbody.innerHTML = "";
-  snap.forEach(d => {
-    const prof = professores.find(p => p.id === d.data().professorId);
-    if (prof) {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `<td>${prof.nome}</td><td>${d.data().turma}</td>
-        <td><button class="btn danger" data-id="${d.id}"><i class="fas fa-trash"></i> Remover</button></td>`;
-      tbody.appendChild(tr);
+  professores.forEach(p => {
+    if (p.status === "ativo") {
+      const opt = document.createElement("option");
+      opt.value = p.id;
+      opt.textContent = `${p.nome} - ${p.materia}`;
+      select.appendChild(opt);
     }
   });
-  tbody.querySelectorAll(".danger").forEach(btn =>
-    btn.addEventListener("click", async e => {
-      await deleteDoc(doc(db,"designacoes",e.target.closest("button").dataset.id));
-      carregarDesignacoesProf();
-    })
-  );
 }
 
-// ===================== ALUNOS =====================
 async function carregarAlunos() {
-  const snap = await getDocs(collection(db,"inscricoes"));
-  alunos = [];
+  const snap = await getDocs(collection(db, "inscricoes"));
   snap.forEach(d => alunos.push({ id: d.id, ...d.data() }));
-
   const select = document.getElementById("selectAluno");
-  select.innerHTML = `<option value="">Selecione um aluno</option>`;
   alunos.forEach(a => {
     const opt = document.createElement("option");
     opt.value = a.id;
@@ -73,114 +33,87 @@ async function carregarAlunos() {
   });
 }
 
-async function designarAluno() {
-  const alunoId = document.getElementById("selectAluno").value;
-  const turma = document.getElementById("selectTurmaAluno").value;
-  if (!alunoId || !turma) return alert("Selecione aluno e turma!");
-
-  const q = query(collection(db,"designacoesAlunos"),
-                  where("alunoId","==",alunoId), where("turma","==",turma));
-  if (!(await getDocs(q)).empty) return alert("Esta designação já existe!");
-
-  await addDoc(collection(db,"designacoesAlunos"), { alunoId, turma });
-  carregarDesignacoesAlunos();
-  carregarTurmas(); // atualiza lista de turmas
-}
-
-async function carregarDesignacoesAlunos() {
-  const snap = await getDocs(collection(db,"designacoesAlunos"));
-  const tbody = document.getElementById("designacoesAlunosBody");
+async function carregarDesignacoes() {
+  designacoes.length = 0;
+  const snap = await getDocs(collection(db,"designacoes"));
+  snap.forEach(d => designacoes.push({id:d.id, ...d.data()}));
+  const tbody = document.getElementById("designacoesBody");
   tbody.innerHTML = "";
-  snap.forEach(d => {
-    const aluno = alunos.find(a => a.id === d.data().alunoId);
-    if (aluno) {
+  designacoes.forEach(des => {
+    const prof = professores.find(p=>p.id===des.professorId);
+    const alu  = alunos.find(a=>a.id===des.alunoId);
+    if (prof && alu) {
       const tr = document.createElement("tr");
-      tr.innerHTML = `<td>${aluno.nomeCompleto}</td><td>${d.data().turma}</td>
-        <td><button class="btn danger" data-id="${d.id}"><i class="fas fa-trash"></i> Remover</button></td>`;
+      tr.innerHTML = `
+        <td>${prof.nome}</td>
+        <td>${alu.nomeCompleto}</td>
+        <td>${des.turma}</td>
+        <td><button class="btn danger" data-id="${des.id}">Remover</button></td>
+      `;
       tbody.appendChild(tr);
     }
   });
-  tbody.querySelectorAll(".danger").forEach(btn =>
-    btn.addEventListener("click", async e => {
-      await deleteDoc(doc(db,"designacoesAlunos",e.target.closest("button").dataset.id));
-      carregarDesignacoesAlunos();
-      carregarTurmas();
-    })
-  );
-}
-
-// ===================== TURMAS =====================
-async function carregarTurmas() {
-  const snap = await getDocs(collection(db, "designacoesAlunos"));
-  const turmas = new Set();
-  snap.forEach(d => turmas.add(d.data().turma));
-
-  const select = document.getElementById("selectTurmaListar");
-  select.innerHTML = `<option value="">Escolha a turma</option>`;
-  turmas.forEach(t => {
-    const opt = document.createElement("option");
-    opt.value = t;
-    opt.textContent = t;
-    select.appendChild(opt);
+  document.querySelectorAll("#designacoesBody .btn.danger").forEach(btn=>{
+    btn.addEventListener("click", async ()=>{
+      await deleteDoc(doc(db,"designacoes",btn.dataset.id));
+      carregarDesignacoes();
+    });
   });
 }
 
-async function listarAlunosTurma(turma) {
-  const q = query(collection(db,"designacoesAlunos"), where("turma","==",turma));
+async function designar() {
+  const prof = document.getElementById("selectProfessor").value;
+  const aluno = document.getElementById("selectAluno").value;
+  const turma = document.getElementById("selectTurma").value;
+  if(!prof || !aluno || !turma) return alert("Selecione professor, aluno e turma!");
+
+  const q = query(collection(db,"designacoes"),
+    where("alunoId","==",aluno), where("turma","==",turma));
   const snap = await getDocs(q);
+  if(!snap.empty) return alert("Aluno já está nesta turma!");
+
+  await addDoc(collection(db,"designacoes"), { professorId: prof, alunoId: aluno, turma });
+  document.getElementById("selectAluno").value="";
+  document.getElementById("selectTurma").value="";
+  carregarDesignacoes();
+}
+
+// --- Turmas -> listar alunos e exportar
+async function listarAlunosTurma() {
+  const turmaSel = document.getElementById("selectTurmaListar").value;
   const tbody = document.getElementById("turmaAlunosBody");
   tbody.innerHTML = "";
-
-  if (snap.empty) {
-    tbody.innerHTML = "<tr><td colspan='2'>Nenhum aluno nessa turma</td></tr>";
-    return;
-  }
-
-  for (const d of snap.docs) {
-    const alunoId = d.data().alunoId;
-    const alunoSnap = alunos.find(a => a.id === alunoId);
-    if (alunoSnap) {
+  if(!turmaSel) return;
+  const snap = await getDocs(query(collection(db,"designacoes"), where("turma","==",turmaSel)));
+  snap.forEach(d => {
+    const alu = alunos.find(a => a.id === d.data().alunoId);
+    if (alu) {
       const tr = document.createElement("tr");
-      tr.innerHTML = `<td>${alunoSnap.nomeCompleto}</td><td>${alunoSnap.email || "-"}</td>`;
+      tr.innerHTML = `<td>${alu.nomeCompleto}</td><td>${alu.email || ""}</td>`;
       tbody.appendChild(tr);
     }
-  }
+  });
 }
 
 function exportarTurmaXLSX() {
   const turma = document.getElementById("selectTurmaListar").value;
   if (!turma) return alert("Selecione uma turma!");
-
   const rows = [["Aluno", "Email"]];
   document.querySelectorAll("#turmaAlunosBody tr").forEach(tr => {
     const cols = Array.from(tr.querySelectorAll("td")).map(td => td.textContent);
-    if (cols.length === 2) rows.push(cols);
+    if (cols.length) rows.push(cols);
   });
-
-  // Cria uma planilha XLSX real
   const ws = XLSX.utils.aoa_to_sheet(rows);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, turma);
   XLSX.writeFile(wb, `turma-${turma}.xlsx`);
 }
 
-// ===================== INIT =====================
 document.addEventListener("DOMContentLoaded", () => {
   carregarProfessores();
-  carregarAlunos();
-  carregarDesignacoesProf();
-  carregarDesignacoesAlunos();
-  carregarTurmas();
+  carregarAlunos().then(carregarDesignacoes);
 
-  document.getElementById("designarProfessorBtn").addEventListener("click", designarProfessor);
-  document.getElementById("designarAlunoBtn").addEventListener("click", designarAluno);
-
-  document.getElementById("selectTurmaListar").addEventListener("change", e => {
-    if (e.target.value) listarAlunosTurma(e.target.value);
-    else document.getElementById("turmaAlunosBody").innerHTML =
-      "<tr><td colspan='2'>Selecione uma turma</td></tr>";
-  });
-
-  document.getElementById("baixarTurmaBtn")
-        .addEventListener("click", exportarTurmaXLSX);
+  document.getElementById("designarBtn").addEventListener("click", designar);
+  document.getElementById("selectTurmaListar").addEventListener("change", listarAlunosTurma);
+  document.getElementById("baixarTurmaBtn").addEventListener("click", exportarTurmaXLSX);
 });
