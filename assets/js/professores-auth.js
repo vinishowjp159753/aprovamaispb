@@ -10,12 +10,10 @@ import { db } from './firebase-config.js';
 class ProfessoresAuth {
     async autenticarProfessor(usuario, senha) {
         try {
+            console.log('🔐 Tentando autenticar:', usuario);
+            
             const professoresRef = collection(db, "professores");
-            const q = query(
-                professoresRef, 
-                where("usuario", "==", usuario),
-                where("senha", "==", senha)
-            );
+            const q = query(professoresRef, where("usuario", "==", usuario));
             
             const querySnapshot = await getDocs(q);
             
@@ -23,19 +21,30 @@ class ProfessoresAuth {
                 const professorDoc = querySnapshot.docs[0];
                 const professorData = professorDoc.data();
                 
-                localStorage.setItem('professorLogado', JSON.stringify({
-                    id: professorDoc.id,
-                    usuario: professorData.usuario,
-                    nome: professorData.nome || professorData.usuario,
-                    email: professorData.email || '',
-                    materia: professorData.materia || ''
-                }));
+                console.log('📋 Dados encontrados:', professorData);
                 
-                return true;
+                // Verificar se a senha corresponde
+                if (professorData.senha === senha) {
+                    console.log('✅ Senha correta!');
+                    
+                    localStorage.setItem('professorLogado', JSON.stringify({
+                        id: professorDoc.id,
+                        usuario: professorData.usuario,
+                        nome: professorData.nome || professorData.usuario,
+                        email: professorData.email || '',
+                        materia: professorData.materia || ''
+                    }));
+                    
+                    return true;
+                } else {
+                    console.log('❌ Senha incorreta');
+                    return false;
+                }
             }
+            console.log('❌ Usuário não encontrado');
             return false;
         } catch (error) {
-            console.error('Erro na autenticação:', error);
+            console.error('💥 Erro na autenticação:', error);
             return false;
         }
     }
