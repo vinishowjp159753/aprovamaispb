@@ -8,6 +8,11 @@
 </head>
 <body>
   <main class="container">
+    <!-- Botão Voltar ao Dashboard -->
+    <div class="back-button-container">
+      <button onclick="window.location.href='dashboard.html'" class="btn-back">← Voltar ao Dashboard</button>
+    </div>
+
     <h1>Designar Turmas</h1>
 
     <section class="form-section">
@@ -46,5 +51,24 @@
   </main>
 
   <script type="module" src="assets/js/designar-turmas.js"></script>
+
+  <style>
+    /* Estilo simples para o botão de voltar */
+    .back-button-container {
+      margin-bottom: 20px;
+    }
+    .btn-back {
+      background-color: #ccc;
+      color: #000;
+      border: none;
+      padding: 8px 16px;
+      cursor: pointer;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    .btn-back:hover {
+      background-color: #bbb;
+    }
+  </style>
 </body>
 </html>
