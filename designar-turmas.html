@@ -3,71 +3,114 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Designar Turmas - AprovaMaisPB</title>
+<title>Gerenciar Professores - AprovaMaisPB</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="assets/css/designar-turmas.css">
+<link rel="stylesheet" href="assets/css/gerenciar-professores.css">
 <!-- XLSX -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.19.3/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 <div class="container">
-  <h1>Designar Turmas</h1>
+    <div class="header">
+        <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Voltar ao Dashboard</a>
+        <h1>Gerenciar Professores</h1>
+        <div></div>
+    </div>
 
-  <!-- Seção Professores -->
-  <section>
-    <h2>Designar Turma para Professor</h2>
-    <div class="form-group">
-      <label for="selectProfessor">Selecionar Professor</label>
-      <select id="selectProfessor">
-        <option value="">Selecione um professor</option>
-      </select>
+    <div class="tabs">
+        <button class="tab active" data-tab="professores">Lista de Professores</button>
+        <button class="tab" data-tab="designar">Designar Turmas</button>
     </div>
-    <div class="form-group">
-      <label for="selectTurmaProfessor">Selecionar Turma</label>
-      <select id="selectTurmaProfessor">
-        <option value="">Selecione uma turma</option>
-        <option value="Turma A - Manhã">Turma A - Manhã</option>
-        <option value="Turma B - Tarde">Turma B - Tarde</option>
-        <option value="Turma C - Noite">Turma C - Noite</option>
-      </select>
-    </div>
-    <button class="btn" id="designarTurmaProfessorBtn">Designar Turma</button>
-  </section>
 
-  <!-- Seção Alunos -->
-  <section>
-    <h2>Designar Turmas para Alunos</h2>
-    <div class="form-group">
-      <label for="selectAlunos">Selecionar Alunos</label>
-      <div id="selectAlunos" class="alunos-list"></div>
+    <!-- Aba Lista de Professores -->
+    <div id="professores" class="tab-content active">
+        <div class="table-container">
+            <table id="teachersTable">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Matéria</th>
+                        <th>Usuário</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
     </div>
-    <div class="form-group">
-      <label for="selectTurmaAluno">Selecionar Turma</label>
-      <select id="selectTurmaAluno">
-        <option value="">Selecione uma turma</option>
-        <option value="Turma A - Manhã">Turma A - Manhã</option>
-        <option value="Turma B - Tarde">Turma B - Tarde</option>
-        <option value="Turma C - Noite">Turma C - Noite</option>
-      </select>
-    </div>
-    <button class="btn" id="designarTurmaAlunoBtn">Designar Turma</button>
-  </section>
 
-  <!-- Lista de Turmas -->
-  <section>
-    <h2>Turmas</h2>
-    <div class="form-group">
-      <label for="turmasSelect">Selecionar Turma</label>
-      <select id="turmasSelect">
-        <option value="">Selecione uma turma</option>
-        <option value="Turma A - Manhã">Turma A - Manhã</option>
-        <option value="Turma B - Tarde">Turma B - Tarde</option>
-        <option value="Turma C - Noite">Turma C - Noite</option>
-      </select>
+    <!-- Aba Designar Turmas -->
+    <div id="designar" class="tab-content">
+        <div class="form-group">
+            <label for="selectProfessor">Selecionar Professor</label>
+            <select id="selectProfessor">
+                <option value="">Selecione um professor</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="selectAlunos">Selecionar Alunos</label>
+            <div id="selectAlunos" class="alunos-list"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="selectTurma">Selecionar Turma</label>
+            <select id="selectTurma">
+                <option value="">Selecione uma turma</option>
+                <option value="Turma A - Manhã">Turma A - Manhã</option>
+                <option value="Turma B - Tarde">Turma B - Tarde</option>
+                <option value="Turma C - Noite">Turma C - Noite</option>
+            </select>
+        </div>
+
+        <button class="btn assign-btn" id="designarTurmaBtn">Designar Turma</button>
+
+        <h3 style="margin-top:20px;">Designações Ativas</h3>
+        <table>
+            <thead>
+                <tr><th>Professor</th><th>Turma</th><th>Alunos</th><th>Ação</th></tr>
+            </thead>
+            <tbody id="designacoesBody"></tbody>
+        </table>
+        <button class="btn" id="exportTurmaBtn">Baixar Turma (Excel)</button>
     </div>
-    <ul id="alunosTurma" class="lista-turma"></ul>
-    <button class="btn" id="exportTurmaBtn">Baixar Turma (Excel)</button>
-  </section>
+</div>
+
+<!-- Modal Editar Professor -->
+<div class="modal" id="editModal">
+    <div class="modal-content">
+        <h2>Editar Professor</h2>
+        <div class="form-group">
+            <label for="editName">Nome Completo</label>
+            <input type="text" id="editName">
+        </div>
+        <div class="form-group">
+            <label for="editEmail">E-mail</label>
+            <input type="email" id="editEmail">
+        </div>
+        <div class="form-group">
+            <label for="editMateria">Matéria</label>
+            <select id="editMateria">
+                <option value="portugues">Português</option>
+                <option value="matematica">Matemática</option>
+                <option value="historia">História</option>
+                <option value="geografia">Geografia</option>
+                <option value="ingles">Inglês</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="editStatus">Status</label>
+            <select id="editStatus">
+                <option value="ativo">Ativo</option>
+                <option value="inativo">Inativo</option>
+            </select>
+        </div>
+        <div class="form-actions">
+            <button class="btn" id="cancelarEdicaoBtn">Cancelar</button>
+            <button class="btn" style="background: var(--primary);" id="salvarEdicaoBtn">Salvar</button>
+        </div>
+    </div>
 </div>
 
 <script type="module" src="assets/js/designar-turmas.js"></script>
