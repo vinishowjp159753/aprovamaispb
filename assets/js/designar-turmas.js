@@ -181,5 +181,6 @@ document.addEventListener("DOMContentLoaded", () => {
       "<tr><td colspan='2'>Selecione uma turma</td></tr>";
   });
 
-  document.getElementById("baixarTurmaBtn").addEventListener("click", exportarTurmaCSV);
+  document.getElementById("baixarTurmaBtn")
+        .addEventListener("click", exportarTurmaXLSX);
 });
