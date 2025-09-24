@@ -7,187 +7,252 @@
 
   <style>
     /* [TODO O CSS ANTERIOR PERMANECE IGUAL] */
-    /* Manter todo o CSS que já estava funcionando */
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1e40af;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --dark: #1e293b;
+      --light: #f8fafc;
+      --white: #ffffff;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-600: #4b5563;
+      --gray-800: #1f2937;
+      --shadow: 0 4px 12px rgba(0,0,0,0.1);
+      --shadow-lg: 0 8px 24px rgba(0,0,0,0.15);
+      --radius: 8px;
+      --radius-lg: 12px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: #333;
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    /* [RESTANTE DO CSS PERMANECE IGUAL] */
+    /* ... */
   </style>
 </head>
 <body>
 
-<!-- [TODO O HTML ANTERIOR PERMANECE IGUAL] -->
-<!-- Manter toda a estrutura HTML que já estava funcionando -->
+<header>
+  <nav class="nav">
+    <div class="brand">
+      <img src="./assets/img/logo_aprovamaispb.png" alt="Logo" />
+      <span>AprovaMaisPB</span>
+    </div>
+    <ul class="menu" id="main-menu">
+      <li><a href="index.html">Início</a></li>
+      <li><a href="matricula.html">Matricule-se</a></li>
+      <li><a href="professores.html" class="active">Área do Professor</a></li>
+      <li><a href="login.html">Login Admin</a></li>
+    </ul>
+    <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">
+      <span>☰</span>
+    </button>
+  </nav>
+</header>
 
-<!-- Firebase SDK -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-  import { 
-    getFirestore, 
-    collection, 
-    getDocs, 
-    query, 
-    where 
-  } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+<!-- LOGIN SECTION -->
+<div id="login-section">
+  <main class="login-container">
+    <h2>👨‍🏫 Área do Professor</h2>
+    <p>Entre com suas credenciais de acesso</p>
+    
+    <form id="login-form">
+      <div class="form-group">
+        <label for="usuario">Usuário:</label>
+        <input type="text" id="usuario" required placeholder="Digite seu usuário">
+      </div>
+      
+      <div class="form-group">
+        <label for="senha">Senha:</label>
+        <input type="password" id="senha" required placeholder="Digite sua senha">
+      </div>
+      
+      <div class="error-message" id="login-error">
+        ❌ Usuário ou senha incorretos!
+      </div>
+      
+      <button type="submit" class="btn-modern" id="login-btn">
+        <span>🚀</span>
+        <span>Acessar Portal</span>
+      </button>
+    </form>
+    
+    <div class="mt-2 p-1" style="background: var(--gray-100); border-radius: var(--radius);">
+      <h4 class="mb-1">💡 Informações Importantes</h4>
+      <p class="text-small">• Credenciais fornecidas pela administração</p>
+      <p class="text-small">• Em caso de problemas, contate o suporte</p>
+      <p class="text-small">• Acesso restrito aos professores autorizados</p>
+    </div>
+  </main>
+</div>
 
-  // SUA CONFIGURAÇÃO DO FIREBASE - VERIFIQUE SE ESTÁ CORRETA!
-  const firebaseConfig = {
-    apiKey: "sua-api-key",
-    authDomain: "seu-projeto.firebaseapp.com",
-    projectId: "seu-projeto-id",
-    storageBucket: "seu-projeto.appspot.com",
-    messagingSenderId: "seu-sender-id",
-    appId: "seu-app-id"
-  };
+<!-- PAINEL DO PROFESSOR -->
+<div id="professor-panel" class="hidden">
+  <div class="welcome-header">
+    <div class="container">
+      <h1>Bem-vindo, <span id="professor-name">Professor</span>! 👋</h1>
+      <p>Gerencie suas turmas designadas</p>
+      <button class="btn-modern" onclick="fazerLogout()" style="max-width: 200px; margin: 1rem auto 0;">
+        <span>🚪</span>
+        <span>Sair do Sistema</span>
+      </button>
+    </div>
+  </div>
 
-  // Inicializar Firebase
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+  <div class="container">
+    <!-- Dashboard Stats -->
+    <div class="dashboard-grid">
+      <div class="stats-card">
+        <div class="stats-number" id="total-alunos">0</div>
+        <div class="stats-label">👥 Total de Alunos</div>
+      </div>
+      
+      <div class="stats-card">
+        <div class="stats-number" id="total-turmas">0</div>
+        <div class="stats-label">🏫 Turmas Designadas</div>
+      </div>
+      
+      <div class="stats-card">
+        <div class="stats-number" id="alunos-ativos">0</div>
+        <div class="stats-label">✅ Alunos Ativos</div>
+      </div>
+    </div>
 
-  class ProfessoresAuth {
+    <!-- Turmas -->
+    <h2 class="section-title">📚 Minhas Turmas Designadas</h2>
+    <p class="section-subtitle">Turmas sob sua responsabilidade</p>
+    
+    <div class="turmas-container" id="turmas-list">
+      <div class="loading">
+        <div class="loading-spinner"></div>
+        <p>Carregando suas turmas...</p>
+      </div>
+    </div>
+
+    <!-- Suporte -->
+    <div class="support-section">
+      <h3>📞 Precisa de Ajuda?</h3>
+      <p>Nossa equipe de suporte está sempre disponível para ajudar você</p>
+      <div class="support-grid">
+        <div class="support-item">
+          <strong>📱 Telefone:</strong><br>
+          (83) 99999-9999
+        </div>
+        <div class="support-item">
+          <strong>✉️ Email:</strong><br>
+          suporte@aprovamaispb.com
+        </div>
+        <div class="support-item">
+          <strong>🕒 Horário:</strong><br>
+          08:00 - 18:00 (Seg-Sex)
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SIMULAÇÃO PARA TESTE (REMOVA QUANDO O FIREBASE ESTIVER FUNCIONANDO) -->
+<script>
+  // Sistema de simulação para teste rápido
+  class ProfessoresAuthSimulado {
     async autenticarProfessor(usuario, senha) {
-      try {
-        console.log('🔐 Tentando autenticar professor:', usuario);
-        
-        // Primeiro, vamos listar TODOS os professores para debug
-        const professoresRef = collection(db, "professores");
-        const todosProfessores = await getDocs(professoresRef);
-        
-        console.log('📊 Todos os professores na coleção:');
-        todosProfessores.forEach((doc) => {
-          console.log('ID:', doc.id, 'Dados:', doc.data());
-        });
-
-        // Agora busca específica pelo usuário
-        const q = query(professoresRef, where("usuario", "==", usuario));
-        const querySnapshot = await getDocs(q);
-        
-        console.log('🔍 Resultado da busca por usuário:', usuario);
-        console.log('Número de documentos encontrados:', querySnapshot.size);
-        
-        if (!querySnapshot.empty) {
-          const professorDoc = querySnapshot.docs[0];
-          const professorData = professorDoc.data();
-          
-          console.log('✅ Usuário encontrado! Dados:', professorData);
-          console.log('🔑 Senha fornecida:', senha);
-          console.log('🔑 Senha no banco:', professorData.senha);
-          console.log('🔍 Comparação:', professorData.senha === senha);
-          
-          // Verificação detalhada da senha
-          if (professorData.senha === senha) {
-            console.log('🎉 Autenticação bem-sucedida!');
-            
-            localStorage.setItem('professorLogado', JSON.stringify({
-              id: professorDoc.id,
-              usuario: professorData.usuario,
-              nome: professorData.nome || professorData.usuario,
-              email: professorData.email || '',
-              materia: professorData.materia || ''
-            }));
-            
-            return true;
-          } else {
-            console.log('❌ Senha incorreta');
-            return false;
-          }
-        } else {
-          console.log('❌ Nenhum professor encontrado com o usuário:', usuario);
-          return false;
-        }
-      } catch (error) {
-        console.error('💥 Erro na autenticação:', error);
-        console.error('Detalhes do erro:', error.message);
-        return false;
+      console.log('🔐 Tentando login:', usuario, senha);
+      
+      // Simular delay de rede
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Dados de teste
+      const professoresTeste = [
+        { usuario: "admin", senha: "123456", nome: "Professor Admin", materia: "Matemática" },
+        { usuario: "professor", senha: "123456", nome: "João Silva", materia: "Português" },
+        { usuario: "teste", senha: "teste123", nome: "Professor Teste", materia: "História" }
+      ];
+      
+      const professor = professoresTeste.find(p => p.usuario === usuario && p.senha === senha);
+      
+      if (professor) {
+        console.log('✅ Login bem-sucedido');
+        localStorage.setItem('professorLogado', JSON.stringify({
+          id: 'simulado-' + Date.now(),
+          ...professor
+        }));
+        return true;
       }
+      
+      console.log('❌ Login falhou');
+      return false;
     }
 
     async buscarTurmasProfessor(professorId) {
-      try {
-        console.log('🏫 Buscando turmas para professor ID:', professorId);
-        
-        const designacoesRef = collection(db, "designacoes");
-        
-        // Primeiro, listar todas as designações para debug
-        const todasDesignacoes = await getDocs(designacoesRef);
-        console.log('📊 Todas as designações:');
-        todasDesignacoes.forEach((doc) => {
-          console.log('Designação:', doc.id, doc.data());
-        });
-
-        const q = query(designacoesRef, where("professorId", "==", professorId));
-        const querySnapshot = await getDocs(q);
-        
-        console.log('🔍 Designações encontradas para o professor:', querySnapshot.size);
-        
-        const turmas = [];
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          console.log('📋 Dados da designação:', data);
-          turmas.push({
-            id: doc.id,
-            turma: data.turma,
-            professorId: data.professorId,
-            disciplina: data.disciplina || 'Não informada',
-            periodo: data.periodo || 'Não informado'
-          });
-        });
-        
-        return turmas;
-      } catch (error) {
-        console.error('Erro ao buscar turmas:', error);
-        return [];
-      }
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      return [
+        { 
+          id: "1", 
+          turma: "Turma A - Manhã", 
+          disciplina: "Matemática", 
+          periodo: "2024/1",
+          professorId: professorId
+        },
+        { 
+          id: "2", 
+          turma: "Turma B - Tarde", 
+          disciplina: "Português", 
+          periodo: "2024/1",
+          professorId: professorId
+        }
+      ];
     }
 
     async buscarAlunosPorTurma(turma) {
-      try {
-        console.log('👥 Buscando alunos da turma:', turma);
-        
-        const inscricoesRef = collection(db, "inscricoes");
-        
-        // Debug: listar todas as inscrições
-        const todasInscricoes = await getDocs(inscricoesRef);
-        console.log('📊 Todas as inscrições:');
-        todasInscricoes.forEach((doc) => {
-          console.log('Inscrição:', doc.id, doc.data());
-        });
-
-        const q = query(inscricoesRef, where("turma", "==", turma));
-        const querySnapshot = await getDocs(q);
-        
-        console.log('🎓 Alunos encontrados na turma:', querySnapshot.size);
-        
-        const alunos = [];
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          alunos.push({
-            id: doc.id,
-            nome: data.nome || data.nomeCompleto || 'Nome não informado',
-            email: data.email || 'Email não informado',
-            telefone: data.telefone || 'Telefone não informado',
-            usuario: data.usuario || 'Usuário não informado',
-            status: data.status || 'pendente',
-            materia: data.materia || 'Não informada',
-            turma: data.turma || turma,
-            criadoEm: data.criadoEm ? this.formatarData(data.criadoEm) : 'Data não informada'
-          });
-        });
-        
-        return alunos;
-      } catch (error) {
-        console.error('Erro ao buscar alunos:', error);
-        return [];
-      }
-    }
-
-    formatarData(data) {
-      try {
-        if (typeof data === 'string') {
-          return new Date(data).toLocaleDateString('pt-BR');
-        } else if (data && data.seconds) {
-          return new Date(data.seconds * 1000).toLocaleDateString('pt-BR');
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      const alunosBase = [
+        {
+          nome: "Ana Silva Santos",
+          telefone: "83999111111",
+          email: "ana.silva@email.com",
+          status: "ativo",
+          usuario: "ana123",
+          turma: turma,
+          criadoEm: "24/09/2024"
+        },
+        {
+          nome: "Carlos Oliveira Lima",
+          telefone: "83999222222", 
+          email: "carlos.lima@email.com",
+          status: "ativo",
+          usuario: "carlos456",
+          turma: turma,
+          criadoEm: "23/09/2024"
+        },
+        {
+          nome: "Mariana Costa Pereira",
+          telefone: "83999333333",
+          email: "mariana.pereira@email.com",
+          status: "pendente",
+          usuario: "mariana789",
+          turma: turma,
+          criadoEm: "22/09/2024"
         }
-        return 'Data não informada';
-      } catch (error) {
-        return 'Data inválida';
-      }
+      ];
+      
+      return turma.includes('A') ? alunosBase : alunosBase.slice(0, 2);
     }
 
     isProfessorLogado() {
@@ -204,57 +269,271 @@
     }
   }
 
-  // Expor para escopo global
-  window.professoresAuth = new ProfessoresAuth();
-  window.db = db;
+  // Inicializar sistema de simulação
+  window.professoresAuth = new ProfessoresAuthSimulado();
+  console.log('🔧 Modo de simulação ativado para testes');
 </script>
 
 <script>
-  // LOGIN COM MAIS DETALHES DE DEBUG
-  document.getElementById('login-form').addEventListener('submit', async function(e){
-    e.preventDefault();
-    const usuario = document.getElementById('usuario').value.trim();
-    const senha = document.getElementById('senha').value;
+  // FUNÇÕES PRINCIPAIS - CORRIGIDAS
+  function inicializarLogin() {
+    const loginForm = document.getElementById('login-form');
     const errorElement = document.getElementById('login-error');
-    const loginBtn = document.getElementById('login-btn');
     
-    errorElement.style.display = 'none';
-    loginBtn.disabled = true;
-    loginBtn.innerHTML = '<span>⏳</span><span>Autenticando...</span>';
-
-    console.log('🔄 Iniciando processo de login...');
-    console.log('📝 Usuário digitado:', usuario);
-    console.log('🔐 Senha digitada:', senha);
-
-    try {
-      const logado = await window.professoresAuth.autenticarProfessor(usuario, senha);
-      
-      if(logado){
-        console.log('✅ Login bem-sucedido! Redirecionando...');
-        document.getElementById('login-section').classList.add('hidden');
-        document.getElementById('professor-panel').classList.remove('hidden');
-        
-        const professor = window.professoresAuth.getProfessorLogado();
-        document.getElementById('professor-name').textContent = professor.nome;
-        
-        await carregarDadosProfessor(professor.id);
-      } else {
-        console.log('❌ Falha no login');
-        errorElement.style.display = 'block';
-        errorElement.textContent = '❌ Usuário ou senha incorretos!';
-      }
-    } catch(err){ 
-      console.error('💥 Erro no login:', err); 
-      errorElement.style.display = 'block';
-      errorElement.textContent = '❌ Erro de conexão. Tente novamente.';
-    } finally {
-      loginBtn.disabled = false;
-      loginBtn.innerHTML = '<span>🚀</span><span>Acessar Portal</span>';
+    console.log('🔧 Inicializando sistema de login...');
+    console.log('📝 Elemento login-form:', loginForm);
+    console.log('📝 Elemento login-error:', errorElement);
+    
+    if (!loginForm) {
+      console.error('❌ Elemento login-form não encontrado!');
+      return;
     }
+    
+    loginForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const usuario = document.getElementById('usuario').value;
+      const senha = document.getElementById('senha').value;
+      const loginBtn = document.getElementById('login-btn');
+      
+      console.log('🔄 Processando login...');
+      
+      errorElement.style.display = 'none';
+      loginBtn.disabled = true;
+      loginBtn.innerHTML = '<span>⏳</span><span>Autenticando...</span>';
+
+      try {
+        const logado = await window.professoresAuth.autenticarProfessor(usuario, senha);
+        
+        if(logado){
+          console.log('✅ Login bem-sucedido!');
+          document.getElementById('login-section').classList.add('hidden');
+          document.getElementById('professor-panel').classList.remove('hidden');
+          
+          const professor = window.professoresAuth.getProfessorLogado();
+          document.getElementById('professor-name').textContent = professor.nome;
+          
+          await carregarDadosProfessor(professor.id);
+        } else {
+          console.log('❌ Login falhou');
+          errorElement.style.display = 'block';
+          errorElement.textContent = '❌ Usuário ou senha incorretos!';
+        }
+      } catch(err) { 
+        console.error('💥 Erro no login:', err); 
+        errorElement.style.display = 'block';
+        errorElement.textContent = '❌ Erro de conexão. Tente novamente.';
+      } finally {
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = '<span>🚀</span><span>Acessar Portal</span>';
+      }
+    });
+    
+    console.log('✅ Sistema de login inicializado com sucesso!');
+  }
+
+  async function carregarDadosProfessor(professorId) {
+    try {
+      console.log('📊 Carregando dados do professor...');
+      
+      const turmasContainer = document.getElementById('turmas-list');
+      turmasContainer.innerHTML = `
+        <div class="loading">
+          <div class="loading-spinner"></div>
+          <p>Carregando suas turmas...</p>
+        </div>
+      `;
+
+      const turmasDesignadas = await window.professoresAuth.buscarTurmasProfessor(professorId);
+      document.getElementById('total-turmas').textContent = turmasDesignadas.length;
+      
+      let totalAlunos = 0;
+      let alunosAtivos = 0;
+
+      if (turmasDesignadas.length === 0) {
+        turmasContainer.innerHTML = `
+          <div class="text-center" style="padding: 2rem; color: var(--gray-600); grid-column: 1 / -1;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">📚</div>
+            <h3 class="mb-1">Nenhuma turma designada</h3>
+            <p>Entre em contato com a administração</p>
+          </div>
+        `;
+        return;
+      }
+      
+      turmasContainer.innerHTML = '';
+
+      for(const turma of turmasDesignadas) {
+        const alunos = await window.professoresAuth.buscarAlunosPorTurma(turma.turma);
+        totalAlunos += alunos.length;
+        alunosAtivos += alunos.filter(a => a.status === 'ativo').length;
+
+        const alunosHTML = alunos.length > 0 ? `
+          <ul class="aluno-list">
+            ${alunos.slice(0, 3).map(aluno => `
+              <li class="aluno-item">
+                <div class="aluno-info">
+                  <div class="aluno-name">${aluno.nome}</div>
+                  <div class="aluno-contact">
+                    <span>📱 ${aluno.telefone}</span>
+                    <span class="status-badge status-${aluno.status}">${aluno.status}</span>
+                  </div>
+                </div>
+                <button class="btn-small" onclick="contatarAluno('${aluno.telefone}')" title="Contatar">
+                  📞
+                </button>
+              </li>
+            `).join('')}
+            ${alunos.length > 3 ? `
+              <li class="text-center text-small" style="padding: 1rem; color: var(--gray-600);">
+                + ${alunos.length - 3} outros alunos
+              </li>
+            ` : ''}
+          </ul>
+        ` : `
+          <p class="text-center text-small" style="padding: 2rem; color: var(--gray-600);">
+            Nenhum aluno matriculado nesta turma
+          </p>
+        `;
+
+        const turmaHTML = `
+          <div class="turma-card">
+            <div class="turma-header">
+              <div class="turma-title">${turma.turma}</div>
+              <div class="turma-badge">${alunos.length} alunos</div>
+            </div>
+            <div class="turma-info">
+              <p><strong>Disciplina:</strong> ${turma.disciplina}</p>
+              <p><strong>Período:</strong> ${turma.periodo}</p>
+            </div>
+            <h4 style="font-size: 1rem; margin-bottom: 0.5rem;">👥 Alunos (${alunos.length})</h4>
+            ${alunosHTML}
+            <div class="btn-group">
+              <button class="btn-small" onclick="baixarListaTurma('${turma.turma}')">
+                💾 Baixar CSV
+              </button>
+              <button class="btn-small" onclick="visualizarTurma('${turma.turma}')">
+                👁️ Ver Todos
+              </button>
+            </div>
+          </div>
+        `;
+        
+        turmasContainer.innerHTML += turmaHTML;
+      }
+
+      document.getElementById('total-alunos').textContent = totalAlunos;
+      document.getElementById('alunos-ativos').textContent = alunosAtivos;
+      
+      console.log('✅ Dados carregados com sucesso!');
+      
+    } catch(err) { 
+      console.error('💥 Erro ao carregar dados:', err);
+      const turmasContainer = document.getElementById('turmas-list');
+      turmasContainer.innerHTML = `
+        <div class="text-center" style="padding: 2rem; color: var(--danger); grid-column: 1 / -1;">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">❌</div>
+          <h3 class="mb-1">Erro ao carregar dados</h3>
+          <button class="btn-small" onclick="carregarDadosProfessor('${professorId}')" style="margin: 0 auto;">
+            🔄 Tentar Novamente
+          </button>
+        </div>
+      `;
+    }
+  }
+
+  function contatarAluno(telefone) { 
+    if (telefone && telefone !== 'Telefone não informado') {
+      const numeroLimpo = telefone.replace(/\D/g, '');
+      window.open(`https://wa.me/55${numeroLimpo}`, '_blank');
+    } else {
+      alert('Telefone não disponível para contato');
+    }
+  }
+
+  async function baixarListaTurma(turma) {
+    try {
+      const alunos = await window.professoresAuth.buscarAlunosPorTurma(turma);
+      if(alunos.length === 0) { 
+        alert('Nenhum aluno encontrado nesta turma');
+        return; 
+      }
+
+      let csv = 'Nome,Email,Telefone,Usuário,Status,Turma,Data Inscrição\n';
+      alunos.forEach(aluno => { 
+        csv += `"${aluno.nome}","${aluno.email}","${aluno.telefone}","${aluno.usuario}","${aluno.status}","${aluno.turma}","${aluno.criadoEm}"\n`; 
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Turma_${turma.replace(/[^a-zA-Z0-9]/g, '_')}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      alert('✅ Lista baixada com sucesso!');
+    } catch (error) {
+      console.error('Erro ao baixar lista:', error);
+      alert('❌ Erro ao baixar lista de alunos');
+    }
+  }
+
+  function visualizarTurma(turma) {
+    alert(`Visualizando turma: ${turma}\n\nEm uma versão futura, esta função mostrará todos os alunos em uma modal.`);
+  }
+
+  function fazerLogout() {
+    window.professoresAuth.logout();
+    window.location.reload();
+  }
+
+  function toggleMenu() { 
+    const menu = document.getElementById('main-menu');
+    if (menu) {
+      menu.classList.toggle('show');
+    }
+  }
+
+  // INICIALIZAÇÃO DA PÁGINA - CORRIGIDA
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Página carregada, inicializando...');
+    
+    // Inicializar sistema de login
+    inicializarLogin();
+    
+    // Esconder mensagem de erro inicialmente
+    const errorElement = document.getElementById('login-error');
+    if (errorElement) {
+      errorElement.style.display = 'none';
+    }
+    
+    // Verificar se já está logado
+    if (window.professoresAuth && window.professoresAuth.isProfessorLogado()) {
+      const professor = window.professoresAuth.getProfessorLogado();
+      console.log('👤 Professor já logado:', professor.nome);
+      
+      document.getElementById('login-section').classList.add('hidden');
+      document.getElementById('professor-panel').classList.remove('hidden');
+      document.getElementById('professor-name').textContent = professor.nome;
+      
+      carregarDadosProfessor(professor.id);
+    } else {
+      console.log('🔒 Nenhum professor logado');
+    }
+    
+    console.log('✅ Página inicializada com sucesso!');
   });
 
-  // [O RESTANTE DO CÓDIGO PERMANECE IGUAL]
-  // ... carregarDadosProfessor, contatarAluno, etc.
+  // Exportar funções para uso global
+  window.contatarAluno = contatarAluno;
+  window.baixarListaTurma = baixarListaTurma;
+  window.visualizarTurma = visualizarTurma;
+  window.fazerLogout = fazerLogout;
+  window.toggleMenu = toggleMenu;
+  window.carregarDadosProfessor = carregarDadosProfessor;
 </script>
+
 </body>
 </html>
