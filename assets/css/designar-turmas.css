@@ -1,111 +1,89 @@
-:root {
-  --primary: #1a2a6c;
-  --accent: #fdbb2d;
-  --bg: #f4f4f9;
-  --card-bg: #fff;
-  --text: #333;
-}
-
 body {
-  font-family: Arial, sans-serif;
-  background: var(--bg);
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f5f7fb;
+  color: #333;
   margin: 0;
   padding: 0;
-  color: var(--text);
 }
 
 .container {
   max-width: 900px;
-  margin: 40px auto;
-  background: var(--card-bg);
-  padding: 25px 35px;
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+  margin: 20px auto;
+  padding: 20px;
 }
 
-h1, h2 {
-  text-align: center;
-  color: var(--primary);
+h1 { color: #1a2a6c; text-align: center; margin-bottom: 30px; }
+h2 { color: #0b63d1; margin-bottom: 15px; }
+
+section {
+  background: #fff;
+  padding: 20px;
   margin-bottom: 20px;
-}
-
-.form-section, .turmas-list {
-  margin-bottom: 30px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.1);
 }
 
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
-label {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 8px;
-  color: var(--primary);
-}
-
-select, input[type="text"] {
+select, input[type="checkbox"] {
   width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
+  padding: 8px;
   border-radius: 6px;
-  font-size: 15px;
+  border: 1px solid #ddd;
 }
 
-button {
-  padding: 12px 20px;
+button.btn {
+  background: #0b63d1;
+  color: #fff;
   border: none;
+  padding: 8px 16px;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 15px;
+  transition: background 0.2s;
 }
 
-.btn-primary {
-  background: var(--primary);
-  color: #fff;
-}
-.btn-primary:hover {
-  background: #14204e;
-}
+button.btn:hover { background: #084a9d; }
 
-.btn-secondary {
-  background: var(--accent);
-  color: #fff;
-}
-.btn-secondary:hover {
-  background: #e0a319;
-}
-
-.checkbox-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 8px;
-  background: #f9f9fb;
-  border: 1px solid #ddd;
-  padding: 12px;
-  border-radius: 8px;
-  max-height: 250px;
+.alunos-list {
+  max-height: 200px;
   overflow-y: auto;
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 6px;
 }
 
-.checkbox-container label {
+.alunos-list label {
   display: flex;
   align-items: center;
-  font-weight: normal;
-  color: #444;
+  margin-bottom: 5px;
 }
 
-.checkbox-container input {
-  margin-right: 8px;
+.alunos-list input[type="checkbox"] {
+  margin-right: 10px;
 }
 
-ul {
+.lista-turma {
   list-style: none;
   padding: 0;
-  margin-top: 20px;
+  margin: 10px 0;
 }
 
-ul li {
-  padding: 6px 0;
-  border-bottom: 1px solid #eee;
+.lista-turma li {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 10px;
+  background: #f0f2f5;
+  margin-bottom: 5px;
+  border-radius: 6px;
+}
+
+.lista-turma li button {
+  background: #f44336;
+  padding: 3px 8px;
+}
+
+.lista-turma li button:hover {
+  background: #c62828;
 }
