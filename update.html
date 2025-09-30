@@ -380,8 +380,8 @@
           <input type="text" id="cpfField" value="CPF" placeholder="Nome da coluna do CPF">
         </div>
         <div class="field-row">
-          <label for="inscricaoField">Campo Inscrição no CSV:</label>
-          <input type="text" id="inscricaoField" value="N° de Inscrição" placeholder="Nome da coluna da inscrição">
+          <label for="cupomField">Campo Cupom no CSV:</label>
+          <input type="text" id="cupomField" value="N° de Inscrição" placeholder="Nome da coluna do cupom">
         </div>
         <div class="field-row">
           <label for="nomeField">Campo Nome no CSV:</label>
@@ -599,8 +599,8 @@ function detectFieldNames(headers) {
   // Mapear nomes de campos comuns para encontrar automaticamente
   const fieldMap = {
     'cpf': ['cpf', 'documento', 'doc'],
-    'inscricao': ['inscricao', 'inscrição', 'numero', 'número', 'n°', 'codigo', 'código', 'id'],
-    'nome': ['nome', 'name', 'aluno', 'candidato'],
+    'cupom': ['cupom', 'inscricao', 'inscrição', 'numero', 'número', 'n°', 'codigo', 'código', 'id', 'cupon'],
+    'nome': ['nome', 'name', 'aluno', 'candidato', 'nomecompleto'],
     'telefone': ['telefone', 'tel', 'celular', 'phone', 'contato']
   };
   
@@ -614,9 +614,9 @@ function detectFieldNames(headers) {
       detectedFields.cpf = header;
     }
     
-    // Procurar por inscrição
-    if (fieldMap.inscricao.some(term => headerLower.includes(term))) {
-      detectedFields.inscricao = header;
+    // Procurar por cupom/inscrição
+    if (fieldMap.cupom.some(term => headerLower.includes(term))) {
+      detectedFields.cupom = header;
     }
     
     // Procurar por nome
@@ -725,8 +725,8 @@ function validateCSV() {
     if (detectedFields.cpf) {
       document.getElementById('cpfField').value = detectedFields.cpf;
     }
-    if (detectedFields.inscricao) {
-      document.getElementById('inscricaoField').value = detectedFields.inscricao;
+    if (detectedFields.cupom) {
+      document.getElementById('cupomField').value = detectedFields.cupom;
     }
     if (detectedFields.nome) {
       document.getElementById('nomeField').value = detectedFields.nome;
@@ -739,7 +739,7 @@ function validateCSV() {
     document.getElementById('debugInfo').innerHTML = `
       <strong>Debug:</strong> Cabeçalhos detectados: ${headers.join(', ')}
       <br>Campos mapeados: CPF=${detectedFields.cpf || 'Não encontrado'}, 
-      Inscrição=${detectedFields.inscricao || 'Não encontrado'}, 
+      Cupom=${detectedFields.cupom || 'Não encontrado'}, 
       Nome=${detectedFields.nome || 'Não encontrado'}
     `;
     
@@ -747,7 +747,7 @@ function validateCSV() {
     
     // Obter mapeamento de campos (usando os detectados ou os manuais)
     const cpfField = document.getElementById('cpfField').value.trim();
-    const inscricaoField = document.getElementById('inscricaoField').value.trim();
+    const cupomField = document.getElementById('cupomField').value.trim();
     const nomeField = document.getElementById('nomeField').value.trim();
     
     // Validar se os campos necessários existem
@@ -758,7 +758,7 @@ function validateCSV() {
     
     const missingFields = [];
     if (!headerMap[cpfField.toLowerCase()]) missingFields.push(cpfField);
-    if (!headerMap[inscricaoField.toLowerCase()]) missingFields.push(inscricaoField);
+    if (!headerMap[cupomField.toLowerCase()]) missingFields.push(cupomField);
     if (!headerMap[nomeField.toLowerCase()]) missingFields.push(nomeField);
     
     if (missingFields.length > 0) {
@@ -801,13 +801,13 @@ function validateCSV() {
         });
       }
       
-      // Validação de número de inscrição
-      const inscricaoValue = data[inscricaoField] || '';
-      if (!inscricaoValue) {
+      // Validação de cupom
+      const cupomValue = data[cupomField] || '';
+      if (!cupomValue) {
         validationErrors.push({
           tipo: 'Campo Obrigatório',
           linha: i + 1,
-          motivo: `Número de inscrição é obrigatório. Campo usado: "${inscricaoField}", Valor encontrado: "${inscricaoValue}"`
+          motivo: `Cupom é obrigatório. Campo usado: "${cupomField}", Valor encontrado: "${cupomValue}"`
         });
       }
       
@@ -911,7 +911,7 @@ async function uploadCSV() {
     
     // Obter mapeamento de campos
     const cpfField = document.getElementById('cpfField').value.trim();
-    const inscricaoField = document.getElementById('inscricaoField').value.trim();
+    const cupomField = document.getElementById('cupomField').value.trim();
     const nomeField = document.getElementById('nomeField').value.trim();
     const telefoneField = document.getElementById('telefoneField').value.trim();
     
@@ -941,7 +941,7 @@ async function uploadCSV() {
       
       // Extrair campos específicos
       const cpfValue = data[cpfField] || '';
-      const inscricaoValue = data[inscricaoField] || '';
+      const cupomValue = data[cupomField] || '';
       const nomeValue = data[nomeField] || '';
       const telefoneValue = data[telefoneField] || '';
       
@@ -953,8 +953,8 @@ async function uploadCSV() {
       }
       
       // Validação de campos obrigatórios
-      if(!inscricaoValue) {
-        errorLines.push({linha: i + 1, motivo: `Número de inscrição é obrigatório. Campo: "${inscricaoField}"`});
+      if(!cupomValue) {
+        errorLines.push({linha: i + 1, motivo: `Cupom é obrigatório. Campo: "${cupomField}"`});
         updateStatus(successCount, errorLines, processedLines, totalLines);
         continue;
       }
@@ -966,12 +966,12 @@ async function uploadCSV() {
       }
       
       try {
-        // Preparar dados para a coleção "inscricoes"
+        // Preparar dados para a coleção "inscricoes" - usando CUPOM como campo principal
         const inscricaoData = {
           nomeCompleto: nomeValue,
           cpf: normalizarCPF(cpfValue), // Salvar CPF sem formatação
           cpfFormatado: formatarCPF(cpfValue), // Salvar CPF formatado também
-          numeroInscricao: inscricaoValue,
+          cupom: cupomValue, // AGORA USANDO CUPOM em vez de numeroInscricao
           telefone: telefoneValue,
           status: data.Status || data.status || "ativo",
           alunoEthos: data["Aluno Ethos"] || data.alunoEthos || "Não",
@@ -980,8 +980,8 @@ async function uploadCSV() {
           ...data
         };
         
-        // Usar o número de inscrição como ID do documento
-        await db.collection("inscricoes").doc(inscricaoValue).set(inscricaoData);
+        // Usar o CUPOM como ID do documento (igual ao Firebase)
+        await db.collection("inscricoes").doc(cupomValue).set(inscricaoData);
         successCount++;
       } catch(err) {
         errorLines.push({linha: i + 1, motivo: `Erro Firebase: ${err.message}`});
@@ -1040,7 +1040,7 @@ function updateStatus(successCount, errorLines, currentLine, totalLines) {
 
 // --------- BAIXAR MODELO DE CSV ----------
 function downloadTemplate() {
-  const headers = ['N°;Data;Nome;CPF;N° de Inscrição;Telefone;Status;Aluno Ethos'];
+  const headers = ['N°;Data;Nome;CPF;Cupom;Telefone;Status;Aluno Ethos'];
   const example = ['1;19/09/2025, 12:32;João Silva;123.456.789-09;APV-20250001-AB12;(11) 99999-9999;ativo;Não'];
   const csvContent = headers.join('') + '\n' + example.join('');
   
