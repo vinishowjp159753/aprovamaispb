@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Upload CSV Avançado</title>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<style>
+  body { font-family: Arial, sans-serif; padding: 20px; }
+  input, button { margin: 10px 0; }
+  #status { margin-top: 20px; white-space: pre-line; }
+  #progressBar { width: 100%; background-color: #f3f3f3; border-radius: 5px; overflow: hidden; margin-top: 10px; }
+  #progress { height: 20px; width: 0; background-color: #4CAF50; text-align: center; color: white; }
+</style>
+</head>
+<body>
+<h2>Upload CSV Avançado</h2>
+<input type="file" id="csvFile" accept=".csv">
+<br>
+<button onclick="uploadCSV()">Enviar CSV</button>
+
+<div id="progressBar"><div id="progress">0%</div></div>
+<div id="status"></div>
+
+<script>
+// --------- CONFIGURAÇÃO DO FIREBASE ----------
+const firebaseConfig = {
+  apiKey: "AIzaSyDYT4OkPkJHkXE44jqIcaWtXL-f105JNoE",
+  authDomain: "aprovamaispb-6ea02.firebaseapp.com",
+  projectId: "aprovamaispb-6ea02",
+  storageBucket: "aprovamaispb-6ea02.firebasestorage.app",
+  messagingSenderId: "980253365163",
+  appId: "1:980253365163:web:e1d116769cd8031dd1b8ee"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// --------- VALIDAÇÃO DE CPF ----------
+function validarCPF(cpf) {
+    cpf = cpf.replace(/\D/g, '');
+    if(cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false;
+    let soma = 0, resto;
+    for(let i=1;i<=9;i++) soma += parseInt(cpf.substring(i-1,i))*(11-i);
+    resto = (soma*10)%11; if(resto===10||resto===11) resto=0; if(resto!==parseInt(cpf.substring(9,10))) return false;
+    soma = 0;
+    for(let i=1;i<=10;i++) soma += parseInt(cpf.substring(i-1,i))*(12-i);
+    resto = (soma*10)%11; if(resto===10||resto===11) resto=0; if(resto!==parseInt(cpf.substring(10,11))) return false;
+    return true;
+}
+
+// --------- FUNÇÃO PARA LER CSV ----------
+async function uploadCSV() {
+    const fileInput = document.getElementById('csvFile');
+    const file = fileInput.files[0];
+    const statusDiv = document.getElementById('status');
+    const progressBar = document.getElementById('progress');
+
+    if (!file) {
+        alert("Escolha um arquivo CSV primeiro!");
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        const text = e.target.result;
+        const lines = text.split(/\r?\n/);
+
+        if (lines.length < 2) {
+            alert("CSV vazio ou inválido");
+            return;
+        }
+
+        const headers = lines[0].split(',');
+        let successCount = 0;
+        let errorLines = [];
+
+        for (let i = 1; i < lines.length; i++) {
+            const row = lines[i].split(',');
+            if(row.length !== headers.length) continue;
+
+            let data = {};
+            for (let j = 0; j < headers.length; j++) {
+                data[headers[j].trim()] = row[j].trim();
+            }
+
+            // Validação CPF
+            if(!validarCPF(data.CPF)) {
+                errorLines.push({linha: i, motivo: "CPF inválido"});
+                updateStatus(successCount, errorLines, i, lines.length);
+                continue;
+            }
+
+            // Usar número de inscrição ou CPF como ID para evitar duplicados
+            let docId = data["N° de Inscrição"] || data.CPF;
+
+            try {
+                await db.collection("alunos").doc(docId).set(data);
+                successCount++;
+            } catch(err) {
+                errorLines.push({linha: i, motivo: err.message});
+            }
+
+            updateStatus(successCount, errorLines, i, lines.length);
+        }
+    };
+    reader.readAsText(file);
+}
+
+// --------- ATUALIZA STATUS E BARRA DE PROGRESSO ----------
+function updateStatus(successCount, errorLines, currentLine, totalLines) {
+    const statusDiv = document.getElementById('status');
+    const progress = document.getElementById('progress');
+
+    statusDiv.innerText = `Linhas processadas: ${currentLine}/${totalLines-1}\nSucesso: ${successCount}\nErros: ${errorLines.length}`;
+    if(errorLines.length > 0) {
+        statusDiv.innerText += `\nLinhas com erro: ${errorLines.map(e => `${e.linha} (${e.motivo})`).join(', ')}`;
+    }
+
+    let percent = Math.floor((currentLine/(totalLines-1))*100);
+    progress.style.width = percent + "%";
+    progress.innerText = percent + "%";
+}
+</script>
+</body>
+</html>
