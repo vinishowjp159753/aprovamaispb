@@ -298,6 +298,15 @@
     border: 1px solid #ccc;
   }
   
+  .debug-info {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: var(--border-radius);
+    font-size: 12px;
+  }
+  
   @media (max-width: 768px) {
     body {
       padding: 10px;
@@ -355,7 +364,7 @@
         <label for="csvSeparator">Separador do CSV:</label>
         <select id="csvSeparator">
           <option value="auto">Auto-detectar</option>
-          <option value=";">Ponto e vírgula (;)</option>
+          <option value=";" selected>Ponto e vírgula (;)</option>
           <option value=",">Vírgula (,)</option>
           <option value="tab">Tabulação</option>
         </select>
@@ -363,6 +372,9 @@
       
       <div class="field-mapping">
         <h4>Mapeamento de Campos</h4>
+        <div class="debug-info" id="debugInfo">
+          <strong>Debug:</strong> Os campos serão detectados automaticamente do cabeçalho do CSV
+        </div>
         <div class="field-row">
           <label for="cpfField">Campo CPF no CSV:</label>
           <input type="text" id="cpfField" value="CPF" placeholder="Nome da coluna do CPF">
@@ -458,6 +470,7 @@ const db = firebase.firestore();
 // --------- VARIÁVEIS GLOBAIS ----------
 let csvData = [];
 let validationErrors = [];
+let detectedHeaders = [];
 
 // --------- VALIDAÇÃO E FORMATAÇÃO DE CPF ----------
 function validarCPF(cpf) {
@@ -556,7 +569,7 @@ function formatFileSize(bytes) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
-// --------- DETECÇÃO DO SEPARADOR ----------
+// --------- DETECÇÃO DO SEPARADOR E CAMPOS ----------
 function detectSeparator(firstLine) {
   const separatorSelect = document.getElementById('csvSeparator');
   const selectedSeparator = separatorSelect.value;
@@ -580,6 +593,44 @@ function detectSeparator(firstLine) {
     // Padrão para CSV brasileiro
     return ';';
   }
+}
+
+function detectFieldNames(headers) {
+  // Mapear nomes de campos comuns para encontrar automaticamente
+  const fieldMap = {
+    'cpf': ['cpf', 'documento', 'doc'],
+    'inscricao': ['inscricao', 'inscrição', 'numero', 'número', 'n°', 'codigo', 'código', 'id'],
+    'nome': ['nome', 'name', 'aluno', 'candidato'],
+    'telefone': ['telefone', 'tel', 'celular', 'phone', 'contato']
+  };
+  
+  const detectedFields = {};
+  
+  headers.forEach(header => {
+    const headerLower = header.toLowerCase().trim();
+    
+    // Procurar por CPF
+    if (fieldMap.cpf.some(term => headerLower.includes(term))) {
+      detectedFields.cpf = header;
+    }
+    
+    // Procurar por inscrição
+    if (fieldMap.inscricao.some(term => headerLower.includes(term))) {
+      detectedFields.inscricao = header;
+    }
+    
+    // Procurar por nome
+    if (fieldMap.nome.some(term => headerLower.includes(term))) {
+      detectedFields.nome = header;
+    }
+    
+    // Procurar por telefone
+    if (fieldMap.telefone.some(term => headerLower.includes(term))) {
+      detectedFields.telefone = header;
+    }
+  });
+  
+  return detectedFields;
 }
 
 // --------- FUNÇÕES AUXILIARES PARA CSV ----------
@@ -633,7 +684,8 @@ function cleanCSVText(text) {
     .replace(/\r/g, '\n')
     .replace(/[“”]/g, '"')
     .replace(/[‘’]/g, "'")
-    .replace(/^\uFEFF/, ''); // Remove BOM
+    .replace(/^\uFEFF/, '') // Remove BOM
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, ''); // Remove acentos
 }
 
 // --------- VALIDAÇÃO DO CSV ----------
@@ -662,11 +714,38 @@ function validateCSV() {
     
     // Processar cabeçalhos
     const headers = parseCSVLine(lines[0], separator);
+    detectedHeaders = headers;
     console.log("Cabeçalhos detectados:", headers);
+    
+    // Detectar nomes de campos automaticamente
+    const detectedFields = detectFieldNames(headers);
+    console.log("Campos detectados:", detectedFields);
+    
+    // Atualizar campos na interface
+    if (detectedFields.cpf) {
+      document.getElementById('cpfField').value = detectedFields.cpf;
+    }
+    if (detectedFields.inscricao) {
+      document.getElementById('inscricaoField').value = detectedFields.inscricao;
+    }
+    if (detectedFields.nome) {
+      document.getElementById('nomeField').value = detectedFields.nome;
+    }
+    if (detectedFields.telefone) {
+      document.getElementById('telefoneField').value = detectedFields.telefone;
+    }
+    
+    // Atualizar debug info
+    document.getElementById('debugInfo').innerHTML = `
+      <strong>Debug:</strong> Cabeçalhos detectados: ${headers.join(', ')}
+      <br>Campos mapeados: CPF=${detectedFields.cpf || 'Não encontrado'}, 
+      Inscrição=${detectedFields.inscricao || 'Não encontrado'}, 
+      Nome=${detectedFields.nome || 'Não encontrado'}
+    `;
     
     validationErrors = [];
     
-    // Obter mapeamento de campos
+    // Obter mapeamento de campos (usando os detectados ou os manuais)
     const cpfField = document.getElementById('cpfField').value.trim();
     const inscricaoField = document.getElementById('inscricaoField').value.trim();
     const nomeField = document.getElementById('nomeField').value.trim();
@@ -702,7 +781,7 @@ function validateCSV() {
         validationErrors.push({
           tipo: 'Formato',
           linha: i + 1,
-          motivo: `Número de colunas incorreto. Esperado: ${headers.length}, Encontrado: ${row.length}. Linha: ${lines[i]}`
+          motivo: `Número de colunas incorreto. Esperado: ${headers.length}, Encontrado: ${row.length}`
         });
         continue;
       }
@@ -728,7 +807,7 @@ function validateCSV() {
         validationErrors.push({
           tipo: 'Campo Obrigatório',
           linha: i + 1,
-          motivo: "Número de inscrição é obrigatório"
+          motivo: `Número de inscrição é obrigatório. Campo usado: "${inscricaoField}", Valor encontrado: "${inscricaoValue}"`
         });
       }
       
@@ -875,7 +954,7 @@ async function uploadCSV() {
       
       // Validação de campos obrigatórios
       if(!inscricaoValue) {
-        errorLines.push({linha: i + 1, motivo: "Número de inscrição é obrigatório"});
+        errorLines.push({linha: i + 1, motivo: `Número de inscrição é obrigatório. Campo: "${inscricaoField}"`});
         updateStatus(successCount, errorLines, processedLines, totalLines);
         continue;
       }
