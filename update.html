@@ -7,21 +7,352 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <style>
-  body { font-family: Arial, sans-serif; padding: 20px; }
-  input, button { margin: 10px 0; }
-  #status { margin-top: 20px; white-space: pre-line; }
-  #progressBar { width: 100%; background-color: #f3f3f3; border-radius: 5px; overflow: hidden; margin-top: 10px; }
-  #progress { height: 20px; width: 0; background-color: #4CAF50; text-align: center; color: white; }
+  :root {
+    --primary-color: #4CAF50;
+    --secondary-color: #2196F3;
+    --danger-color: #f44336;
+    --light-color: #f5f5f5;
+    --dark-color: #333;
+    --border-radius: 8px;
+    --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: var(--dark-color);
+    background-color: #f9f9f9;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  h2 {
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .card {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 25px;
+    margin-bottom: 20px;
+  }
+  
+  .upload-area {
+    border: 2px dashed #ccc;
+    border-radius: var(--border-radius);
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+  }
+  
+  .upload-area:hover, .upload-area.active {
+    border-color: var(--primary-color);
+    background-color: rgba(76, 175, 80, 0.05);
+  }
+  
+  .upload-area i {
+    font-size: 48px;
+    color: #ccc;
+    margin-bottom: 15px;
+    display: block;
+  }
+  
+  .upload-area p {
+    margin-bottom: 10px;
+  }
+  
+  .hidden {
+    display: none;
+  }
+  
+  .btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: background-color 0.3s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .btn:hover {
+    background-color: #3d8b40;
+  }
+  
+  .btn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+  
+  .btn i {
+    margin-right: 8px;
+  }
+  
+  .btn-secondary {
+    background-color: var(--secondary-color);
+  }
+  
+  .btn-secondary:hover {
+    background-color: #0b7dda;
+  }
+  
+  .btn-danger {
+    background-color: var(--danger-color);
+  }
+  
+  .btn-danger:hover {
+    background-color: #d32f2f;
+  }
+  
+  .file-info {
+    background-color: var(--light-color);
+    padding: 15px;
+    border-radius: var(--border-radius);
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .file-info .file-name {
+    font-weight: 600;
+  }
+  
+  .file-info .file-size {
+    color: #666;
+  }
+  
+  .progress-container {
+    margin: 20px 0;
+  }
+  
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  
+  #progressBar {
+    width: 100%;
+    height: 20px;
+    background-color: #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  
+  #progress {
+    height: 100%;
+    width: 0;
+    background-color: var(--primary-color);
+    transition: width 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+  }
+  
+  .status-container {
+    margin-top: 20px;
+  }
+  
+  .status-card {
+    background-color: var(--light-color);
+    border-radius: var(--border-radius);
+    padding: 15px;
+    margin-bottom: 15px;
+  }
+  
+  .status-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .status-title {
+    font-weight: 600;
+    color: var(--dark-color);
+  }
+  
+  .status-value {
+    font-weight: 700;
+  }
+  
+  .status-success {
+    color: var(--primary-color);
+  }
+  
+  .status-error {
+    color: var(--danger-color);
+  }
+  
+  .error-list {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #e0e0e0;
+    border-radius: var(--border-radius);
+    padding: 10px;
+    background-color: white;
+  }
+  
+  .error-item {
+    padding: 8px;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 14px;
+  }
+  
+  .error-item:last-child {
+    border-bottom: none;
+  }
+  
+  .actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  
+  .summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .summary-item {
+    background-color: white;
+    border-radius: var(--border-radius);
+    padding: 15px;
+    text-align: center;
+    box-shadow: var(--box-shadow);
+  }
+  
+  .summary-value {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 10px 0;
+  }
+  
+  .summary-label {
+    color: #666;
+    font-size: 14px;
+  }
+  
+  @media (max-width: 768px) {
+    body {
+      padding: 10px;
+    }
+    
+    .card {
+      padding: 15px;
+    }
+    
+    .actions {
+      flex-direction: column;
+    }
+    
+    .btn {
+      width: 100%;
+    }
+  }
 </style>
 </head>
 <body>
-<h2>Upload CSV Avançado</h2>
-<input type="file" id="csvFile" accept=".csv">
-<br>
-<button onclick="uploadCSV()">Enviar CSV</button>
-
-<div id="progressBar"><div id="progress">0%</div></div>
-<div id="status"></div>
+  <div class="card">
+    <h2>Upload CSV Avançado</h2>
+    
+    <div class="upload-area" id="uploadArea">
+      <i>📁</i>
+      <p>Arraste e solte seu arquivo CSV aqui ou clique para selecionar</p>
+      <p class="file-types">Formatos suportados: .csv</p>
+      <input type="file" id="csvFile" accept=".csv" class="hidden">
+    </div>
+    
+    <div id="fileInfo" class="file-info hidden">
+      <div>
+        <span class="file-name" id="fileName"></span>
+        <span class="file-size" id="fileSize"></span>
+      </div>
+      <button class="btn btn-danger" id="removeFile">✕</button>
+    </div>
+    
+    <div class="actions">
+      <button class="btn" id="uploadBtn" onclick="uploadCSV()" disabled>
+        <i>📤</i> Enviar CSV
+      </button>
+      <button class="btn btn-secondary" id="validateBtn" onclick="validateCSV()" disabled>
+        <i>🔍</i> Validar CSV
+      </button>
+      <button class="btn btn-secondary" onclick="downloadTemplate()">
+        <i>📥</i> Baixar Modelo
+      </button>
+    </div>
+    
+    <div class="progress-container hidden" id="progressContainer">
+      <div class="progress-label">
+        <span>Progresso do Upload</span>
+        <span id="progressText">0%</span>
+      </div>
+      <div id="progressBar">
+        <div id="progress">0%</div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="card hidden" id="resultsCard">
+    <h3>Resultados do Processamento</h3>
+    
+    <div class="summary">
+      <div class="summary-item">
+        <div class="summary-value" id="totalCount">0</div>
+        <div class="summary-label">Total de Registros</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-value status-success" id="successCount">0</div>
+        <div class="summary-label">Registros Importados</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-value status-error" id="errorCount">0</div>
+        <div class="summary-label">Erros Encontrados</div>
+      </div>
+    </div>
+    
+    <div class="status-container">
+      <div class="status-card">
+        <div class="status-header">
+          <span class="status-title">Detalhes do Processamento</span>
+        </div>
+        <div id="status"></div>
+      </div>
+      
+      <div class="status-card hidden" id="errorsCard">
+        <div class="status-header">
+          <span class="status-title">Erros Detalhados</span>
+          <span class="status-value status-error" id="errorsCount">0 erros</span>
+        </div>
+        <div class="error-list" id="errorList"></div>
+      </div>
+    </div>
+  </div>
 
 <script>
 // --------- CONFIGURAÇÃO DO FIREBASE ----------
@@ -37,6 +368,10 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+// --------- VARIÁVEIS GLOBAIS ----------
+let csvData = [];
+let validationErrors = [];
+
 // --------- VALIDAÇÃO DE CPF ----------
 function validarCPF(cpf) {
     cpf = cpf.replace(/\D/g, '');
@@ -50,77 +385,326 @@ function validarCPF(cpf) {
     return true;
 }
 
-// --------- FUNÇÃO PARA LER CSV ----------
-async function uploadCSV() {
-    const fileInput = document.getElementById('csvFile');
-    const file = fileInput.files[0];
-    const statusDiv = document.getElementById('status');
-    const progressBar = document.getElementById('progress');
+// --------- MANIPULAÇÃO DE ARQUIVOS ----------
+document.getElementById('uploadArea').addEventListener('click', () => {
+  document.getElementById('csvFile').click();
+});
 
-    if (!file) {
-        alert("Escolha um arquivo CSV primeiro!");
-        return;
+document.getElementById('csvFile').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    handleFileSelection(file);
+  }
+});
+
+// Arrastar e soltar
+const uploadArea = document.getElementById('uploadArea');
+uploadArea.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  uploadArea.classList.add('active');
+});
+
+uploadArea.addEventListener('dragleave', () => {
+  uploadArea.classList.remove('active');
+});
+
+uploadArea.addEventListener('drop', (e) => {
+  e.preventDefault();
+  uploadArea.classList.remove('active');
+  
+  const file = e.dataTransfer.files[0];
+  if (file && file.type === 'text/csv') {
+    document.getElementById('csvFile').files = e.dataTransfer.files;
+    handleFileSelection(file);
+  } else {
+    alert('Por favor, selecione um arquivo CSV válido.');
+  }
+});
+
+document.getElementById('removeFile').addEventListener('click', () => {
+  document.getElementById('csvFile').value = '';
+  document.getElementById('fileInfo').classList.add('hidden');
+  document.getElementById('uploadBtn').disabled = true;
+  document.getElementById('validateBtn').disabled = true;
+  uploadArea.classList.remove('hidden');
+});
+
+function handleFileSelection(file) {
+  const fileInfo = document.getElementById('fileInfo');
+  const fileName = document.getElementById('fileName');
+  const fileSize = document.getElementById('fileSize');
+  
+  fileName.textContent = file.name;
+  fileSize.textContent = ` (${formatFileSize(file.size)})`;
+  
+  fileInfo.classList.remove('hidden');
+  uploadArea.classList.add('hidden');
+  
+  document.getElementById('uploadBtn').disabled = false;
+  document.getElementById('validateBtn').disabled = false;
+  
+  // Limpar resultados anteriores
+  document.getElementById('resultsCard').classList.add('hidden');
+  document.getElementById('errorsCard').classList.add('hidden');
+}
+
+function formatFileSize(bytes) {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+// --------- VALIDAÇÃO DO CSV ----------
+function validateCSV() {
+  const fileInput = document.getElementById('csvFile');
+  const file = fileInput.files[0];
+  
+  if (!file) {
+    alert("Escolha um arquivo CSV primeiro!");
+    return;
+  }
+  
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const text = e.target.result;
+    const lines = text.split(/\r?\n/);
+    
+    if (lines.length < 2) {
+      alert("CSV vazio ou inválido");
+      return;
     }
+    
+    const headers = lines[0].split(',');
+    validationErrors = [];
+    
+    // Validar cabeçalhos
+    const requiredHeaders = ['CPF', 'N° de Inscrição'];
+    const missingHeaders = requiredHeaders.filter(header => 
+      !headers.some(h => h.trim().toLowerCase() === header.toLowerCase())
+    );
+    
+    if (missingHeaders.length > 0) {
+      validationErrors.push({
+        tipo: 'Cabeçalho',
+        linha: 1,
+        motivo: `Cabeçalhos obrigatórios ausentes: ${missingHeaders.join(', ')}`
+      });
+    }
+    
+    // Validar linhas de dados
+    for (let i = 1; i < lines.length; i++) {
+      if (lines[i].trim() === '') continue;
+      
+      const row = lines[i].split(',');
+      if (row.length !== headers.length) {
+        validationErrors.push({
+          tipo: 'Formato',
+          linha: i + 1,
+          motivo: `Número de colunas incorreto. Esperado: ${headers.length}, Encontrado: ${row.length}`
+        });
+        continue;
+      }
+      
+      let data = {};
+      for (let j = 0; j < headers.length; j++) {
+        data[headers[j].trim()] = row[j].trim();
+      }
+      
+      // Validação CPF
+      if (data.CPF && !validarCPF(data.CPF)) {
+        validationErrors.push({
+          tipo: 'CPF',
+          linha: i + 1,
+          motivo: "CPF inválido"
+        });
+      }
+      
+      // Validação de campos obrigatórios
+      if (!data.CPF) {
+        validationErrors.push({
+          tipo: 'Campo Obrigatório',
+          linha: i + 1,
+          motivo: "CPF é obrigatório"
+        });
+      }
+      
+      if (!data["N° de Inscrição"]) {
+        validationErrors.push({
+          tipo: 'Campo Obrigatório',
+          linha: i + 1,
+          motivo: "N° de Inscrição é obrigatório"
+        });
+      }
+    }
+    
+    showValidationResults(validationErrors, lines.length - 1);
+  };
+  reader.readAsText(file);
+}
 
-    const reader = new FileReader();
-    reader.onload = async function(e) {
-        const text = e.target.result;
-        const lines = text.split(/\r?\n/);
+function showValidationResults(errors, totalLines) {
+  document.getElementById('resultsCard').classList.remove('hidden');
+  
+  document.getElementById('totalCount').textContent = totalLines;
+  document.getElementById('successCount').textContent = totalLines - errors.length;
+  document.getElementById('errorCount').textContent = errors.length;
+  
+  const statusDiv = document.getElementById('status');
+  if (errors.length === 0) {
+    statusDiv.innerHTML = '<p class="status-success">✓ CSV validado com sucesso! Nenhum erro encontrado.</p>';
+    document.getElementById('errorsCard').classList.add('hidden');
+  } else {
+    statusDiv.innerHTML = `<p class="status-error">✗ Foram encontrados ${errors.length} erro(s) no arquivo CSV.</p>`;
+    
+    const errorList = document.getElementById('errorList');
+    errorList.innerHTML = '';
+    
+    errors.forEach(error => {
+      const errorItem = document.createElement('div');
+      errorItem.className = 'error-item';
+      errorItem.innerHTML = `
+        <strong>Linha ${error.linha}</strong> (${error.tipo}): ${error.motivo}
+      `;
+      errorList.appendChild(errorItem);
+    });
+    
+    document.getElementById('errorsCount').textContent = `${errors.length} erro(s)`;
+    document.getElementById('errorsCard').classList.remove('hidden');
+  }
+}
 
-        if (lines.length < 2) {
-            alert("CSV vazio ou inválido");
-            return;
-        }
-
-        const headers = lines[0].split(',');
-        let successCount = 0;
-        let errorLines = [];
-
-        for (let i = 1; i < lines.length; i++) {
-            const row = lines[i].split(',');
-            if(row.length !== headers.length) continue;
-
-            let data = {};
-            for (let j = 0; j < headers.length; j++) {
-                data[headers[j].trim()] = row[j].trim();
-            }
-
-            // Validação CPF
-            if(!validarCPF(data.CPF)) {
-                errorLines.push({linha: i, motivo: "CPF inválido"});
-                updateStatus(successCount, errorLines, i, lines.length);
-                continue;
-            }
-
-            // Usar número de inscrição ou CPF como ID para evitar duplicados
-            let docId = data["N° de Inscrição"] || data.CPF;
-
-            try {
-                await db.collection("alunos").doc(docId).set(data);
-                successCount++;
-            } catch(err) {
-                errorLines.push({linha: i, motivo: err.message});
-            }
-
-            updateStatus(successCount, errorLines, i, lines.length);
-        }
-    };
-    reader.readAsText(file);
+// --------- UPLOAD DO CSV ----------
+async function uploadCSV() {
+  const fileInput = document.getElementById('csvFile');
+  const file = fileInput.files[0];
+  
+  if (!file) {
+    alert("Escolha um arquivo CSV primeiro!");
+    return;
+  }
+  
+  // Mostrar container de progresso
+  document.getElementById('progressContainer').classList.remove('hidden');
+  document.getElementById('resultsCard').classList.remove('hidden');
+  
+  // Desabilitar botões durante o upload
+  document.getElementById('uploadBtn').disabled = true;
+  document.getElementById('validateBtn').disabled = true;
+  
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    const text = e.target.result;
+    const lines = text.split(/\r?\n/);
+    
+    if (lines.length < 2) {
+      alert("CSV vazio ou inválido");
+      return;
+    }
+    
+    const headers = lines[0].split(',');
+    let successCount = 0;
+    let errorLines = [];
+    
+    document.getElementById('totalCount').textContent = lines.length - 1;
+    
+    for (let i = 1; i < lines.length; i++) {
+      if (lines[i].trim() === '') continue;
+      
+      const row = lines[i].split(',');
+      if (row.length !== headers.length) {
+        errorLines.push({linha: i + 1, motivo: "Número de colunas incorreto"});
+        updateStatus(successCount, errorLines, i, lines.length);
+        continue;
+      }
+      
+      let data = {};
+      for (let j = 0; j < headers.length; j++) {
+        data[headers[j].trim()] = row[j].trim();
+      }
+      
+      // Validação CPF
+      if (!validarCPF(data.CPF)) {
+        errorLines.push({linha: i + 1, motivo: "CPF inválido"});
+        updateStatus(successCount, errorLines, i, lines.length);
+        continue;
+      }
+      
+      // Usar número de inscrição ou CPF como ID para evitar duplicados
+      let docId = data["N° de Inscrição"] || data.CPF;
+      
+      try {
+        await db.collection("alunos").doc(docId).set(data);
+        successCount++;
+      } catch(err) {
+        errorLines.push({linha: i + 1, motivo: err.message});
+      }
+      
+      updateStatus(successCount, errorLines, i, lines.length);
+    }
+    
+    // Reabilitar botões após o upload
+    document.getElementById('uploadBtn').disabled = false;
+    document.getElementById('validateBtn').disabled = false;
+  };
+  reader.readAsText(file);
 }
 
 // --------- ATUALIZA STATUS E BARRA DE PROGRESSO ----------
 function updateStatus(successCount, errorLines, currentLine, totalLines) {
-    const statusDiv = document.getElementById('status');
-    const progress = document.getElementById('progress');
+  const statusDiv = document.getElementById('status');
+  const progress = document.getElementById('progress');
+  const progressText = document.getElementById('progressText');
+  
+  document.getElementById('successCount').textContent = successCount;
+  document.getElementById('errorCount').textContent = errorLines.length;
+  
+  statusDiv.innerHTML = `
+    <p>Linhas processadas: ${currentLine}/${totalLines-1}</p>
+    <p class="status-success">Sucesso: ${successCount}</p>
+    <p class="status-error">Erros: ${errorLines.length}</p>
+  `;
+  
+  if(errorLines.length > 0) {
+    const errorList = document.getElementById('errorList');
+    errorList.innerHTML = '';
+    
+    errorLines.forEach(error => {
+      const errorItem = document.createElement('div');
+      errorItem.className = 'error-item';
+      errorItem.innerHTML = `
+        <strong>Linha ${error.linha}</strong>: ${error.motivo}
+      `;
+      errorList.appendChild(errorItem);
+    });
+    
+    document.getElementById('errorsCount').textContent = `${errorLines.length} erro(s)`;
+    document.getElementById('errorsCard').classList.remove('hidden');
+  }
+  
+  let percent = Math.floor((currentLine/(totalLines-1))*100);
+  progress.style.width = percent + "%";
+  progress.innerText = percent + "%";
+  progressText.textContent = percent + "%";
+}
 
-    statusDiv.innerText = `Linhas processadas: ${currentLine}/${totalLines-1}\nSucesso: ${successCount}\nErros: ${errorLines.length}`;
-    if(errorLines.length > 0) {
-        statusDiv.innerText += `\nLinhas com erro: ${errorLines.map(e => `${e.linha} (${e.motivo})`).join(', ')}`;
-    }
-
-    let percent = Math.floor((currentLine/(totalLines-1))*100);
-    progress.style.width = percent + "%";
-    progress.innerText = percent + "%";
+// --------- BAIXAR MODELO DE CSV ----------
+function downloadTemplate() {
+  const headers = ['CPF', 'N° de Inscrição', 'Nome', 'Email', 'Telefone'];
+  const csvContent = headers.join(',') + '\n';
+  
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  
+  link.setAttribute('href', url);
+  link.setAttribute('download', 'modelo_alunos.csv');
+  link.style.visibility = 'hidden';
+  
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
 </script>
 </body>
