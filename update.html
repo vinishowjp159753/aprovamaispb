@@ -288,6 +288,16 @@
     align-items: center;
   }
   
+  .separator-option {
+    margin: 15px 0;
+  }
+  
+  .separator-option select {
+    padding: 8px;
+    border-radius: var(--border-radius);
+    border: 1px solid #ccc;
+  }
+  
   @media (max-width: 768px) {
     body {
       padding: 10px;
@@ -339,6 +349,16 @@
       <div class="config-option">
         <input type="checkbox" id="autoFixColumns" checked>
         <label for="autoFixColumns">Tentar corrigir automaticamente problemas de colunas</label>
+      </div>
+      
+      <div class="separator-option">
+        <label for="csvSeparator">Separador do CSV:</label>
+        <select id="csvSeparator">
+          <option value="auto">Auto-detectar</option>
+          <option value=";">Ponto e vírgula (;)</option>
+          <option value=",">Vírgula (,)</option>
+          <option value="tab">Tabulação</option>
+        </select>
       </div>
       
       <div class="field-mapping">
@@ -536,8 +556,34 @@ function formatFileSize(bytes) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
+// --------- DETECÇÃO DO SEPARADOR ----------
+function detectSeparator(firstLine) {
+  const separatorSelect = document.getElementById('csvSeparator');
+  const selectedSeparator = separatorSelect.value;
+  
+  if (selectedSeparator !== 'auto') {
+    return selectedSeparator === 'tab' ? '\t' : selectedSeparator;
+  }
+  
+  // Auto-detectar
+  const semicolonCount = (firstLine.match(/;/g) || []).length;
+  const commaCount = (firstLine.match(/,/g) || []).length;
+  const tabCount = (firstLine.match(/\t/g) || []).length;
+  
+  if (semicolonCount > commaCount && semicolonCount > tabCount) {
+    return ';';
+  } else if (commaCount > semicolonCount && commaCount > tabCount) {
+    return ',';
+  } else if (tabCount > semicolonCount && tabCount > commaCount) {
+    return '\t';
+  } else {
+    // Padrão para CSV brasileiro
+    return ';';
+  }
+}
+
 // --------- FUNÇÕES AUXILIARES PARA CSV ----------
-function parseCSVLine(line, expectedColumns = null) {
+function parseCSVLine(line, separator, expectedColumns = null) {
   // Método mais robusto para parsing de CSV
   const result = [];
   let current = '';
@@ -548,7 +594,7 @@ function parseCSVLine(line, expectedColumns = null) {
     
     if (char === '"') {
       inQuotes = !inQuotes;
-    } else if (char === ',' && !inQuotes) {
+    } else if (char === separator && !inQuotes) {
       result.push(current.trim());
       current = '';
     } else {
@@ -603,15 +649,21 @@ function validateCSV() {
   const reader = new FileReader();
   reader.onload = function(e) {
     const text = cleanCSVText(e.target.result);
-    const lines = text.split('\n');
+    const lines = text.split('\n').filter(line => line.trim() !== '');
     
     if (lines.length < 2) {
       alert("CSV vazio ou inválido");
       return;
     }
     
+    // Detectar separador
+    const separator = detectSeparator(lines[0]);
+    console.log("Separador detectado:", separator);
+    
     // Processar cabeçalhos
-    const headers = parseCSVLine(lines[0]);
+    const headers = parseCSVLine(lines[0], separator);
+    console.log("Cabeçalhos detectados:", headers);
+    
     validationErrors = [];
     
     // Obter mapeamento de campos
@@ -644,13 +696,13 @@ function validateCSV() {
     for (let i = 1; i < lines.length; i++) {
       if (skipEmptyLines && lines[i].trim() === '') continue;
       
-      const row = parseCSVLine(lines[i], headers.length);
+      const row = parseCSVLine(lines[i], separator, headers.length);
       
       if (row.length !== headers.length) {
         validationErrors.push({
           tipo: 'Formato',
           linha: i + 1,
-          motivo: `Número de colunas incorreto. Esperado: ${headers.length}, Encontrado: ${row.length}`
+          motivo: `Número de colunas incorreto. Esperado: ${headers.length}, Encontrado: ${row.length}. Linha: ${lines[i]}`
         });
         continue;
       }
@@ -760,15 +812,21 @@ async function uploadCSV() {
   const reader = new FileReader();
   reader.onload = async function(e) {
     const text = cleanCSVText(e.target.result);
-    const lines = text.split('\n');
+    const lines = text.split('\n').filter(line => line.trim() !== '');
     
     if (lines.length < 2) {
       alert("CSV vazio ou inválido");
       return;
     }
     
+    // Detectar separador
+    const separator = detectSeparator(lines[0]);
+    console.log("Separador usado:", separator);
+    
     // Processar cabeçalhos
-    const headers = parseCSVLine(lines[0]);
+    const headers = parseCSVLine(lines[0], separator);
+    console.log("Cabeçalhos processados:", headers);
+    
     let successCount = 0;
     let errorLines = [];
     
@@ -789,7 +847,7 @@ async function uploadCSV() {
       if (skipEmptyLines && lines[i].trim() === '') continue;
       
       processedLines++;
-      const row = parseCSVLine(lines[i], headers.length);
+      const row = parseCSVLine(lines[i], separator, headers.length);
       
       if (row.length !== headers.length) {
         errorLines.push({linha: i + 1, motivo: "Número de colunas incorreto"});
@@ -810,7 +868,7 @@ async function uploadCSV() {
       
       // Validação CPF
       if(!validarCPF(cpfValue)) {
-        errorLines.push({linha: i + 1, motivo: "CPF inválido"});
+        errorLines.push({linha: i + 1, motivo: `CPF inválido: ${cpfValue}`});
         updateStatus(successCount, errorLines, processedLines, totalLines);
         continue;
       }
@@ -836,8 +894,8 @@ async function uploadCSV() {
           cpfFormatado: formatarCPF(cpfValue), // Salvar CPF formatado também
           numeroInscricao: inscricaoValue,
           telefone: telefoneValue,
-          status: data.status || "ativo",
-          alunoEthos: data.alunoEthos || data["Aluno Ethos"] || "Não",
+          status: data.Status || data.status || "ativo",
+          alunoEthos: data["Aluno Ethos"] || data.alunoEthos || "Não",
           criadoEm: firebase.firestore.FieldValue.serverTimestamp(),
           // Incluir todos os outros campos do CSV
           ...data
@@ -903,9 +961,9 @@ function updateStatus(successCount, errorLines, currentLine, totalLines) {
 
 // --------- BAIXAR MODELO DE CSV ----------
 function downloadTemplate() {
-  const headers = ['Nome', 'CPF', 'N° de Inscrição', 'Telefone', 'Email', 'Status', 'Aluno Ethos'];
-  const example = ['Maria Clara Santana', '152.337.044-04', 'APV-20250929-GBTV', '(83) 99945-7441', 'maria@email.com', 'ativo', 'Não'];
-  const csvContent = headers.join(',') + '\n' + example.join(',');
+  const headers = ['N°;Data;Nome;CPF;N° de Inscrição;Telefone;Status;Aluno Ethos'];
+  const example = ['1;19/09/2025, 12:32;João Silva;123.456.789-09;APV-20250001-AB12;(11) 99999-9999;ativo;Não'];
+  const csvContent = headers.join('') + '\n' + example.join('');
   
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
