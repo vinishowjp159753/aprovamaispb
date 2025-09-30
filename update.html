@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Upload CSV Avançado</title>
+<title>Upload CSV Avançado - Inscrições</title>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <style>
@@ -257,6 +257,37 @@
     font-size: 14px;
   }
   
+  .config-section {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: var(--light-color);
+    border-radius: var(--border-radius);
+  }
+  
+  .config-option {
+    margin: 10px 0;
+  }
+  
+  .config-option label {
+    margin-left: 8px;
+  }
+  
+  .field-mapping {
+    margin-top: 15px;
+    padding: 15px;
+    background-color: white;
+    border-radius: var(--border-radius);
+    border: 1px solid #e0e0e0;
+  }
+  
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 10px;
+    margin: 10px 0;
+    align-items: center;
+  }
+  
   @media (max-width: 768px) {
     body {
       padding: 10px;
@@ -273,12 +304,16 @@
     .btn {
       width: 100%;
     }
+    
+    .field-row {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
 </head>
 <body>
   <div class="card">
-    <h2>Upload CSV Avançado</h2>
+    <h2>Upload CSV - Sistema de Inscrições</h2>
     
     <div class="upload-area" id="uploadArea">
       <i>📁</i>
@@ -295,9 +330,41 @@
       <button class="btn btn-danger" id="removeFile">✕</button>
     </div>
     
+    <div class="config-section">
+      <h3>Configurações de Importação</h3>
+      <div class="config-option">
+        <input type="checkbox" id="skipEmptyLines" checked>
+        <label for="skipEmptyLines">Ignorar linhas vazias</label>
+      </div>
+      <div class="config-option">
+        <input type="checkbox" id="autoFixColumns" checked>
+        <label for="autoFixColumns">Tentar corrigir automaticamente problemas de colunas</label>
+      </div>
+      
+      <div class="field-mapping">
+        <h4>Mapeamento de Campos</h4>
+        <div class="field-row">
+          <label for="cpfField">Campo CPF no CSV:</label>
+          <input type="text" id="cpfField" value="CPF" placeholder="Nome da coluna do CPF">
+        </div>
+        <div class="field-row">
+          <label for="inscricaoField">Campo Inscrição no CSV:</label>
+          <input type="text" id="inscricaoField" value="N° de Inscrição" placeholder="Nome da coluna da inscrição">
+        </div>
+        <div class="field-row">
+          <label for="nomeField">Campo Nome no CSV:</label>
+          <input type="text" id="nomeField" value="Nome" placeholder="Nome da coluna do nome">
+        </div>
+        <div class="field-row">
+          <label for="telefoneField">Campo Telefone no CSV:</label>
+          <input type="text" id="telefoneField" value="Telefone" placeholder="Nome da coluna do telefone">
+        </div>
+      </div>
+    </div>
+    
     <div class="actions">
       <button class="btn" id="uploadBtn" onclick="uploadCSV()" disabled>
-        <i>📤</i> Enviar CSV
+        <i>📤</i> Enviar para Inscrições
       </button>
       <button class="btn btn-secondary" id="validateBtn" onclick="validateCSV()" disabled>
         <i>🔍</i> Validar CSV
@@ -328,7 +395,7 @@
       </div>
       <div class="summary-item">
         <div class="summary-value status-success" id="successCount">0</div>
-        <div class="summary-label">Registros Importados</div>
+        <div class="summary-label">Inscrições Criadas</div>
       </div>
       <div class="summary-item">
         <div class="summary-value status-error" id="errorCount">0</div>
@@ -372,8 +439,9 @@ const db = firebase.firestore();
 let csvData = [];
 let validationErrors = [];
 
-// --------- VALIDAÇÃO DE CPF ----------
+// --------- VALIDAÇÃO E FORMATAÇÃO DE CPF ----------
 function validarCPF(cpf) {
+    if (!cpf) return false;
     cpf = cpf.replace(/\D/g, '');
     if(cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false;
     let soma = 0, resto;
@@ -383,6 +451,18 @@ function validarCPF(cpf) {
     for(let i=1;i<=10;i++) soma += parseInt(cpf.substring(i-1,i))*(12-i);
     resto = (soma*10)%11; if(resto===10||resto===11) resto=0; if(resto!==parseInt(cpf.substring(10,11))) return false;
     return true;
+}
+
+function formatarCPF(cpf) {
+    if (!cpf) return '';
+    cpf = cpf.replace(/\D/g, '');
+    if (cpf.length !== 11) return cpf;
+    return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+}
+
+function normalizarCPF(cpf) {
+    if (!cpf) return '';
+    return cpf.replace(/\D/g, '');
 }
 
 // --------- MANIPULAÇÃO DE ARQUIVOS ----------
@@ -413,7 +493,7 @@ uploadArea.addEventListener('drop', (e) => {
   uploadArea.classList.remove('active');
   
   const file = e.dataTransfer.files[0];
-  if (file && file.type === 'text/csv') {
+  if (file && (file.type === 'text/csv' || file.name.endsWith('.csv'))) {
     document.getElementById('csvFile').files = e.dataTransfer.files;
     handleFileSelection(file);
   } else {
@@ -456,6 +536,60 @@ function formatFileSize(bytes) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
+// --------- FUNÇÕES AUXILIARES PARA CSV ----------
+function parseCSVLine(line, expectedColumns = null) {
+  // Método mais robusto para parsing de CSV
+  const result = [];
+  let current = '';
+  let inQuotes = false;
+  
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    
+    if (char === '"') {
+      inQuotes = !inQuotes;
+    } else if (char === ',' && !inQuotes) {
+      result.push(current.trim());
+      current = '';
+    } else {
+      current += char;
+    }
+  }
+  
+  result.push(current.trim());
+  
+  // Se temos um número esperado de colunas, tentar ajustar
+  if (expectedColumns && document.getElementById('autoFixColumns').checked) {
+    return adjustColumns(result, expectedColumns);
+  }
+  
+  return result;
+}
+
+function adjustColumns(columns, expectedCount) {
+  // Se temos mais colunas que o esperado, cortar as extras
+  if (columns.length > expectedCount) {
+    return columns.slice(0, expectedCount);
+  }
+  
+  // Se temos menos colunas que o esperado, preencher com vazio
+  if (columns.length < expectedCount) {
+    return [...columns, ...Array(expectedCount - columns.length).fill('')];
+  }
+  
+  return columns;
+}
+
+function cleanCSVText(text) {
+  // Remover caracteres problemáticos e normalizar
+  return text
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n')
+    .replace(/[“”]/g, '"')
+    .replace(/[‘’]/g, "'")
+    .replace(/^\uFEFF/, ''); // Remove BOM
+}
+
 // --------- VALIDAÇÃO DO CSV ----------
 function validateCSV() {
   const fileInput = document.getElementById('csvFile');
@@ -468,36 +602,50 @@ function validateCSV() {
   
   const reader = new FileReader();
   reader.onload = function(e) {
-    const text = e.target.result;
-    const lines = text.split(/\r?\n/);
+    const text = cleanCSVText(e.target.result);
+    const lines = text.split('\n');
     
     if (lines.length < 2) {
       alert("CSV vazio ou inválido");
       return;
     }
     
-    const headers = lines[0].split(',');
+    // Processar cabeçalhos
+    const headers = parseCSVLine(lines[0]);
     validationErrors = [];
     
-    // Validar cabeçalhos
-    const requiredHeaders = ['CPF', 'N° de Inscrição'];
-    const missingHeaders = requiredHeaders.filter(header => 
-      !headers.some(h => h.trim().toLowerCase() === header.toLowerCase())
-    );
+    // Obter mapeamento de campos
+    const cpfField = document.getElementById('cpfField').value.trim();
+    const inscricaoField = document.getElementById('inscricaoField').value.trim();
+    const nomeField = document.getElementById('nomeField').value.trim();
     
-    if (missingHeaders.length > 0) {
+    // Validar se os campos necessários existem
+    const headerMap = {};
+    headers.forEach((header, index) => {
+      headerMap[header.trim().toLowerCase()] = index;
+    });
+    
+    const missingFields = [];
+    if (!headerMap[cpfField.toLowerCase()]) missingFields.push(cpfField);
+    if (!headerMap[inscricaoField.toLowerCase()]) missingFields.push(inscricaoField);
+    if (!headerMap[nomeField.toLowerCase()]) missingFields.push(nomeField);
+    
+    if (missingFields.length > 0) {
       validationErrors.push({
         tipo: 'Cabeçalho',
         linha: 1,
-        motivo: `Cabeçalhos obrigatórios ausentes: ${missingHeaders.join(', ')}`
+        motivo: `Campos obrigatórios não encontrados: ${missingFields.join(', ')}. Cabeçalhos encontrados: ${headers.join(', ')}`
       });
     }
     
     // Validar linhas de dados
+    const skipEmptyLines = document.getElementById('skipEmptyLines').checked;
+    
     for (let i = 1; i < lines.length; i++) {
-      if (lines[i].trim() === '') continue;
+      if (skipEmptyLines && lines[i].trim() === '') continue;
       
-      const row = lines[i].split(',');
+      const row = parseCSVLine(lines[i], headers.length);
+      
       if (row.length !== headers.length) {
         validationErrors.push({
           tipo: 'Formato',
@@ -513,28 +661,32 @@ function validateCSV() {
       }
       
       // Validação CPF
-      if (data.CPF && !validarCPF(data.CPF)) {
+      const cpfValue = data[cpfField] || '';
+      if (!validarCPF(cpfValue)) {
         validationErrors.push({
           tipo: 'CPF',
           linha: i + 1,
-          motivo: "CPF inválido"
+          motivo: `CPF inválido: ${cpfValue}`
         });
       }
       
-      // Validação de campos obrigatórios
-      if (!data.CPF) {
+      // Validação de número de inscrição
+      const inscricaoValue = data[inscricaoField] || '';
+      if (!inscricaoValue) {
         validationErrors.push({
           tipo: 'Campo Obrigatório',
           linha: i + 1,
-          motivo: "CPF é obrigatório"
+          motivo: "Número de inscrição é obrigatório"
         });
       }
       
-      if (!data["N° de Inscrição"]) {
+      // Validação de nome
+      const nomeValue = data[nomeField] || '';
+      if (!nomeValue) {
         validationErrors.push({
           tipo: 'Campo Obrigatório',
           linha: i + 1,
-          motivo: "N° de Inscrição é obrigatório"
+          motivo: "Nome é obrigatório"
         });
       }
     }
@@ -547,8 +699,9 @@ function validateCSV() {
 function showValidationResults(errors, totalLines) {
   document.getElementById('resultsCard').classList.remove('hidden');
   
+  const validLines = totalLines - errors.length;
   document.getElementById('totalCount').textContent = totalLines;
-  document.getElementById('successCount').textContent = totalLines - errors.length;
+  document.getElementById('successCount').textContent = validLines;
   document.getElementById('errorCount').textContent = errors.length;
   
   const statusDiv = document.getElementById('status');
@@ -556,12 +709,16 @@ function showValidationResults(errors, totalLines) {
     statusDiv.innerHTML = '<p class="status-success">✓ CSV validado com sucesso! Nenhum erro encontrado.</p>';
     document.getElementById('errorsCard').classList.add('hidden');
   } else {
-    statusDiv.innerHTML = `<p class="status-error">✗ Foram encontrados ${errors.length} erro(s) no arquivo CSV.</p>`;
+    statusDiv.innerHTML = `<p class="status-error">✗ Foram encontrados ${errors.length} erro(s) no arquivo CSV.</p>
+                          <p>${validLines} registros válidos de ${totalLines} totais.</p>`;
     
     const errorList = document.getElementById('errorList');
     errorList.innerHTML = '';
     
-    errors.forEach(error => {
+    // Mostrar apenas os primeiros 20 erros para não sobrecarregar a interface
+    const errorsToShow = errors.slice(0, 20);
+    
+    errorsToShow.forEach(error => {
       const errorItem = document.createElement('div');
       errorItem.className = 'error-item';
       errorItem.innerHTML = `
@@ -570,12 +727,19 @@ function showValidationResults(errors, totalLines) {
       errorList.appendChild(errorItem);
     });
     
+    if (errors.length > 20) {
+      const moreItem = document.createElement('div');
+      moreItem.className = 'error-item';
+      moreItem.innerHTML = `<em>... e mais ${errors.length - 20} erros</em>`;
+      errorList.appendChild(moreItem);
+    }
+    
     document.getElementById('errorsCount').textContent = `${errors.length} erro(s)`;
     document.getElementById('errorsCard').classList.remove('hidden');
   }
 }
 
-// --------- UPLOAD DO CSV ----------
+// --------- UPLOAD DO CSV PARA INSCRIÇÕES ----------
 async function uploadCSV() {
   const fileInput = document.getElementById('csvFile');
   const file = fileInput.files[0];
@@ -595,27 +759,41 @@ async function uploadCSV() {
   
   const reader = new FileReader();
   reader.onload = async function(e) {
-    const text = e.target.result;
-    const lines = text.split(/\r?\n/);
+    const text = cleanCSVText(e.target.result);
+    const lines = text.split('\n');
     
     if (lines.length < 2) {
       alert("CSV vazio ou inválido");
       return;
     }
     
-    const headers = lines[0].split(',');
+    // Processar cabeçalhos
+    const headers = parseCSVLine(lines[0]);
     let successCount = 0;
     let errorLines = [];
     
-    document.getElementById('totalCount').textContent = lines.length - 1;
+    // Obter mapeamento de campos
+    const cpfField = document.getElementById('cpfField').value.trim();
+    const inscricaoField = document.getElementById('inscricaoField').value.trim();
+    const nomeField = document.getElementById('nomeField').value.trim();
+    const telefoneField = document.getElementById('telefoneField').value.trim();
+    
+    const skipEmptyLines = document.getElementById('skipEmptyLines').checked;
+    const totalLines = lines.filter((line, index) => !(skipEmptyLines && index > 0 && line.trim() === '')).length - 1;
+    
+    document.getElementById('totalCount').textContent = totalLines;
+    
+    let processedLines = 0;
     
     for (let i = 1; i < lines.length; i++) {
-      if (lines[i].trim() === '') continue;
+      if (skipEmptyLines && lines[i].trim() === '') continue;
       
-      const row = lines[i].split(',');
+      processedLines++;
+      const row = parseCSVLine(lines[i], headers.length);
+      
       if (row.length !== headers.length) {
         errorLines.push({linha: i + 1, motivo: "Número de colunas incorreto"});
-        updateStatus(successCount, errorLines, i, lines.length);
+        updateStatus(successCount, errorLines, processedLines, totalLines);
         continue;
       }
       
@@ -624,24 +802,55 @@ async function uploadCSV() {
         data[headers[j].trim()] = row[j].trim();
       }
       
+      // Extrair campos específicos
+      const cpfValue = data[cpfField] || '';
+      const inscricaoValue = data[inscricaoField] || '';
+      const nomeValue = data[nomeField] || '';
+      const telefoneValue = data[telefoneField] || '';
+      
       // Validação CPF
-      if (!validarCPF(data.CPF)) {
+      if(!validarCPF(cpfValue)) {
         errorLines.push({linha: i + 1, motivo: "CPF inválido"});
-        updateStatus(successCount, errorLines, i, lines.length);
+        updateStatus(successCount, errorLines, processedLines, totalLines);
         continue;
       }
       
-      // Usar número de inscrição ou CPF como ID para evitar duplicados
-      let docId = data["N° de Inscrição"] || data.CPF;
-      
-      try {
-        await db.collection("alunos").doc(docId).set(data);
-        successCount++;
-      } catch(err) {
-        errorLines.push({linha: i + 1, motivo: err.message});
+      // Validação de campos obrigatórios
+      if(!inscricaoValue) {
+        errorLines.push({linha: i + 1, motivo: "Número de inscrição é obrigatório"});
+        updateStatus(successCount, errorLines, processedLines, totalLines);
+        continue;
       }
       
-      updateStatus(successCount, errorLines, i, lines.length);
+      if(!nomeValue) {
+        errorLines.push({linha: i + 1, motivo: "Nome é obrigatório"});
+        updateStatus(successCount, errorLines, processedLines, totalLines);
+        continue;
+      }
+      
+      try {
+        // Preparar dados para a coleção "inscricoes"
+        const inscricaoData = {
+          nomeCompleto: nomeValue,
+          cpf: normalizarCPF(cpfValue), // Salvar CPF sem formatação
+          cpfFormatado: formatarCPF(cpfValue), // Salvar CPF formatado também
+          numeroInscricao: inscricaoValue,
+          telefone: telefoneValue,
+          status: data.status || "ativo",
+          alunoEthos: data.alunoEthos || data["Aluno Ethos"] || "Não",
+          criadoEm: firebase.firestore.FieldValue.serverTimestamp(),
+          // Incluir todos os outros campos do CSV
+          ...data
+        };
+        
+        // Usar o número de inscrição como ID do documento
+        await db.collection("inscricoes").doc(inscricaoValue).set(inscricaoData);
+        successCount++;
+      } catch(err) {
+        errorLines.push({linha: i + 1, motivo: `Erro Firebase: ${err.message}`});
+      }
+      
+      updateStatus(successCount, errorLines, processedLines, totalLines);
     }
     
     // Reabilitar botões após o upload
@@ -661,8 +870,8 @@ function updateStatus(successCount, errorLines, currentLine, totalLines) {
   document.getElementById('errorCount').textContent = errorLines.length;
   
   statusDiv.innerHTML = `
-    <p>Linhas processadas: ${currentLine}/${totalLines-1}</p>
-    <p class="status-success">Sucesso: ${successCount}</p>
+    <p>Linhas processadas: ${currentLine}/${totalLines}</p>
+    <p class="status-success">Inscrições criadas: ${successCount}</p>
     <p class="status-error">Erros: ${errorLines.length}</p>
   `;
   
@@ -670,7 +879,10 @@ function updateStatus(successCount, errorLines, currentLine, totalLines) {
     const errorList = document.getElementById('errorList');
     errorList.innerHTML = '';
     
-    errorLines.forEach(error => {
+    // Mostrar apenas os primeiros 10 erros
+    const errorsToShow = errorLines.slice(-10);
+    
+    errorsToShow.forEach(error => {
       const errorItem = document.createElement('div');
       errorItem.className = 'error-item';
       errorItem.innerHTML = `
@@ -683,7 +895,7 @@ function updateStatus(successCount, errorLines, currentLine, totalLines) {
     document.getElementById('errorsCard').classList.remove('hidden');
   }
   
-  let percent = Math.floor((currentLine/(totalLines-1))*100);
+  let percent = Math.floor((currentLine/totalLines)*100);
   progress.style.width = percent + "%";
   progress.innerText = percent + "%";
   progressText.textContent = percent + "%";
@@ -691,15 +903,16 @@ function updateStatus(successCount, errorLines, currentLine, totalLines) {
 
 // --------- BAIXAR MODELO DE CSV ----------
 function downloadTemplate() {
-  const headers = ['CPF', 'N° de Inscrição', 'Nome', 'Email', 'Telefone'];
-  const csvContent = headers.join(',') + '\n';
+  const headers = ['Nome', 'CPF', 'N° de Inscrição', 'Telefone', 'Email', 'Status', 'Aluno Ethos'];
+  const example = ['Maria Clara Santana', '152.337.044-04', 'APV-20250929-GBTV', '(83) 99945-7441', 'maria@email.com', 'ativo', 'Não'];
+  const csvContent = headers.join(',') + '\n' + example.join(',');
   
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
   const url = URL.createObjectURL(blob);
   
   link.setAttribute('href', url);
-  link.setAttribute('download', 'modelo_alunos.csv');
+  link.setAttribute('download', 'modelo_inscricoes.csv');
   link.style.visibility = 'hidden';
   
   document.body.appendChild(link);
