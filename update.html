@@ -7,454 +7,86 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <style>
-  :root {
-    --primary-color: #4CAF50;
-    --secondary-color: #2196F3;
-    --danger-color: #f44336;
-    --light-color: #f5f5f5;
-    --dark-color: #333;
-    --border-radius: 8px;
-    --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-  
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    line-height: 1.6;
-    color: var(--dark-color);
-    background-color: #f9f9f9;
-    padding: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-  
-  h2 {
-    color: var(--primary-color);
-    margin-bottom: 20px;
-    text-align: center;
-  }
-  
-  .card {
-    background: white;
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
-    padding: 25px;
-    margin-bottom: 20px;
-  }
-  
-  .upload-area {
-    border: 2px dashed #ccc;
-    border-radius: var(--border-radius);
-    padding: 40px 20px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-bottom: 20px;
-  }
-  
-  .upload-area:hover, .upload-area.active {
-    border-color: var(--primary-color);
-    background-color: rgba(76, 175, 80, 0.05);
-  }
-  
-  .upload-area i {
-    font-size: 48px;
-    color: #ccc;
-    margin-bottom: 15px;
-    display: block;
-  }
-  
-  .upload-area p {
-    margin-bottom: 10px;
-  }
-  
-  .hidden {
-    display: none;
-  }
-  
-  .btn {
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: var(--border-radius);
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: 600;
-    transition: background-color 0.3s;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .btn:hover {
-    background-color: #3d8b40;
-  }
-  
-  .btn:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-  }
-  
-  .btn i {
-    margin-right: 8px;
-  }
-  
-  .btn-secondary {
-    background-color: var(--secondary-color);
-  }
-  
-  .btn-secondary:hover {
-    background-color: #0b7dda;
-  }
-  
-  .btn-danger {
-    background-color: var(--danger-color);
-  }
-  
-  .btn-danger:hover {
-    background-color: #d32f2f;
-  }
-  
-  .file-info {
-    background-color: var(--light-color);
-    padding: 15px;
-    border-radius: var(--border-radius);
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .file-info .file-name {
-    font-weight: 600;
-  }
-  
-  .file-info .file-size {
-    color: #666;
-  }
-  
-  .progress-container {
-    margin: 20px 0;
-  }
-  
-  .progress-label {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-  }
-  
-  #progressBar {
-    width: 100%;
-    height: 20px;
-    background-color: #e0e0e0;
-    border-radius: 10px;
-    overflow: hidden;
-    margin-bottom: 10px;
-  }
-  
-  #progress {
-    height: 100%;
-    width: 0;
-    background-color: var(--primary-color);
-    transition: width 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 12px;
-    font-weight: bold;
-  }
-  
-  .status-container {
-    margin-top: 20px;
-  }
-  
-  .status-card {
-    background-color: var(--light-color);
-    border-radius: var(--border-radius);
-    padding: 15px;
-    margin-bottom: 15px;
-  }
-  
-  .status-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-  
-  .status-title {
-    font-weight: 600;
-    color: var(--dark-color);
-  }
-  
-  .status-value {
-    font-weight: 700;
-  }
-  
-  .status-success {
-    color: var(--primary-color);
-  }
-  
-  .status-error {
-    color: var(--danger-color);
-  }
-  
-  .error-list {
-    max-height: 200px;
-    overflow-y: auto;
-    border: 1px solid #e0e0e0;
-    border-radius: var(--border-radius);
-    padding: 10px;
-    background-color: white;
-  }
-  
-  .error-item {
-    padding: 8px;
-    border-bottom: 1px solid #f0f0f0;
-    font-size: 14px;
-  }
-  
-  .error-item:last-child {
-    border-bottom: none;
-  }
-  
-  .actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-  }
-  
-  .summary {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px;
-    margin-bottom: 20px;
-  }
-  
-  .summary-item {
-    background-color: white;
-    border-radius: var(--border-radius);
-    padding: 15px;
-    text-align: center;
-    box-shadow: var(--box-shadow);
-  }
-  
-  .summary-value {
-    font-size: 24px;
-    font-weight: 700;
-    margin: 10px 0;
-  }
-  
-  .summary-label {
-    color: #666;
-    font-size: 14px;
-  }
-  
-  .config-section {
-    margin-top: 20px;
-    padding: 15px;
-    background-color: var(--light-color);
-    border-radius: var(--border-radius);
-  }
-  
-  .config-option {
-    margin: 10px 0;
-  }
-  
-  .config-option label {
-    margin-left: 8px;
-  }
-  
-  .field-mapping {
-    margin-top: 15px;
-    padding: 15px;
-    background-color: white;
-    border-radius: var(--border-radius);
-    border: 1px solid #e0e0e0;
-  }
-  
-  .field-row {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 10px;
-    margin: 10px 0;
-    align-items: center;
-  }
-  
-  .separator-option {
-    margin: 15px 0;
-  }
-  
-  .separator-option select {
-    padding: 8px;
-    border-radius: var(--border-radius);
-    border: 1px solid #ccc;
-  }
-  
-  .debug-info {
-    margin-top: 10px;
-    padding: 10px;
-    background-color: #fff3cd;
-    border: 1px solid #ffeaa7;
-    border-radius: var(--border-radius);
-    font-size: 12px;
-  }
-  
-  @media (max-width: 768px) {
-    body {
-      padding: 10px;
-    }
-    
-    .card {
-      padding: 15px;
-    }
-    
-    .actions {
-      flex-direction: column;
-    }
-    
-    .btn {
-      width: 100%;
-    }
-    
-    .field-row {
-      grid-template-columns: 1fr;
-    }
-  }
+/* --- ESTILOS --- */
+:root {
+  --primary-color: #4CAF50;
+  --secondary-color: #2196F3;
+  --danger-color: #f44336;
+  --light-color: #f5f5f5;
+  --dark-color: #333;
+  --border-radius: 8px;
+  --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Tahoma,Verdana,sans-serif;line-height:1.6;color:var(--dark-color);background:#f9f9f9;padding:20px;max-width:1200px;margin:auto}
+h2{color:var(--primary-color);margin-bottom:20px;text-align:center}
+.card{background:#fff;border-radius:var(--border-radius);box-shadow:var(--box-shadow);padding:25px;margin-bottom:20px}
+.upload-area{border:2px dashed #ccc;border-radius:var(--border-radius);padding:40px 20px;text-align:center;cursor:pointer;transition:.3s;margin-bottom:20px}
+.upload-area:hover,.upload-area.active{border-color:var(--primary-color);background:rgba(76,175,80,0.05)}
+.upload-area i{font-size:48px;color:#ccc;margin-bottom:15px;display:block}
+.hidden{display:none}
+.btn{background:var(--primary-color);color:#fff;border:none;padding:12px 24px;border-radius:var(--border-radius);cursor:pointer;font-size:16px;font-weight:600;transition:.3s}
+.btn:hover{background:#3d8b40}
+.btn:disabled{background:#ccc;cursor:not-allowed}
+.btn-secondary{background:var(--secondary-color)}
+.btn-secondary:hover{background:#0b7dda}
+.btn-danger{background:var(--danger-color)}
+.btn-danger:hover{background:#d32f2f}
+.file-info{background:var(--light-color);padding:15px;border-radius:var(--border-radius);margin-bottom:20px;display:flex;justify-content:space-between;align-items:center}
+.file-info .file-name{font-weight:600}
+.progress-container{margin:20px 0}
+#progressBar{width:100%;height:20px;background:#e0e0e0;border-radius:10px;overflow:hidden;margin-bottom:10px}
+#progress{height:100%;width:0;background:var(--primary-color);transition:width .3s ease;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:bold}
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin-bottom:20px}
+.summary-item{background:#fff;border-radius:var(--border-radius);padding:15px;text-align:center;box-shadow:var(--box-shadow)}
+.summary-value{font-size:24px;font-weight:700;margin:10px 0}
+.status-error{color:var(--danger-color)}
+.status-success{color:var(--primary-color)}
+.error-list{max-height:200px;overflow-y:auto;border:1px solid #e0e0e0;border-radius:var(--border-radius);padding:10px;background:#fff}
+.error-item{padding:8px;border-bottom:1px solid #f0f0f0;font-size:14px}
+.error-item:last-child{border-bottom:none}
 </style>
 </head>
 <body>
-  <div class="card">
-    <h2>Upload CSV - Sistema de Inscrições</h2>
-    
-    <div class="upload-area" id="uploadArea">
-      <i>📁</i>
-      <p>Arraste e solte seu arquivo CSV aqui ou clique para selecionar</p>
-      <p class="file-types">Formatos suportados: .csv</p>
-      <input type="file" id="csvFile" accept=".csv" class="hidden">
-    </div>
-    
-    <div id="fileInfo" class="file-info hidden">
-      <div>
-        <span class="file-name" id="fileName"></span>
-        <span class="file-size" id="fileSize"></span>
-      </div>
-      <button class="btn btn-danger" id="removeFile">✕</button>
-    </div>
-    
-    <div class="config-section">
-      <h3>Configurações de Importação</h3>
-      <div class="config-option">
-        <input type="checkbox" id="skipEmptyLines" checked>
-        <label for="skipEmptyLines">Ignorar linhas vazias</label>
-      </div>
-      <div class="config-option">
-        <input type="checkbox" id="autoFixColumns" checked>
-        <label for="autoFixColumns">Tentar corrigir automaticamente problemas de colunas</label>
-      </div>
-      
-      <div class="separator-option">
-        <label for="csvSeparator">Separador do CSV:</label>
-        <select id="csvSeparator">
-          <option value="auto">Auto-detectar</option>
-          <option value=";" selected>Ponto e vírgula (;)</option>
-          <option value=",">Vírgula (,)</option>
-          <option value="tab">Tabulação</option>
-        </select>
-      </div>
-      
-      <div class="field-mapping">
-        <h4>Mapeamento de Campos</h4>
-        <div class="debug-info" id="debugInfo">
-          <strong>Debug:</strong> Os campos serão detectados automaticamente do cabeçalho do CSV
-        </div>
-        <div class="field-row">
-          <label for="cpfField">Campo CPF no CSV:</label>
-          <input type="text" id="cpfField" value="CPF" placeholder="Nome da coluna do CPF">
-        </div>
-        <div class="field-row">
-          <label for="cupomField">Campo Cupom no CSV:</label>
-          <input type="text" id="cupomField" value="N° de Inscrição" placeholder="Nome da coluna do cupom">
-        </div>
-        <div class="field-row">
-          <label for="nomeField">Campo Nome no CSV:</label>
-          <input type="text" id="nomeField" value="Nome" placeholder="Nome da coluna do nome">
-        </div>
-        <div class="field-row">
-          <label for="telefoneField">Campo Telefone no CSV:</label>
-          <input type="text" id="telefoneField" value="Telefone" placeholder="Nome da coluna do telefone">
-        </div>
-      </div>
-    </div>
-    
-    <div class="actions">
-      <button class="btn" id="uploadBtn" onclick="uploadCSV()" disabled>
-        <i>📤</i> Enviar para Inscrições
-      </button>
-      <button class="btn btn-secondary" id="validateBtn" onclick="validateCSV()" disabled>
-        <i>🔍</i> Validar CSV
-      </button>
-      <button class="btn btn-secondary" onclick="downloadTemplate()">
-        <i>📥</i> Baixar Modelo
-      </button>
-    </div>
-    
-    <div class="progress-container hidden" id="progressContainer">
-      <div class="progress-label">
-        <span>Progresso do Upload</span>
-        <span id="progressText">0%</span>
-      </div>
-      <div id="progressBar">
-        <div id="progress">0%</div>
-      </div>
-    </div>
+<div class="card">
+  <h2>Upload CSV - Sistema de Inscrições</h2>
+  <div class="upload-area" id="uploadArea">
+    <i>📁</i>
+    <p>Arraste e solte seu arquivo CSV aqui ou clique para selecionar</p>
+    <input type="file" id="csvFile" accept=".csv" class="hidden">
   </div>
-  
-  <div class="card hidden" id="resultsCard">
-    <h3>Resultados do Processamento</h3>
-    
-    <div class="summary">
-      <div class="summary-item">
-        <div class="summary-value" id="totalCount">0</div>
-        <div class="summary-label">Total de Registros</div>
-      </div>
-      <div class="summary-item">
-        <div class="summary-value status-success" id="successCount">0</div>
-        <div class="summary-label">Inscrições Criadas</div>
-      </div>
-      <div class="summary-item">
-        <div class="summary-value status-error" id="errorCount">0</div>
-        <div class="summary-label">Erros Encontrados</div>
-      </div>
+  <div id="fileInfo" class="file-info hidden">
+    <div>
+      <span class="file-name" id="fileName"></span>
+      <span class="file-size" id="fileSize"></span>
     </div>
-    
-    <div class="status-container">
-      <div class="status-card">
-        <div class="status-header">
-          <span class="status-title">Detalhes do Processamento</span>
-        </div>
-        <div id="status"></div>
-      </div>
-      
-      <div class="status-card hidden" id="errorsCard">
-        <div class="status-header">
-          <span class="status-title">Erros Detalhados</span>
-          <span class="status-value status-error" id="errorsCount">0 erros</span>
-        </div>
-        <div class="error-list" id="errorList"></div>
-      </div>
-    </div>
+    <button class="btn btn-danger" id="removeFile">✕</button>
   </div>
+  <div class="actions">
+    <button class="btn" id="uploadBtn" onclick="uploadCSV()" disabled>📤 Enviar</button>
+    <button class="btn btn-secondary" id="validateBtn" onclick="validateCSV()" disabled>🔍 Validar</button>
+  </div>
+  <div class="progress-container hidden" id="progressContainer">
+    <span id="progressText">0%</span>
+    <div id="progressBar"><div id="progress">0%</div></div>
+  </div>
+</div>
+<div class="card hidden" id="resultsCard">
+  <h3>Resultados</h3>
+  <div class="summary">
+    <div class="summary-item"><div class="summary-value" id="totalCount">0</div><div>Total</div></div>
+    <div class="summary-item"><div class="summary-value status-success" id="successCount">0</div><div>Sucesso</div></div>
+    <div class="summary-item"><div class="summary-value status-error" id="errorCount">0</div><div>Erros</div></div>
+  </div>
+  <div id="status"></div>
+  <div class="hidden" id="errorsCard">
+    <h4>Erros Detalhados</h4>
+    <div class="error-list" id="errorList"></div>
+  </div>
+</div>
 
 <script>
-// --------- CONFIGURAÇÃO DO FIREBASE ----------
+// -------- FIREBASE --------
 const firebaseConfig = {
   apiKey: "AIzaSyA8IOr3_gzyCbYqk8RH6lwwgtQLQ0u5ch0",
   authDomain: "aprovamaispb-73d39.firebaseapp.com",
@@ -464,598 +96,121 @@ const firebaseConfig = {
   appId: "1:1052452508337:web:0b7919f981aa487c410890",
   measurementId: "G-M99KFX9636"
 };
-
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// --------- VARIÁVEIS GLOBAIS ----------
-let csvData = [];
-let validationErrors = [];
-let detectedHeaders = [];
-
-// --------- VALIDAÇÃO E FORMATAÇÃO DE CPF ----------
-function validarCPF(cpf) {
-    if (!cpf) return false;
-    cpf = cpf.replace(/\D/g, '');
-    if(cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false;
-    let soma = 0, resto;
-    for(let i=1;i<=9;i++) soma += parseInt(cpf.substring(i-1,i))*(11-i);
-    resto = (soma*10)%11; if(resto===10||resto===11) resto=0; if(resto!==parseInt(cpf.substring(9,10))) return false;
-    soma = 0;
-    for(let i=1;i<=10;i++) soma += parseInt(cpf.substring(i-1,i))*(12-i);
-    resto = (soma*10)%11; if(resto===10||resto===11) resto=0; if(resto!==parseInt(cpf.substring(10,11))) return false;
-    return true;
+// -------- Funções Auxiliares --------
+function formatFileSize(bytes){
+  if(bytes===0) return '0 Bytes';
+  const k=1024,sizes=['Bytes','KB','MB','GB'],i=Math.floor(Math.log(bytes)/Math.log(k));
+  return parseFloat((bytes/Math.pow(k,i)).toFixed(2))+' '+sizes[i];
+}
+function cleanCSVText(text){
+  return text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').replace(/^\uFEFF/,'');
 }
 
-function formatarCPF(cpf) {
-    if (!cpf) return '';
-    cpf = cpf.replace(/\D/g, '');
-    if (cpf.length !== 11) return cpf;
-    return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
-}
-
-function normalizarCPF(cpf) {
-    if (!cpf) return '';
-    return cpf.replace(/\D/g, '');
-}
-
-// --------- MANIPULAÇÃO DE ARQUIVOS ----------
-document.getElementById('uploadArea').addEventListener('click', () => {
-  document.getElementById('csvFile').click();
+// -------- Upload Area --------
+const uploadArea=document.getElementById('uploadArea');
+uploadArea.addEventListener('click',()=>document.getElementById('csvFile').click());
+document.getElementById('csvFile').addEventListener('change',e=>{
+  const file=e.target.files[0]; if(file) handleFile(file);
 });
-
-document.getElementById('csvFile').addEventListener('change', (e) => {
-  const file = e.target.files[0];
-  if (file) {
-    handleFileSelection(file);
-  }
+uploadArea.addEventListener('dragover',e=>{e.preventDefault();uploadArea.classList.add('active')});
+uploadArea.addEventListener('dragleave',()=>uploadArea.classList.remove('active'));
+uploadArea.addEventListener('drop',e=>{
+  e.preventDefault();uploadArea.classList.remove('active');
+  const file=e.dataTransfer.files[0];
+  if(file && file.name.endsWith('.csv')){
+    document.getElementById('csvFile').files=e.dataTransfer.files; handleFile(file);
+  } else alert('Arquivo inválido');
 });
-
-// Arrastar e soltar
-const uploadArea = document.getElementById('uploadArea');
-uploadArea.addEventListener('dragover', (e) => {
-  e.preventDefault();
-  uploadArea.classList.add('active');
-});
-
-uploadArea.addEventListener('dragleave', () => {
-  uploadArea.classList.remove('active');
-});
-
-uploadArea.addEventListener('drop', (e) => {
-  e.preventDefault();
-  uploadArea.classList.remove('active');
-  
-  const file = e.dataTransfer.files[0];
-  if (file && (file.type === 'text/csv' || file.name.endsWith('.csv'))) {
-    document.getElementById('csvFile').files = e.dataTransfer.files;
-    handleFileSelection(file);
-  } else {
-    alert('Por favor, selecione um arquivo CSV válido.');
-  }
-});
-
-document.getElementById('removeFile').addEventListener('click', () => {
-  document.getElementById('csvFile').value = '';
+document.getElementById('removeFile').addEventListener('click',()=>{
+  document.getElementById('csvFile').value='';
   document.getElementById('fileInfo').classList.add('hidden');
-  document.getElementById('uploadBtn').disabled = true;
-  document.getElementById('validateBtn').disabled = true;
+  document.getElementById('uploadBtn').disabled=true;
+  document.getElementById('validateBtn').disabled=true;
   uploadArea.classList.remove('hidden');
 });
 
-function handleFileSelection(file) {
-  const fileInfo = document.getElementById('fileInfo');
-  const fileName = document.getElementById('fileName');
-  const fileSize = document.getElementById('fileSize');
-  
-  fileName.textContent = file.name;
-  fileSize.textContent = ` (${formatFileSize(file.size)})`;
-  
-  fileInfo.classList.remove('hidden');
+function handleFile(file){
+  document.getElementById('fileName').textContent=file.name;
+  document.getElementById('fileSize').textContent=' ('+formatFileSize(file.size)+')';
+  document.getElementById('fileInfo').classList.remove('hidden');
   uploadArea.classList.add('hidden');
-  
-  document.getElementById('uploadBtn').disabled = false;
-  document.getElementById('validateBtn').disabled = false;
-  
-  // Limpar resultados anteriores
-  document.getElementById('resultsCard').classList.add('hidden');
-  document.getElementById('errorsCard').classList.add('hidden');
+  document.getElementById('uploadBtn').disabled=false;
+  document.getElementById('validateBtn').disabled=false;
 }
 
-function formatFileSize(bytes) {
-  if (bytes === 0) return '0 Bytes';
-  const k = 1024;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-}
-
-// --------- DETECÇÃO DO SEPARADOR E CAMPOS ----------
-function detectSeparator(firstLine) {
-  const separatorSelect = document.getElementById('csvSeparator');
-  const selectedSeparator = separatorSelect.value;
-  
-  if (selectedSeparator !== 'auto') {
-    return selectedSeparator === 'tab' ? '\t' : selectedSeparator;
-  }
-  
-  // Auto-detectar
-  const semicolonCount = (firstLine.match(/;/g) || []).length;
-  const commaCount = (firstLine.match(/,/g) || []).length;
-  const tabCount = (firstLine.match(/\t/g) || []).length;
-  
-  if (semicolonCount > commaCount && semicolonCount > tabCount) {
-    return ';';
-  } else if (commaCount > semicolonCount && commaCount > tabCount) {
-    return ',';
-  } else if (tabCount > semicolonCount && tabCount > commaCount) {
-    return '\t';
-  } else {
-    // Padrão para CSV brasileiro
-    return ';';
-  }
-}
-
-function detectFieldNames(headers) {
-  // Mapear nomes de campos comuns para encontrar automaticamente
-  const fieldMap = {
-    'cpf': ['cpf', 'documento', 'doc'],
-    'cupom': ['cupom', 'inscricao', 'inscrição', 'numero', 'número', 'n°', 'codigo', 'código', 'id', 'cupon'],
-    'nome': ['nome', 'name', 'aluno', 'candidato', 'nomecompleto'],
-    'telefone': ['telefone', 'tel', 'celular', 'phone', 'contato']
-  };
-  
-  const detectedFields = {};
-  
-  headers.forEach(header => {
-    const headerLower = header.toLowerCase().trim();
-    
-    // Procurar por CPF
-    if (fieldMap.cpf.some(term => headerLower.includes(term))) {
-      detectedFields.cpf = header;
-    }
-    
-    // Procurar por cupom/inscrição
-    if (fieldMap.cupom.some(term => headerLower.includes(term))) {
-      detectedFields.cupom = header;
-    }
-    
-    // Procurar por nome
-    if (fieldMap.nome.some(term => headerLower.includes(term))) {
-      detectedFields.nome = header;
-    }
-    
-    // Procurar por telefone
-    if (fieldMap.telefone.some(term => headerLower.includes(term))) {
-      detectedFields.telefone = header;
-    }
-  });
-  
-  return detectedFields;
-}
-
-// --------- FUNÇÕES AUXILIARES PARA CSV ----------
-function parseCSVLine(line, separator, expectedColumns = null) {
-  // Método mais robusto para parsing de CSV
-  const result = [];
-  let current = '';
-  let inQuotes = false;
-  
-  for (let i = 0; i < line.length; i++) {
-    const char = line[i];
-    
-    if (char === '"') {
-      inQuotes = !inQuotes;
-    } else if (char === separator && !inQuotes) {
-      result.push(current.trim());
-      current = '';
-    } else {
-      current += char;
-    }
-  }
-  
-  result.push(current.trim());
-  
-  // Se temos um número esperado de colunas, tentar ajustar
-  if (expectedColumns && document.getElementById('autoFixColumns').checked) {
-    return adjustColumns(result, expectedColumns);
-  }
-  
-  return result;
-}
-
-function adjustColumns(columns, expectedCount) {
-  // Se temos mais colunas que o esperado, cortar as extras
-  if (columns.length > expectedCount) {
-    return columns.slice(0, expectedCount);
-  }
-  
-  // Se temos menos colunas que o esperado, preencher com vazio
-  if (columns.length < expectedCount) {
-    return [...columns, ...Array(expectedCount - columns.length).fill('')];
-  }
-  
-  return columns;
-}
-
-function cleanCSVText(text) {
-  // Remover caracteres problemáticos e normalizar
-  return text
-    .replace(/\r\n/g, '\n')
-    .replace(/\r/g, '\n')
-    .replace(/[“”]/g, '"')
-    .replace(/[‘’]/g, "'")
-    .replace(/^\uFEFF/, '') // Remove BOM
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, ''); // Remove acentos
-}
-
-// --------- VALIDAÇÃO DO CSV ----------
-function validateCSV() {
-  const fileInput = document.getElementById('csvFile');
-  const file = fileInput.files[0];
-  
-  if (!file) {
-    alert("Escolha um arquivo CSV primeiro!");
-    return;
-  }
-  
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const text = cleanCSVText(e.target.result);
-    const lines = text.split('\n').filter(line => line.trim() !== '');
-    
-    if (lines.length < 2) {
-      alert("CSV vazio ou inválido");
-      return;
-    }
-    
-    // Detectar separador
-    const separator = detectSeparator(lines[0]);
-    console.log("Separador detectado:", separator);
-    
-    // Processar cabeçalhos
-    const headers = parseCSVLine(lines[0], separator);
-    detectedHeaders = headers;
-    console.log("Cabeçalhos detectados:", headers);
-    
-    // Detectar nomes de campos automaticamente
-    const detectedFields = detectFieldNames(headers);
-    console.log("Campos detectados:", detectedFields);
-    
-    // Atualizar campos na interface
-    if (detectedFields.cpf) {
-      document.getElementById('cpfField').value = detectedFields.cpf;
-    }
-    if (detectedFields.cupom) {
-      document.getElementById('cupomField').value = detectedFields.cupom;
-    }
-    if (detectedFields.nome) {
-      document.getElementById('nomeField').value = detectedFields.nome;
-    }
-    if (detectedFields.telefone) {
-      document.getElementById('telefoneField').value = detectedFields.telefone;
-    }
-    
-    // Atualizar debug info
-    document.getElementById('debugInfo').innerHTML = `
-      <strong>Debug:</strong> Cabeçalhos detectados: ${headers.join(', ')}
-      <br>Campos mapeados: CPF=${detectedFields.cpf || 'Não encontrado'}, 
-      Cupom=${detectedFields.cupom || 'Não encontrado'}, 
-      Nome=${detectedFields.nome || 'Não encontrado'}
-    `;
-    
-    validationErrors = [];
-    
-    // Obter mapeamento de campos (usando os detectados ou os manuais)
-    const cpfField = document.getElementById('cpfField').value.trim();
-    const cupomField = document.getElementById('cupomField').value.trim();
-    const nomeField = document.getElementById('nomeField').value.trim();
-    
-    // Validar se os campos necessários existem
-    const headerMap = {};
-    headers.forEach((header, index) => {
-      headerMap[header.trim().toLowerCase()] = index;
-    });
-    
-    const missingFields = [];
-    if (!headerMap[cpfField.toLowerCase()]) missingFields.push(cpfField);
-    if (!headerMap[cupomField.toLowerCase()]) missingFields.push(cupomField);
-    if (!headerMap[nomeField.toLowerCase()]) missingFields.push(nomeField);
-    
-    if (missingFields.length > 0) {
-      validationErrors.push({
-        tipo: 'Cabeçalho',
-        linha: 1,
-        motivo: `Campos obrigatórios não encontrados: ${missingFields.join(', ')}. Cabeçalhos encontrados: ${headers.join(', ')}`
-      });
-    }
-    
-    // Validar linhas de dados
-    const skipEmptyLines = document.getElementById('skipEmptyLines').checked;
-    
-    for (let i = 1; i < lines.length; i++) {
-      if (skipEmptyLines && lines[i].trim() === '') continue;
-      
-      const row = parseCSVLine(lines[i], separator, headers.length);
-      
-      if (row.length !== headers.length) {
-        validationErrors.push({
-          tipo: 'Formato',
-          linha: i + 1,
-          motivo: `Número de colunas incorreto. Esperado: ${headers.length}, Encontrado: ${row.length}`
-        });
-        continue;
-      }
-      
-      let data = {};
-      for (let j = 0; j < headers.length; j++) {
-        data[headers[j].trim()] = row[j].trim();
-      }
-      
-      // Validação CPF
-      const cpfValue = data[cpfField] || '';
-      if (!validarCPF(cpfValue)) {
-        validationErrors.push({
-          tipo: 'CPF',
-          linha: i + 1,
-          motivo: `CPF inválido: ${cpfValue}`
-        });
-      }
-      
-      // Validação de cupom
-      const cupomValue = data[cupomField] || '';
-      if (!cupomValue) {
-        validationErrors.push({
-          tipo: 'Campo Obrigatório',
-          linha: i + 1,
-          motivo: `Cupom é obrigatório. Campo usado: "${cupomField}", Valor encontrado: "${cupomValue}"`
-        });
-      }
-      
-      // Validação de nome
-      const nomeValue = data[nomeField] || '';
-      if (!nomeValue) {
-        validationErrors.push({
-          tipo: 'Campo Obrigatório',
-          linha: i + 1,
-          motivo: "Nome é obrigatório"
-        });
+// -------- Validação --------
+function validateCSV(){
+  const file=document.getElementById('csvFile').files[0];
+  if(!file) return alert("Escolha um arquivo");
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const text=cleanCSVText(e.target.result);
+    const lines=text.split('\n').filter(l=>l.trim()!=='');
+    if(lines.length<2) return alert("CSV vazio");
+    const headers=lines[0].split(';');
+    const errors=[];
+    for(let i=1;i<lines.length;i++){
+      const row=lines[i].split(';');
+      if(row.length!==headers.length){
+        errors.push({linha:i+1,motivo:"Número de colunas incorreto"});
       }
     }
-    
-    showValidationResults(validationErrors, lines.length - 1);
+    showResults(errors,lines.length-1);
   };
   reader.readAsText(file);
 }
 
-function showValidationResults(errors, totalLines) {
+function showResults(errors,total){
   document.getElementById('resultsCard').classList.remove('hidden');
-  
-  const validLines = totalLines - errors.length;
-  document.getElementById('totalCount').textContent = totalLines;
-  document.getElementById('successCount').textContent = validLines;
-  document.getElementById('errorCount').textContent = errors.length;
-  
-  const statusDiv = document.getElementById('status');
-  if (errors.length === 0) {
-    statusDiv.innerHTML = '<p class="status-success">✓ CSV validado com sucesso! Nenhum erro encontrado.</p>';
+  document.getElementById('totalCount').textContent=total;
+  document.getElementById('successCount').textContent=total-errors.length;
+  document.getElementById('errorCount').textContent=errors.length;
+  const status=document.getElementById('status');
+  if(errors.length===0){
+    status.innerHTML='<p class="status-success">✓ CSV válido</p>';
     document.getElementById('errorsCard').classList.add('hidden');
   } else {
-    statusDiv.innerHTML = `<p class="status-error">✗ Foram encontrados ${errors.length} erro(s) no arquivo CSV.</p>
-                          <p>${validLines} registros válidos de ${totalLines} totais.</p>`;
-    
-    const errorList = document.getElementById('errorList');
-    errorList.innerHTML = '';
-    
-    // Mostrar apenas os primeiros 20 erros para não sobrecarregar a interface
-    const errorsToShow = errors.slice(0, 20);
-    
-    errorsToShow.forEach(error => {
-      const errorItem = document.createElement('div');
-      errorItem.className = 'error-item';
-      errorItem.innerHTML = `
-        <strong>Linha ${error.linha}</strong> (${error.tipo}): ${error.motivo}
-      `;
-      errorList.appendChild(errorItem);
+    status.innerHTML=`<p class="status-error">✗ ${errors.length} erros</p>`;
+    const list=document.getElementById('errorList'); list.innerHTML='';
+    errors.forEach(e=>{
+      list.innerHTML+=`<div class="error-item">Linha ${e.linha}: ${e.motivo}</div>`;
     });
-    
-    if (errors.length > 20) {
-      const moreItem = document.createElement('div');
-      moreItem.className = 'error-item';
-      moreItem.innerHTML = `<em>... e mais ${errors.length - 20} erros</em>`;
-      errorList.appendChild(moreItem);
-    }
-    
-    document.getElementById('errorsCount').textContent = `${errors.length} erro(s)`;
     document.getElementById('errorsCard').classList.remove('hidden');
   }
 }
 
-// --------- UPLOAD DO CSV PARA INSCRIÇÕES ----------
-async function uploadCSV() {
-  const fileInput = document.getElementById('csvFile');
-  const file = fileInput.files[0];
-  
-  if (!file) {
-    alert("Escolha um arquivo CSV primeiro!");
-    return;
-  }
-  
-  // Mostrar container de progresso
+// -------- Upload --------
+async function uploadCSV(){
+  const file=document.getElementById('csvFile').files[0];
+  if(!file) return alert("Escolha um arquivo");
   document.getElementById('progressContainer').classList.remove('hidden');
-  document.getElementById('resultsCard').classList.remove('hidden');
-  
-  // Desabilitar botões durante o upload
-  document.getElementById('uploadBtn').disabled = true;
-  document.getElementById('validateBtn').disabled = true;
-  
-  const reader = new FileReader();
-  reader.onload = async function(e) {
-    const text = cleanCSVText(e.target.result);
-    const lines = text.split('\n').filter(line => line.trim() !== '');
-    
-    if (lines.length < 2) {
-      alert("CSV vazio ou inválido");
-      return;
+  const reader=new FileReader();
+  reader.onload=async e=>{
+    const text=cleanCSVText(e.target.result);
+    const lines=text.split('\n').filter(l=>l.trim()!=='');
+    const headers=lines[0].split(';');
+    let uploaded=0;
+    for(let i=1;i<lines.length;i++){
+      const row=lines[i].split(';');
+      if(row.length!==headers.length) continue;
+      const data={};
+      headers.forEach((h,idx)=>data[h.trim()]=row[idx].trim());
+      try{
+        await db.collection("inscricoes").add(data);
+        uploaded++;
+      }catch(err){console.error("Erro Firestore:",err)}
+      let percent=Math.round((i/lines.length)*100);
+      document.getElementById('progress').style.width=percent+'%';
+      document.getElementById('progress').textContent=percent+'%';
+      document.getElementById('progressText').textContent=percent+'%';
     }
-    
-    // Detectar separador
-    const separator = detectSeparator(lines[0]);
-    console.log("Separador usado:", separator);
-    
-    // Processar cabeçalhos
-    const headers = parseCSVLine(lines[0], separator);
-    console.log("Cabeçalhos processados:", headers);
-    
-    let successCount = 0;
-    let errorLines = [];
-    
-    // Obter mapeamento de campos
-    const cpfField = document.getElementById('cpfField').value.trim();
-    const cupomField = document.getElementById('cupomField').value.trim();
-    const nomeField = document.getElementById('nomeField').value.trim();
-    const telefoneField = document.getElementById('telefoneField').value.trim();
-    
-    const skipEmptyLines = document.getElementById('skipEmptyLines').checked;
-    const totalLines = lines.filter((line, index) => !(skipEmptyLines && index > 0 && line.trim() === '')).length - 1;
-    
-    document.getElementById('totalCount').textContent = totalLines;
-    
-    let processedLines = 0;
-    
-    for (let i = 1; i < lines.length; i++) {
-      if (skipEmptyLines && lines[i].trim() === '') continue;
-      
-      processedLines++;
-      const row = parseCSVLine(lines[i], separator, headers.length);
-      
-      if (row.length !== headers.length) {
-        errorLines.push({linha: i + 1, motivo: "Número de colunas incorreto"});
-        updateStatus(successCount, errorLines, processedLines, totalLines);
-        continue;
-      }
-      
-      let data = {};
-      for (let j = 0; j < headers.length; j++) {
-        data[headers[j].trim()] = row[j].trim();
-      }
-      
-      // Extrair campos específicos
-      const cpfValue = data[cpfField] || '';
-      const cupomValue = data[cupomField] || '';
-      const nomeValue = data[nomeField] || '';
-      const telefoneValue = data[telefoneField] || '';
-      
-      // Validação CPF
-      if(!validarCPF(cpfValue)) {
-        errorLines.push({linha: i + 1, motivo: `CPF inválido: ${cpfValue}`});
-        updateStatus(successCount, errorLines, processedLines, totalLines);
-        continue;
-      }
-      
-      // Validação de campos obrigatórios
-      if(!cupomValue) {
-        errorLines.push({linha: i + 1, motivo: `Cupom é obrigatório. Campo: "${cupomField}"`});
-        updateStatus(successCount, errorLines, processedLines, totalLines);
-        continue;
-      }
-      
-      if(!nomeValue) {
-        errorLines.push({linha: i + 1, motivo: "Nome é obrigatório"});
-        updateStatus(successCount, errorLines, processedLines, totalLines);
-        continue;
-      }
-      
-      try {
-        // Preparar dados para a coleção "inscricoes" - usando CUPOM como campo principal
-        const inscricaoData = {
-          nomeCompleto: nomeValue,
-          cpf: normalizarCPF(cpfValue), // Salvar CPF sem formatação
-          cpfFormatado: formatarCPF(cpfValue), // Salvar CPF formatado também
-          cupom: cupomValue, // AGORA USANDO CUPOM em vez de numeroInscricao
-          telefone: telefoneValue,
-          status: data.Status || data.status || "ativo",
-          alunoEthos: data["Aluno Ethos"] || data.alunoEthos || "Não",
-          criadoEm: firebase.firestore.FieldValue.serverTimestamp(),
-          // Incluir todos os outros campos do CSV
-          ...data
-        };
-        
-        // Usar o CUPOM como ID do documento (igual ao Firebase)
-        await db.collection("inscricoes").doc(cupomValue).set(inscricaoData);
-        successCount++;
-      } catch(err) {
-        errorLines.push({linha: i + 1, motivo: `Erro Firebase: ${err.message}`});
-      }
-      
-      updateStatus(successCount, errorLines, processedLines, totalLines);
-    }
-    
-    // Reabilitar botões após o upload
-    document.getElementById('uploadBtn').disabled = false;
-    document.getElementById('validateBtn').disabled = false;
+    validateCSV();
+    alert(`Upload concluído: ${uploaded} registros salvos.`);
   };
   reader.readAsText(file);
-}
-
-// --------- ATUALIZA STATUS E BARRA DE PROGRESSO ----------
-function updateStatus(successCount, errorLines, currentLine, totalLines) {
-  const statusDiv = document.getElementById('status');
-  const progress = document.getElementById('progress');
-  const progressText = document.getElementById('progressText');
-  
-  document.getElementById('successCount').textContent = successCount;
-  document.getElementById('errorCount').textContent = errorLines.length;
-  
-  statusDiv.innerHTML = `
-    <p>Linhas processadas: ${currentLine}/${totalLines}</p>
-    <p class="status-success">Inscrições criadas: ${successCount}</p>
-    <p class="status-error">Erros: ${errorLines.length}</p>
-  `;
-  
-  if(errorLines.length > 0) {
-    const errorList = document.getElementById('errorList');
-    errorList.innerHTML = '';
-    
-    // Mostrar apenas os primeiros 10 erros
-    const errorsToShow = errorLines.slice(-10);
-    
-    errorsToShow.forEach(error => {
-      const errorItem = document.createElement('div');
-      errorItem.className = 'error-item';
-      errorItem.innerHTML = `
-        <strong>Linha ${error.linha}</strong>: ${error.motivo}
-      `;
-      errorList.appendChild(errorItem);
-    });
-    
-    document.getElementById('errorsCount').textContent = `${errorLines.length} erro(s)`;
-    document.getElementById('errorsCard').classList.remove('hidden');
-  }
-  
-  let percent = Math.floor((currentLine/totalLines)*100);
-  progress.style.width = percent + "%";
-  progress.innerText = percent + "%";
-  progressText.textContent = percent + "%";
-}
-
-// --------- BAIXAR MODELO DE CSV ----------
-function downloadTemplate() {
-  const headers = ['N°;Data;Nome;CPF;Cupom;Telefone;Status;Aluno Ethos'];
-  const example = ['1;19/09/2025, 12:32;João Silva;123.456.789-09;APV-20250001-AB12;(11) 99999-9999;ativo;Não'];
-  const csvContent = headers.join('') + '\n' + example.join('');
-  
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
-  const url = URL.createObjectURL(blob);
-  
-  link.setAttribute('href', url);
-  link.setAttribute('download', 'modelo_inscricoes.csv');
-  link.style.visibility = 'hidden';
-  
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
 }
 </script>
 </body>
