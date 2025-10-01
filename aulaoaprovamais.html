@@ -25,7 +25,7 @@ body {
     color: #fff;
     border: none;
     padding: 8px 16px;
-    margin-right: 6px;
+    margin: 4px 0;
     border-radius: 6px;
     cursor: pointer;
     font-size: 14px;
@@ -85,6 +85,7 @@ thead th.sort-desc::after {
 tbody td {
     padding: 10px;
     border-bottom: 1px solid rgba(255,255,255,0.1);
+    vertical-align: top;
 }
 tbody tr:nth-child(even) {
     background: rgba(255,255,255,0.05);
@@ -109,9 +110,7 @@ tbody tr:hover {
     justify-content: center;
     align-items: center;
     z-index: 1000;
-    animation: fadeIn 0.3s ease forwards;
 }
-@keyframes fadeIn { from {opacity:0} to {opacity:1} }
 .modal-content {
     background: #1a2a6c;
     padding: 25px;
@@ -120,9 +119,7 @@ tbody tr:hover {
     width: 90%;
     color: #fff;
     box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-    animation: slideDown 0.3s ease forwards;
 }
-@keyframes slideDown { from {transform: translateY(-20px); opacity:0} to {transform:translateY(0);opacity:1} }
 .modal-content input {
     width: 100%;
     padding: 10px;
@@ -169,6 +166,7 @@ h1 {
                 <th>Aluno Ethos</th>
                 <th>Ações</th>
                 <th>WhatsApp</th>
+                <th>QR Code</th>
             </tr>
         </thead>
         <tbody id="alunosTableBody"></tbody>
@@ -186,6 +184,8 @@ h1 {
 </div>
 
 <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
 <script type="module">
 import { db } from "./assets/js/firebase-config.js";
 import { collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
@@ -221,20 +221,19 @@ function formatDate(firebaseDate) {
 
 // ---------- Montar tabela ----------
 function renderTable(data) {
-    // Ordenar por data
     data.sort((a, b) => {
         const dateA = a.criadoEm.toDate ? a.criadoEm.toDate() : new Date(a.criadoEm);
         const dateB = b.criadoEm.toDate ? b.criadoEm.toDate() : new Date(b.criadoEm);
         return ascendingOrder ? dateA - dateB : dateB - dateA;
     });
 
-    // Atualizar ícone no cabeçalho
     dateHeader.classList.toggle("sort-asc", ascendingOrder);
     dateHeader.classList.toggle("sort-desc", !ascendingOrder);
 
     alunosTableBody.innerHTML = "";
     data.forEach(aluno => {
         const statusClass = aluno.status === "ativo" ? "status-ativo" : "status-pendente";
+
         const mensagem = `
 Olá ${aluno.nomeCompleto},
 
@@ -246,8 +245,6 @@ Sua inscrição para o MEGA AULÃO Aprova+ & Colégio Ethos está CONFIRMADA! �
 
 Número de inscrição: ${aluno.cupom}
 CPF: ${aluno.cpf}
-
-Prepare-se para uma manhã inteira de revisão focada no ENEM!
         `.trim();
 
         const phone = (aluno.telefone || "").replace(/\D/g,"");
@@ -268,21 +265,42 @@ Prepare-se para uma manhã inteira de revisão focada no ENEM!
                 <button class="table-btn" onclick="editField('${aluno.id}','observacoes','Editar Observação')">Observação</button>
                 <button class="table-btn delete" onclick="deleteAluno('${aluno.id}')">Excluir</button>
             </td>
-            <td>
-                <a class="table-btn" target="_blank" href="${linkWhats}">WhatsApp</a>
-            </td>
+            <td><a class="table-btn" target="_blank" href="${linkWhats}">WhatsApp</a></td>
         `;
+
+        const qrTd = document.createElement("td");
+        const qrCanvas = document.createElement("canvas");
+        const qrUrl = `validar.html?inscricao=${aluno.cupom}`;
+
+        // Gera QR
+        QRCode.toCanvas(qrCanvas, qrUrl, { width: 80 }, function (error) {
+            if (error) console.error(error);
+            const qrDataUrl = qrCanvas.toDataURL("image/png");
+
+            const qrLink = document.createElement("a");
+            qrLink.href = qrDataUrl;
+            qrLink.download = `inscricao_${aluno.cupom}.png`;
+            qrLink.textContent = "⬇️ Baixar QR";
+            qrLink.className = "table-btn";
+            qrLink.style.display = "block";
+            qrLink.style.marginTop = "6px";
+
+            qrTd.appendChild(qrLink);
+        });
+
+        qrTd.appendChild(qrCanvas);
+        tr.appendChild(qrTd);
         alunosTableBody.appendChild(tr);
     });
 }
 
-// ---------- Ordenar ao clicar no cabeçalho ----------
+// ---------- Ordenar ----------
 dateHeader.addEventListener("click", () => {
     ascendingOrder = !ascendingOrder;
     renderTable(alunosData);
 });
 
-// ---------- Busca com debounce ----------
+// ---------- Busca ----------
 let debounceTimer;
 searchInput.addEventListener("input", () => {
     clearTimeout(debounceTimer);
@@ -336,7 +354,7 @@ window.deleteAluno = async (id) => {
     }
 };
 
-// ---------- Voltar ao dashboard ----------
+// ---------- Voltar ----------
 document.getElementById("backBtn").addEventListener("click", ()=>window.location.href="dashboard.html");
 
 // ---------- Exportar Excel ----------
