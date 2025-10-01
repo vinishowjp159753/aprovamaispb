@@ -6,7 +6,6 @@
 <link rel="icon" type="image/png" href="assets/img/logo_aprovamaispb.png" />
 <title>Lista de Alunos</title>
 
-<!-- CSS Principal -->
 <style>
 body {
     font-family: "Segoe UI", Roboto, sans-serif;
@@ -15,15 +14,8 @@ body {
     background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
     color: #fff;
 }
-.container {
-    max-width: 1200px;
-    margin: 30px auto;
-    padding: 20px;
-}
-#contadorAlunos {
-    font-size: 16px;
-    margin-bottom: 10px;
-}
+.container { max-width: 1200px; margin: 30px auto; padding: 20px; }
+#contadorAlunos { font-size: 16px; margin-bottom: 10px; }
 .table-btn {
     background: linear-gradient(90deg,#1a2a6c,#3b5fc7);
     color: #fff;
@@ -40,60 +32,41 @@ body {
     display: inline-block;
     text-align: center;
 }
-.table-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
-}
-.table-btn.delete {
-    background: #ff4d4d;
-}
-.table-btn.delete:hover {
-    background: #ff1a1a;
-}
+.table-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.3); }
+.table-btn.delete { background: #ff4d4d; }
+.table-btn.delete:hover { background: #ff1a1a; }
 #searchInput {
-    width: 100%;
-    padding: 10px 12px;
-    margin: 15px 0;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    font-size: 14px;
-    outline: none;
+    width: 100%; padding: 10px 12px; margin: 15px 0; border-radius: 6px;
+    border: 1px solid #ccc; font-size: 14px; outline: none;
     transition: box-shadow 0.2s, border-color 0.2s;
 }
-#searchInput:focus {
-    border-color: #1a2a6c;
-    box-shadow: 0 0 8px rgba(26,42,108,0.7);
-}
+#searchInput:focus { border-color: #1a2a6c; box-shadow: 0 0 8px rgba(26,42,108,0.7); }
 table {
-    width: 100%;
-    border-collapse: collapse;
-    background: rgba(255,255,255,0.05);
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    font-size: 14px;
+    width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.05);
+    border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-size: 14px;
 }
 thead th {
     background: linear-gradient(90deg,#1a2a6c,#3b5fc7);
-    color: #fff;
-    padding: 12px;
-    text-align: left;
-    cursor: pointer;
+    color: #fff; padding: 12px; text-align: left; cursor: pointer;
 }
 thead th.sort-asc::after { content: " ↑"; }
 thead th.sort-desc::after { content: " ↓"; }
-tbody td {
-    padding: 10px;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    vertical-align: top;
-}
+tbody td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); vertical-align: top; }
 tbody tr:nth-child(even) { background: rgba(255,255,255,0.05); }
 tbody tr:hover { background: rgba(59,95,199,0.2); }
 .status-ativo { color: #00ff99; font-weight: bold; }
 .status-pendente { color: #ffcc00; font-weight: bold; }
+#loader {
+    display: none;
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6); color: #fff; font-size: 20px;
+    display: flex; align-items: center; justify-content: center; z-index: 9999;
+}
 </style>
 </head>
 <body>
+
+<div id="loader">Aguarde...</div>
 
 <div class="container">
     <button id="backBtn" class="table-btn">← Voltar ao Dashboard</button>
@@ -127,7 +100,7 @@ tbody tr:hover { background: rgba(59,95,199,0.2); }
 <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 <script type="module">
 import { db } from "./assets/js/firebase-config.js";
-import { collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { collection, getDocs, doc, writeBatch, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 const alunosTableBody = document.getElementById("alunosTableBody");
 const searchInput      = document.getElementById("searchInput");
@@ -136,33 +109,39 @@ const dateHeader       = document.getElementById("dateHeader");
 const contadorEl       = document.getElementById("contadorAlunos");
 const ativarTodosBtn   = document.getElementById("ativarTodosBtn");
 const desativarTodosBtn= document.getElementById("desativarTodosBtn");
+const backBtn          = document.getElementById("backBtn");
+const loader           = document.getElementById("loader");
 
 let alunosData = [];
 let ascendingOrder = true;
 
-// ---------- Carregar alunos ----------
+// Voltar para dashboard
+backBtn.addEventListener("click", () => { window.location.href = "dashboard.html"; });
+
+// Loader
+function showLoader(){ loader.style.display="flex"; }
+function hideLoader(){ loader.style.display="none"; }
+
+// Carregar alunos
 async function loadAlunos() {
     const snapshot = await getDocs(collection(db, "inscricoes"));
-    alunosData = snapshot.docs.map(d => {
-        const data = d.data();
-        return { id: d.id, ...data };
-    });
+    alunosData = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
     alunosData.sort((a,b)=>{
-        if(a.status===b.status) return 0;
-        if(a.status==="pendente") return 1;
-        return -1;
+        if(!a.Data) return 1;
+        if(!b.Data) return -1;
+        return ascendingOrder ? new Date(a.Data) - new Date(b.Data) : new Date(b.Data) - new Date(a.Data);
     });
     renderTable(alunosData);
 }
 
-// ---------- Formatador ----------
+// Formatar data
 function formatDate(dataStr) {
     if(!dataStr) return "";
     const d = new Date(dataStr);
     return d.toLocaleString("pt-BR", { day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit" });
 }
 
-// ---------- Montar tabela ----------
+// Renderizar tabela
 function renderTable(data){
     const term = searchInput.value.toLowerCase();
     const filtered = data.filter(a =>
@@ -175,7 +154,6 @@ function renderTable(data){
     alunosTableBody.innerHTML = "";
     filtered.forEach(aluno => {
         const statusClass = aluno.status==="ativo" ? "status-ativo" : "status-pendente";
-
         const mensagem = `Olá ${aluno.Nome},\n\nSua inscrição está CONFIRMADA!\nNúmero de inscrição: ${aluno.Cupom}\nCPF: ${aluno.CPF}`;
         const phone = (aluno.Telefone||"").replace(/\D/g,"");
         const linkWhats = `https://api.whatsapp.com/send?phone=55${phone}&text=${encodeURIComponent(mensagem)}`;
@@ -196,29 +174,13 @@ function renderTable(data){
                 <button class="table-btn">Observação</button>
             </td>
             <td><a class="table-btn" target="_blank" href="${linkWhats}">WhatsApp</a></td>
+            <td>
+                <button class="table-btn" onclick="baixarQR('${aluno.Cupom}')">⬇️ Baixar QR</button>
+                <canvas id="qr_${aluno.Cupom}" style="display:none;"></canvas>
+            </td>
         `;
-
-        // QR Code
-        const qrTd = document.createElement("td");
-        const qrCanvas = document.createElement("canvas");
-        const qrUrl = `validar.html?inscricao=${aluno.Cupom}`;
-        QRCode.toCanvas(qrCanvas, qrUrl, { width: 80 }, function(err){
-            if(err) console.error(err);
-            const qrLink = document.createElement("a");
-            qrLink.href = qrCanvas.toDataURL("image/png");
-            qrLink.download = `inscricao_${aluno.Cupom}.png`;
-            qrLink.textContent = "⬇️ Baixar QR";
-            qrLink.className = "table-btn";
-            qrLink.style.display = "block";
-            qrLink.style.marginTop = "6px";
-            qrTd.appendChild(qrLink);
-        });
-        qrTd.appendChild(qrCanvas);
-        tr.appendChild(qrTd);
-
         alunosTableBody.appendChild(tr);
     });
-
     contadorEl.textContent = `Alunos: ${filtered.length}`;
 }
 
@@ -226,9 +188,11 @@ function renderTable(data){
 window.toggleStatus = async function(id){
     const aluno = alunosData.find(a=>a.id===id);
     if(!aluno) return;
+    showLoader();
     const novoStatus = aluno.status==="pendente" ? "ativo" : "pendente";
     await updateDoc(doc(db,"inscricoes",id),{ status: novoStatus });
-    loadAlunos();
+    await loadAlunos();
+    hideLoader();
 }
 
 // Excluir aluno
@@ -236,51 +200,56 @@ window.deleteAluno = async function(id){
     const aluno = alunosData.find(a=>a.id===id);
     if(!aluno) return;
     if(confirm(`Deseja excluir ${aluno.Nome}?`)){
+        showLoader();
         await deleteDoc(doc(db,"inscricoes",id));
-        loadAlunos();
+        await loadAlunos();
+        hideLoader();
     }
 }
 
-// Ativar todos
-ativarTodosBtn.addEventListener("click", async ()=>{
-    if(confirm("Tem certeza que deseja ATIVAR todos os alunos?")){
-        const updates = alunosData.map(a => updateDoc(doc(db,"inscricoes",a.id), { status: "ativo" }));
-        await Promise.all(updates);
-        loadAlunos();
-        alert("Todos os alunos foram ATIVADOS.");
-    }
-});
+// Ativar/Desativar todos com batch
+async function atualizarTodos(status){
+    if(!confirm(`Tem certeza que deseja ${status==="ativo"?"ATIVAR":"DESATIVAR"} todos os alunos?`)) return;
+    showLoader();
+    const batch = writeBatch(db);
+    alunosData.forEach(a=> batch.update(doc(db,"inscricoes",a.id), { status }) );
+    await batch.commit();
+    await loadAlunos();
+    hideLoader();
+    alert(`Todos os alunos foram ${status==="ativo"?"ATIVADOS":"DESATIVADOS"}.`);
+}
+ativarTodosBtn.addEventListener("click", ()=> atualizarTodos("ativo"));
+desativarTodosBtn.addEventListener("click", ()=> atualizarTodos("pendente"));
 
-// Desativar todos
-desativarTodosBtn.addEventListener("click", async ()=>{
-    if(confirm("Tem certeza que deseja DESATIVAR todos os alunos?")){
-        const updates = alunosData.map(a => updateDoc(doc(db,"inscricoes",a.id), { status: "pendente" }));
-        await Promise.all(updates);
-        loadAlunos();
-        alert("Todos os alunos foram DESATIVADOS.");
-    }
-});
+// Gerar QR sob demanda
+window.baixarQR = function(cupom){
+    const canvas = document.getElementById(`qr_${cupom}`);
+    const url = `validar.html?inscricao=${cupom}`;
+    QRCode.toCanvas(canvas, url, { width: 150 }, function(err){
+        if(err){ alert("Erro ao gerar QR"); return; }
+        const link = document.createElement("a");
+        link.href = canvas.toDataURL("image/png");
+        link.download = `inscricao_${cupom}.png`;
+        link.click();
+    });
+}
 
 // Busca
-searchInput.addEventListener("input", ()=>renderTable(alunosData));
+searchInput.addEventListener("input", ()=> renderTable(alunosData));
 
 // Ordenar por data
-dateHeader.addEventListener("click", ()=>{
-    ascendingOrder = !ascendingOrder;
-    renderTable(alunosData);
-});
+dateHeader.addEventListener("click", ()=>{ ascendingOrder=!ascendingOrder; renderTable(alunosData); });
 
-// Exportar para Excel
+// Exportar Excel (somente alunos filtrados)
 downloadBtn.addEventListener("click", ()=>{
+    const filtered = alunosData.filter(a =>
+        (a.Nome||"").toLowerCase().includes(searchInput.value.toLowerCase()) ||
+        (a.CPF||"").toLowerCase().includes(searchInput.value.toLowerCase()) ||
+        (a.Cupom||"").toLowerCase().includes(searchInput.value.toLowerCase())
+    );
     const header = ["Data","Nome","CPF","N° de Inscrição","Telefone","Status","Aluno Ethos"];
-    const rows = alunosData.map(a=>[
-        formatDate(a.Data),
-        a.Nome||"",
-        a.CPF||"",
-        a.Cupom||"",
-        a.Telefone||"",
-        a.status||"",
-        a["Aluno Ethos"]||""
+    const rows = filtered.map(a=>[
+        formatDate(a.Data), a.Nome||"", a.CPF||"", a.Cupom||"", a.Telefone||"", a.status||"", a["Aluno Ethos"]||""
     ]);
     const ws = XLSX.utils.aoa_to_sheet([header,...rows]);
     const wb = XLSX.utils.book_new();
