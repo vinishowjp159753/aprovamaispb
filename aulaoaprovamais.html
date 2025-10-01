@@ -1,119 +1,53 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/png" href="assets/img/logo_aprovamaispb.png" />
-<title>Lista de Alunos</title>
-
-<!-- CSS Principal -->
-<style>
-body {
-    font-family: "Segoe UI", Roboto, sans-serif;
-    margin: 0;
-    padding: 0;
-    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-    color: #fff;
-}
-.container {
-    max-width: 1200px;
-    margin: 30px auto;
-    padding: 20px;
-}
-.table-btn {
-    background: linear-gradient(90deg,#1a2a6c,#3b5fc7);
-    color: #fff;
-    border: none;
-    padding: 8px 16px;
-    margin: 4px 0;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-    transition: transform 0.2s, box-shadow 0.2s;
-    text-decoration: none;
-    display: inline-block;
-    text-align: center;
-}
-.table-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
-}
-.table-btn.delete { background: #ff4d4d; }
-.table-btn.delete:hover { background: #ff1a1a; }
-#searchInput {
-    width: 100%;
-    padding: 10px 12px;
-    margin: 15px 0;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    font-size: 14px;
-    outline: none;
-}
-#searchInput:focus {
-    border-color: #1a2a6c;
-    box-shadow: 0 0 8px rgba(26,42,108,0.7);
-}
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: rgba(255,255,255,0.05);
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    font-size: 14px;
-}
-thead th {
-    background: linear-gradient(90deg,#1a2a6c,#3b5fc7);
-    color: #fff;
-    padding: 12px;
-    text-align: left;
-}
-tbody td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-tbody tr:nth-child(even) { background: rgba(255,255,255,0.05); }
-tbody tr:hover { background: rgba(59,95,199,0.2); }
-.status-ativo { color: #00ff99; font-weight: bold; }
-.status-pendente { color: #ffcc00; font-weight: bold; }
-h1 { text-align:center; font-size:28px; margin-bottom:10px; }
-#contadorAlunos { margin-bottom: 15px; font-weight: bold; font-size:16px; }
-.btn-container { margin-bottom:20px; display:flex; flex-wrap:wrap; gap:10px; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Alunos</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#f9f9f9; padding:20px; }
+    h1 { color:#004aad; }
+    #contadorAlunos { font-weight:bold; margin-bottom:10px; display:block; }
+    .search-box { margin-bottom: 15px; }
+    table { width:100%; border-collapse: collapse; background:#fff; box-shadow:0 0 6px rgba(0,0,0,.1); }
+    th, td { border:1px solid #ccc; padding:8px; text-align:center; }
+    th { background:#004aad; color:white; }
+    .status-ativo { color:green; font-weight:bold; }
+    .status-pendente { color:red; font-weight:bold; }
+    .table-btn { background:#004aad; color:white; padding:4px 8px; border:none; border-radius:4px; cursor:pointer; margin:2px; font-size: 13px; }
+    .table-btn.delete { background:#d9534f; }
+    .table-btn:hover { opacity:0.85; }
+    .qr-cell { display:flex; flex-direction:column; align-items:center; }
+    .qr-cell a { margin-top:6px; font-size:12px; text-decoration:none; background:#28a745; padding:3px 6px; border-radius:3px; color:white; }
+  </style>
 </head>
 <body>
+  <h1>📋 Lista de Alunos</h1>
+  <span id="contadorAlunos">Alunos: 0</span>
 
-<div class="container">
-    <div class="btn-container">
-        <button id="backBtn" class="table-btn">← Voltar ao Dashboard</button>
-        <button id="downloadBtn" class="table-btn">⬇️ Baixar Lista</button>
-    </div>
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="🔎 Buscar aluno...">
+  </div>
 
-    <h1>Lista de Alunos</h1>
-    <div id="contadorAlunos">Alunos: 0</div>
-    <input type="text" id="searchInput" placeholder="Buscar aluno...">
+  <table>
+    <thead>
+      <tr>
+        <th>Data</th>
+        <th>Nome</th>
+        <th>CPF</th>
+        <th>Cupom</th>
+        <th>Telefone</th>
+        <th>Status</th>
+        <th>Aluno Ethos</th>
+        <th>Ações</th>
+        <th>WhatsApp</th>
+        <th>QR Code</th>
+      </tr>
+    </thead>
+    <tbody id="alunosTableBody"></tbody>
+  </table>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Data</th>
-                <th>Nome</th>
-                <th>CPF</th>
-                <th>N° de Inscrição</th>
-                <th>Telefone</th>
-                <th>Status</th>
-                <th>Aluno Ethos</th>
-                <th>Ações</th>
-                <th>WhatsApp</th>
-                <th>QR Code</th>
-            </tr>
-        </thead>
-        <tbody id="alunosTableBody"></tbody>
-    </table>
-</div>
-
-<!-- Scripts -->
-<script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
-<script type="module" src="./assets/js/listaAlunos.js"></script>
-
+  <!-- Firebase -->
+  <script type="module" src="./assets/js/listaAlunos.js"></script>
 </body>
 </html>
