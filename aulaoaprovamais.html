@@ -139,9 +139,13 @@ async function loadAlunos() {
 }
 
 function renderTable(data) {
-    // Primeiro ordena por status (ativos primeiro), depois por data
+    // Ordena: ativos primeiro, pendentes depois, e por data
     data.sort((a, b) => {
-        if (a.Status !== b.Status) return a.Status === "ativo" ? -1 : 1;
+        const statusA = (a.Status || "").toLowerCase().trim();
+        const statusB = (b.Status || "").toLowerCase().trim();
+
+        if (statusA !== statusB) return statusA === "ativo" ? -1 : 1;
+
         const dateA = new Date(a.Data);
         const dateB = new Date(b.Data);
         return ascendingOrder ? dateA - dateB : dateB - dateA;
@@ -152,7 +156,8 @@ function renderTable(data) {
 
     alunosTableBody.innerHTML = "";
     data.forEach(aluno => {
-        const statusClass = aluno.Status === "ativo" ? "status-ativo" : "status-pendente";
+        const statusNormalized = (aluno.Status || "pendente").toLowerCase().trim();
+        const statusClass = statusNormalized === "ativo" ? "status-ativo" : "status-pendente";
 
         const mensagem = `Olá ${aluno.Nome},\nSua inscrição para o MEGA AULÃO Aprova+ & Colégio Ethos está CONFIRMADA!\nNúmero de inscrição: ${aluno.Cupom}\nCPF: ${aluno.CPF}`;
 
@@ -166,7 +171,7 @@ function renderTable(data) {
             <td>${aluno.CPF||""}</td>
             <td>${aluno.Cupom||""}</td>
             <td>${aluno.Telefone||""}</td>
-            <td class="${statusClass}">${aluno.Status||""}</td>
+            <td class="${statusClass}">${statusNormalized}</td>
             <td>${aluno.AlunoEthos||""}</td>
             <td>
                 <button class="table-btn" onclick="toggleStatus('${aluno.id}')">Status</button>
@@ -202,7 +207,10 @@ function renderTable(data) {
 window.toggleStatus = async (id) => {
     const aluno = alunosData.find(a => a.id===id);
     if (!aluno) return;
-    const newStatus = aluno.Status==="ativo"?"pendente":"ativo";
+
+    const statusAtual = (aluno.Status || "pendente").toLowerCase().trim();
+    const newStatus = statusAtual === "ativo" ? "pendente" : "ativo";
+
     await updateDoc(doc(db,"inscricoes",id),{ Status:newStatus });
     loadAlunos();
 };
