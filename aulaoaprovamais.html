@@ -267,24 +267,36 @@ CPF: ${aluno.CPF || ""}
             <td><a class="table-btn" target="_blank" href="${linkWhats}">WhatsApp</a></td>
         `;
 
+        // QR Code
         const qrTd = document.createElement("td");
+        const qrContainer = document.createElement("div");
+        qrContainer.style.textAlign = "center";
+
         const qrCanvas = document.createElement("canvas");
         const qrUrl = `validar.html?inscricao=${aluno.Cupom || ""}`;
 
         QRCode.toCanvas(qrCanvas, qrUrl, { width: 80 }, function (error) {
             if (error) console.error(error);
-            const qrDataUrl = qrCanvas.toDataURL("image/png");
-            const qrLink = document.createElement("a");
-            qrLink.href = qrDataUrl;
-            qrLink.download = `inscricao_${aluno.Cupom || ""}.png`;
-            qrLink.textContent = "⬇️ Baixar QR";
-            qrLink.className = "table-btn";
-            qrLink.style.display = "block";
-            qrLink.style.marginTop = "6px";
-            qrTd.appendChild(qrLink);
         });
 
-        qrTd.appendChild(qrCanvas);
+        const qrLink = document.createElement("a");
+        qrLink.textContent = "⬇️ Baixar QR";
+        qrLink.className = "table-btn";
+        qrLink.style.display = "block";
+        qrLink.style.marginTop = "6px";
+
+        qrLink.addEventListener("click", () => {
+            const qrDataUrl = qrCanvas.toDataURL("image/png");
+            const link = document.createElement("a");
+            link.href = qrDataUrl;
+            link.download = `inscricao_${aluno.Cupom || ""}.png`;
+            link.click();
+        });
+
+        qrContainer.appendChild(qrCanvas);
+        qrContainer.appendChild(qrLink);
+        qrTd.appendChild(qrContainer);
+
         tr.appendChild(qrTd);
         alunosTableBody.appendChild(tr);
     });
