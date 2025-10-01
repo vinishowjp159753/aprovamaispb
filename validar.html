@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Validação de Inscrição</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+    .ok { color: green; font-weight: bold; }
+    .fail { color: red; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>Validação de Matrícula</h1>
+  <div id="resultado">Validando...</div>
+
+  <script type="module">
+    import { db } from "./assets/js/firebase-config.js";
+    import { collection, getDocs } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+    async function validar() {
+      const params = new URLSearchParams(window.location.search);
+      const inscricao = params.get("inscricao");
+      if (!inscricao) {
+        document.getElementById("resultado").innerHTML = "<span class='fail'>QR Code inválido</span>";
+        return;
+      }
+
+      const snapshot = await getDocs(collection(db, "inscricoes"));
+      const alunos = snapshot.docs.map(d => d.data());
+
+      const aluno = alunos.find(a => a.cupom == inscricao);
+
+      if (aluno) {
+        if (aluno.status === "ativo") {
+          document.getElementById("resultado").innerHTML = `
+            ✅ <span class="ok">Matrícula CONFIRMADA!</span><br>
+            Nome: ${aluno.nomeCompleto}<br>
+            CPF: ${aluno.cpf}<br>
+            Inscrição: ${aluno.cupom}
+          `;
+        } else {
+          document.getElementById("resultado").innerHTML = "<span class='fail'>Inscrição encontrada, mas não confirmada.</span>";
+        }
+      } else {
+        document.getElementById("resultado").innerHTML = "<span class='fail'>Inscrição não encontrada</span>";
+      }
+    }
+
+    validar();
+  </script>
+</body>
+</html>
