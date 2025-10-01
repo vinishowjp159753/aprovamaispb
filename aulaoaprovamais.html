@@ -6,77 +6,75 @@
   <title>Lista de Alunos</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f5f7fa;
-      margin: 0;
-      padding: 20px;
+      font-family: "Segoe UI", sans-serif;
+      margin: 20px;
+      background: #f4f6f9;
     }
     h1 {
-      text-align: center;
-      color: #2c3e50;
+      color: #1a2a6c;
     }
-    .top-bar {
+    .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 15px;
     }
-    .contador-box {
-      background: #3498db;
-      color: white;
-      padding: 10px 15px;
-      border-radius: 8px;
+    .contador {
       font-weight: bold;
+      color: #333;
     }
     table {
       width: 100%;
       border-collapse: collapse;
+      margin-top: 15px;
       background: white;
       border-radius: 8px;
       overflow: hidden;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
-    table th, table td {
+    th, td {
       padding: 10px;
+      border: 1px solid #ddd;
       text-align: left;
-      border-bottom: 1px solid #eee;
     }
-    table th {
-      background: #3498db;
+    th {
+      background: #1a2a6c;
       color: white;
     }
     button {
-      padding: 5px 10px;
+      padding: 6px 12px;
       margin: 2px;
       border: none;
-      border-radius: 6px;
+      border-radius: 5px;
       cursor: pointer;
+      font-weight: bold;
     }
     .btn-status {
-      background: #2ecc71;
+      background: #4caf50;
       color: white;
     }
     .btn-excluir {
-      background: #e74c3c;
+      background: #f44336;
       color: white;
+    }
+    .filter {
+      margin-bottom: 15px;
     }
   </style>
 </head>
 <body>
-  <h1>Lista de Alunos</h1>
 
-  <div class="top-bar">
-    <label>
-      Filtrar por status:
-      <select id="statusFilter">
-        <option value="todos">Todos</option>
-        <option value="ativo">Ativos</option>
-        <option value="pendente">Pendentes</option>
-      </select>
-    </label>
-    <div class="contador-box">
-      Total de alunos: <span id="contadorAlunos">0</span>
-    </div>
+  <div class="header">
+    <h1>Lista de Alunos</h1>
+    <div class="contador">Total: <span id="contador">0</span></div>
+  </div>
+
+  <div class="filter">
+    <label for="statusFilter">Filtrar por status: </label>
+    <select id="statusFilter">
+      <option value="todos">Todos</option>
+      <option value="ativo">Ativos</option>
+      <option value="pendente">Pendentes</option>
+    </select>
   </div>
 
   <table id="alunosTable">
@@ -94,66 +92,67 @@
     <tbody></tbody>
   </table>
 
-  <!-- Firebase -->
   <script type="module">
-    import { initializeApp } from "./firebase-config.js";
-    import { getFirestore, collection, getDocs, updateDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+    import { app, db } from "./assets/js/firebase-config.js";
+    import { collection, getDocs, updateDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-    const app = initializeApp();
-    const db = getFirestore(app);
     const alunosCollection = collection(db, "inscricoes");
-
     const tabela = document.getElementById("alunosTable").querySelector("tbody");
     const statusFilter = document.getElementById("statusFilter");
-    const contadorSpan = document.getElementById("contadorAlunos");
+    const contadorEl = document.getElementById("contador");
 
     let alunosCache = [];
 
     async function carregarAlunos() {
-      tabela.innerHTML = "";
+      tabela.innerHTML = ""; 
       const snapshot = await getDocs(alunosCollection);
-      alunosCache = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+
+      // Mapeia documentos
+      alunosCache = snapshot.docs.map(docSnap => ({
+        id: docSnap.id,
+        ...docSnap.data()
+      }));
+
       renderizarTabela();
     }
 
     function renderizarTabela() {
       tabela.innerHTML = "";
       const filtro = statusFilter.value;
+      const alunosFiltrados = filtro === "todos" ? alunosCache : alunosCache.filter(a => a.status === filtro);
 
-      const alunosFiltrados = filtro === "todos"
-        ? alunosCache
-        : alunosCache.filter(a => (a.Status || "").toLowerCase().trim() === filtro);
-
-      // Atualiza contador
-      contadorSpan.textContent = alunosFiltrados.length;
+      // Ordena pendentes por último
+      alunosFiltrados.sort((a, b) => {
+        if (a.status === "pendente" && b.status !== "pendente") return 1;
+        if (a.status !== "pendente" && b.status === "pendente") return -1;
+        return (a.nomeCompleto || "").localeCompare(b.nomeCompleto || "");
+      });
 
       alunosFiltrados.forEach(aluno => {
         const tr = document.createElement("tr");
-        const statusAtual = (aluno.Status || "pendente").toLowerCase();
-
         tr.innerHTML = `
-          <td>${aluno.Nome || ""}</td>
+          <td>${aluno.nomeCompleto || ""}</td>
           <td>${aluno.Turma || ""}</td>
-          <td>${aluno.Cupom || ""}</td>
-          <td>${aluno.Telefone || ""}</td>
+          <td>${aluno.cupom || ""}</td>
+          <td>${aluno.telefone || ""}</td>
           <td>${aluno["Aluno Ethos"] || ""}</td>
-          <td>${statusAtual}</td>
+          <td>${aluno.status || "pendente"}</td>
           <td>
-            <button class="btn-status">${statusAtual === "pendente" ? "Ativar" : "Desativar"}</button>
-            <button class="btn-excluir">Excluir</button>
+              <button class="btn-status">${aluno.status === "pendente" ? "Ativar" : "Desativar"}</button>
+              <button class="btn-excluir">Excluir</button>
           </td>
         `;
 
         // Alterar status
         tr.querySelector(".btn-status").addEventListener("click", async () => {
-          const novoStatus = statusAtual === "pendente" ? "ativo" : "pendente";
-          await updateDoc(doc(db, "inscricoes", aluno.id), { Status: novoStatus });
+          const novoStatus = aluno.status === "pendente" ? "ativo" : "pendente";
+          await updateDoc(doc(db, "inscricoes", aluno.id), { status: novoStatus });
           carregarAlunos();
         });
 
         // Excluir aluno
         tr.querySelector(".btn-excluir").addEventListener("click", async () => {
-          if (confirm(`Deseja excluir o aluno ${aluno.Nome}?`)) {
+          if (confirm(`Deseja excluir o aluno ${aluno.nomeCompleto}?`)) {
             await deleteDoc(doc(db, "inscricoes", aluno.id));
             carregarAlunos();
           }
@@ -161,9 +160,13 @@
 
         tabela.appendChild(tr);
       });
+
+      // Atualiza contador
+      contadorEl.textContent = alunosFiltrados.length;
     }
 
     statusFilter.addEventListener("change", renderizarTabela);
+
     carregarAlunos();
   </script>
 </body>
