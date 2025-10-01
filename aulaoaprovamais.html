@@ -44,6 +44,7 @@ body {
 table {
     width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.05);
     border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-size: 14px;
+    display: block; overflow-x: auto; /* responsivo */
 }
 thead th {
     background: linear-gradient(90deg,#1a2a6c,#3b5fc7);
@@ -51,16 +52,20 @@ thead th {
 }
 thead th.sort-asc::after { content: " ↑"; }
 thead th.sort-desc::after { content: " ↓"; }
-tbody td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); vertical-align: top; }
+tbody td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); vertical-align: top; white-space: nowrap; }
 tbody tr:nth-child(even) { background: rgba(255,255,255,0.05); }
 tbody tr:hover { background: rgba(59,95,199,0.2); }
 .status-ativo { color: #00ff99; font-weight: bold; }
 .status-pendente { color: #ffcc00; font-weight: bold; }
 #loader {
-    display: none;
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0,0,0,0.6); color: #fff; font-size: 20px;
     display: flex; align-items: center; justify-content: center; z-index: 9999;
+}
+@media (max-width: 768px){
+    .table-btn { padding: 6px 10px; font-size: 12px; }
+    #searchInput { font-size: 12px; padding: 8px 10px; }
+    #loader { font-size: 16px; padding: 10px; }
 }
 </style>
 </head>
@@ -115,23 +120,31 @@ const loader           = document.getElementById("loader");
 let alunosData = [];
 let ascendingOrder = true;
 
-// Voltar para dashboard
-backBtn.addEventListener("click", () => { window.location.href = "dashboard.html"; });
-
 // Loader
 function showLoader(){ loader.style.display="flex"; }
 function hideLoader(){ loader.style.display="none"; }
 
+// Voltar para dashboard
+backBtn.addEventListener("click", () => { window.location.href = "dashboard.html"; });
+
 // Carregar alunos
 async function loadAlunos() {
-    const snapshot = await getDocs(collection(db, "inscricoes"));
-    alunosData = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-    alunosData.sort((a,b)=>{
-        if(!a.Data) return 1;
-        if(!b.Data) return -1;
-        return ascendingOrder ? new Date(a.Data) - new Date(b.Data) : new Date(b.Data) - new Date(a.Data);
-    });
-    renderTable(alunosData);
+    showLoader();
+    try {
+        const snapshot = await getDocs(collection(db, "inscricoes"));
+        alunosData = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        alunosData.sort((a,b)=>{
+            if(!a.Data) return 1;
+            if(!b.Data) return -1;
+            return ascendingOrder ? new Date(a.Data) - new Date(b.Data) : new Date(b.Data) - new Date(a.Data);
+        });
+        renderTable(alunosData);
+    } catch(err){
+        console.error(err);
+        alert("Erro ao carregar alunos!");
+    } finally {
+        hideLoader();
+    }
 }
 
 // Formatar data
@@ -189,10 +202,16 @@ window.toggleStatus = async function(id){
     const aluno = alunosData.find(a=>a.id===id);
     if(!aluno) return;
     showLoader();
-    const novoStatus = aluno.status==="pendente" ? "ativo" : "pendente";
-    await updateDoc(doc(db,"inscricoes",id),{ status: novoStatus });
-    await loadAlunos();
-    hideLoader();
+    try {
+        const novoStatus = aluno.status==="pendente" ? "ativo" : "pendente";
+        await updateDoc(doc(db,"inscricoes",id),{ status: novoStatus });
+        await loadAlunos();
+    } catch(err){
+        console.error(err);
+        alert("Erro ao atualizar status!");
+    } finally {
+        hideLoader();
+    }
 }
 
 // Excluir aluno
@@ -201,9 +220,15 @@ window.deleteAluno = async function(id){
     if(!aluno) return;
     if(confirm(`Deseja excluir ${aluno.Nome}?`)){
         showLoader();
-        await deleteDoc(doc(db,"inscricoes",id));
-        await loadAlunos();
-        hideLoader();
+        try {
+            await deleteDoc(doc(db,"inscricoes",id));
+            await loadAlunos();
+        } catch(err){
+            console.error(err);
+            alert("Erro ao excluir aluno!");
+        } finally {
+            hideLoader();
+        }
     }
 }
 
@@ -211,12 +236,18 @@ window.deleteAluno = async function(id){
 async function atualizarTodos(status){
     if(!confirm(`Tem certeza que deseja ${status==="ativo"?"ATIVAR":"DESATIVAR"} todos os alunos?`)) return;
     showLoader();
-    const batch = writeBatch(db);
-    alunosData.forEach(a=> batch.update(doc(db,"inscricoes",a.id), { status }) );
-    await batch.commit();
-    await loadAlunos();
-    hideLoader();
-    alert(`Todos os alunos foram ${status==="ativo"?"ATIVADOS":"DESATIVADOS"}.`);
+    try {
+        const batch = writeBatch(db);
+        alunosData.forEach(a=> batch.update(doc(db,"inscricoes",a.id), { status }) );
+        await batch.commit();
+        await loadAlunos();
+        alert(`Todos os alunos foram ${status==="ativo"?"ATIVADOS":"DESATIVADOS"}.`);
+    } catch(err){
+        console.error(err);
+        alert("Erro ao atualizar todos os alunos!");
+    } finally {
+        hideLoader();
+    }
 }
 ativarTodosBtn.addEventListener("click", ()=> atualizarTodos("ativo"));
 desativarTodosBtn.addEventListener("click", ()=> atualizarTodos("pendente"));
