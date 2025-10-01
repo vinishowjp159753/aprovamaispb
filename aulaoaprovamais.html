@@ -222,8 +222,8 @@ function formatDate(firebaseDate) {
 // ---------- Montar tabela ----------
 function renderTable(data) {
     data.sort((a, b) => {
-        const dateA = a.criadoEm.toDate ? a.criadoEm.toDate() : new Date(a.criadoEm);
-        const dateB = b.criadoEm.toDate ? b.criadoEm.toDate() : new Date(b.criadoEm);
+        const dateA = a.Data.toDate ? a.Data.toDate() : new Date(a.Data);
+        const dateB = b.Data.toDate ? b.Data.toDate() : new Date(b.Data);
         return ascendingOrder ? dateA - dateB : dateB - dateA;
     });
 
