@@ -3,12 +3,13 @@
 
 // Configuração do Firebase (substitua se necessário)
 const firebaseConfig = {
-  apiKey: "AIzaSyAK3U35fipoWOOIJg0yrtgmVfQ7XQxZxqY",
-  authDomain: "aprovamaispb-d4e75.firebaseapp.com",
-  projectId: "aprovamaispb-d4e75",
-  storageBucket: "aprovamaispb-d4e75.firebasestorage.app",
-  messagingSenderId: "828577018900",
-  appId: "1:828577018900:web:473d8c3fc2685d3f192301"
+  apiKey: "AIzaSyA8IOr3_gzyCbYqk8RH6lwwgtQLQ0u5ch0",
+  authDomain: "aprovamaispb-73d39.firebaseapp.com",
+  projectId: "aprovamaispb-73d39",
+  storageBucket: "aprovamaispb-73d39.firebasestorage.app",
+  messagingSenderId: "1052452508337",
+  appId: "1:1052452508337:web:0b7919f981aa487c410890",
+  measurementId: "G-M99KFX9636"
 };
 
 // Inicializar Firebase apenas se não estiver inicializado
