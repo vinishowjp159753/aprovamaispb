@@ -250,48 +250,46 @@ CPF: ${aluno.cpf}
         const phone = (aluno.telefone || "").replace(/\D/g,"");
         const linkWhats = `https://api.whatsapp.com/send?phone=55${phone}&text=${encodeURIComponent(mensagem)}`;
 
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-            <td>${formatDate(aluno.Data)}</td>
-            <td>${aluno.Nome||""}</td>
-            <td>${aluno.CPF||""}</td>
-            <td>${aluno.Cupom||""}</td>
-            <td>${aluno.Telefone||""}</td>
-            <td class="${statusClass}">${aluno.Status||""}</td>
-            <td>${aluno.AlunoEthos||""}</td>
-            <td>
-                <button class="table-btn" onclick="toggleStatus('${aluno.id}')">Status</button>
-                <button class="table-btn" onclick="editField('${aluno.id}','valorPago','Atualizar Pagamento')">Pagamento</button>
-                <button class="table-btn" onclick="editField('${aluno.id}','observacoes','Editar Observação')">Observação</button>
-                <button class="table-btn delete" onclick="deleteAluno('${aluno.id}')">Excluir</button>
-            </td>
-            <td><a class="table-btn" target="_blank" href="${linkWhats}">WhatsApp</a></td>
-        `;
+    const phone = (aluno.Telefone || "").replace(/\D/g,"");
+    const linkWhats = `https://api.whatsapp.com/send?phone=55${phone}&text=${encodeURIComponent(mensagem)}`;
 
-        const qrTd = document.createElement("td");
-        const qrCanvas = document.createElement("canvas");
-        const qrUrl = `validar.html?inscricao=${aluno.cupom}`;
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+        <td>${formatDate(aluno.Data)}</td>
+        <td>${aluno.Nome||""}</td>
+        <td>${aluno.CPF||""}</td>
+        <td>${aluno.Cupom||""}</td>
+        <td>${aluno.Telefone||""}</td>
+        <td class="${statusClass}">${aluno.Status||""}</td>
+        <td>${aluno.AlunoEthos||""}</td>
+        <td>
+            <button class="table-btn" onclick="toggleStatus('${aluno.id}')">Status</button>
+            <button class="table-btn delete" onclick="deleteAluno('${aluno.id}')">Excluir</button>
+        </td>
+        <td><a class="table-btn" target="_blank" href="${linkWhats}">WhatsApp</a></td>
+    `;
 
-        // Gera QR
-        QRCode.toCanvas(qrCanvas, qrUrl, { width: 80 }, function (error) {
-            if (error) console.error(error);
-            const qrDataUrl = qrCanvas.toDataURL("image/png");
+    const qrTd = document.createElement("td");
+    const qrCanvas = document.createElement("canvas");
+    const qrUrl = `validar.html?inscricao=${aluno.Cupom}`;
 
-            const qrLink = document.createElement("a");
-            qrLink.href = qrDataUrl;
-            qrLink.download = `inscricao_${aluno.cupom}.png`;
-            qrLink.textContent = "⬇️ Baixar QR";
-            qrLink.className = "table-btn";
-            qrLink.style.display = "block";
-            qrLink.style.marginTop = "6px";
-
-            qrTd.appendChild(qrLink);
-        });
-
-        qrTd.appendChild(qrCanvas);
-        tr.appendChild(qrTd);
-        alunosTableBody.appendChild(tr);
+    QRCode.toCanvas(qrCanvas, qrUrl, { width: 80 }, function (error) {
+        if (error) console.error(error);
+        const qrDataUrl = qrCanvas.toDataURL("image/png");
+        const qrLink = document.createElement("a");
+        qrLink.href = qrDataUrl;
+        qrLink.download = `inscricao_${aluno.Cupom}.png`;
+        qrLink.textContent = "⬇️ Baixar QR";
+        qrLink.className = "table-btn";
+        qrLink.style.display = "block";
+        qrLink.style.marginTop = "6px";
+        qrTd.appendChild(qrLink);
     });
+
+    qrTd.appendChild(qrCanvas);
+    tr.appendChild(qrTd);
+    alunosTableBody.appendChild(tr);
+});
 }
 
 // ---------- Ordenar ----------
@@ -306,11 +304,11 @@ searchInput.addEventListener("input", () => {
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
         const term = searchInput.value.toLowerCase();
-        const filtered = alunosData.filter(a =>
-            a.Nome?.toLowerCase().includes(term) ||
-            a.CPF?.toLowerCase().includes(term) ||
-            a.Cupom?.toLowerCase().includes(term) ||
-            a.AlunoEthos?.toLowerCase().includes(term)
+const filtered = alunosData.filter(a =>
+    a.Nome?.toLowerCase().includes(term) ||
+    a.CPF?.toLowerCase().includes(term) ||
+    a.Cupom?.toLowerCase().includes(term) ||
+    a.AlunoEthos?.toLowerCase().includes(term)
         );
         renderTable(filtered);
     }, 250);
@@ -361,7 +359,7 @@ document.getElementById("backBtn").addEventListener("click", ()=>window.location
 function exportExcel() {
     const header = ["Data","Nome","CPF","N° de Inscrição","Telefone","Status","Aluno Ethos"];
     const rows = alunosData.map(a=>[
-        formatDate(a.criadoEm),
+        formatDate(a.Data),
         a.Nome||"",
         a.CPF||"",
         a.Cupom||"",
