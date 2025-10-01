@@ -29,7 +29,7 @@ body {
     color: #fff;
     border: none;
     padding: 8px 16px;
-    margin: 4px 0;
+    margin: 4px 4px 4px 0;
     border-radius: 6px;
     cursor: pointer;
     font-size: 14px;
@@ -98,6 +98,9 @@ tbody tr:hover { background: rgba(59,95,199,0.2); }
 <div class="container">
     <button id="backBtn" class="table-btn">← Voltar ao Dashboard</button>
     <button id="downloadBtn" class="table-btn">⬇️ Baixar Lista</button>
+    <button id="ativarTodosBtn" class="table-btn">✅ Ativar Todos</button>
+    <button id="desativarTodosBtn" class="table-btn delete">❌ Desativar Todos</button>
+
     <div id="contadorAlunos">Alunos: 0</div>
     <input type="text" id="searchInput" placeholder="Buscar aluno...">
 
@@ -131,6 +134,8 @@ const searchInput      = document.getElementById("searchInput");
 const downloadBtn      = document.getElementById("downloadBtn");
 const dateHeader       = document.getElementById("dateHeader");
 const contadorEl       = document.getElementById("contadorAlunos");
+const ativarTodosBtn   = document.getElementById("ativarTodosBtn");
+const desativarTodosBtn= document.getElementById("desativarTodosBtn");
 
 let alunosData = [];
 let ascendingOrder = true;
@@ -142,7 +147,6 @@ async function loadAlunos() {
         const data = d.data();
         return { id: d.id, ...data };
     });
-    // Ordenar ativos primeiro
     alunosData.sort((a,b)=>{
         if(a.status===b.status) return 0;
         if(a.status==="pendente") return 1;
@@ -173,7 +177,6 @@ function renderTable(data){
         const statusClass = aluno.status==="ativo" ? "status-ativo" : "status-pendente";
 
         const mensagem = `Olá ${aluno.Nome},\n\nSua inscrição está CONFIRMADA!\nNúmero de inscrição: ${aluno.Cupom}\nCPF: ${aluno.CPF}`;
-
         const phone = (aluno.Telefone||"").replace(/\D/g,"");
         const linkWhats = `https://api.whatsapp.com/send?phone=55${phone}&text=${encodeURIComponent(mensagem)}`;
 
@@ -219,7 +222,7 @@ function renderTable(data){
     contadorEl.textContent = `Alunos: ${filtered.length}`;
 }
 
-// Alterar status
+// Alterar status individual
 window.toggleStatus = async function(id){
     const aluno = alunosData.find(a=>a.id===id);
     if(!aluno) return;
@@ -238,6 +241,26 @@ window.deleteAluno = async function(id){
     }
 }
 
+// Ativar todos
+ativarTodosBtn.addEventListener("click", async ()=>{
+    if(confirm("Tem certeza que deseja ATIVAR todos os alunos?")){
+        const updates = alunosData.map(a => updateDoc(doc(db,"inscricoes",a.id), { status: "ativo" }));
+        await Promise.all(updates);
+        loadAlunos();
+        alert("Todos os alunos foram ATIVADOS.");
+    }
+});
+
+// Desativar todos
+desativarTodosBtn.addEventListener("click", async ()=>{
+    if(confirm("Tem certeza que deseja DESATIVAR todos os alunos?")){
+        const updates = alunosData.map(a => updateDoc(doc(db,"inscricoes",a.id), { status: "pendente" }));
+        await Promise.all(updates);
+        loadAlunos();
+        alert("Todos os alunos foram DESATIVADOS.");
+    }
+});
+
 // Busca
 searchInput.addEventListener("input", ()=>renderTable(alunosData));
 
@@ -247,6 +270,7 @@ dateHeader.addEventListener("click", ()=>{
     renderTable(alunosData);
 });
 
+// Exportar para Excel
 downloadBtn.addEventListener("click", ()=>{
     const header = ["Data","Nome","CPF","N° de Inscrição","Telefone","Status","Aluno Ethos"];
     const rows = alunosData.map(a=>[
