@@ -247,9 +247,6 @@ Número de inscrição: ${aluno.cupom}
 CPF: ${aluno.cpf}
         `.trim();
 
-        const phone = (aluno.telefone || "").replace(/\D/g,"");
-        const linkWhats = `https://api.whatsapp.com/send?phone=55${phone}&text=${encodeURIComponent(mensagem)}`;
-
     const phone = (aluno.Telefone || "").replace(/\D/g,"");
     const linkWhats = `https://api.whatsapp.com/send?phone=55${phone}&text=${encodeURIComponent(mensagem)}`;
 
