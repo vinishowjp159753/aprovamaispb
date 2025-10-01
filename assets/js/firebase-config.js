@@ -4,13 +4,13 @@ import { getFirestore } from "https://www.gstatic.com/firebasejs/9.23.0/firebase
 import { getAuth } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyA8IOr3_gzyCbYqk8RH6lwwgtQLQ0u5ch0",
-  authDomain: "aprovamaispb-73d39.firebaseapp.com",
-  projectId: "aprovamaispb-73d39",
-  storageBucket: "aprovamaispb-73d39.firebasestorage.app",
-  messagingSenderId: "1052452508337",
-  appId: "1:1052452508337:web:0b7919f981aa487c410890",
-  measurementId: "G-M99KFX9636"
+  apiKey: "AIzaSyDZwVAAJ1hYzzT3U0Jae59KBEZypmR6hNE",
+  authDomain: "aprovamaispb-ceec4.firebaseapp.com",
+  projectId: "aprovamaispb-ceec4",
+  storageBucket: "aprovamaispb-ceec4.firebasestorage.app",
+  messagingSenderId: "419459930869",
+  appId: "1:419459930869:web:349c510b9b650c78cb83bc",
+  measurementId: "G-GEXTZMR0B1"
 };
 
 const app = initializeApp(firebaseConfig);
