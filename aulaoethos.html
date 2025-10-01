@@ -218,6 +218,13 @@ function gerarCupom() {
     return `APV-${ano}${mes}${dia}-${rand}`;
 }
 
+// Data legível
+function formatarData() {
+    const data = new Date();
+    const pad = n => n.toString().padStart(2,'0');
+    return `${pad(data.getDate())}/${pad(data.getMonth()+1)}/${data.getFullYear()} ${pad(data.getHours())}:${pad(data.getMinutes())}`;
+}
+
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
     successAlert.style.display = 'none';
@@ -243,14 +250,12 @@ form.addEventListener('submit', async (e) => {
     try {
         const snapshot = await getDocs(collection(db, "inscricoes"));
 
-        // Limite de inscrições
         if (snapshot.size >= 230) {
             errorAlert.textContent = "Matrículas encerradas: limite de 230 atingido.";
             errorAlert.style.display = 'block';
             return;
         }
 
-        // Bloqueio de CPF duplicado
         const cpfExistente = snapshot.docs.some(doc => doc.data().CPF === cpf);
         if (cpfExistente) {
             errorAlert.textContent = "Este CPF já foi cadastrado.";
@@ -259,19 +264,18 @@ form.addEventListener('submit', async (e) => {
         }
 
         const cupom = gerarCupom();
+        const dataString = formatarData();
 
-        // Salvar dados no Firestore com os campos exatamente iguais ao da lista
         await addDoc(collection(db, "inscricoes"), {
             Nome: nomeCompleto,
             CPF: cpf,
             Telefone: telefone,
             AlunoEthos: alunoEthos,
             Cupom: cupom,
-            Data: new Date(),
-            Status: "pendente"
+            Status: "pendente",
+            Data: dataString
         });
 
-        // Preencher modal
         document.getElementById('modalNome').textContent = nomeCompleto;
         document.getElementById('modalCPF').textContent = cpf;
         document.getElementById('modalCupom').textContent = cupom;
@@ -288,7 +292,6 @@ form.addEventListener('submit', async (e) => {
     }
 });
 
-// Fechar modal
 closeModal.onclick = () => modal.style.display = 'none';
 modal.querySelector('.modal-overlay').onclick = () => modal.style.display = 'none';
 
