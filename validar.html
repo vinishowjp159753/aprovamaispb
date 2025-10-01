@@ -4,26 +4,84 @@
   <meta charset="UTF-8">
   <title>Validação de Inscrição</title>
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
-    .ok { color: green; font-weight: bold; }
-    .fail { color: red; font-weight: bold; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .card {
+      background: rgba(255,255,255,0.05);
+      padding: 30px;
+      border-radius: 12px;
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    }
+    h1 {
+      margin-bottom: 15px;
+      font-size: 24px;
+      color: #00ffcc;
+    }
+    #resultado {
+      margin-top: 20px;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .ok {
+      color: #00ff99;
+      font-weight: bold;
+    }
+    .fail {
+      color: #ff4d4d;
+      font-weight: bold;
+    }
+    #reader {
+      width: 100%;
+      margin: 20px auto;
+    }
+    button {
+      background: linear-gradient(90deg,#1a2a6c,#3b5fc7);
+      color: #fff;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 15px;
+      font-weight: 500;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+    }
   </style>
 </head>
 <body>
-  <h1>Validação de Matrícula</h1>
-  <div id="resultado">Validando...</div>
+  <div class="card">
+    <h1>Validação de Inscrição</h1>
+    <p>Escaneie o QR Code ou abra pelo link.</p>
+    
+    <div id="reader"></div>
+    <button id="scanBtn">📷 Ler QR Code</button>
 
+    <div id="resultado">Aguardando validação...</div>
+  </div>
+
+  <!-- Firebase -->
   <script type="module">
     import { db } from "./assets/js/firebase-config.js";
     import { collection, getDocs } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-    async function validar() {
-      const params = new URLSearchParams(window.location.search);
-      const inscricao = params.get("inscricao");
-      if (!inscricao) {
-        document.getElementById("resultado").innerHTML = "<span class='fail'>QR Code inválido</span>";
-        return;
-      }
+    async function validar(inscricao) {
+      const resultado = document.getElementById("resultado");
+      resultado.innerHTML = "🔄 Validando...";
 
       const snapshot = await getDocs(collection(db, "inscricoes"));
       const alunos = snapshot.docs.map(d => d.data());
@@ -32,21 +90,45 @@
 
       if (aluno) {
         if (aluno.status === "ativo") {
-          document.getElementById("resultado").innerHTML = `
-            ✅ <span class="ok">Matrícula CONFIRMADA!</span><br>
-            Nome: ${aluno.nomeCompleto}<br>
-            CPF: ${aluno.cpf}<br>
-            Inscrição: ${aluno.cupom}
+          resultado.innerHTML = `
+            ✅ <span class="ok">Matrícula CONFIRMADA!</span><br><br>
+            <b>Nome:</b> ${aluno.nomeCompleto}<br>
+            <b>CPF:</b> ${aluno.cpf}<br>
+            <b>Inscrição:</b> ${aluno.cupom}
           `;
         } else {
-          document.getElementById("resultado").innerHTML = "<span class='fail'>Inscrição encontrada, mas não confirmada.</span>";
+          resultado.innerHTML = "<span class='fail'>⚠️ Inscrição encontrada, mas não confirmada.</span>";
         }
       } else {
-        document.getElementById("resultado").innerHTML = "<span class='fail'>Inscrição não encontrada</span>";
+        resultado.innerHTML = "<span class='fail'>❌ Inscrição não encontrada.</span>";
       }
     }
 
-    validar();
+    // 🔹 Caso venha pelo link
+    const params = new URLSearchParams(window.location.search);
+    const inscricaoParam = params.get("inscricao");
+    if (inscricaoParam) {
+      validar(inscricaoParam);
+    }
+
+    // 🔹 Inicialização do leitor de QR
+    import QrScanner from "https://cdn.jsdelivr.net/npm/qr-scanner@1.4.2/qr-scanner.min.js";
+
+    const scanBtn = document.getElementById("scanBtn");
+    const readerDiv = document.getElementById("reader");
+    let scanner = null;
+
+    scanBtn.addEventListener("click", () => {
+      if (!scanner) {
+        scanner = new QrScanner(readerDiv, result => {
+          scanner.stop();
+          readerDiv.style.display = "none";
+          validar(result.data.replace("validar.html?inscricao=",""));
+        });
+      }
+      readerDiv.style.display = "block";
+      scanner.start();
+    });
   </script>
 </body>
 </html>
