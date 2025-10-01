@@ -235,7 +235,7 @@ function renderTable(data) {
         const statusClass = aluno.status === "ativo" ? "status-ativo" : "status-pendente";
 
         const mensagem = `
-Olá ${aluno.nomeCompleto},
+Olá ${aluno.Nome},
 
 Sua inscrição para o MEGA AULÃO Aprova+ & Colégio Ethos está CONFIRMADA! 🚀
 
@@ -252,13 +252,13 @@ CPF: ${aluno.cpf}
 
         const tr = document.createElement("tr");
         tr.innerHTML = `
-            <td>${formatDate(aluno.criadoEm)}</td>
-            <td>${aluno.nomeCompleto||""}</td>
-            <td>${aluno.cpf||""}</td>
-            <td>${aluno.cupom||""}</td>
-            <td>${aluno.telefone||""}</td>
-            <td class="${statusClass}">${aluno.status||""}</td>
-            <td>${aluno.alunoEthos||""}</td>
+            <td>${formatDate(aluno.Data)}</td>
+            <td>${aluno.Nome||""}</td>
+            <td>${aluno.CPF||""}</td>
+            <td>${aluno.Cupom||""}</td>
+            <td>${aluno.Telefone||""}</td>
+            <td class="${statusClass}">${aluno.Status||""}</td>
+            <td>${aluno.Aluno Ethos||""}</td>
             <td>
                 <button class="table-btn" onclick="toggleStatus('${aluno.id}')">Status</button>
                 <button class="table-btn" onclick="editField('${aluno.id}','valorPago','Atualizar Pagamento')">Pagamento</button>
@@ -307,10 +307,10 @@ searchInput.addEventListener("input", () => {
     debounceTimer = setTimeout(() => {
         const term = searchInput.value.toLowerCase();
         const filtered = alunosData.filter(a =>
-            a.nomeCompleto?.toLowerCase().includes(term) ||
-            a.cpf?.toLowerCase().includes(term) ||
-            a.cupom?.toLowerCase().includes(term) ||
-            a.alunoEthos?.toLowerCase().includes(term)
+            a.Nome?.toLowerCase().includes(term) ||
+            a.CPF?.toLowerCase().includes(term) ||
+            a.Cupom?.toLowerCase().includes(term) ||
+            a.AlunoEthos?.toLowerCase().includes(term)
         );
         renderTable(filtered);
     }, 250);
@@ -362,12 +362,12 @@ function exportExcel() {
     const header = ["Data","Nome","CPF","N° de Inscrição","Telefone","Status","Aluno Ethos"];
     const rows = alunosData.map(a=>[
         formatDate(a.criadoEm),
-        a.nomeCompleto||"",
-        a.cpf||"",
-        a.cupom||"",
-        a.telefone||"",
-        a.status||"",
-        a.alunoEthos||""
+        a.Nome||"",
+        a.CPF||"",
+        a.Cupom||"",
+        a.Telefone||"",
+        a.Status||"",
+        a.AlunoEthos||""
     ]);
     const worksheet = XLSX.utils.aoa_to_sheet([header,...rows]);
     const wb = XLSX.utils.book_new();
