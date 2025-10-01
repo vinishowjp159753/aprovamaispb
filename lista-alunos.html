@@ -3,36 +3,93 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="assets/img/logo_aprovamaispb.png" />
 <title>Lista de Alunos</title>
-<link rel="stylesheet" href="assets/css/lista-alunos.css">
 
 <style>
-/* === BOTÕES ESTILO DA TABELA === */
+body {
+    font-family: "Segoe UI", Roboto, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: #fff;
+}
+.container {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 20px;
+}
 .table-btn {
-    background-color: #f8f8f8;
-    border: 1px solid #ccc;
-    color: #333;
-    padding: 8px 14px;
-    margin-right: 6px;
-    border-radius: 4px;
+    background: linear-gradient(90deg,#1a2a6c,#3b5fc7);
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    margin: 4px 0;
+    border-radius: 6px;
     cursor: pointer;
     font-size: 14px;
-    transition: background 0.2s, color 0.2s;
+    font-weight: 500;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
 }
 .table-btn:hover {
-    background-color: #e0e0e0;
-    color: #000;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
 }
-.btn-container {
-    margin-bottom: 15px;
+.table-btn.delete {
+    background: #ff4d4d;
 }
+.table-btn.delete:hover {
+    background: #ff1a1a;
+}
+#searchInput {
+    width: 100%;
+    padding: 10px 12px;
+    margin: 15px 0;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    outline: none;
+}
+#searchInput:focus {
+    border-color: #1a2a6c;
+    box-shadow: 0 0 8px rgba(26,42,108,0.7);
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    font-size: 14px;
+}
+thead th {
+    background: linear-gradient(90deg,#1a2a6c,#3b5fc7);
+    color: #fff;
+    padding: 12px;
+    text-align: left;
+    cursor: pointer;
+}
+thead th.sort-asc::after { content: " ↑"; }
+thead th.sort-desc::after { content: " ↓"; }
+tbody td {
+    padding: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    vertical-align: top;
+}
+tbody tr:nth-child(even) { background: rgba(255,255,255,0.05); }
+tbody tr:hover { background: rgba(59,95,199,0.2); }
+.status-ativo { color: #00ff99; font-weight: bold; }
+.status-pendente { color: #ffcc00; font-weight: bold; }
 </style>
 </head>
 <body>
 
 <div class="container">
-
-    <!-- BOTÕES NO MESMO ESTILO DA TABELA -->
     <div class="btn-container">
         <button id="backBtn" class="table-btn">← Voltar ao Dashboard</button>
         <button id="downloadBtn" class="table-btn">⬇️ Baixar Lista</button>
@@ -44,164 +101,161 @@
     <table>
         <thead>
             <tr>
+                <th id="dateHeader">Data</th>
                 <th>Nome</th>
-                <th>Turma</th>
-                <th>Número do Pedido</th>
+                <th>CPF</th>
+                <th>N° de Inscrição</th>
                 <th>Telefone</th>
                 <th>Status</th>
+                <th>Aluno Ethos</th>
                 <th>Ações</th>
+                <th>WhatsApp</th>
+                <th>QR Code</th>
             </tr>
         </thead>
         <tbody id="alunosTableBody"></tbody>
     </table>
 </div>
 
-<!-- Modal para Pagamento / Observações -->
-<div id="modal" class="modal">
-    <div class="modal-content">
-        <h3 id="modalTitle"></h3>
-        <input type="text" id="modalInput" placeholder="">
-        <button id="saveModalBtn" class="table-btn">Salvar</button>
-        <button id="closeModalBtn" class="table-btn">Fechar</button>
-    </div>
-</div>
- 
+<script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
 <script type="module">
-import { app, db } from "./assets/js/firebase-config.js";
-import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { db } from "./assets/js/firebase-config.js";
+import { collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 const alunosTableBody = document.getElementById("alunosTableBody");
 const searchInput = document.getElementById("searchInput");
-const modal = document.getElementById("modal");
-const modalTitle = document.getElementById("modalTitle");
-const modalInput = document.getElementById("modalInput");
-const saveModalBtn = document.getElementById("saveModalBtn");
-const closeModalBtn = document.getElementById("closeModalBtn");
 const downloadBtn = document.getElementById("downloadBtn");
+const dateHeader = document.getElementById("dateHeader");
 
 let alunosData = [];
-let selectedAlunoId = null;
-let selectedField = null;
+let ascendingOrder = true;
 
-// Carregar alunos
 async function loadAlunos() {
     const snapshot = await getDocs(collection(db, "inscricoes"));
-    alunosData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    alunosData = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
     renderTable(alunosData);
 }
 
-// Renderizar tabela
 function renderTable(data) {
+    // Primeiro ordena por status (ativos primeiro), depois por data
+    data.sort((a, b) => {
+        if (a.Status !== b.Status) return a.Status === "ativo" ? -1 : 1;
+        const dateA = new Date(a.Data);
+        const dateB = new Date(b.Data);
+        return ascendingOrder ? dateA - dateB : dateB - dateA;
+    });
+
+    dateHeader.classList.toggle("sort-asc", ascendingOrder);
+    dateHeader.classList.toggle("sort-desc", !ascendingOrder);
+
     alunosTableBody.innerHTML = "";
     data.forEach(aluno => {
+        const statusClass = aluno.Status === "ativo" ? "status-ativo" : "status-pendente";
+
+        const mensagem = `Olá ${aluno.Nome},\nSua inscrição para o MEGA AULÃO Aprova+ & Colégio Ethos está CONFIRMADA!\nNúmero de inscrição: ${aluno.Cupom}\nCPF: ${aluno.CPF}`;
+
+        const phone = (aluno.Telefone || "").replace(/\D/g,"");
+        const linkWhats = `https://api.whatsapp.com/send?phone=55${phone}&text=${encodeURIComponent(mensagem)}`;
+
         const tr = document.createElement("tr");
         tr.innerHTML = `
-            <td>${aluno.nomeCompleto || ""}</td>
-            <td>${aluno.turma || ""}</td>
-            <td>${aluno.numeroPedido || ""}</td>
-            <td>${aluno.telefone || ""}</td>
-            <td>${aluno.status || ""}</td>
+            <td>${aluno.Data}</td>
+            <td>${aluno.Nome||""}</td>
+            <td>${aluno.CPF||""}</td>
+            <td>${aluno.Cupom||""}</td>
+            <td>${aluno.Telefone||""}</td>
+            <td class="${statusClass}">${aluno.Status||""}</td>
+            <td>${aluno.AlunoEthos||""}</td>
             <td>
                 <button class="table-btn" onclick="toggleStatus('${aluno.id}')">Status</button>
-                <button class="table-btn" onclick="editField('${aluno.id}', 'valorPago', 'Atualizar Pagamento')">Pagamento</button>
-                <button class="table-btn" onclick="editField('${aluno.id}', 'observacoes', 'Editar Observação')">Observação</button>
-                <button class="table-btn" onclick="deleteAluno('${aluno.id}')">Excluir</button>
+                <button class="table-btn delete" onclick="deleteAluno('${aluno.id}')">Excluir</button>
             </td>
+            <td><a class="table-btn" target="_blank" href="${linkWhats}">WhatsApp</a></td>
         `;
+
+        const qrTd = document.createElement("td");
+        const qrCanvas = document.createElement("canvas");
+        const qrUrl = `validar.html?inscricao=${aluno.Cupom}`;
+
+        QRCode.toCanvas(qrCanvas, qrUrl, { width: 80 }, function (error) {
+            if (error) console.error(error);
+            const qrDataUrl = qrCanvas.toDataURL("image/png");
+            const qrLink = document.createElement("a");
+            qrLink.href = qrDataUrl;
+            qrLink.download = `inscricao_${aluno.Cupom}.png`;
+            qrLink.textContent = "⬇️ Baixar QR";
+            qrLink.className = "table-btn";
+            qrLink.style.display = "block";
+            qrLink.style.marginTop = "6px";
+            qrTd.appendChild(qrLink);
+        });
+
+        qrTd.appendChild(qrCanvas);
+        tr.appendChild(qrTd);
         alunosTableBody.appendChild(tr);
     });
 }
 
-// Busca
-searchInput.addEventListener("input", () => {
-    const term = searchInput.value.toLowerCase();
-    const filtered = alunosData.filter(a => a.nomeCompleto?.toLowerCase().includes(term));
-    renderTable(filtered);
-});
-
 // Funções globais
 window.toggleStatus = async (id) => {
-    const aluno = alunosData.find(a => a.id === id);
+    const aluno = alunosData.find(a => a.id===id);
     if (!aluno) return;
-    const newStatus = aluno.status === "ativo" ? "pendente" : "ativo";
-    await updateDoc(doc(db, "inscricoes", id), { status: newStatus });
+    const newStatus = aluno.Status==="ativo"?"pendente":"ativo";
+    await updateDoc(doc(db,"inscricoes",id),{ Status:newStatus });
     loadAlunos();
 };
-
-window.editField = (id, field, title) => {
-    selectedAlunoId = id;
-    selectedField = field;
-    modalTitle.textContent = title;
-    const aluno = alunosData.find(a => a.id === id);
-    modalInput.value = aluno[field] || "";
-    modal.style.display = "flex";
-};
-
-saveModalBtn.addEventListener("click", async () => {
-    if (!selectedAlunoId || !selectedField) return;
-    const value = modalInput.value;
-    await updateDoc(doc(db, "inscricoes", selectedAlunoId), { [selectedField]: value });
-    modal.style.display = "none";
-    selectedAlunoId = null;
-    selectedField = null;
-    loadAlunos();
-});
-
-closeModalBtn.addEventListener("click", () => {
-    modal.style.display = "none";
-    selectedAlunoId = null;
-    selectedField = null;
-});
 
 window.deleteAluno = async (id) => {
-    if (confirm("Tem certeza que deseja excluir este aluno?")) {
-        await deleteDoc(doc(db, "inscricoes", id));
+    if(confirm("Tem certeza que deseja excluir este aluno?")) {
+        await deleteDoc(doc(db,"inscricoes",id));
         loadAlunos();
     }
 };
 
-// Voltar ao dashboard
-document.getElementById("backBtn").addEventListener("click", () => {
-    window.location.href = "dashboard.html";
+dateHeader.addEventListener("click", () => {
+    ascendingOrder = !ascendingOrder;
+    renderTable(alunosData);
 });
 
-// === Download CSV limpo ===
-function exportCSV() {
-    if (alunosData.length === 0) {
-        alert("Nenhum aluno para exportar.");
-        return;
-    }
+let debounceTimer;
+searchInput.addEventListener("input", () => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+        const term = searchInput.value.toLowerCase();
+        const filtered = alunosData.filter(a =>
+            (a.Nome || "").toLowerCase().includes(term) ||
+            (a.CPF || "").toLowerCase().includes(term) ||
+            (a.Cupom || "").toLowerCase().includes(term) ||
+            (a.AlunoEthos || "").toLowerCase().includes(term)
+        );
+        renderTable(filtered);
+    }, 250);
+});
 
-    const header = ["Nome","Turma","Número do Pedido","Telefone","Status"];
-    const rows = alunosData.map(a => [
-        a.nomeCompleto || "",
-        a.turma || "",
-        a.numeroPedido || "",
-        a.telefone || "",
-        a.status || ""
+// Exportar Excel
+downloadBtn.addEventListener("click", () => {
+    const header = ["Data","Nome","CPF","N° de Inscrição","Telefone","Status","Aluno Ethos"];
+    const rows = alunosData.map(a=>[
+        a.Data,
+        a.Nome||"",
+        a.CPF||"",
+        a.Cupom||"",
+        a.Telefone||"",
+        a.Status||"",
+        a.AlunoEthos||""
     ]);
+    const worksheet = XLSX.utils.aoa_to_sheet([header,...rows]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, worksheet,"Lista Alunos");
+    XLSX.writeFile(wb,"lista_alunos.xlsx");
+});
 
-    let csvContent = header.join(",") + "\r\n"; // cabeçalho
-    rows.forEach(row => {
-        csvContent += row.join(",") + "\r\n";
-    });
+// Voltar
+document.getElementById("backBtn").addEventListener("click", ()=>window.location.href="dashboard.html");
 
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "lista_alunos.csv";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-
-// Evento botão download
-downloadBtn.addEventListener("click", exportCSV);
-
-// Inicializa
 loadAlunos();
 </script>
-
 </body>
 </html>
