@@ -25,11 +25,11 @@ function renderizarTabela() {
     alunosFiltrados.forEach(aluno => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
-            <td>${aluno.nomeCompleto || ""}</td>
-            <td>${aluno.turma || ""}</td>
-            <td>${aluno.numeroPedido || ""}</td>
-            <td>${aluno.telefone || ""}</td>
-            <td>${aluno.status || ""}</td>
+            <td>${aluno.Nome || ""}</td>
+            <td>${aluno.Turma || ""}</td>
+            <td>${aluno.Cupom || ""}</td>
+            <td>${aluno.Telefone || ""}</td>
+            <td>${aluno.Status || ""}</td>
             <td>
                 <button class="btn-status">${aluno.status === "pendente" ? "Ativar" : "Ativo"}</button>
                 <button class="btn-excluir">Excluir</button>
