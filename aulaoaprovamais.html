@@ -213,17 +213,18 @@ async function loadAlunos() {
 }
 
 // ---------- Formatador ----------
-function formatDate(firebaseDate) {
-    if (!firebaseDate) return "";
-    const d = firebaseDate.toDate ? firebaseDate.toDate() : new Date(firebaseDate);
+function formatDate(dataStr) {
+    if (!dataStr) return "";
+    const d = new Date(dataStr);
+    if (isNaN(d)) return dataStr;
     return d.toLocaleDateString("pt-BR", { day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit" });
 }
 
 // ---------- Montar tabela ----------
 function renderTable(data) {
     data.sort((a, b) => {
-        const dateA = a.Data.toDate ? a.Data.toDate() : new Date(a.Data);
-        const dateB = b.Data.toDate ? b.Data.toDate() : new Date(b.Data);
+        const dateA = a.Data ? new Date(a.Data) : new Date(0);
+        const dateB = b.Data ? new Date(b.Data) : new Date(0);
         return ascendingOrder ? dateA - dateB : dateB - dateA;
     });
 
@@ -232,10 +233,10 @@ function renderTable(data) {
 
     alunosTableBody.innerHTML = "";
     data.forEach(aluno => {
-        const statusClass = aluno.status === "ativo" ? "status-ativo" : "status-pendente";
+        const statusClass = (aluno.Status||"").toLowerCase() === "ativo" ? "status-ativo" : "status-pendente";
 
         const mensagem = `
-Olá ${aluno.Nome},
+Olá ${aluno.Nome || ""},
 
 Sua inscrição para o MEGA AULÃO Aprova+ & Colégio Ethos está CONFIRMADA! 🚀
 
@@ -243,50 +244,50 @@ Sua inscrição para o MEGA AULÃO Aprova+ & Colégio Ethos está CONFIRMADA! �
 ⏰ Horário: 8h às 12h
 📍 Local: Senac – Av. Dom Pedro I, 389 – Centro
 
-Número de inscrição: ${aluno.cupom}
-CPF: ${aluno.cpf}
+Número de inscrição: ${aluno.Cupom || ""}
+CPF: ${aluno.CPF || ""}
         `.trim();
 
-    const phone = (aluno.Telefone || "").replace(/\D/g,"");
-    const linkWhats = `https://api.whatsapp.com/send?phone=55${phone}&text=${encodeURIComponent(mensagem)}`;
+        const phone = (aluno.Telefone || "").replace(/\D/g,"");
+        const linkWhats = `https://api.whatsapp.com/send?phone=55${phone}&text=${encodeURIComponent(mensagem)}`;
 
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-        <td>${formatDate(aluno.Data)}</td>
-        <td>${aluno.Nome||""}</td>
-        <td>${aluno.CPF||""}</td>
-        <td>${aluno.Cupom||""}</td>
-        <td>${aluno.Telefone||""}</td>
-        <td class="${statusClass}">${aluno.Status||""}</td>
-        <td>${aluno.AlunoEthos||""}</td>
-        <td>
-            <button class="table-btn" onclick="toggleStatus('${aluno.id}')">Status</button>
-            <button class="table-btn delete" onclick="deleteAluno('${aluno.id}')">Excluir</button>
-        </td>
-        <td><a class="table-btn" target="_blank" href="${linkWhats}">WhatsApp</a></td>
-    `;
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${formatDate(aluno.Data)}</td>
+            <td>${aluno.Nome || ""}</td>
+            <td>${aluno.CPF || ""}</td>
+            <td>${aluno.Cupom || ""}</td>
+            <td>${aluno.Telefone || ""}</td>
+            <td class="${statusClass}">${aluno.Status || ""}</td>
+            <td>${aluno.AlunoEthos || ""}</td>
+            <td>
+                <button class="table-btn" onclick="toggleStatus('${aluno.id}')">Status</button>
+                <button class="table-btn delete" onclick="deleteAluno('${aluno.id}')">Excluir</button>
+            </td>
+            <td><a class="table-btn" target="_blank" href="${linkWhats}">WhatsApp</a></td>
+        `;
 
-    const qrTd = document.createElement("td");
-    const qrCanvas = document.createElement("canvas");
-    const qrUrl = `validar.html?inscricao=${aluno.Cupom}`;
+        const qrTd = document.createElement("td");
+        const qrCanvas = document.createElement("canvas");
+        const qrUrl = `validar.html?inscricao=${aluno.Cupom || ""}`;
 
-    QRCode.toCanvas(qrCanvas, qrUrl, { width: 80 }, function (error) {
-        if (error) console.error(error);
-        const qrDataUrl = qrCanvas.toDataURL("image/png");
-        const qrLink = document.createElement("a");
-        qrLink.href = qrDataUrl;
-        qrLink.download = `inscricao_${aluno.Cupom}.png`;
-        qrLink.textContent = "⬇️ Baixar QR";
-        qrLink.className = "table-btn";
-        qrLink.style.display = "block";
-        qrLink.style.marginTop = "6px";
-        qrTd.appendChild(qrLink);
+        QRCode.toCanvas(qrCanvas, qrUrl, { width: 80 }, function (error) {
+            if (error) console.error(error);
+            const qrDataUrl = qrCanvas.toDataURL("image/png");
+            const qrLink = document.createElement("a");
+            qrLink.href = qrDataUrl;
+            qrLink.download = `inscricao_${aluno.Cupom || ""}.png`;
+            qrLink.textContent = "⬇️ Baixar QR";
+            qrLink.className = "table-btn";
+            qrLink.style.display = "block";
+            qrLink.style.marginTop = "6px";
+            qrTd.appendChild(qrLink);
+        });
+
+        qrTd.appendChild(qrCanvas);
+        tr.appendChild(qrTd);
+        alunosTableBody.appendChild(tr);
     });
-
-    qrTd.appendChild(qrCanvas);
-    tr.appendChild(qrTd);
-    alunosTableBody.appendChild(tr);
-});
 }
 
 // ---------- Ordenar ----------
@@ -301,11 +302,11 @@ searchInput.addEventListener("input", () => {
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
         const term = searchInput.value.toLowerCase();
-const filtered = alunosData.filter(a =>
-    a.Nome?.toLowerCase().includes(term) ||
-    a.CPF?.toLowerCase().includes(term) ||
-    a.Cupom?.toLowerCase().includes(term) ||
-    a.AlunoEthos?.toLowerCase().includes(term)
+        const filtered = alunosData.filter(a =>
+            (a.Nome||"").toLowerCase().includes(term) ||
+            (a.CPF||"").toLowerCase().includes(term) ||
+            (a.Cupom||"").toLowerCase().includes(term) ||
+            (a.AlunoEthos||"").toLowerCase().includes(term)
         );
         renderTable(filtered);
     }, 250);
@@ -315,8 +316,8 @@ const filtered = alunosData.filter(a =>
 window.toggleStatus = async (id) => {
     const aluno = alunosData.find(a => a.id===id);
     if (!aluno) return;
-    const newStatus = aluno.status==="ativo"?"pendente":"ativo";
-    await updateDoc(doc(db,"inscricoes",id),{ status:newStatus });
+    const newStatus = (aluno.Status||"").toLowerCase() === "ativo" ? "pendente" : "ativo";
+    await updateDoc(doc(db,"inscricoes",id),{ Status:newStatus });
     loadAlunos();
 };
 
