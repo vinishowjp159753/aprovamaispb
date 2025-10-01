@@ -42,9 +42,10 @@
       color: #ff4d4d;
       font-weight: bold;
     }
-    #reader {
+    video {
       width: 100%;
-      margin: 20px auto;
+      border-radius: 8px;
+      margin-top: 15px;
     }
     button {
       background: linear-gradient(90deg,#1a2a6c,#3b5fc7);
@@ -68,7 +69,7 @@
     <h1>Validação de Inscrição</h1>
     <p>Escaneie o QR Code ou abra pelo link.</p>
     
-    <div id="reader"></div>
+    <video id="qr-video" muted playsinline></video>
     <button id="scanBtn">📷 Ler QR Code</button>
 
     <div id="resultado">Aguardando validação...</div>
@@ -78,6 +79,11 @@
   <script type="module">
     import { db } from "./assets/js/firebase-config.js";
     import { collection, getDocs } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+    import QrScanner from "https://cdn.jsdelivr.net/npm/qr-scanner@1.4.2/qr-scanner.min.js";
+
+    const videoElem = document.getElementById("qr-video");
+    const scanBtn = document.getElementById("scanBtn");
+    let scanner = null;
 
     async function validar(inscricao) {
       const resultado = document.getElementById("resultado");
@@ -104,29 +110,21 @@
       }
     }
 
-    // 🔹 Caso venha pelo link
+    // Caso venha pelo link
     const params = new URLSearchParams(window.location.search);
     const inscricaoParam = params.get("inscricao");
     if (inscricaoParam) {
       validar(inscricaoParam);
     }
 
-    // 🔹 Inicialização do leitor de QR
-    import QrScanner from "https://cdn.jsdelivr.net/npm/qr-scanner@1.4.2/qr-scanner.min.js";
-
-    const scanBtn = document.getElementById("scanBtn");
-    const readerDiv = document.getElementById("reader");
-    let scanner = null;
-
+    // Botão para abrir câmera
     scanBtn.addEventListener("click", () => {
       if (!scanner) {
-        scanner = new QrScanner(readerDiv, result => {
+        scanner = new QrScanner(videoElem, result => {
           scanner.stop();
-          readerDiv.style.display = "none";
           validar(result.data.replace("validar.html?inscricao=",""));
         });
       }
-      readerDiv.style.display = "block";
       scanner.start();
     });
   </script>
