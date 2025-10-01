@@ -21,15 +21,15 @@ async function updateDashboard() {
         alunosSnapshot.forEach(docSnap => {
             const data = docSnap.data();
 
-            if (data.turma) turmasSet.add(data.turma);
+            if (data.Turma) turmasSet.add(data.Turma);
 
-            // Converte criadoEm para Date corretamente
+            // Converte Data para Date corretamente
             let dateObj = null;
-            if (data.criadoEm) {
-                if (typeof data.criadoEm === "object" && data.criadoEm.toDate) {
-                    dateObj = data.criadoEm.toDate(); // Timestamp Firebase
+            if (data.Data) {
+                if (typeof data.Data === "object" && data.Data.toDate) {
+                    dateObj = data.Data.toDate(); // String
                 } else {
-                    dateObj = new Date(data.criadoEm);
+                    dateObj = new Date(data.Data);
                 }
             }
 
@@ -68,13 +68,13 @@ function updateCharts(alunosSnapshot) {
     alunosSnapshot.forEach(docSnap => {
         const data = docSnap.data();
 
-        // Converte criadoEm para Date
+        // Converte Data para Date
         let dateObj = null;
-        if (data.criadoEm) {
-            if (typeof data.criadoEm === "object" && data.criadoEm.toDate) {
-                dateObj = data.criadoEm.toDate();
+        if (data.Data) {
+            if (typeof data.Data === "object" && data.Data.toDate) {
+                dateObj = data.Data.toDate();
             } else {
-                dateObj = new Date(data.criadoEm);
+                dateObj = new Date(data.Data);
             }
         }
 
