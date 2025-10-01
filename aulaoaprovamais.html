@@ -20,10 +20,6 @@ body {
     margin: 30px auto;
     padding: 20px;
 }
-#contadorAlunos {
-    font-size: 16px;
-    margin-bottom: 10px;
-}
 .table-btn {
     background: linear-gradient(90deg,#1a2a6c,#3b5fc7);
     color: #fff;
@@ -44,12 +40,8 @@ body {
     transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(0,0,0,0.3);
 }
-.table-btn.delete {
-    background: #ff4d4d;
-}
-.table-btn.delete:hover {
-    background: #ff1a1a;
-}
+.table-btn.delete { background: #ff4d4d; }
+.table-btn.delete:hover { background: #ff1a1a; }
 #searchInput {
     width: 100%;
     padding: 10px 12px;
@@ -58,7 +50,6 @@ body {
     border: 1px solid #ccc;
     font-size: 14px;
     outline: none;
-    transition: box-shadow 0.2s, border-color 0.2s;
 }
 #searchInput:focus {
     border-color: #1a2a6c;
@@ -78,33 +69,33 @@ thead th {
     color: #fff;
     padding: 12px;
     text-align: left;
-    cursor: pointer;
 }
-thead th.sort-asc::after { content: " ↑"; }
-thead th.sort-desc::after { content: " ↓"; }
-tbody td {
-    padding: 10px;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    vertical-align: top;
-}
+tbody td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
 tbody tr:nth-child(even) { background: rgba(255,255,255,0.05); }
 tbody tr:hover { background: rgba(59,95,199,0.2); }
 .status-ativo { color: #00ff99; font-weight: bold; }
 .status-pendente { color: #ffcc00; font-weight: bold; }
+h1 { text-align:center; font-size:28px; margin-bottom:10px; }
+#contadorAlunos { margin-bottom: 15px; font-weight: bold; font-size:16px; }
+.btn-container { margin-bottom:20px; display:flex; flex-wrap:wrap; gap:10px; }
 </style>
 </head>
 <body>
 
 <div class="container">
-    <button id="backBtn" class="table-btn">← Voltar ao Dashboard</button>
-    <button id="downloadBtn" class="table-btn">⬇️ Baixar Lista</button>
+    <div class="btn-container">
+        <button id="backBtn" class="table-btn">← Voltar ao Dashboard</button>
+        <button id="downloadBtn" class="table-btn">⬇️ Baixar Lista</button>
+    </div>
+
+    <h1>Lista de Alunos</h1>
     <div id="contadorAlunos">Alunos: 0</div>
     <input type="text" id="searchInput" placeholder="Buscar aluno...">
 
     <table>
         <thead>
             <tr>
-                <th id="dateHeader">Data</th>
+                <th>Data</th>
                 <th>Nome</th>
                 <th>CPF</th>
                 <th>N° de Inscrição</th>
@@ -120,151 +111,9 @@ tbody tr:hover { background: rgba(59,95,199,0.2); }
     </table>
 </div>
 
+<!-- Scripts -->
 <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
-<script type="module">
-import { db } from "./assets/js/firebase-config.js";
-import { collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+<script type="module" src="./assets/js/listaAlunos.js"></script>
 
-const alunosTableBody = document.getElementById("alunosTableBody");
-const searchInput      = document.getElementById("searchInput");
-const downloadBtn      = document.getElementById("downloadBtn");
-const dateHeader       = document.getElementById("dateHeader");
-const contadorEl       = document.getElementById("contadorAlunos");
-
-let alunosData = [];
-let ascendingOrder = true;
-
-// ---------- Carregar alunos ----------
-async function loadAlunos() {
-    const snapshot = await getDocs(collection(db, "inscricoes"));
-    alunosData = snapshot.docs.map(d => {
-        const data = d.data();
-        return { id: d.id, ...data };
-    });
-    // Ordenar ativos primeiro
-    alunosData.sort((a,b)=>{
-        if(a.status===b.status) return 0;
-        if(a.status==="pendente") return 1;
-        return -1;
-    });
-    renderTable(alunosData);
-}
-
-// ---------- Formatador ----------
-function formatDate(dataStr) {
-    if(!dataStr) return "";
-    const d = new Date(dataStr);
-    return d.toLocaleString("pt-BR", { day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit" });
-}
-
-// ---------- Montar tabela ----------
-function renderTable(data){
-    const term = searchInput.value.toLowerCase();
-    const filtered = data.filter(a =>
-        (a.Nome||"").toLowerCase().includes(term) ||
-        (a.CPF||"").toLowerCase().includes(term) ||
-        (a.Cupom||"").toLowerCase().includes(term) ||
-        ((a["Aluno Ethos"]||"").toLowerCase().includes(term))
-    );
-
-    alunosTableBody.innerHTML = "";
-    filtered.forEach(aluno => {
-        const statusClass = aluno.status==="ativo" ? "status-ativo" : "status-pendente";
-
-        const mensagem = `Olá ${aluno.Nome},\n\nSua inscrição está CONFIRMADA!\nNúmero de inscrição: ${aluno.Cupom}\nCPF: ${aluno.CPF}`;
-
-        const phone = (aluno.Telefone||"").replace(/\D/g,"");
-        const linkWhats = `https://api.whatsapp.com/send?phone=55${phone}&text=${encodeURIComponent(mensagem)}`;
-
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-            <td>${formatDate(aluno.Data)}</td>
-            <td>${aluno.Nome||""}</td>
-            <td>${aluno.CPF||""}</td>
-            <td>${aluno.Cupom||""}</td>
-            <td>${aluno.Telefone||""}</td>
-            <td class="${statusClass}">${aluno.status||""}</td>
-            <td>${aluno["Aluno Ethos"]||""}</td>
-            <td>
-                <button class="table-btn" onclick="toggleStatus('${aluno.id}')">Status</button>
-                <button class="table-btn delete" onclick="deleteAluno('${aluno.id}')">Excluir</button>
-                <button class="table-btn">Pagamento</button>
-                <button class="table-btn">Observação</button>
-            </td>
-            <td><a class="table-btn" target="_blank" href="${linkWhats}">WhatsApp</a></td>
-        `;
-
-        // QR Code
-        const qrTd = document.createElement("td");
-        const qrCanvas = document.createElement("canvas");
-        const qrUrl = `validar.html?inscricao=${aluno.Cupom}`;
-        QRCode.toCanvas(qrCanvas, qrUrl, { width: 80 }, function(err){
-            if(err) console.error(err);
-            const qrLink = document.createElement("a");
-            qrLink.href = qrCanvas.toDataURL("image/png");
-            qrLink.download = `inscricao_${aluno.Cupom}.png`;
-            qrLink.textContent = "⬇️ Baixar QR";
-            qrLink.className = "table-btn";
-            qrLink.style.display = "block";
-            qrLink.style.marginTop = "6px";
-            qrTd.appendChild(qrLink);
-        });
-        qrTd.appendChild(qrCanvas);
-        tr.appendChild(qrTd);
-
-        alunosTableBody.appendChild(tr);
-    });
-
-    contadorEl.textContent = `Alunos: ${filtered.length}`;
-}
-
-// Alterar status
-window.toggleStatus = async function(id){
-    const aluno = alunosData.find(a=>a.id===id);
-    if(!aluno) return;
-    const novoStatus = aluno.status==="pendente" ? "ativo" : "pendente";
-    await updateDoc(doc(db,"inscricoes",id),{ status: novoStatus });
-    loadAlunos();
-}
-
-// Excluir aluno
-window.deleteAluno = async function(id){
-    const aluno = alunosData.find(a=>a.id===id);
-    if(!aluno) return;
-    if(confirm(`Deseja excluir ${aluno.Nome}?`)){
-        await deleteDoc(doc(db,"inscricoes",id));
-        loadAlunos();
-    }
-}
-
-// Busca
-searchInput.addEventListener("input", ()=>renderTable(alunosData));
-
-// Ordenar por data
-dateHeader.addEventListener("click", ()=>{
-    ascendingOrder = !ascendingOrder;
-    renderTable(alunosData);
-});
-
-downloadBtn.addEventListener("click", ()=>{
-    const header = ["Data","Nome","CPF","N° de Inscrição","Telefone","Status","Aluno Ethos"];
-    const rows = alunosData.map(a=>[
-        formatDate(a.Data),
-        a.Nome||"",
-        a.CPF||"",
-        a.Cupom||"",
-        a.Telefone||"",
-        a.status||"",
-        a["Aluno Ethos"]||""
-    ]);
-    const ws = XLSX.utils.aoa_to_sheet([header,...rows]);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws,"Alunos");
-    XLSX.writeFile(wb,"lista_alunos.xlsx");
-});
-
-loadAlunos();
-</script>
 </body>
 </html>
