@@ -251,7 +251,7 @@ form.addEventListener('submit', async (e) => {
         }
 
         // Bloqueio de CPF duplicado
-        const cpfExistente = snapshot.docs.some(doc => doc.data().cpf === cpf);
+        const cpfExistente = snapshot.docs.some(doc => doc.data().CPF === cpf);
         if (cpfExistente) {
             errorAlert.textContent = "Este CPF já foi cadastrado.";
             errorAlert.style.display = 'block';
@@ -260,9 +260,15 @@ form.addEventListener('submit', async (e) => {
 
         const cupom = gerarCupom();
 
+        // Salvar dados no Firestore com os campos exatamente iguais ao da lista
         await addDoc(collection(db, "inscricoes"), {
-            nomeCompleto, cpf, telefone, alunoEthos,
-            cupom, criadoEm: new Date()
+            Nome: nomeCompleto,
+            CPF: cpf,
+            Telefone: telefone,
+            AlunoEthos: alunoEthos,
+            Cupom: cupom,
+            Data: new Date(),
+            Status: "pendente"
         });
 
         // Preencher modal
