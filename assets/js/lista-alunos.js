@@ -20,32 +20,38 @@ async function carregarAlunos() {
 function renderizarTabela() {
     tabela.innerHTML = "";
     const filtro = statusFilter.value;
-    const alunosFiltrados = filtro === "todos" ? alunosCache : alunosCache.filter(a => a.status === filtro);
+
+    // Corrigido para pegar Status com maiúscula
+    const alunosFiltrados = filtro === "todos" 
+        ? alunosCache 
+        : alunosCache.filter(a => (a.Status || "").toLowerCase() === filtro);
 
     alunosFiltrados.forEach(aluno => {
         const tr = document.createElement("tr");
+        const statusAtual = (aluno.Status || "pendente").toLowerCase();
+
         tr.innerHTML = `
             <td>${aluno.Nome || ""}</td>
             <td>${aluno.Turma || ""}</td>
             <td>${aluno.Cupom || ""}</td>
             <td>${aluno.Telefone || ""}</td>
-            <td>${aluno.Status || ""}</td>
+            <td>${statusAtual}</td>
             <td>
-                <button class="btn-status">${aluno.status === "pendente" ? "Ativar" : "Ativo"}</button>
+                <button class="btn-status">${statusAtual === "pendente" ? "Ativar" : "Desativar"}</button>
                 <button class="btn-excluir">Excluir</button>
             </td>
         `;
 
         // Botão alterar status
         tr.querySelector(".btn-status").addEventListener("click", async () => {
-            const novoStatus = aluno.status === "pendente" ? "ativo" : "pendente";
-            await updateDoc(doc(db, "inscricoes", aluno.id), { status: novoStatus });
+            const novoStatus = statusAtual === "pendente" ? "ativo" : "pendente";
+            await updateDoc(doc(db, "inscricoes", aluno.id), { Status: novoStatus }); // Corrigido para maiúscula
             carregarAlunos();
         });
 
         // Botão excluir
         tr.querySelector(".btn-excluir").addEventListener("click", async () => {
-            if (confirm(`Deseja excluir o aluno ${aluno.nomeCompleto}?`)) {
+            if (confirm(`Deseja excluir o aluno ${aluno.Nome}?`)) { // Corrigido para Nome
                 await deleteDoc(doc(db, "inscricoes", aluno.id));
                 carregarAlunos();
             }
