@@ -20,14 +20,10 @@ body {
     margin: 30px auto;
     padding: 20px;
 }
-.header-top {
-    display:flex;
-    justify-content: space-between;
-    align-items: center;
+#contadorAlunos {
+    font-size: 16px;
     margin-bottom: 10px;
 }
-.header-top h1 { margin:0; }
-.header-top .contador { font-weight:bold; font-size:16px; }
 .table-btn {
     background: linear-gradient(90deg,#1a2a6c,#3b5fc7);
     color: #fff;
@@ -100,10 +96,9 @@ tbody tr:hover { background: rgba(59,95,199,0.2); }
 <body>
 
 <div class="container">
-    <div class="header-top">
-        <h1>Lista de Alunos</h1>
-        <div class="contador">Total: <span id="contador">0</span></div>
-    </div>
+    <button id="backBtn" class="table-btn">← Voltar ao Dashboard</button>
+    <button id="downloadBtn" class="table-btn">⬇️ Baixar Lista</button>
+    <div id="contadorAlunos">Alunos: 0</div>
     <input type="text" id="searchInput" placeholder="Buscar aluno...">
 
     <table>
@@ -114,8 +109,8 @@ tbody tr:hover { background: rgba(59,95,199,0.2); }
                 <th>CPF</th>
                 <th>N° de Inscrição</th>
                 <th>Telefone</th>
-                <th>Aluno Ethos</th>
                 <th>Status</th>
+                <th>Aluno Ethos</th>
                 <th>Ações</th>
                 <th>WhatsApp</th>
                 <th>QR Code</th>
@@ -127,72 +122,75 @@ tbody tr:hover { background: rgba(59,95,199,0.2); }
 
 <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
-
 <script type="module">
 import { db } from "./assets/js/firebase-config.js";
-import { collection, getDocs, updateDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 const alunosTableBody = document.getElementById("alunosTableBody");
 const searchInput      = document.getElementById("searchInput");
-const contadorEl       = document.getElementById("contador");
+const downloadBtn      = document.getElementById("downloadBtn");
 const dateHeader       = document.getElementById("dateHeader");
+const contadorEl       = document.getElementById("contadorAlunos");
 
 let alunosData = [];
 let ascendingOrder = true;
 
+// ---------- Carregar alunos ----------
 async function loadAlunos() {
     const snapshot = await getDocs(collection(db, "inscricoes"));
-    alunosData = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    alunosData = snapshot.docs.map(d => {
+        const data = d.data();
+        return { id: d.id, ...data };
+    });
+    // Ordenar ativos primeiro
+    alunosData.sort((a,b)=>{
+        if(a.status===b.status) return 0;
+        if(a.status==="pendente") return 1;
+        return -1;
+    });
     renderTable(alunosData);
 }
 
+// ---------- Formatador ----------
 function formatDate(dataStr) {
-    if (!dataStr) return "";
+    if(!dataStr) return "";
     const d = new Date(dataStr);
-    return d.toLocaleDateString("pt-BR", { day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit" });
+    return d.toLocaleString("pt-BR", { day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit" });
 }
 
-function renderTable(data) {
-    // Ordena pendentes por último
-    data.sort((a, b) => {
-        if (a.status === "pendente" && b.status !== "pendente") return 1;
-        if (a.status !== "pendente" && b.status === "pendente") return -1;
-        const dateA = new Date(a.Data || 0);
-        const dateB = new Date(b.Data || 0);
-        return ascendingOrder ? dateA - dateB : dateB - dateA;
-    });
-
-    dateHeader.classList.toggle("sort-asc", ascendingOrder);
-    dateHeader.classList.toggle("sort-desc", !ascendingOrder);
-
-    // Aplica busca
+// ---------- Montar tabela ----------
+function renderTable(data){
     const term = searchInput.value.toLowerCase();
     const filtered = data.filter(a =>
-        (a.Nome || "").toLowerCase().includes(term) ||
-        (a.CPF || "").toLowerCase().includes(term) ||
-        (a.Cupom || "").toLowerCase().includes(term) ||
-        (a["Aluno Ethos"] || "").toLowerCase().includes(term)
+        (a.Nome||"").toLowerCase().includes(term) ||
+        (a.CPF||"").toLowerCase().includes(term) ||
+        (a.Cupom||"").toLowerCase().includes(term) ||
+        ((a["Aluno Ethos"]||"").toLowerCase().includes(term))
     );
 
     alunosTableBody.innerHTML = "";
     filtered.forEach(aluno => {
-        const statusClass = aluno.status === "ativo" ? "status-ativo" : "status-pendente";
+        const statusClass = aluno.status==="ativo" ? "status-ativo" : "status-pendente";
+
+        const mensagem = `Olá ${aluno.Nome},\n\nSua inscrição está CONFIRMADA!\nNúmero de inscrição: ${aluno.Cupom}\nCPF: ${aluno.CPF}`;
+
+        const phone = (aluno.Telefone||"").replace(/\D/g,"");
+        const linkWhats = `https://api.whatsapp.com/send?phone=55${phone}&text=${encodeURIComponent(mensagem)}`;
+
         const tr = document.createElement("tr");
-
-        const phone = (aluno.Telefone || "").replace(/\D/g,"");
-        const linkWhats = `https://api.whatsapp.com/send?phone=55${phone}&text=${encodeURIComponent(`Olá ${aluno.Nome}, sua inscrição está CONFIRMADA!`)}`;
-
         tr.innerHTML = `
             <td>${formatDate(aluno.Data)}</td>
             <td>${aluno.Nome||""}</td>
             <td>${aluno.CPF||""}</td>
             <td>${aluno.Cupom||""}</td>
             <td>${aluno.Telefone||""}</td>
-            <td>${aluno["Aluno Ethos"]||""}</td>
             <td class="${statusClass}">${aluno.status||""}</td>
+            <td>${aluno["Aluno Ethos"]||""}</td>
             <td>
-                <button class="table-btn" onclick="toggleStatus('${aluno.id}')">${aluno.status==="ativo"?"Desativar":"Ativar"}</button>
+                <button class="table-btn" onclick="toggleStatus('${aluno.id}')">Status</button>
                 <button class="table-btn delete" onclick="deleteAluno('${aluno.id}')">Excluir</button>
+                <button class="table-btn">Pagamento</button>
+                <button class="table-btn">Observação</button>
             </td>
             <td><a class="table-btn" target="_blank" href="${linkWhats}">WhatsApp</a></td>
         `;
@@ -201,18 +199,28 @@ function renderTable(data) {
         const qrTd = document.createElement("td");
         const qrCanvas = document.createElement("canvas");
         const qrUrl = `validar.html?inscricao=${aluno.Cupom}`;
-        QRCode.toCanvas(qrCanvas, qrUrl, { width: 80 }, (err)=>{ if(err) console.error(err); });
+        QRCode.toCanvas(qrCanvas, qrUrl, { width: 80 }, function(err){
+            if(err) console.error(err);
+            const qrLink = document.createElement("a");
+            qrLink.href = qrCanvas.toDataURL("image/png");
+            qrLink.download = `inscricao_${aluno.Cupom}.png`;
+            qrLink.textContent = "⬇️ Baixar QR";
+            qrLink.className = "table-btn";
+            qrLink.style.display = "block";
+            qrLink.style.marginTop = "6px";
+            qrTd.appendChild(qrLink);
+        });
         qrTd.appendChild(qrCanvas);
         tr.appendChild(qrTd);
 
         alunosTableBody.appendChild(tr);
     });
 
-    contadorEl.textContent = filtered.length;
+    contadorEl.textContent = `Alunos: ${filtered.length}`;
 }
 
 // Alterar status
-window.toggleStatus = async function(id) {
+window.toggleStatus = async function(id){
     const aluno = alunosData.find(a=>a.id===id);
     if(!aluno) return;
     const novoStatus = aluno.status==="pendente" ? "ativo" : "pendente";
@@ -221,22 +229,39 @@ window.toggleStatus = async function(id) {
 }
 
 // Excluir aluno
-window.deleteAluno = async function(id) {
+window.deleteAluno = async function(id){
     const aluno = alunosData.find(a=>a.id===id);
     if(!aluno) return;
-    if(confirm(`Deseja excluir ${aluno.Nome}?`)) {
+    if(confirm(`Deseja excluir ${aluno.Nome}?`)){
         await deleteDoc(doc(db,"inscricoes",id));
         loadAlunos();
     }
 }
 
 // Busca
-searchInput.addEventListener("input",()=>renderTable(alunosData));
+searchInput.addEventListener("input", ()=>renderTable(alunosData));
 
 // Ordenar por data
 dateHeader.addEventListener("click", ()=>{
     ascendingOrder = !ascendingOrder;
     renderTable(alunosData);
+});
+
+downloadBtn.addEventListener("click", ()=>{
+    const header = ["Data","Nome","CPF","N° de Inscrição","Telefone","Status","Aluno Ethos"];
+    const rows = alunosData.map(a=>[
+        formatDate(a.Data),
+        a.Nome||"",
+        a.CPF||"",
+        a.Cupom||"",
+        a.Telefone||"",
+        a.status||"",
+        a["Aluno Ethos"]||""
+    ]);
+    const ws = XLSX.utils.aoa_to_sheet([header,...rows]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws,"Alunos");
+    XLSX.writeFile(wb,"lista_alunos.xlsx");
 });
 
 loadAlunos();
