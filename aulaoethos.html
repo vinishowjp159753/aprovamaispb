@@ -44,23 +44,6 @@ body {
 .alert.error { background:#ffebee; color:#d32f2f; border:1px solid #ffcdd2; }
 #cupom { font-weight:bold; color:var(--primary); margin-top:10px; word-break: break-word; }
 
-/* Consulta de matrícula */
-.consulta {
-    margin-top: 30px;
-    border-top: 2px solid #ddd;
-    padding-top: 20px;
-}
-.consulta h2 {
-    text-align:center;
-    color:#333;
-    margin-bottom:10px;
-}
-#consultaResultado {
-    margin-top:15px;
-    text-align:center;
-    font-weight:600;
-}
-
 /* Modal */
 .confirmation-modal {
     position: fixed;
@@ -176,184 +159,14 @@ body {
             </div>
             <button type="submit" class="btn">Realizar Matrícula</button>
         </form>
-
-        <!-- Consulta de matrícula -->
-        <div class="consulta">
-            <h2>🔍 Consultar Matrícula</h2>
-            <input type="text" id="cpfConsulta" placeholder="Digite seu CPF" style="width:100%;padding:12px 15px;border:1px solid #ccc;border-radius:6px;font-size:16px;">
-            <button id="btnConsulta" class="btn" style="margin-top:10px;">Consultar</button>
-            <div id="consultaResultado"></div>
-        </div>
     </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 // Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyDZwVAAJ1hYzzT3U0Jae59KBEZypmR6hNE",
-  authDomain: "aprovamaispb-ceec4.firebaseapp.com",
-  projectId: "aprovamaispb-ceec4",
-  storageBucket: "aprovamaispb-ceec4.firebasestorage.app",
-  messagingSenderId: "419459930869",
-  appId: "1:419459930869:web:349c510b9b650c78cb83bc",
-  measurementId: "G-GEXTZMR0B1"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-const form = document.getElementById('matriculaForm');
-const successAlert = document.getElementById('successAlert');
-const errorAlert = document.getElementById('errorAlert');
-const cupomEl = document.getElementById('cupom');
-const modal = document.getElementById('confirmationModal');
-const closeModal = document.getElementById('closeModal');
-const cpfConsulta = document.getElementById('cpfConsulta');
-const btnConsulta = document.getElementById('btnConsulta');
-const consultaResultado = document.getElementById('consultaResultado');
-
-// CPF Validation
-function validarCPF(cpf) {
-    cpf = cpf.replace(/[^\d]+/g,'');
-    if(cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false;
-    let soma = 0, resto;
-    for (let i=1; i<=9; i++) soma += parseInt(cpf.substring(i-1,i)) * (11-i);
-    resto = (soma * 10) % 11; if(resto===10 || resto===11) resto=0;
-    if(resto !== parseInt(cpf.substring(9,10))) return false;
-    soma = 0;
-    for(let i=1;i<=10;i++) soma += parseInt(cpf.substring(i-1,i))*(12-i);
-    resto = (soma*10)%11; if(resto===10 || resto===11) resto=0;
-    return resto === parseInt(cpf.substring(10,11));
-}
-
-// Gera cupom
-function gerarCupom() {
-    const data = new Date();
-    const pad = n => n.toString().padStart(2,'0');
-    const rand = Math.random().toString(36).substring(2,6).toUpperCase();
-    return `APV-${data.getFullYear()}${pad(data.getMonth()+1)}${pad(data.getDate())}-${rand}`;
-}
-
-// Data formatada
-function formatarData() {
-    const data = new Date();
-    const pad = n => n.toString().padStart(2,'0');
-    return `${pad(data.getDate())}/${pad(data.getMonth()+1)}/${data.getFullYear()} ${pad(data.getHours())}:${pad(data.getMinutes())}`;
-}
-
-// Submissão do formulário
-form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    successAlert.style.display = 'none';
-    errorAlert.style.display = 'none';
-    modal.style.display = 'none';
-
-    const nomeCompleto = document.getElementById('nomeCompleto').value.trim();
-    const cpf = document.getElementById('cpf').value.trim();
-    const telefone = document.getElementById('telefone').value.trim();
-    const alunoEthos = document.querySelector('input[name="alunoEthos"]:checked')?.value;
-
-    if (!nomeCompleto || !cpf || !telefone || !alunoEthos) {
-        errorAlert.textContent = "Preencha todos os campos corretamente.";
-        errorAlert.style.display = 'block';
-        return;
-    }
-
-    if (!validarCPF(cpf)) {
-        errorAlert.textContent = "CPF inválido.";
-        errorAlert.style.display = 'block';
-        return;
-    }
-
-    try {
-        const snapshot = await getDocs(collection(db, "inscricoes"));
-        const nomeLower = nomeCompleto.toLowerCase().trim();
-
-        const duplicado = snapshot.docs.some(doc => {
-            const data = doc.data();
-            return (
-                data.CPF === cpf ||
-                data.Nome.toLowerCase().trim() === nomeLower
-            );
-        });
-
-        if (duplicado) {
-            errorAlert.textContent = "Este CPF ou nome já foi cadastrado.";
-            errorAlert.style.display = 'block';
-            return;
-        }
-
-        const cupom = gerarCupom();
-        const dataString = formatarData();
-
-        await addDoc(collection(db, "inscricoes"), {
-            Nome: nomeCompleto,
-            CPF: cpf,
-            Telefone: telefone,
-            AlunoEthos: alunoEthos,
-            Cupom: cupom,
-            Status: "pendente",
-            Data: dataString
-        });
-
-        document.getElementById('modalNome').textContent = nomeCompleto;
-        document.getElementById('modalCPF').textContent = cpf;
-        document.getElementById('modalCupom').textContent = cupom;
-        modal.style.display = 'flex';
-        successAlert.style.display = 'block';
-        cupomEl.textContent = cupom;
-        form.reset();
-
-    } catch (err) {
-        console.error(err);
-        errorAlert.textContent = "Erro ao salvar matrícula.";
-        errorAlert.style.display = 'block';
-    }
-});
-
-closeModal.onclick = () => modal.style.display = 'none';
-modal.querySelector('.modal-overlay').onclick = () => modal.style.display = 'none';
-
-// Consulta de matrícula
-btnConsulta.addEventListener('click', async () => {
-    const cpfBusca = cpfConsulta.value.trim();
-    consultaResultado.textContent = "";
-    if (!validarCPF(cpfBusca)) {
-        consultaResultado.style.color = "#d32f2f";
-        consultaResultado.textContent = "❌ CPF inválido.";
-        return;
-    }
-
-    const snapshot = await getDocs(collection(db, "inscricoes"));
-    const inscricao = snapshot.docs.find(doc => doc.data().CPF === cpfBusca);
-
-    if (inscricao) {
-        consultaResultado.style.color = "#2e7d32";
-        consultaResultado.textContent = `✅ Matrícula encontrada! Seu código: ${inscricao.data().Cupom}`;
-    } else {
-        consultaResultado.style.color = "#d32f2f";
-        consultaResultado.textContent = "❌ Nenhuma matrícula encontrada.";
-    }
-});
-
-// Máscaras
-document.getElementById('cpf').addEventListener('input', function(){
-    let v = this.value.replace(/\D/g,'');
-    if(v.length>3 && v.length<=6) v=v.replace(/(\d{3})(\d+)/,'$1.$2');
-    else if(v.length>6 && v.length<=9) v=v.replace(/(\d{3})(\d{3})(\d+)/,'$1.$2.$3');
-    else if(v.length>9) v=v.replace(/(\d{3})(\d{3})(\d{3})(\d+)/,'$1.$2.$3-$4');
-    this.value = v;
-});
-document.getElementById('telefone').addEventListener('input', function(){
-    let v = this.value.replace(/\D/g,'');
-    if(v.length>2 && v.length<=7) v=v.replace(/(\d{2})(\d+)/,'($1) $2');
-    else if(v.length>7) v=v.replace(/(\d{2})(\d{5})(\d+)/,'($1) $2-$3');
-    this.value = v;
-});
-</script>
-
-</body>
-</html>
+  aut
