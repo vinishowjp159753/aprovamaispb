@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="AprovaMaisPB - Curso preparatório inteligente para o ENEM" />
+  <title>AprovaMaisPB</title>
+  <script src="firebase-config.js"></script>
+  <link rel="stylesheet" href="notification-system.css">
+  <link rel="stylesheet" href="./assets/css/style.css" />
+  <link rel="icon" type="image/png" href="./assets/img/logo_aprovamaispb.png" />
+</head>
+<body>
+  <header>
+    <nav class="nav">
+      <div class="brand">
+        <img src="./assets/img/logo_aprovamaispb.png" alt="Logo" />
+        <span>AprovaMaisPB</span>
+      </div>
+      <ul class="menu">
+        <li><a href="index.html">Início</a></li>
+        <li><a href="matricula.html">Matricule-se</a></li>
+        <li><a href="login.html">Dashboard</a></li>
+      </ul>
+      <button class="hamburger" aria-label="menu" onclick="toggleMenu()">☰</button>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="hero-inner">
+      <h1>O próximo aprovado pode ser você!</h1>
+      <p>Prepare-se para o ENEM com o curso que mais aprova na Paraíba.</p>
+      <a class="cta" href="matricula.html">Quero me matricular</a>
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="container">
+      <h2>Por que escolher o AprovaMaisPB?</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">📚</div>
+          <h3>Material Atualizado</h3>
+          <p>Conteúdo alinhado com o último edital do ENEM</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">👨‍🏫</div>
+          <h3>Professores Qualificados</h3>
+          <p>Equipe especializada em aprovação no ENEM</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3>Simulados Regulares</h3>
+          <p>Teste seus conhecimentos com simulados mensais</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="info-enem">
+    <div class="container">
+      <h2>Dicas rápidas para o ENEM</h2>
+      <ul class="tips">
+        <li><strong>Organize um cronograma:</strong> Separe horários de estudo para cada área do conhecimento.</li>
+        <li><strong>Resolva provas anteriores:</strong> Familiarize-se com o estilo das questões e tempo de prova.</li>
+        <li><strong>Redação:</strong> Pratique temas, aprenda estrutura (introdução, desenvolvimento, conclusão) e revise coesão e coerência.</li>
+        <li><strong>Saúde:</strong> Durma bem, alimente-se e faça pausas — rendimento melhora com equilíbrio.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>AprovaMaisPB</h3>
+        <p>O curso preparatório inteligente para o ENEM</p>
+      </div>
+      <div class="footer-section">
+        <h3>Contato</h3>
+        <p>Email: contato@aprovamaispb.com</p>
+        <p>Telefone: (83) 99662-7827</p>
+      </div>
+      <div class="footer-section">
+        <h3>Redes Sociais</h3>
+        <div class="social-icons">
+          <a href="#">Instagram</a>
+          <a href="#">Facebook</a>
+          <a href="#">YouTube</a>
+        </div>
+      </div>
+    </div>
+    <p class="copyright">© 2025 AprovaMaisPB - Todos os direitos reservados.</p>
+  </footer>
+
+<script>
+function toggleMenu(){
+  document.querySelector('.menu').classList.toggle('open');
+}
+</script>
+  <script src="notification-system.js"></script>
+  <script src="firebase-integration.js"></script>
+</body>
+</html>
