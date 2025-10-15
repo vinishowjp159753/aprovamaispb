@@ -127,37 +127,6 @@ function hideLoader(){ loader.style.display="none"; }
 // Voltar para dashboard
 backBtn.addEventListener("click", () => { window.location.href = "dashboard.html"; });
 
-// Função corrigida para aceitar formato brasileiro e ISO
-function formatDate(dataStr) {
-    if (!dataStr) return "";
-
-    // Se for Timestamp do Firestore
-    if (typeof dataStr === "object" && dataStr.seconds) {
-        const d = new Date(dataStr.seconds * 1000);
-        return d.toLocaleString("pt-BR", { day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit" });
-    }
-
-    // Se for string "dd/mm/yyyy hh:mm"
-    const partes = dataStr.split(/[/ :]/);
-    if (partes.length >= 3) {
-        const [dia, mes, ano, hora = 0, minuto = 0] = partes.map(Number);
-        const d = new Date(ano, mes - 1, dia, hora, minuto);
-        if (!isNaN(d.getTime())) {
-            return d.toLocaleString("pt-BR", {
-                day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit"
-            });
-        }
-    }
-
-    // Se for formato ISO
-    const d = new Date(dataStr);
-    if (!isNaN(d.getTime())) {
-        return d.toLocaleString("pt-BR", { day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit" });
-    }
-
-    return dataStr;
-}
-
 // Carregar alunos
 async function loadAlunos() {
     showLoader();
@@ -167,4 +136,187 @@ async function loadAlunos() {
         alunosData.sort((a,b)=>{
             if(!a.Data) return 1;
             if(!b.Data) return -1;
-            return ascendingOrder ? new Date(a.Data) - new Date(b.Data) : new Date(b.Data
+            return ascendingOrder ? new Date(a.Data) - new Date(b.Data) : new Date(b.Data) - new Date(a.Data);
+        });
+        renderTable(alunosData);
+    } catch(err){
+        console.error(err);
+        alert("Erro ao carregar alunos!");
+    } finally {
+        hideLoader();
+    }
+}
+
+// ✅ NOVA função formatDate — agora compatível com datas em string brasileira
+function formatDate(dataStr) {
+    if (!dataStr) return "";
+
+    // Caso venha no formato brasileiro "dd/mm/yyyy hh:mm"
+    const partes = dataStr.split(/[/ :]/);
+    if (partes.length >= 3) {
+        const [dia, mes, ano, hora = 0, minuto = 0] = partes.map(Number);
+        const d = new Date(ano, mes - 1, dia, hora, minuto);
+        if (!isNaN(d.getTime())) {
+            return d.toLocaleString("pt-BR", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            });
+        }
+    }
+
+    // Caso venha no formato ISO
+    const d = new Date(dataStr);
+    if (!isNaN(d.getTime())) {
+        return d.toLocaleString("pt-BR", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+        });
+    }
+
+    return dataStr; // retorna original se nada der certo
+}
+
+// Renderizar tabela
+function renderTable(data){
+    const term = searchInput.value.toLowerCase();
+    const filtered = data.filter(a =>
+        (a.Nome||"").toLowerCase().includes(term) ||
+        (a.CPF||"").toLowerCase().includes(term) ||
+        (a.Cupom||"").toLowerCase().includes(term) ||
+        ((a["Aluno Ethos"]||"").toLowerCase().includes(term))
+    );
+
+    alunosTableBody.innerHTML = "";
+    filtered.forEach(aluno => {
+        const statusClass = aluno.status==="ativo" ? "status-ativo" : "status-pendente";
+        const mensagem = `Olá ${aluno.Nome},\n\nSua inscrição está CONFIRMADA!\nNúmero de inscrição: ${aluno.Cupom}\nCPF: ${aluno.CPF}`;
+        const phone = (aluno.Telefone||"").replace(/\D/g,"");
+        const linkWhats = `https://api.whatsapp.com/send?phone=55${phone}&text=${encodeURIComponent(mensagem)}`;
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${formatDate(aluno.Data)}</td>
+            <td>${aluno.Nome||""}</td>
+            <td>${aluno.CPF||""}</td>
+            <td>${aluno.Cupom||""}</td>
+            <td>${aluno.Telefone||""}</td>
+            <td class="${statusClass}">${aluno.status||""}</td>
+            <td>${aluno["Aluno Ethos"]||""}</td>
+            <td>
+                <button class="table-btn" onclick="toggleStatus('${aluno.id}')">Status</button>
+                <button class="table-btn delete" onclick="deleteAluno('${aluno.id}')">Excluir</button>
+                <button class="table-btn">Pagamento</button>
+                <button class="table-btn">Observação</button>
+            </td>
+            <td><a class="table-btn" target="_blank" href="${linkWhats}">WhatsApp</a></td>
+            <td>
+                <button class="table-btn" onclick="baixarQR('${aluno.Cupom}')">⬇️ Baixar QR</button>
+                <canvas id="qr_${aluno.Cupom}" style="display:none;"></canvas>
+            </td>
+        `;
+        alunosTableBody.appendChild(tr);
+    });
+    contadorEl.textContent = `Alunos: ${filtered.length}`;
+}
+
+// Alterar status individual
+window.toggleStatus = async function(id){
+    const aluno = alunosData.find(a=>a.id===id);
+    if(!aluno) return;
+    showLoader();
+    try {
+        const novoStatus = aluno.status==="pendente" ? "ativo" : "pendente";
+        await updateDoc(doc(db,"inscricoes",id),{ status: novoStatus });
+        await loadAlunos();
+    } catch(err){
+        console.error(err);
+        alert("Erro ao atualizar status!");
+    } finally {
+        hideLoader();
+    }
+}
+
+// Excluir aluno
+window.deleteAluno = async function(id){
+    const aluno = alunosData.find(a=>a.id===id);
+    if(!aluno) return;
+    if(confirm(`Deseja excluir ${aluno.Nome}?`)){
+        showLoader();
+        try {
+            await deleteDoc(doc(db,"inscricoes",id));
+            await loadAlunos();
+        } catch(err){
+            console.error(err);
+            alert("Erro ao excluir aluno!");
+        } finally {
+            hideLoader();
+        }
+    }
+}
+
+// Ativar/Desativar todos com batch
+async function atualizarTodos(status){
+    if(!confirm(`Tem certeza que deseja ${status==="ativo"?"ATIVAR":"DESATIVAR"} todos os alunos?`)) return;
+    showLoader();
+    try {
+        const batch = writeBatch(db);
+        alunosData.forEach(a=> batch.update(doc(db,"inscricoes",a.id), { status }) );
+        await batch.commit();
+        await loadAlunos();
+        alert(`Todos os alunos foram ${status==="ativo"?"ATIVADOS":"DESATIVADOS"}.`);
+    } catch(err){
+        console.error(err);
+        alert("Erro ao atualizar todos os alunos!");
+    } finally {
+        hideLoader();
+    }
+}
+ativarTodosBtn.addEventListener("click", ()=> atualizarTodos("ativo"));
+desativarTodosBtn.addEventListener("click", ()=> atualizarTodos("pendente"));
+
+// Gerar QR sob demanda
+window.baixarQR = function(cupom){
+    const canvas = document.getElementById(`qr_${cupom}`);
+    const url = `validar.html?inscricao=${cupom}`;
+    QRCode.toCanvas(canvas, url, { width: 150 }, function(err){
+        if(err){ alert("Erro ao gerar QR"); return; }
+        const link = document.createElement("a");
+        link.href = canvas.toDataURL("image/png");
+        link.download = `inscricao_${cupom}.png`;
+        link.click();
+    });
+}
+
+// Busca
+searchInput.addEventListener("input", ()=> renderTable(alunosData));
+
+// Ordenar por data
+dateHeader.addEventListener("click", ()=>{ ascendingOrder=!ascendingOrder; renderTable(alunosData); });
+
+// Exportar Excel (somente alunos filtrados)
+downloadBtn.addEventListener("click", ()=>{
+    const filtered = alunosData.filter(a =>
+        (a.Nome||"").toLowerCase().includes(searchInput.value.toLowerCase()) ||
+        (a.CPF||"").toLowerCase().includes(searchInput.value.toLowerCase()) ||
+        (a.Cupom||"").toLowerCase().includes(searchInput.value.toLowerCase())
+    );
+    const header = ["Data","Nome","CPF","N° de Inscrição","Telefone","Status","Aluno Ethos"];
+    const rows = filtered.map(a=>[
+        formatDate(a.Data), a.Nome||"", a.CPF||"", a.Cupom||"", a.Telefone||"", a.status||"", a["Aluno Ethos"]||""
+    ]);
+    const ws = XLSX.utils.aoa_to_sheet([header,...rows]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws,"Alunos");
+    XLSX.writeFile(wb,"lista_alunos.xlsx");
+});
+
+loadAlunos();
+</script>
+</body>
+</html>
