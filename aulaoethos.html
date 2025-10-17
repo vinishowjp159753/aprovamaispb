@@ -4,21 +4,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mega Aulão ENEM - Inscrições Encerradas</title>
-  <link rel="icon" type="image/png" href="logo_aprovamaispb.png">
+  <link rel="icon" type="image/png" href="assets/img/logo_aprovamaispb.png">
   <style>
     body {
       margin: 0;
       font-family: 'Poppins', sans-serif;
-      background-color: #007BFF;
       color: #222;
-      background-image: url('logo_aprovamaispb.png'); /* pode usar várias logos como padrão */
+      background-color: #007BFF;
+      background-image: url('assets/img/logo_aprovamaispb.png');
       background-repeat: repeat;
-      background-size: 150px;
-      background-blend-mode: overlay;
+      background-size: 120px;
+      background-blend-mode: lighten;
+      background-attachment: fixed;
     }
 
     .overlay {
-      background: rgba(255, 255, 255, 0.95);
+      background: rgba(255, 255, 255, 0.92);
       min-height: 100vh;
       display: flex;
       justify-content: center;
@@ -31,25 +32,28 @@
       background: #fff;
       border-radius: 20px;
       padding: 40px;
-      max-width: 500px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      max-width: 480px;
+      width: 90%;
+      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
       animation: fadeIn 1s ease;
     }
 
     .card img {
-      width: 150px;
+      width: 160px;
       margin-bottom: 20px;
     }
 
     h1 {
       color: #007BFF;
-      font-size: 1.8rem;
+      font-size: 1.9rem;
+      margin-bottom: 10px;
     }
 
     p {
       font-size: 1rem;
       margin: 15px 0;
       color: #333;
+      line-height: 1.5;
     }
 
     a.whatsapp-button {
@@ -60,29 +64,45 @@
       padding: 12px 25px;
       border-radius: 30px;
       font-weight: 600;
-      transition: background 0.3s ease;
+      transition: background 0.3s ease, transform 0.2s ease;
     }
 
     a.whatsapp-button:hover {
       background-color: #1ebe5d;
+      transform: scale(1.05);
     }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
     }
+
+    @media (max-width: 500px) {
+      .card {
+        padding: 30px 20px;
+      }
+
+      .card img {
+        width: 120px;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="overlay">
     <div class="card">
-      <img src="logo_aprovamaispb.png" alt="Logo Aprova+">
+      <img src="assets/img/logo_aprovamaispb.png" alt="Logo Aprova+">
       <h1>Inscrições Encerradas</h1>
       <p>As inscrições para o <strong>Mega Aulão do ENEM</strong> foram encerradas! 🎓</p>
       <p>Se você ainda tem alguma dúvida, entre em contato com a nossa equipe pelo WhatsApp:</p>
-      <a class="whatsapp-button" href="https://wa.me/558396627827?text=Vim%20pelo%20site%20e%20quero%20tirar%20d%C3%BAvidas" target="_blank">Falar no WhatsApp</a>
+      <a class="whatsapp-button" href="https://wa.me/558396627827?text=Vim%20pelo%20site%20e%20quero%20tirar%20d%C3%BAvidas" target="_blank">
+        Falar no WhatsApp
+      </a>
     </div>
   </div>
 </body>
 </html>
-
