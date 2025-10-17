@@ -1,523 +1,80 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AprovaMaisPB - Login</title>
-    <!-- Importação do Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        
-        .container {
-            width: 100%;
-            max-width: 450px;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-        }
-        
-        .header {
-            background: #1a2a6c;
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-        
-        .logo {
-            max-width: 120px;
-            margin-bottom: 15px;
-        }
-        
-        .header h1 {
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-        
-        .content {
-            padding: 25px;
-        }
-        
-        .input-group {
-            margin-bottom: 20px;
-        }
-        
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-        }
-        
-        .input-group select, 
-        .input-group input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-        
-        .input-group select:focus, 
-        .input-group input:focus {
-            border-color: #1a2a6c;
-            outline: none;
-        }
-        
-        .input-group input[type="password"] {
-            letter-spacing: 3px;
-            font-weight: bold;
-            font-family: 'Courier New', monospace;
-        }
-        
-        .password-container {
-            position: relative;
-        }
-        
-        .toggle-password {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #666;
-        }
-        
-        .btn {
-            background: #1a2a6c;
-            color: white;
-            border: none;
-            padding: 14px 20px;
-            width: 100%;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        
-        .btn:hover {
-            background: #2a3a9c;
-        }
-        
-        .btn:disabled {
-            background: #cccccc;
-            cursor: not-allowed;
-        }
-        
-        .error-message {
-            color: #d32f2f;
-            text-align: center;
-            margin: 15px 0;
-            font-weight: 500;
-            padding: 10px;
-            background: #ffebee;
-            border-radius: 6px;
-            display: none;
-        }
-        
-        .info-box {
-            background: #e3f2fd;
-            border-left: 4px solid #2196f3;
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        
-        .info-box h3 {
-            margin-bottom: 8px;
-            color: #1565c0;
-        }
-        
-        .credentials {
-            margin-top: 10px;
-            padding: 10px;
-            background: #bbdefb;
-            border-radius: 4px;
-            font-size: 13px;
-        }
-        
-        .credentials summary {
-            cursor: pointer;
-            font-weight: 600;
-        }
-        
-        .credentials p {
-            margin: 8px 0;
-        }
-        
-        .footer {
-            text-align: center;
-            padding: 15px;
-            background: #f5f5f5;
-            color: #666;
-            font-size: 14px;
-        }
-        
-        .success-message {
-            display: none;
-            background: #e8f5e9;
-            color: #2e7d32;
-            padding: 15px;
-            border-radius: 6px;
-            text-align: center;
-            margin-top: 15px;
-            border-left: 4px solid #4caf50;
-        }
-        
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        @media (max-width: 500px) {
-            .container {
-                width: 95%;
-            }
-            
-            .header h1 {
-                font-size: 20px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acesso Restrito - AprovaMaisPB</title>
+  <link rel="icon" type="image/png" href="assets/img/logo_aprovamaispb.png" />
+  <link rel="stylesheet" href="assets/css/login.css">
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <img src="assets/img/logo_aprovamaispb.png" alt="Logo AprovaMaisPB" class="logo" onerror="this.style.display='none'">
-            <h1>AprovaMaisPB</h1>
-            <p>Acesso Restrito ao Sistema</p>
-        </div>
+  <div class="login-container">
+    <div class="login-box">
+      <img src="assets/img/logo_aprovamaispb.png" alt="Logo AprovaMaisPB" class="logo">
+      <h2>Área Restrita</h2>
+      
+      <form id="loginForm">
+        <label for="email">Usuário (e-mail)</label>
+        <input type="email" id="email" placeholder="Digite seu e-mail" required>
         
-        <div class="content">
-            <div class="input-group">
-                <label for="tipoAcesso">Tipo de Acesso:</label>
-                <select id="tipoAcesso">
-                    <option value="professor">Professor</option>
-                    <option value="administrador">Administrador</option>
-                </select>
-            </div>
-            
-            <div class="input-group">
-                <label for="usuario">Usuário:</label>
-                <input type="text" id="usuario" placeholder="Digite seu usuário" autocomplete="username">
-            </div>
-            
-            <div class="input-group">
-                <label for="senha">Senha:</label>
-                <div class="password-container">
-                    <input type="password" id="senha" placeholder="Digite sua senha" autocomplete="current-password">
-                    <button type="button" id="togglePassword" class="toggle-password">👁️</button>
-                </div>
-            </div>
-            
-            <div class="error-message" id="errorMessage">
-                Usuário ou senha incorretos!
-            </div>
-            
-            <button class="btn" id="btnEntrar">
-                <span id="btnText">Entrar no Sistema</span>
-                <span id="btnLoading" class="loading" style="display: none;"></span>
-            </button>
-            
-            <div class="success-message" id="successMessage">
-                Autenticação bem-sucedida! Conectando ao sistema...
-            </div>
-        </div>
-        
-        <div class="footer">
-            <p>Sistema AprovaMaisPB &copy; 2023 - Todos os direitos reservados</p>
-        </div>
+        <label for="password">Senha</label>
+        <input type="password" id="password" placeholder="Digite sua senha" required>
+
+        <button type="submit">Entrar</button>
+      </form>
+
+      <p id="loginMessage" class="message"></p>
     </div>
+  </div>
 
-    <script>
-        // Configuração do Firebase
-        const firebaseConfig = {
-  apiKey: "AIzaSyDZwVAAJ1hYzzT3U0Jae59KBEZypmR6hNE",
-  authDomain: "aprovamaispb-ceec4.firebaseapp.com",
-  projectId: "aprovamaispb-ceec4",
-  storageBucket: "aprovamaispb-ceec4.firebasestorage.app",
-  messagingSenderId: "419459930869",
-  appId: "1:419459930869:web:349c510b9b650c78cb83bc",
-  measurementId: "G-GEXTZMR0B1"
-        };
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-        // Inicializar Firebase
-        if (typeof firebase !== 'undefined' && !firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        } else if (typeof firebase !== 'undefined') {
-            console.log("Firebase já inicializado");
-        }
-        
-        // Referência para Firestore
-        const db = firebase.firestore();
-        
-        // Elementos da interface
-        const tipoAcesso = document.getElementById('tipoAcesso');
-        const usuario = document.getElementById('usuario');
-        const senha = document.getElementById('senha');
-        const btnEntrar = document.getElementById('btnEntrar');
-        const btnText = document.getElementById('btnText');
-        const btnLoading = document.getElementById('btnLoading');
-        const togglePassword = document.getElementById('togglePassword');
-        const errorMessage = document.getElementById('errorMessage');
-        const successMessage = document.getElementById('successMessage');
-        
-        /* =========================
-           FUNÇÕES DE AUTENTICAÇÃO
-           ========================= */
-        
-        /**
-         * Autentica um professor
-         * @param {string} usuario - Nome de usuário
-         * @param {string} senha - Senha
-         * @returns {Promise<boolean>} - True se autenticado com sucesso
-         */
-        async function autenticarProfessor(usuario, senha) {
-            try {
-                const snapshot = await db.collection("professores")
-                    .where("usuario", "==", usuario)
-                    .where("senha", "==", senha)
-                    .where("status", "==", "ativo")
-                    .get();
-                    
-                if (!snapshot.empty) {
-                    return true;
-                }
-                
-                // Fallback para credenciais padrão
-                if (usuario === "professor" && senha === "123456") {
-                    // Verificar se o professor padrão existe, se não, criar
-                    const professorPadrao = await db.collection("professores")
-                        .where("usuario", "==", "professor")
-                        .get();
-                        
-                    if (professorPadrao.empty) {
-                        await db.collection("professores").add({
-                            usuario: "professor",
-                            senha: "123456",
-                            nome: "Professor Exemplo",
-                            email: "professor@aprovamaispb.com",
-                            status: "ativo",
-                            criadoEm: firebase.firestore.FieldValue.serverTimestamp()
-                        });
-                    }
-                    return true;
-                }
-                
-                return false;
-            } catch (err) {
-                console.error("Erro ao autenticar professor:", err);
-                return false;
-            }
-        }
+    // 🔥 Configuração do Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDZwVAAJ1hYzzT3U0Jae59KBEZypmR6hNE",
+      authDomain: "aprovamaispb-ceec4.firebaseapp.com",
+      projectId: "aprovamaispb-ceec4",
+      storageBucket: "aprovamaispb-ceec4.firebasestorage.app",
+      messagingSenderId: "419459930869",
+      appId: "1:419459930869:web:349c510b9b650c78cb83bc",
+      measurementId: "G-GEXTZMR0B1"
+    };
 
-        /**
-         * Autentica um administrador
-         * @param {string} usuario - Nome de usuário
-         * @param {string} senha - Senha
-         * @returns {Promise<boolean>} - True se autenticado com sucesso
-         */
-        async function autenticarAdmin(usuario, senha) {
-            try {
-                const snapshot = await db.collection("admins")
-                    .where("usuario", "==", usuario)
-                    .where("senha", "==", senha)
-                    .get();
-                    
-                if (!snapshot.empty) {
-                    return true;
-                }
-                
-                // Fallback para credenciais padrão
-                if (usuario === "admin" && senha === "admin123") {
-                    // Verificar se o admin padrão existe, se não, criar
-                    const adminPadrao = await db.collection("admins")
-                        .where("usuario", "==", "admin")
-                        .get();
-                        
-                    if (adminPadrao.empty) {
-                        await db.collection("admins").add({
-                            usuario: "admin",
-                            senha: "admin123",
-                            nome: "Administrador Padrão",
-                            email: "admin@aprovamaispb.com",
-                            criadoEm: firebase.firestore.FieldValue.serverTimestamp()
-                        });
-                    }
-                    return true;
-                }
-                
-                return false;
-            } catch (err) {
-                console.error("Erro ao autenticar admin:", err);
-                return false;
-            }
-        }
-        
-        /**
-         * Verifica se usuário está logado
-         * @returns {boolean} - True se estiver logado
-         */
-        function estaLogado() {
-            return localStorage.getItem('usuarioLogado') !== null;
-        }
-        
-        /**
-         * Obtém informações do usuário logado
-         * @returns {Object} - Dados do usuário ou null
-         */
-        function obterUsuarioLogado() {
-            return {
-                usuario: localStorage.getItem('usuarioLogado'),
-                tipo: localStorage.getItem('tipoAcesso'),
-                loginTimestamp: localStorage.getItem('timestampLogin')
-            };
-        }
-        
-        // Evento de clique no botão de entrar
-        btnEntrar.addEventListener('click', async () => {
-            const user = usuario.value.trim();
-            const pass = senha.value.trim();
-            const accessType = tipoAcesso.value;
-            
-            if (!user || !pass) {
-                mostrarErro("Por favor, preencha todos os campos!");
-                return;
-            }
-            
-            try {
-                // Mostrar loading
-                btnText.style.display = 'none';
-                btnLoading.style.display = 'inline-block';
-                btnEntrar.disabled = true;
-                
-                let authenticated = false;
-                
-                if (accessType === 'professor') {
-                    authenticated = await autenticarProfessor(user, pass);
-                } else if (accessType === 'administrador') {
-                    authenticated = await autenticarAdmin(user, pass);
-                }
-                
-                if (authenticated) {
-                    sucessoLogin(user, accessType);
-                } else {
-                    mostrarErro("Usuário ou senha incorretos!");
-                    // Restaurar botão
-                    btnText.style.display = 'block';
-                    btnLoading.style.display = 'none';
-                    btnEntrar.disabled = false;
-                }
-            } catch (error) {
-                console.error("Erro durante autenticação:", error);
-                mostrarErro("Erro de conexão. Tente novamente.");
-                // Restaurar botão
-                btnText.style.display = 'block';
-                btnLoading.style.display = 'none';
-                btnEntrar.disabled = false;
-            }
-        });
-        
-        // Alternar visibilidade da senha
-        togglePassword.addEventListener('click', () => {
-            if (senha.type === 'password') {
-                senha.type = 'text';
-                togglePassword.textContent = '🔒';
-            } else {
-                senha.type = 'password';
-                togglePassword.textContent = '👁️';
-            }
-        });
-        
-        function mostrarErro(mensagem) {
-            errorMessage.textContent = mensagem;
-            errorMessage.style.display = 'block';
-            successMessage.style.display = 'none';
-        }
-        
-        function sucessoLogin(user, accessType) {
-            errorMessage.style.display = 'none';
-            successMessage.style.display = 'block';
-            
-            // Salvar informações de login
-            localStorage.setItem('usuarioLogado', user);
-            localStorage.setItem('tipoAcesso', accessType);
-            localStorage.setItem('timestampLogin', new Date().getTime());
-            
-            // Redirecionar para a página correta baseada no tipo de acesso
-            setTimeout(() => {
-                if (accessType === 'professor') {
-                    window.location.href = 'professores.html';
-                } else {
-                    window.location.href = 'dashboard.html';
-                }
-            }, 1500);
-        }
-        
-        // Verificar se o Firebase foi carregado corretamente
-        document.addEventListener('DOMContentLoaded', () => {
-            if (typeof firebase === 'undefined') {
-                mostrarErro("Erro: Firebase não carregado. Verifique sua conexão.");
-                btnEntrar.disabled = true;
-            } else {
-                console.log("Firebase carregado com sucesso!");
-            }
-            
-            // Verificar se já está logado e redirecionar
-            if (estaLogado()) {
-                const tipoAcesso = localStorage.getItem('tipoAcesso');
-                if (tipoAcesso === 'professor') {
-                    window.location.href = 'professores.html';
-                } else {
-                    window.location.href = 'dashboard.html';
-                }
-            }
-            
-            // Focar no campo de senha ao pressionar Enter no usuário
-            usuario.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    senha.focus();
-                }
-            });
-            
-            // Clicar no botão entrar ao pressionar Enter na senha
-            senha.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    btnEntrar.click();
-                }
-            });
-        });
-    </script>
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    const form = document.getElementById('loginForm');
+    const msg = document.getElementById('loginMessage');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        localStorage.setItem('usuarioLogado', user.email);
+        localStorage.setItem('tipoAcesso', 'administrador');
+        localStorage.setItem('timestampLogin', new Date().getTime());
+
+        msg.textContent = "✅ Login bem-sucedido! Redirecionando...";
+        msg.style.color = "green";
+
+        setTimeout(() => {
+          window.location.href = "dashboard.html";
+        }, 1000);
+
+      } catch (error) {
+        console.error(error);
+        msg.textContent = "❌ E-mail ou senha incorretos!";
+        msg.style.color = "red";
+      }
+    });
+  </script>
 </body>
 </html>
