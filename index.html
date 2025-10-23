@@ -14,6 +14,7 @@ body{
   background:linear-gradient(180deg,#ffffff 0%,#eaf8ff 100%);
   color:#1c1c1c;
   overflow-x:hidden;
+  scroll-behavior:smooth;
 }
 
 /* NAVBAR */
@@ -22,29 +23,28 @@ nav{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding:1.2rem 3rem;
+  padding:1rem 2rem;
   position:fixed;
   top:0;
   left:0;
-  background:rgba(255,255,255,0.9);
+  background:rgba(255,255,255,0.95);
   box-shadow:0 2px 10px rgba(0,0,0,0.05);
   z-index:1000;
+  backdrop-filter:blur(6px);
 }
 nav .brand{
   display:flex;
   align-items:center;
   gap:0.6rem;
   font-weight:700;
-  font-size:1.5rem;
+  font-size:1.3rem;
   color:#007BFF;
 }
-nav .brand img{
-  width:45px;
-}
+nav .brand img{width:38px;}
 nav ul{
   list-style:none;
   display:flex;
-  gap:2rem;
+  gap:1.4rem;
 }
 nav a{
   color:#1c1c1c;
@@ -52,41 +52,41 @@ nav a{
   font-weight:600;
   transition:color .3s;
 }
-nav a:hover{
-  color:#007BFF;
-}
+nav a:hover{color:#007BFF;}
 
 /* HERO SECTION */
 .hero{
-  min-height:100vh;
+  min-height:90vh;
   display:flex;
   flex-direction:column;
   justify-content:center;
   align-items:center;
   text-align:center;
-  padding:8rem 2rem 3rem;
+  padding:7rem 1.5rem 3rem;
   background:linear-gradient(180deg,#ffffff 0%,#e7f4ff 100%);
 }
 .hero h1{
   color:#007BFF;
-  font-size:clamp(2rem,5vw,3.5rem);
+  font-size:clamp(1.8rem,5vw,3rem);
   font-weight:700;
   margin-bottom:1rem;
+  line-height:1.3;
 }
 .hero p{
-  max-width:700px;
-  font-size:1.2rem;
+  max-width:650px;
+  font-size:1.05rem;
   color:#444;
-  margin-bottom:2.5rem;
+  margin-bottom:2.2rem;
+  padding:0 0.5rem;
 }
 .hero .cta{
   display:inline-block;
   background:#007BFF;
   color:#fff;
   font-weight:600;
-  padding:1rem 2.5rem;
+  padding:1rem 2.3rem;
   border-radius:50px;
-  font-size:1.2rem;
+  font-size:1.15rem;
   box-shadow:0 4px 20px rgba(0,123,255,0.3);
   transition:transform .3s, box-shadow .3s;
   text-decoration:none;
@@ -99,35 +99,77 @@ nav a:hover{
 /* IMAGE SECTION */
 .image-section{
   text-align:center;
-  background:#fff;
-  padding:3rem 1rem;
+  padding:3rem 1rem 5rem;
+  position:relative;
+  overflow:hidden;
 }
-.image-section img{
-  max-width:90%;
+.image-bg{
+  position:absolute;
+  top:50%;
+  left:50%;
+  width:400px;
+  height:400px;
+  background:radial-gradient(circle,rgba(0,123,255,0.12) 0%,transparent 70%);
+  transform:translate(-50%,-50%);
+  filter:blur(70px);
+  z-index:0;
+  animation: glowPulse 6s infinite alternate ease-in-out;
+}
+@keyframes glowPulse{
+  from{opacity:.5; transform:translate(-50%,-50%) scale(1);}
+  to{opacity:.9; transform:translate(-50%,-50%) scale(1.1);}
+}
+.image-container{
+  position:relative;
+  display:inline-block;
+  z-index:2;
+  animation: fadeUp 1.2s ease forwards;
+}
+@keyframes fadeUp{
+  0%{opacity:0; transform:translateY(40px);}
+  100%{opacity:1; transform:translateY(0);}
+}
+.image-container img{
+  max-width:85%;
   border-radius:20px;
-  box-shadow:0 10px 40px rgba(0,0,0,0.1);
-  transition:transform .4s;
+  box-shadow:0 6px 25px rgba(0,0,0,0.1);
+  transition:transform .4s ease, box-shadow .4s ease;
 }
-.image-section img:hover{
-  transform:scale(1.02);
+.image-container:hover img{
+  transform:scale(1.03);
+  box-shadow:0 14px 40px rgba(0,123,255,0.25);
+}
+
+/* PARTICLES */
+.particle{
+  position:absolute;
+  border-radius:50%;
+  background:rgba(0,123,255,0.7);
+  animation: floatParticle linear infinite;
+  opacity:0.8;
+  pointer-events:none;
+}
+@keyframes floatParticle {
+  0%{transform:translateY(0) scale(1); opacity:0.9;}
+  100%{transform:translateY(-200px) scale(0.7); opacity:0;}
 }
 
 /* WHATSAPP BUTTON FIXO */
 .whatsapp-float{
   position:fixed;
-  bottom:25px;
-  right:25px;
+  bottom:20px;
+  right:20px;
   background:#25d366;
   color:white;
-  width:65px;
-  height:65px;
+  width:60px;
+  height:60px;
   border-radius:50%;
   display:flex;
   justify-content:center;
   align-items:center;
-  font-size:2rem;
+  font-size:1.8rem;
   text-decoration:none;
-  box-shadow:0 4px 20px rgba(0,0,0,0.2);
+  box-shadow:0 4px 15px rgba(0,0,0,0.25);
   transition:transform .3s;
   z-index:1000;
 }
@@ -136,25 +178,48 @@ nav a:hover{
 /* FOOTER */
 footer{
   background:#f5faff;
-  padding:2rem;
+  padding:2rem 1rem;
   text-align:center;
-  font-size:1rem;
+  font-size:0.95rem;
   color:#555;
-  margin-top:4rem;
+  margin-top:2rem;
   border-top:1px solid #e0f0ff;
 }
 
-/* RESPONSIVE */
-@media(max-width:768px){
+/* MOBILE */
+@media(max-width:600px){
   nav{
-    padding:1rem 1.5rem;
+    padding:0.8rem 1.2rem;
   }
-  nav ul{
-    display:none;
+  nav .brand{
+    font-size:1.1rem;
   }
-  .hero h1{font-size:2rem;}
-  .hero p{font-size:1rem;}
-  .hero .cta{font-size:1.1rem;}
+  nav .brand img{
+    width:34px;
+  }
+  .hero{
+    padding:6rem 1rem 2rem;
+  }
+  .hero p{
+    font-size:1rem;
+    margin-bottom:1.8rem;
+  }
+  .hero .cta{
+    font-size:1rem;
+    padding:0.9rem 2rem;
+  }
+  .image-container img{
+    max-width:92%;
+  }
+  .image-bg{
+    width:300px;
+    height:300px;
+  }
+  .whatsapp-float{
+    width:55px;
+    height:55px;
+    font-size:1.6rem;
+  }
 }
 </style>
 </head>
@@ -167,7 +232,6 @@ footer{
   </div>
   <ul>
     <li><a href="#hero">Início</a></li>
-    <li><a href="#image-section">Aula VIP</a></li>
   </ul>
 </nav>
 
@@ -178,7 +242,12 @@ footer{
 </section>
 
 <section class="image-section" id="image-section">
-  <img src="./assets/img/aula-vip-aprovamaispb.jpeg" alt="Equipe AprovaMaisPB Aula VIP">
+  <div class="image-bg"></div>
+  <div id="particles"></div>
+
+  <div class="image-container">
+    <img src="./assets/img/WhatsApp-Image-2025-10-23-at-15.42.53.jpeg" alt="Equipe AprovaMaisPB Aula VIP">
+  </div>
 </section>
 
 <a href="https://wa.me/5583996627827?text=Olá!%20Quero%20garantir%20minha%20vaga%20na%20Aula%20VIP%20do%20AprovaMaisPB!" class="whatsapp-float" target="_blank">
@@ -188,6 +257,33 @@ footer{
 <footer>
   © 2025 AprovaMaisPB – Todos os direitos reservados
 </footer>
+
+<script>
+// Partículas leves para mobile
+const particlesContainer = document.getElementById("particles");
+const totalParticles = window.innerWidth < 600 ? 10 : 20;
+
+for (let i = 0; i < totalParticles; i++) {
+  const particle = document.createElement("span");
+  particle.classList.add("particle");
+
+  const size = Math.random() * 5 + 2;
+  const left = Math.random() * 100;
+  const duration = Math.random() * 5 + 4;
+  const delay = Math.random() * 5;
+  const blur = Math.random() * 3;
+
+  particle.style.width = `${size}px`;
+  particle.style.height = `${size}px`;
+  particle.style.left = `${left}%`;
+  particle.style.bottom = `0px`;
+  particle.style.filter = `blur(${blur}px)`;
+  particle.style.animationDuration = `${duration}s`;
+  particle.style.animationDelay = `${delay}s`;
+
+  particlesContainer.appendChild(particle);
+}
+</script>
 
 </body>
 </html>
