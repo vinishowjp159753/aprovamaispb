@@ -4,15 +4,28 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AprovaMaisPB – Aula VIP</title>
+<meta name="description" content="Participe da Aula VIP do AprovaMaisPB e dê o primeiro passo rumo à sua aprovação!">
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
+:root {
+  --primary-color: #007BFF;
+  --secondary-color: #25d366;
+  --bg-gradient-start: #ffffff;
+  --bg-gradient-end: #eaf8ff;
+  --text-color: #1c1c1c;
+  --soft-shadow: rgba(0,0,0,0.1);
+  --highlight-gradient-start: #ff3b3b;
+  --highlight-gradient-end: #ff9800;
+}
+
+/* RESET */
 *{margin:0;padding:0;box-sizing:border-box;}
 body{
   font-family:'Poppins',sans-serif;
-  background:linear-gradient(180deg,#ffffff 0%,#eaf8ff 100%);
-  color:#1c1c1c;
+  background:linear-gradient(180deg,var(--bg-gradient-start) 0%,var(--bg-gradient-end) 100%);
+  color:var(--text-color);
   overflow-x:hidden;
   scroll-behavior:smooth;
 }
@@ -38,7 +51,7 @@ nav .brand{
   gap:0.6rem;
   font-weight:700;
   font-size:1.3rem;
-  color:#007BFF;
+  color:var(--primary-color);
 }
 nav .brand img{width:38px;}
 nav ul{
@@ -47,12 +60,13 @@ nav ul{
   gap:1.4rem;
 }
 nav a{
-  color:#1c1c1c;
+  color:var(--text-color);
   text-decoration:none;
   font-weight:600;
   transition:color .3s;
 }
-nav a:hover{color:#007BFF;}
+nav a:hover, nav a:focus{color:var(--primary-color); outline:none;}
+nav a:focus {outline: 2px dashed var(--primary-color); outline-offset:4px;}
 
 /* HERO SECTION */
 .hero{
@@ -63,10 +77,10 @@ nav a:hover{color:#007BFF;}
   align-items:center;
   text-align:center;
   padding:7rem 1.5rem 3rem;
-  background:linear-gradient(180deg,#ffffff 0%,#e7f4ff 100%);
+  background:linear-gradient(180deg,var(--bg-gradient-start) 0%,#e7f4ff 100%);
 }
 .hero h1{
-  color:#007BFF;
+  color:var(--primary-color);
   font-size:clamp(1.8rem,5vw,3rem);
   font-weight:700;
   margin-bottom:1rem;
@@ -81,7 +95,7 @@ nav a:hover{color:#007BFF;}
 }
 .hero .cta{
   display:inline-block;
-  background:#007BFF;
+  background:var(--primary-color);
   color:#fff;
   font-weight:600;
   padding:1rem 2.3rem;
@@ -91,9 +105,10 @@ nav a:hover{color:#007BFF;}
   transition:transform .3s, box-shadow .3s;
   text-decoration:none;
 }
-.hero .cta:hover{
+.hero .cta:hover, .hero .cta:focus{
   transform:scale(1.05);
   box-shadow:0 6px 25px rgba(0,123,255,0.5);
+  outline:none;
 }
 
 /* IMAGE SECTION */
@@ -132,13 +147,14 @@ nav a:hover{color:#007BFF;}
 .image-container img{
   max-width:80%;
   border-radius:20px;
-  box-shadow:0 6px 25px rgba(0,0,0,0.1);
+  box-shadow:0 6px 25px var(--soft-shadow);
   transition:transform .4s ease, box-shadow .4s ease;
 }
 .image-container:hover img{
   transform:scale(1.03);
   box-shadow:0 14px 40px rgba(0,123,255,0.25);
 }
+.image-container img{display:block; margin:0 auto;}
 
 /* PARTICLES */
 .particle{
@@ -159,7 +175,7 @@ nav a:hover{color:#007BFF;}
   position:fixed;
   bottom:20px;
   right:20px;
-  background:#25d366;
+  background:var(--secondary-color);
   color:white;
   width:60px;
   height:60px;
@@ -173,14 +189,14 @@ nav a:hover{color:#007BFF;}
   transition:transform .3s;
   z-index:1000;
 }
-.whatsapp-float:hover{transform:scale(1.1);}
+.whatsapp-float:hover, .whatsapp-float:focus{transform:scale(1.1); outline:none;}
 
 /* ALERTA ÚLTIMAS VAGAS */
 .last-spots{
   position:fixed;
   top:90px;
   right:20px;
-  background:linear-gradient(135deg,#ff3b3b,#ff9800);
+  background:linear-gradient(135deg,var(--highlight-gradient-start),var(--highlight-gradient-end));
   color:#fff;
   font-weight:700;
   padding:0.8rem 1.2rem;
@@ -189,7 +205,7 @@ nav a:hover{color:#007BFF;}
   font-size:1rem;
   z-index:1100;
   cursor:default;
-  animation:pulseSoft 1.5s infinite ease-in-out;
+  animation:pulseStrong 0.8s infinite ease-in-out;
 }
 @keyframes pulseSoft {
   0%,100%{transform:scale(1); box-shadow:0 0 15px rgba(255,87,34,0.4);}
@@ -210,6 +226,8 @@ footer{
   margin-top:2rem;
   border-top:1px solid #e0f0ff;
 }
+footer a{color:var(--primary-color); text-decoration:none;}
+footer a:hover, footer a:focus{text-decoration:underline; outline:none;}
 
 /* MOBILE */
 @media(max-width:600px){
@@ -233,7 +251,7 @@ footer{
 </head>
 <body>
 
-<nav>
+<nav aria-label="Menu principal">
   <div class="brand">
     <img src="./assets/img/logo_aprovamaispb.png" alt="Logo AprovaMaisPB">
     AprovaMaisPB
@@ -245,26 +263,31 @@ footer{
 
 <div class="last-spots" id="lastSpots">🚨 Últimas 10 vagas!</div>
 
-<section class="hero" id="hero">
-  <h1>Grandes Conquistas começam com pequenos passos</h1>
-  <p>Participe da nossa <strong>Aula VIP</strong> e dê o primeiro passo rumo à sua aprovação com o time do AprovaMaisPB!</p>
-  <a class="cta" href="https://wa.me/5583996627827?text=Olá!%20Quero%20garantir%20minha%20vaga%20na%20Aula%20VIP%20do%20AprovaMaisPB!">Garantir minha vaga 💬</a>
-</section>
+<main>
+  <section class="hero" id="hero">
+    <h1>Grandes Conquistas começam com pequenos passos</h1>
+    <p>Participe da nossa <strong>Aula VIP</strong> e dê o primeiro passo rumo à sua aprovação com o time do AprovaMaisPB!</p>
+    <a class="cta" href="https://wa.me/5583996627827?text=Olá!%20Quero%20garantir%20minha%20vaga%20na%20Aula%20VIP%20do%20AprovaMaisPB!" target="_blank" aria-label="Garantir minha vaga na Aula VIP do AprovaMaisPB">
+      Garantir minha vaga 💬
+    </a>
+  </section>
 
-<section class="image-section" id="image-section">
-  <div class="image-bg"></div>
-  <div id="particles"></div>
-  <div class="image-container">
-    <img src="./assets/img/aula-vip-aprovamaispb.jpeg" alt="Equipe AprovaMaisPB Aula VIP">
-  </div>
-</section>
+  <section class="image-section" id="image-section">
+    <div class="image-bg"></div>
+    <div id="particles"></div>
+    <div class="image-container">
+      <img src="./assets/img/aula-vip-aprovamaispb.jpeg" alt="Equipe AprovaMaisPB Aula VIP" loading="lazy">
+    </div>
+  </section>
+</main>
 
-<a href="https://wa.me/5583996627827?text=Olá!%20Quero%20garantir%20minha%20vaga%20na%20Aula%20VIP%20do%20AprovaMaisPB!" class="whatsapp-float" target="_blank">
+<a href="https://wa.me/5583996627827?text=Olá!%20Quero%20garantir%20minha%20vaga%20na%20Aula%20VIP%20do%20AprovaMaisPB!" class="whatsapp-float" target="_blank" aria-label="Entrar em contato pelo WhatsApp">
   💬
 </a>
 
 <footer>
-  © 2025 AprovaMaisPB – Todos os direitos reservados
+  © 2025 AprovaMaisPB – Todos os direitos reservados | 
+  <a href="/politica-privacidade">Política de Privacidade</a>
 </footer>
 
 <script>
@@ -295,10 +318,9 @@ for (let i = 0; i < totalParticles; i++) {
 
 // Efeito de destaque inicial "forte" na faixa
 const lastSpots = document.getElementById('lastSpots');
-lastSpots.style.animation = 'pulseStrong 0.8s infinite ease-in-out';
-setTimeout(() => {
+lastSpots.addEventListener('animationend', () => {
   lastSpots.style.animation = 'pulseSoft 1.5s infinite ease-in-out';
-}, 5000);
+});
 </script>
 
 </body>
