@@ -4,244 +4,45 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AprovaMaisPB – Aula VIP</title>
-<meta name="description" content="Participe da Aula VIP do AprovaMaisPB e dê o primeiro passo rumo à sua aprovação!">
-
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-
 <style>
-:root {
-  --primary-color: #007BFF;
-  --secondary-color: #25d366;
-  --bg-gradient-start: #ffffff;
-  --bg-gradient-end: #eaf8ff;
-  --text-color: #1c1c1c;
-  --soft-shadow: rgba(0,0,0,0.1);
-  --highlight-gradient-start: #ff3b3b;
-  --highlight-gradient-end: #ff9800;
-}
-
-/* RESET */
 *{margin:0;padding:0;box-sizing:border-box;}
 body{
   font-family:'Poppins',sans-serif;
-  background:linear-gradient(180deg,var(--bg-gradient-start) 0%,var(--bg-gradient-end) 100%);
-  color:var(--text-color);
+  background: linear-gradient(180deg,#ffffff 0%,#eaf8ff 100%);
+  color:#1c1c1c;
   overflow-x:hidden;
   scroll-behavior:smooth;
 }
-
-/* NAVBAR */
 nav{
-  width:100%;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:1rem 2rem;
-  position:fixed;
-  top:0;
-  left:0;
-  background:rgba(255,255,255,0.95);
-  box-shadow:0 2px 10px rgba(0,0,0,0.05);
-  z-index:1000;
-  backdrop-filter:blur(6px);
+  width:100%;display:flex;justify-content:space-between;align-items:center;
+  padding:1rem 2rem;position:fixed;top:0;left:0;background:rgba(255,255,255,0.95);
+  box-shadow:0 2px 10px rgba(0,0,0,0.05);z-index:1000;backdrop-filter:blur(6px);
 }
-nav .brand{
-  display:flex;
-  align-items:center;
-  gap:0.6rem;
-  font-weight:700;
-  font-size:1.3rem;
-  color:var(--primary-color);
-}
+nav .brand{display:flex;align-items:center;gap:0.6rem;font-weight:700;font-size:1.3rem;color:#007BFF;}
 nav .brand img{width:38px;}
-nav ul{
-  list-style:none;
-  display:flex;
-  gap:1.4rem;
-}
-nav a{
-  color:var(--text-color);
-  text-decoration:none;
-  font-weight:600;
-  transition:color .3s;
-}
-nav a:hover, nav a:focus{color:var(--primary-color); outline:none;}
-nav a:focus {outline: 2px dashed var(--primary-color); outline-offset:4px;}
-
-/* HERO SECTION */
-.hero{
-  min-height:90vh;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  text-align:center;
-  padding:7rem 1.5rem 3rem;
-  background:linear-gradient(180deg,var(--bg-gradient-start) 0%,#e7f4ff 100%);
-}
-.hero h1{
-  color:var(--primary-color);
-  font-size:clamp(1.8rem,5vw,3rem);
-  font-weight:700;
-  margin-bottom:1rem;
-  line-height:1.3;
-  opacity:0; transform: translateY(30px);
-}
-.hero p{
-  max-width:650px;
-  font-size:1.05rem;
-  color:#444;
-  margin-bottom:2.2rem;
-  padding:0 0.5rem;
-  opacity:0; transform: translateY(20px);
-}
-.hero .cta{
-  display:inline-block;
-  background:var(--primary-color);
-  color:#fff;
-  font-weight:600;
-  padding:1rem 2.3rem;
-  border-radius:50px;
-  font-size:1.15rem;
-  box-shadow:0 4px 20px rgba(0,123,255,0.3);
-  transition:transform .3s, box-shadow .3s;
-  text-decoration:none;
-  opacity:0; transform: translateY(20px);
-}
-.hero .cta:hover, .hero .cta:focus{
-  transform:scale(1.05);
-  box-shadow:0 6px 25px rgba(0,123,255,0.5);
-  outline:none;
-}
-
-/* IMAGE SECTION */
-.image-section{
-  text-align:center;
-  padding:3rem 1rem 5rem;
-  position:relative;
-  overflow:hidden;
-}
-.image-bg{
-  position:absolute;
-  top:50%;
-  left:50%;
-  width:400px;
-  height:400px;
-  background:radial-gradient(circle,rgba(0,123,255,0.12) 0%,transparent 70%);
-  transform:translate(-50%,-50%);
-  filter:blur(70px);
-  z-index:0;
-  animation: glowPulse 6s infinite alternate ease-in-out;
-}
-@keyframes glowPulse{
-  from{opacity:.5; transform:translate(-50%,-50%) scale(1);}
-  to{opacity:.9; transform:translate(-50%,-50%) scale(1.1);}
-}
-.image-container{
-  position:relative;
-  display:inline-block;
-  z-index:2;
-  opacity:0; transform: translateY(30px);
-}
-.image-container img{
-  max-width:80%;
-  border-radius:20px;
-  box-shadow:0 6px 25px var(--soft-shadow);
-  transition:transform .4s ease, box-shadow .4s ease;
-}
-.image-container:hover img{
-  transform:scale(1.03);
-  box-shadow:0 14px 40px rgba(0,123,255,0.25);
-}
-
-/* PARTICLES */
-.particle{
-  position:absolute;
-  border-radius:50%;
-  background:rgba(0,123,255,0.7);
-  animation: floatParticle linear infinite;
-  opacity:0.8;
-  pointer-events:none;
-}
-@keyframes floatParticle {
-  0%{transform:translateY(0) scale(1); opacity:0.9;}
-  100%{transform:translateY(-200px) scale(0.7); opacity:0;}
-}
-
-/* WHATSAPP BUTTON FIXO */
-.whatsapp-float{
-  position:fixed;
-  bottom:20px;
-  right:20px;
-  background:var(--secondary-color);
-  color:white;
-  width:60px;
-  height:60px;
-  border-radius:50%;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-size:1.8rem;
-  text-decoration:none;
-  box-shadow:0 4px 15px rgba(0,0,0,0.25);
-  transition:transform .3s;
-  z-index:1000;
-}
-.whatsapp-float:hover, .whatsapp-float:focus{transform:scale(1.1); outline:none;}
-
-/* ALERTA ÚLTIMAS VAGAS */
-.last-spots{
-  position:fixed;
-  top:90px;
-  right:20px;
-  background:linear-gradient(135deg,var(--highlight-gradient-start),var(--highlight-gradient-end));
-  color:#fff;
-  font-weight:700;
-  padding:0.8rem 1.2rem;
-  border-radius:12px;
-  box-shadow:0 4px 15px rgba(0,0,0,0.25);
-  font-size:1rem;
-  z-index:1100;
-  cursor:default;
-  animation:pulseStrong 0.8s infinite ease-in-out;
-}
-
-/* FOOTER */
-footer{
-  background:#f5faff;
-  padding:2rem 1rem;
-  text-align:center;
-  font-size:0.95rem;
-  color:#555;
-  margin-top:2rem;
-  border-top:1px solid #e0f0ff;
-}
-footer a{color:var(--primary-color); text-decoration:none;}
-footer a:hover, footer a:focus{text-decoration:underline; outline:none;}
-
-/* MOBILE */
-@media(max-width:600px){
-  nav{padding:0.8rem 1.2rem;}
-  nav .brand{font-size:1.1rem;}
-  nav .brand img{width:34px;}
-  .hero{padding:6rem 1rem 2rem;}
-  .hero p{font-size:1rem;margin-bottom:1.8rem;}
-  .hero .cta{font-size:1rem;padding:0.9rem 2rem;}
-  .image-container img{max-width:92%;}
-  .image-bg{width:300px;height:300px;}
-  .whatsapp-float{width:55px;height:55px;font-size:1.6rem;}
-  .last-spots{
-    top:75px;
-    right:10px;
-    font-size:0.85rem;
-    padding:0.6rem 0.9rem;
-  }
-}
+nav ul{list-style:none;display:flex;gap:1.4rem;}
+nav a{color:#1c1c1c;text-decoration:none;font-weight:600;transition:color .3s;}
+nav a:hover{color:#007BFF;}
+.hero{min-height:90vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:7rem 1.5rem 3rem;}
+.hero h1{color:#007BFF;font-size:clamp(1.8rem,5vw,3rem);font-weight:700;margin-bottom:1rem;line-height:1.3;}
+.hero p{max-width:650px;font-size:1.05rem;color:#444;margin-bottom:2.2rem;padding:0 0.5rem;}
+.hero .cta{display:inline-block;background:#007BFF;color:#fff;font-weight:600;padding:1rem 2.3rem;border-radius:50px;font-size:1.15rem;box-shadow:0 4px 20px rgba(0,123,255,0.3);text-decoration:none;transition:transform .3s, box-shadow .3s;}
+.hero .cta:hover{transform:scale(1.05);box-shadow:0 6px 25px rgba(0,123,255,0.5);}
+.image-section{text-align:center;padding:3rem 1rem 5rem;position:relative;overflow:hidden;}
+.image-bg{position:absolute;top:50%;left:50%;width:400px;height:400px;background:radial-gradient(circle,rgba(0,123,255,0.12) 0%,transparent 70%);transform:translate(-50%,-50%);filter:blur(70px);z-index:0;}
+.image-container{position:relative;display:inline-block;z-index:2;}
+.image-container img{max-width:80%;border-radius:20px;box-shadow:0 6px 25px rgba(0,0,0,0.1);}
+.whatsapp-float{position:fixed;bottom:20px;right:20px;background:#25d366;color:white;width:60px;height:60px;border-radius:50%;display:flex;justify-content:center;align-items:center;font-size:1.8rem;text-decoration:none;box-shadow:0 4px 15px rgba(0,0,0,0.25);}
+.whatsapp-float:hover{transform:scale(1.1);}
+.last-spots{position:fixed;top:90px;right:20px;background:linear-gradient(135deg,#ff3b3b,#ff9800);color:#fff;font-weight:700;padding:0.8rem 1.2rem;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,0.25);font-size:1rem;z-index:1100;cursor:default;}
+footer{background:#f5faff;padding:2rem 1rem;text-align:center;font-size:0.95rem;color:#555;margin-top:2rem;border-top:1px solid #e0f0ff;}
+@media(max-width:600px){.hero{padding:6rem 1rem 2rem;}.hero p{font-size:1rem;margin-bottom:1.8rem;}.hero .cta{font-size:1rem;padding:0.9rem 2rem;}.image-container img{max-width:92%;}.image-bg{width:300px;height:300px;}.whatsapp-float{width:55px;height:55px;font-size:1.6rem;}.last-spots{top:75px;right:10px;font-size:0.85rem;padding:0.6rem 0.9rem;}}
 </style>
 </head>
 <body>
 
-<nav aria-label="Menu principal">
+<nav>
   <div class="brand">
     <img src="./assets/img/logo_aprovamaispb.png" alt="Logo AprovaMaisPB">
     AprovaMaisPB
@@ -251,72 +52,48 @@ footer a:hover, footer a:focus{text-decoration:underline; outline:none;}
   </ul>
 </nav>
 
-<div class="last-spots" id="lastSpots">🚨 Últimas vagas!</div>
+<div class="last-spots">🚨 Últimas vagas!</div>
 
-<main>
-  <section class="hero" id="hero">
-    <h1>Grandes Conquistas começam com pequenos passos</h1>
-    <p>Participe da nossa <strong>Aula VIP</strong> e dê o primeiro passo rumo à sua aprovação com o time do AprovaMaisPB!</p>
-    <a class="cta" href="https://wa.me/5583996627827?text=Olá!%20Quero%20garantir%20minha%20vaga%20na%20Aula%20VIP%20do%20AprovaMaisPB!" target="_blank" aria-label="Garantir minha vaga na Aula VIP do AprovaMaisPB">
-      Garantir minha vaga 💬
-    </a>
-  </section>
+<section class="hero" id="hero">
+  <h1>Grandes Conquistas começam com pequenos passos</h1>
+  <p>Participe da nossa <strong>Aula VIP</strong> e dê o primeiro passo rumo à sua aprovação com o time do AprovaMaisPB!</p>
+  <a class="cta" href="https://wa.me/5583996627827" target="_blank">Garantir minha vaga 💬</a>
+</section>
 
-  <section class="image-section" id="image-section">
-    <div class="image-bg"></div>
-    <div id="particles"></div>
-    <div class="image-container">
-      <img src="./assets/img/aula-vip-aprovamaispb.jpeg" alt="Equipe AprovaMaisPB Aula VIP" loading="lazy">
-    </div>
-  </section>
-</main>
+<section class="image-section">
+  <div class="image-bg"></div>
+  <div class="image-container">
+    <img src="./assets/img/aula-vip-aprovamaispb.jpeg" alt="Equipe AprovaMaisPB Aula VIP">
+  </div>
+</section>
 
-<a href="https://wa.me/5583996627827?text=Olá!%20Quero%20garantir%20minha%20vaga%20na%20Aula%20VIP%20do%20AprovaMaisPB!" class="whatsapp-float" target="_blank" aria-label="Entrar em contato pelo WhatsApp">
-  💬
-</a>
+<a href="https://wa.me/5583996627827" class="whatsapp-float" target="_blank">💬</a>
 
-<footer>
-  © 2025 AprovaMaisPB – Todos os direitos reservados | 
-  <a href="/politica-privacidade">Política de Privacidade</a>
-</footer>
+<footer>© 2025 AprovaMaisPB – Todos os direitos reservados</footer>
 
-<!-- ScrollReveal CDN -->
-<script src="https://unpkg.com/scrollreveal"></script>
 <script>
-// Partículas leves
-const particlesContainer = document.getElementById("particles");
-const totalParticles = window.innerWidth < 600 ? 10 : 20;
-
-for (let i = 0; i < totalParticles; i++) {
-  const particle = document.createElement("span");
-  particle.classList.add("particle");
-  const size = Math.random() * 5 + 2;
-  const left = Math.random() * 100;
-  const duration = Math.random() * 5 + 4;
-  const delay = Math.random() * 5;
-  const blur = Math.random() * 3;
-  particle.style.width = `${size}px`;
-  particle.style.height = `${size}px`;
-  particle.style.left = `${left}%`;
-  particle.style.bottom = `0px`;
-  particle.style.filter = `blur(${blur}px)`;
-  particle.style.animationDuration = `${duration}s`;
-  particle.style.animationDelay = `${delay}s`;
-  particlesContainer.appendChild(particle);
-}
-
-// Últimas vagas efeito inicial
-const lastSpots = document.getElementById('lastSpots');
-lastSpots.addEventListener('animationend', () => {
-  lastSpots.style.animation = 'pulseSoft 1.5s infinite ease-in-out';
+// Partículas leves sem travar
+document.addEventListener("DOMContentLoaded", function(){
+  const particlesContainer = document.createElement("div");
+  particlesContainer.id = "particles";
+  document.body.appendChild(particlesContainer);
+  const totalParticles = window.innerWidth < 600 ? 10 : 20;
+  for(let i=0;i<totalParticles;i++){
+    const p = document.createElement("span");
+    p.className = "particle";
+    const size=Math.random()*5+2;
+    const left=Math.random()*100;
+    const duration=Math.random()*5+4;
+    const delay=Math.random()*5;
+    const blur=Math.random()*3;
+    p.style.width=p.style.height=size+'px';
+    p.style.left=left+'%';
+    p.style.bottom='0px';
+    p.style.filter=`blur(${blur}px)`;
+    p.style.animation=`floatParticle ${duration}s linear ${delay}s infinite`;
+    particlesContainer.appendChild(p);
+  }
 });
-
-// ScrollReveal animações
-ScrollReveal().reveal('.hero h1', {origin:'bottom', distance:'40px', duration:1000, delay:200, opacity:0, easing:'ease-out'});
-ScrollReveal().reveal('.hero p', {origin:'bottom', distance:'20px', duration:1000, delay:400, opacity:0, easing:'ease-out'});
-ScrollReveal().reveal('.hero .cta', {origin:'bottom', distance:'20px', duration:1000, delay:600, opacity:0, easing:'ease-out'});
-ScrollReveal().reveal('.image-container', {origin:'bottom', distance:'40px', duration:1200, delay:300, opacity:0, easing:'ease-out'});
 </script>
-
 </body>
 </html>
