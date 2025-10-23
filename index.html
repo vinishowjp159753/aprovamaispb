@@ -146,7 +146,7 @@ nav a:hover{color: var(--primary);}
   box-shadow:0 8px 25px rgba(0,0,0,0.35);
 }
 
-/* Botão flutuante de inscrição */
+/* Botão flutuante */
 #floating-cta{
   position:fixed;
   bottom:100px; right:20px;
@@ -185,6 +185,31 @@ nav a:hover{color: var(--primary);}
 @keyframes pulse{
   0%,100%{transform: scale(1);}
   50%{transform: scale(1.05);}
+}
+
+/* Balões flutuantes */
+#photo-balloons{
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 0;
+  height: 0;
+  z-index: 950;
+  pointer-events: none;
+}
+.photo-balloon{
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+  animation: floatBalloon linear infinite;
+}
+@keyframes floatBalloon{
+  0% { transform: translateY(0) translateX(0) rotate(0deg);}
+  50% { transform: translateY(-80px) translateX(20px) rotate(15deg);}
+  100% { transform: translateY(0) translateX(-20px) rotate(-15deg);}
 }
 
 /* Footer */
@@ -240,7 +265,7 @@ footer{
 </nav>
 
 <!-- Últimas Vagas -->
-<div class="last-spots">🚨 Últimas <span id="countdown">10</span> vagas!</div>
+<div class="last-spots">🚨 Últimas <span id="countdown">0</span> vagas!</div>
 
 <!-- Hero Section -->
 <section class="hero" id="hero">
@@ -257,11 +282,12 @@ footer{
   </div>
 </section>
 
-<!-- Botão flutuante -->
-<a href="https://wa.me/5583996627827" id="floating-cta">Quero minha vaga!</a>
 
 <!-- WhatsApp Float -->
-<a href="https://wa.me/5583996627827" class="whatsapp-float" target="_blank">💬</a>
+<a href="https://wa.me/5583996627827" class="whatsapp-float" target="_blank">Dúvidas?</a>
+
+<!-- Balões flutuantes -->
+<div id="photo-balloons"></div>
 
 <!-- Footer -->
 <footer>© 2025 AprovaMaisPB – Todos os direitos reservados</footer>
@@ -317,8 +343,6 @@ const observer = new IntersectionObserver(entries=>{
     }
   });
 },{threshold:0.2});
-
-// Aplica observer
 revealElements.forEach(el=>observer.observe(el));
 
 // Parallax da imagem
@@ -327,7 +351,23 @@ window.addEventListener('scroll', () => {
   const scrollY = window.scrollY;
   imgContainer.style.transform = `translateY(${scrollY*0.2}px) scale(1.02)`;
 });
-</script>
 
+// Balões flutuantes
+const balloonPhotos = [
+  './assets/img/aula1.jpeg',
+  './assets/img/aula2.jpeg'
+];
+const container = document.getElementById('photo-balloons');
+balloonPhotos.forEach((src, index)=>{
+  const img = document.createElement('img');
+  img.src = src;
+  img.className = 'photo-balloon';
+  img.style.bottom = `${Math.random()*20}px`;
+  img.style.right = `${index*70}px`;
+  img.style.animationDuration = `${4 + Math.random()*3}s`;
+  img.style.animationDelay = `${Math.random()*3}s`;
+  container.appendChild(img);
+});
+</script>
 </body>
 </html>
