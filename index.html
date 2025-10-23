@@ -5,189 +5,164 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AprovaMaisPB – Aula VIP</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 body{
-  font-family:'Roboto',sans-serif;
-  background:#0f2027;
-  color:#fff;
+  font-family:'Poppins',sans-serif;
+  background:linear-gradient(180deg,#ffffff 0%,#eaf8ff 100%);
+  color:#1c1c1c;
   overflow-x:hidden;
 }
 
-/* BACKGROUND */
-#bg-canvas{
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  z-index:-1;
-}
-#scanlines{
-  position:fixed;
-  top:0; left:0;
-  width:100%; height:100%;
-  background: repeating-linear-gradient(
-    180deg,
-    rgba(255,255,255,0.03),
-    rgba(255,255,255,0.03) 1px,
-    transparent 2px,
-    transparent 4px
-  );
-  animation: moveLines 1.5s linear infinite;
-  pointer-events:none;
-  z-index:0;
-}
-@keyframes moveLines{
-  0%{background-position:0 0;}
-  100%{background-position:0 4px;}
-}
-
-/* NAV */
+/* NAVBAR */
 nav{
+  width:100%;
   display:flex;
   justify-content:space-between;
   align-items:center;
   padding:1.2rem 3rem;
-  background:rgba(0,0,0,0.5);
-  backdrop-filter:blur(8px);
   position:fixed;
-  width:100%;
+  top:0;
+  left:0;
+  background:rgba(255,255,255,0.9);
+  box-shadow:0 2px 10px rgba(0,0,0,0.05);
   z-index:1000;
-  transition: all .3s ease;
-}
-nav.scrolled{
-  background:rgba(0,0,0,0.85);
-  backdrop-filter:blur(12px);
-  box-shadow:0 0 20px #00ffe0;
 }
 nav .brand{
   display:flex;
   align-items:center;
-  gap:0.7rem;
-  font-family:'Orbitron',sans-serif;
-  font-size:2rem;
-  color:#00ffe0;
-  text-shadow:0 0 10px #00ffe0;
+  gap:0.6rem;
+  font-weight:700;
+  font-size:1.5rem;
+  color:#007BFF;
 }
-nav .brand img{width:50px;}
+nav .brand img{
+  width:45px;
+}
 nav ul{
-  display:flex;
-  gap:2.5rem;
   list-style:none;
+  display:flex;
+  gap:2rem;
 }
 nav a{
-  color:#fff;
+  color:#1c1c1c;
   text-decoration:none;
-  font-weight:700;
-  font-size:1.1rem;
-  position:relative;
+  font-weight:600;
+  transition:color .3s;
 }
-nav a::after{
-  content:''; position:absolute; left:0; bottom:-5px;
-  width:0%; height:4px;
-  background:linear-gradient(90deg,#00ffe0,#00bfff);
-  transition:width .3s; border-radius:2px;
+nav a:hover{
+  color:#007BFF;
 }
-nav a:hover::after{width:100%;}
 
-/* HERO */
+/* HERO SECTION */
 .hero{
   min-height:100vh;
-  display:flex; flex-direction:column;
-  justify-content:center; align-items:center;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
   text-align:center;
-  padding:0 2rem;
-  z-index:1;
+  padding:8rem 2rem 3rem;
+  background:linear-gradient(180deg,#ffffff 0%,#e7f4ff 100%);
 }
 .hero h1{
-  font-family:'Orbitron',sans-serif;
-  font-size:clamp(2.5rem,5vw,4rem);
-  color:#00ffe0;
-  text-shadow:0 0 20px #00ffe0,0 0 40px #00bfff;
+  color:#007BFF;
+  font-size:clamp(2rem,5vw,3.5rem);
+  font-weight:700;
   margin-bottom:1rem;
-  animation: neonPulse 2s infinite;
-}
-@keyframes neonPulse{
-  0%,100%{text-shadow:0 0 20px #00ffe0,0 0 40px #00bfff;}
-  50%{text-shadow:0 0 30px #00bfff,0 0 60px #00ffe0;}
 }
 .hero p{
   max-width:700px;
-  font-size:clamp(1rem,2.5vw,1.5rem);
-  margin-bottom:2rem;
-  color:#d7faff;
+  font-size:1.2rem;
+  color:#444;
+  margin-bottom:2.5rem;
 }
-.cta{
-  position:relative;
-  background:linear-gradient(45deg,#00ffe0,#00bfff);
-  padding:1.2rem 3rem;
+.hero .cta{
+  display:inline-block;
+  background:#007BFF;
+  color:#fff;
+  font-weight:600;
+  padding:1rem 2.5rem;
   border-radius:50px;
-  font-size:1.5rem;
-  color:#0f2027;
-  font-weight:700;
+  font-size:1.2rem;
+  box-shadow:0 4px 20px rgba(0,123,255,0.3);
+  transition:transform .3s, box-shadow .3s;
   text-decoration:none;
-  box-shadow:0 0 20px #00ffe0,0 0 40px #00bfff;
-  transition: all .3s ease;
-  animation: pulse 2s infinite;
 }
-@keyframes pulse{
-  0%,100%{transform:scale(1);}
-  50%{transform:scale(1.05);}
-}
-.cta:hover{
-  box-shadow:0 0 30px #00bfff,0 0 60px #00ffe0;
+.hero .cta:hover{
+  transform:scale(1.05);
+  box-shadow:0 6px 25px rgba(0,123,255,0.5);
 }
 
 /* IMAGE SECTION */
 .image-section{
   text-align:center;
-  margin-top:3rem;
-  padding:2rem;
+  background:#fff;
+  padding:3rem 1rem;
 }
 .image-section img{
-  max-width:95%;
+  max-width:90%;
   border-radius:20px;
-  box-shadow:0 0 40px rgba(0,255,224,0.3);
+  box-shadow:0 10px 40px rgba(0,0,0,0.1);
   transition:transform .4s;
 }
 .image-section img:hover{
   transform:scale(1.02);
 }
 
+/* WHATSAPP BUTTON FIXO */
+.whatsapp-float{
+  position:fixed;
+  bottom:25px;
+  right:25px;
+  background:#25d366;
+  color:white;
+  width:65px;
+  height:65px;
+  border-radius:50%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:2rem;
+  text-decoration:none;
+  box-shadow:0 4px 20px rgba(0,0,0,0.2);
+  transition:transform .3s;
+  z-index:1000;
+}
+.whatsapp-float:hover{transform:scale(1.1);}
+
 /* FOOTER */
 footer{
-  background:rgba(0,0,0,0.6);
-  padding:3rem;
+  background:#f5faff;
+  padding:2rem;
   text-align:center;
-  font-size:1.1rem;
-  color:#bbb;
+  font-size:1rem;
+  color:#555;
   margin-top:4rem;
+  border-top:1px solid #e0f0ff;
 }
 
 /* RESPONSIVE */
-@media (max-width:768px){
-  nav ul{
-    flex-direction:column;
-    background:rgba(0,0,0,0.85);
-    position:absolute; top:100%; right:0;
-    width:200px; padding:1rem;
-    display:none; border-radius:8px;
+@media(max-width:768px){
+  nav{
+    padding:1rem 1.5rem;
   }
-  nav ul.active{display:flex;}
+  nav ul{
+    display:none;
+  }
+  .hero h1{font-size:2rem;}
+  .hero p{font-size:1rem;}
+  .hero .cta{font-size:1.1rem;}
 }
 </style>
 </head>
 <body>
 
-<div id="scanlines"></div>
-<canvas id="bg-canvas"></canvas>
-
 <nav>
   <div class="brand">
-    <img src="./assets/img/logo_aprovamaispb.png" alt="Logo">
+    <img src="./assets/img/logo_aprovamaispb.png" alt="Logo AprovaMaisPB">
     AprovaMaisPB
   </div>
   <ul>
@@ -198,66 +173,21 @@ footer{
 
 <section class="hero" id="hero">
   <h1>Grandes Conquistas começam com pequenos passos</h1>
-  <p>Venha participar da nossa Aula VIP e dê o primeiro passo rumo à sua aprovação!</p>
-  <a class="cta" href="https://wa.me/5583996627827?text=Quero%20garantir%20minha%20vaga%20na%20Aula%20VIP%20do%20AprovaMaisPB!">GARANTIR MINHA VAGA NO WHATSAPP 💬</a>
+  <p>Participe da nossa <strong>Aula VIP</strong> e dê o primeiro passo rumo à sua aprovação com o time do AprovaMaisPB!</p>
+  <a class="cta" href="https://wa.me/5583996627827?text=Olá!%20Quero%20garantir%20minha%20vaga%20na%20Aula%20VIP%20do%20AprovaMaisPB!">Garantir minha vaga 💬</a>
 </section>
 
 <section class="image-section" id="image-section">
-  <img src="aula-vip-aprovamaispb.jpg" alt="Equipe AprovaMaisPB Aula VIP">
+  <img src="./assets/img/WhatsApp-Image-2025-10-23-at-15.42.53.jpeg" alt="Equipe AprovaMaisPB Aula VIP">
 </section>
+
+<a href="https://wa.me/5583996627827?text=Olá!%20Quero%20garantir%20minha%20vaga%20na%20Aula%20VIP%20do%20AprovaMaisPB!" class="whatsapp-float" target="_blank">
+  💬
+</a>
 
 <footer>
   © 2025 AprovaMaisPB – Todos os direitos reservados
 </footer>
-
-<script>
-// Menu mobile
-const navToggle = document.createElement('div');
-navToggle.innerHTML = '☰';
-navToggle.style.fontSize = '1.8rem';
-navToggle.style.cursor = 'pointer';
-navToggle.style.color = '#00ffe0';
-navToggle.style.userSelect = 'none';
-document.querySelector('nav').appendChild(navToggle);
-navToggle.addEventListener('click',()=>{ document.querySelector('nav ul').classList.toggle('active'); });
-
-// Navbar scroll
-window.addEventListener('scroll', () => {
-  const nav = document.querySelector('nav');
-  if(window.scrollY > 50){ nav.classList.add('scrolled'); }
-  else{ nav.classList.remove('scrolled'); }
-});
-
-// Partículas
-const canvas = document.getElementById('bg-canvas');
-const ctx = canvas.getContext('2d');
-canvas.width = innerWidth; canvas.height = innerHeight;
-let particles = [];
-const colors = ['#00ffe0','#00bfff','#0ff','#0bf'];
-for(let i=0;i<120;i++){
-  particles.push({
-    x: Math.random()*canvas.width,
-    y: Math.random()*canvas.height,
-    r: Math.random()*3+1,
-    c: colors[Math.floor(Math.random()*colors.length)],
-    dx:(Math.random()-0.5)*0.5,
-    dy:(Math.random()-0.5)*0.5
-  });
-}
-function animate(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  for(let p of particles){
-    p.x+=p.dx; p.y+=p.dy;
-    if(p.x<0)p.x=canvas.width; if(p.x>canvas.width)p.x=0;
-    if(p.y<0)p.y=canvas.height; if(p.y>canvas.height)p.y=0;
-    ctx.beginPath();
-    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-    ctx.fillStyle=p.c; ctx.shadowColor=p.c; ctx.shadowBlur=10; ctx.fill();
-  }
-  requestAnimationFrame(animate);
-}
-animate();
-</script>
 
 </body>
 </html>
