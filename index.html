@@ -130,7 +130,7 @@ nav a:hover{color:#007BFF;}
   100%{opacity:1; transform:translateY(0);}
 }
 .image-container img{
-  max-width:85%;
+  max-width:80%;
   border-radius:20px;
   box-shadow:0 6px 25px rgba(0,0,0,0.1);
   transition:transform .4s ease, box-shadow .4s ease;
@@ -175,6 +175,27 @@ nav a:hover{color:#007BFF;}
 }
 .whatsapp-float:hover{transform:scale(1.1);}
 
+/* ALERTA ÚLTIMAS VAGAS */
+.last-spots{
+  position:fixed;
+  top:90px;
+  right:20px;
+  background:linear-gradient(135deg,#ff3b3b,#ff9800);
+  color:#fff;
+  font-weight:700;
+  padding:0.8rem 1.2rem;
+  border-radius:12px;
+  box-shadow:0 4px 15px rgba(0,0,0,0.25);
+  font-size:1rem;
+  animation:pulse 1.5s infinite ease-in-out;
+  z-index:1100;
+  cursor:default;
+}
+@keyframes pulse {
+  0%,100%{transform:scale(1); box-shadow:0 0 15px rgba(255,87,34,0.4);}
+  50%{transform:scale(1.07); box-shadow:0 0 25px rgba(255,87,34,0.6);}
+}
+
 /* FOOTER */
 footer{
   background:#f5faff;
@@ -188,37 +209,20 @@ footer{
 
 /* MOBILE */
 @media(max-width:600px){
-  nav{
-    padding:0.8rem 1.2rem;
-  }
-  nav .brand{
-    font-size:1.1rem;
-  }
-  nav .brand img{
-    width:34px;
-  }
-  .hero{
-    padding:6rem 1rem 2rem;
-  }
-  .hero p{
-    font-size:1rem;
-    margin-bottom:1.8rem;
-  }
-  .hero .cta{
-    font-size:1rem;
-    padding:0.9rem 2rem;
-  }
-  .image-container img{
-    max-width:92%;
-  }
-  .image-bg{
-    width:300px;
-    height:300px;
-  }
-  .whatsapp-float{
-    width:55px;
-    height:55px;
-    font-size:1.6rem;
+  nav{padding:0.8rem 1.2rem;}
+  nav .brand{font-size:1.1rem;}
+  nav .brand img{width:34px;}
+  .hero{padding:6rem 1rem 2rem;}
+  .hero p{font-size:1rem;margin-bottom:1.8rem;}
+  .hero .cta{font-size:1rem;padding:0.9rem 2rem;}
+  .image-container img{max-width:92%;}
+  .image-bg{width:300px;height:300px;}
+  .whatsapp-float{width:55px;height:55px;font-size:1.6rem;}
+  .last-spots{
+    top:75px;
+    right:10px;
+    font-size:0.85rem;
+    padding:0.6rem 0.9rem;
   }
 }
 </style>
@@ -234,6 +238,8 @@ footer{
     <li><a href="#hero">Início</a></li>
   </ul>
 </nav>
+
+<div class="last-spots">🚨 Últimas 10 vagas!</div>
 
 <section class="hero" id="hero">
   <h1>Grandes Conquistas começam com pequenos passos</h1>
