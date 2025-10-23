@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AprovaMaisPB – Aula VIP</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-
 <style>
 :root {
   --primary: #007BFF;
@@ -15,6 +14,7 @@
   --pulse-gradient: linear-gradient(135deg,#ff3b3b,#ff9800);
 }
 
+/* Reset e base */
 *{margin:0;padding:0;box-sizing:border-box;}
 body{
   font-family:'Poppins',sans-serif;
@@ -37,10 +37,7 @@ nav{
   box-shadow: 0 2px 10px rgba(0,0,0,0.05);
   z-index:1000;
   backdrop-filter: blur(6px);
-  animation: slideDown 0.6s ease;
 }
-@keyframes slideDown { from {transform: translateY(-100px); opacity:0} to {transform: translateY(0); opacity:1} }
-
 nav .brand{display:flex;align-items:center;gap:0.6rem;font-weight:700;font-size:1.3rem;color: var(--primary);}
 nav .brand img{width:38px;}
 nav ul{list-style:none;display:flex;gap:1.4rem;}
@@ -64,7 +61,8 @@ nav a:hover{color: var(--primary);}
   margin-bottom:1rem;
   line-height:1.3;
   opacity:0;
-  animation: fadeInUp 1s forwards 0.3s;
+  transform: translateY(20px);
+  transition: all 1s ease;
 }
 .hero p{
   max-width:650px;
@@ -73,7 +71,8 @@ nav a:hover{color: var(--primary);}
   margin-bottom:2.2rem;
   padding:0 0.5rem;
   opacity:0;
-  animation: fadeInUp 1s forwards 0.6s;
+  transform: translateY(20px);
+  transition: all 1s ease;
 }
 .hero .cta{
   display:inline-block;
@@ -85,20 +84,16 @@ nav a:hover{color: var(--primary);}
   font-size:1.15rem;
   box-shadow:0 4px 20px rgba(0,123,255,0.3);
   text-decoration:none;
-  transition: transform .3s, box-shadow .3s;
   opacity:0;
-  animation: fadeInUp 1s forwards 0.9s;
+  transform: translateY(20px);
+  transition: all 0.5s ease, transform 0.3s;
 }
 .hero .cta:hover{
-  transform: scale(1.05);
-  box-shadow:0 6px 25px rgba(0,123,255,0.5);
-}
-@keyframes fadeInUp{
-  0%{opacity:0; transform: translateY(20px);}
-  100%{opacity:1; transform: translateY(0);}
+  transform: scale(1.1) rotate(-1deg);
+  box-shadow:0 8px 30px rgba(0,123,255,0.5);
 }
 
-/* Image Section */
+/* Image Section com Parallax */
 .image-section{
   text-align:center;
   padding:3rem 1rem 5rem;
@@ -113,16 +108,14 @@ nav a:hover{color: var(--primary);}
   transform: translate(-50%,-50%);
   filter:blur(70px);
   z-index:0;
-  animation: floatBg 6s ease-in-out infinite alternate;
-}
-@keyframes floatBg{
-  0%{transform: translate(-50%,-50%) scale(1);}
-  100%{transform: translate(-50%,-50%) scale(1.05);}
 }
 .image-container{
   position:relative;
   display:inline-block;
   z-index:2;
+  perspective:1000px;
+  transform: translateY(0);
+  transition: transform 0.3s ease-out;
 }
 .image-container img{
   max-width:80%;
@@ -130,7 +123,7 @@ nav a:hover{color: var(--primary);}
   box-shadow:0 6px 25px rgba(0,0,0,0.1);
   transition: transform .5s;
 }
-.image-container img:hover{transform: scale(1.03);}
+.image-container img:hover{transform: scale(1.05) translateY(-5px) rotateX(2deg);}
 
 /* WhatsApp Float */
 .whatsapp-float{
@@ -149,11 +142,31 @@ nav a:hover{color: var(--primary);}
   transition: transform .3s, box-shadow .3s;
 }
 .whatsapp-float:hover{
-  transform: scale(1.1);
-  box-shadow:0 6px 20px rgba(0,0,0,0.35);
+  transform: scale(1.15) rotate(-5deg);
+  box-shadow:0 8px 25px rgba(0,0,0,0.35);
 }
 
-/* Last Spots */
+/* Botão flutuante de inscrição */
+#floating-cta{
+  position:fixed;
+  bottom:100px; right:20px;
+  background: var(--primary);
+  color:#fff;
+  font-weight:600;
+  padding:1rem 2rem;
+  border-radius:50px;
+  font-size:1.1rem;
+  box-shadow:0 6px 20px rgba(0,123,255,0.4);
+  z-index:1200;
+  transition: transform .3s, box-shadow .3s;
+  cursor:pointer;
+}
+#floating-cta:hover{
+  transform: scale(1.1) rotate(-2deg);
+  box-shadow:0 8px 25px rgba(0,123,255,0.5);
+}
+
+/* Last Spots com countdown */
 .last-spots{
   position:fixed;
   top:90px; right:20px;
@@ -166,6 +179,7 @@ nav a:hover{color: var(--primary);}
   font-size:1rem;
   z-index:1100;
   cursor:default;
+  display:flex; align-items:center; gap:0.5rem;
   animation: pulse 1.2s infinite;
 }
 @keyframes pulse{
@@ -193,6 +207,7 @@ footer{
   .image-bg{width:300px;height:300px;}
   .whatsapp-float{width:55px;height:55px;font-size:1.6rem;}
   .last-spots{top:75px;right:10px;font-size:0.85rem;padding:0.6rem 0.9rem;}
+  #floating-cta{padding:0.9rem 1.8rem; font-size:1rem; bottom:80px;}
 }
 
 /* Partículas leves */
@@ -225,7 +240,7 @@ footer{
 </nav>
 
 <!-- Últimas Vagas -->
-<div class="last-spots">🚨 Últimas 10 vagas!</div>
+<div class="last-spots">🚨 Últimas <span id="countdown">10</span> vagas!</div>
 
 <!-- Hero Section -->
 <section class="hero" id="hero">
@@ -234,7 +249,7 @@ footer{
   <a class="cta" href="https://wa.me/5583996627827" target="_blank">Garantir minha vaga 💬</a>
 </section>
 
-<!-- Imagem -->
+<!-- Imagem com Parallax -->
 <section class="image-section">
   <div class="image-bg"></div>
   <div class="image-container">
@@ -242,19 +257,23 @@ footer{
   </div>
 </section>
 
+<!-- Botão flutuante -->
+<a href="https://wa.me/5583996627827" id="floating-cta">Quero minha vaga!</a>
+
 <!-- WhatsApp Float -->
 <a href="https://wa.me/5583996627827" class="whatsapp-float" target="_blank">💬</a>
 
 <!-- Footer -->
 <footer>© 2025 AprovaMaisPB – Todos os direitos reservados</footer>
 
-<!-- Partículas JS -->
+<!-- Scripts -->
 <script>
+// Partículas interativas
 document.addEventListener("DOMContentLoaded", function(){
   const particlesContainer = document.createElement("div");
   particlesContainer.id = "particles";
   document.body.appendChild(particlesContainer);
-  const totalParticles = window.innerWidth < 600 ? 10 : 20;
+  const totalParticles = window.innerWidth < 600 ? 10 : 25;
   for(let i=0;i<totalParticles;i++){
       const p=document.createElement("span");
       p.className="particle";
@@ -269,6 +288,44 @@ document.addEventListener("DOMContentLoaded", function(){
       });
       particlesContainer.appendChild(p);
   }
+  document.addEventListener('mousemove', e => {
+    particlesContainer.childNodes.forEach(p => {
+      p.style.transform = `translate(${(e.clientX/window.innerWidth-0.5)*15}px, ${(e.clientY/window.innerHeight-0.5)*15}px)`;
+    });
+  });
+});
+
+// Contagem regressiva real
+const countdownEl = document.getElementById('countdown');
+const eventTime = new Date();
+eventTime.setHours(eventTime.getHours() + 3); // exemplo: 3 horas a partir de agora
+setInterval(() => {
+  const now = new Date().getTime();
+  const distance = eventTime - now;
+  let vagas = Math.max(Math.ceil(distance/1000/60), 1); // diminui a cada minuto
+  countdownEl.textContent = vagas;
+}, 1000);
+
+// Scroll Reveal
+const revealElements = document.querySelectorAll('.hero h1, .hero p, .hero .cta, .image-section');
+const observer = new IntersectionObserver(entries=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      entry.target.style.opacity = 1;
+      entry.target.style.transform = 'translateY(0)';
+      observer.unobserve(entry.target);
+    }
+  });
+},{threshold:0.2});
+
+// Aplica observer
+revealElements.forEach(el=>observer.observe(el));
+
+// Parallax da imagem
+const imgContainer = document.querySelector('.image-container img');
+window.addEventListener('scroll', () => {
+  const scrollY = window.scrollY;
+  imgContainer.style.transform = `translateY(${scrollY*0.2}px) scale(1.02)`;
 });
 </script>
 
