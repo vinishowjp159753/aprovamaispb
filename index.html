@@ -93,7 +93,29 @@ nav a:hover{color: var(--primary);}
   box-shadow:0 8px 30px rgba(0,123,255,0.5);
 }
 
-/* Image Section */
+/* Video Section dentro da Hero */
+.video-card{
+  margin-top:2.5rem;
+  background:#fff;
+  border-radius:20px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.1);
+  overflow:hidden;
+  transition: transform .3s, box-shadow .3s;
+  max-width:560px;
+  width:90%;
+}
+.video-card:hover{
+  transform: scale(1.03);
+  box-shadow:0 10px 25px rgba(0,123,255,0.3);
+}
+.video-card iframe{
+  width:100%;
+  height:315px;
+  border:none;
+  border-radius:20px;
+}
+
+/* Imagem com Parallax */
 .image-section{
   text-align:center;
   padding:3rem 1rem 5rem;
@@ -125,46 +147,6 @@ nav a:hover{color: var(--primary);}
 }
 .image-container img:hover{transform: scale(1.05) translateY(-5px) rotateX(2deg);}
 
-/* Section Último Aulão */
-.last-class {
-  text-align:center;
-  padding:5rem 1rem;
-  background: #f7fbff;
-  position:relative;
-}
-.last-class h2{
-  color: var(--primary);
-  font-size:2rem;
-  margin-bottom:1rem;
-  font-weight:700;
-}
-.last-class p{
-  max-width:700px;
-  margin:0 auto 2rem;
-  font-size:1.05rem;
-  color:#444;
-}
-.video-card{
-  display:inline-block;
-  background:#fff;
-  border-radius:20px;
-  box-shadow:0 6px 20px rgba(0,0,0,0.1);
-  overflow:hidden;
-  transition: transform .3s, box-shadow .3s;
-  max-width:560px;
-  width:90%;
-}
-.video-card:hover{
-  transform: scale(1.03);
-  box-shadow:0 10px 25px rgba(0,123,255,0.3);
-}
-.video-card iframe{
-  width:100%;
-  height:315px;
-  border:none;
-  border-radius:20px 20px 0 0;
-}
-
 /* WhatsApp Float */
 .whatsapp-float{
   position:fixed;
@@ -180,6 +162,7 @@ nav a:hover{color: var(--primary);}
   text-decoration:none;
   box-shadow:0 4px 15px rgba(0,0,0,0.25);
   transition: transform .3s, box-shadow .3s;
+  z-index:1200;
 }
 .whatsapp-float:hover{
   transform: scale(1.15) rotate(-5deg);
@@ -195,15 +178,6 @@ footer{
   color:#555;
   margin-top:2rem;
   border-top:1px solid #e0f0ff;
-}
-
-/* Responsividade */
-@media(max-width:600px){
-  .hero{padding:6rem 1rem 2rem;}
-  .hero p{font-size:1rem;margin-bottom:1.8rem;}
-  .hero .cta{font-size:1rem;padding:0.9rem 2rem;}
-  .image-container img{max-width:92%;}
-  .image-bg{width:300px;height:300px;}
 }
 
 /* Balões flutuantes */
@@ -245,14 +219,21 @@ footer{
   </ul>
 </nav>
 
-<!-- Hero -->
+<!-- Hero Section -->
 <section class="hero" id="hero">
   <h1>Grandes Conquistas começam com pequenos passos</h1>
   <p>Participe da nossa <strong>Aula VIP</strong> e dê o primeiro passo rumo à sua aprovação com o time do AprovaMaisPB!</p>
   <a class="cta" href="https://wa.me/5583996627827" target="_blank">Garantir minha vaga 💬</a>
+
+  <!-- Video do Último Aulão -->
+  <div class="video-card">
+    <iframe src="https://www.youtube.com/embed/0QA9OgbnGEE" 
+      title="Resumo do Último Aulão AprovaMaisPB" 
+      frameborder="0" allowfullscreen></iframe>
+  </div>
 </section>
 
-<!-- Imagem -->
+<!-- Imagem com Parallax -->
 <section class="image-section">
   <div class="image-bg"></div>
   <div class="image-container">
@@ -260,18 +241,11 @@ footer{
   </div>
 </section>
 
-<!-- Seção Último Aulão -->
-<section class="last-class">
-  <h2>Último Aulão AprovaMaisPB 🚀</h2>
-  <p>O último aulão foi simplesmente inesquecível! Tivemos casa cheia, energia lá em cima e muito conteúdo de qualidade com nossos professores especialistas.  
-  Se você perdeu, não se preocupe! Assista ao resumo completo abaixo e veja os principais momentos e dicas que fizeram desse evento um sucesso.</p>
-  <div class="video-card">
-    <iframe src="https://www.youtube.com/embed/0QA9OgbnGEE" title="Resumo do Último Aulão AprovaMaisPB" allowfullscreen></iframe>
-  </div>
-</section>
-
 <!-- Balões flutuantes -->
 <div id="photo-balloons"></div>
+
+<!-- Botão flutuante do WhatsApp -->
+<a href="https://wa.me/5583996627827" target="_blank" class="whatsapp-float">💬</a>
 
 <!-- Footer -->
 <footer>© 2025 AprovaMaisPB – Todos os direitos reservados</footer>
@@ -294,6 +268,19 @@ document.addEventListener("DOMContentLoaded", function(){
     img.style.animationDelay = `${Math.random()*3}s`;
     container.appendChild(img);
   });
+
+  // Scroll Reveal da hero
+  const revealElements = document.querySelectorAll('.hero h1, .hero p, .hero .cta, .video-card');
+  const observer = new IntersectionObserver(entries=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        entry.target.style.opacity = 1;
+        entry.target.style.transform = 'translateY(0)';
+        observer.unobserve(entry.target);
+      }
+    });
+  },{threshold:0.2});
+  revealElements.forEach(el=>observer.observe(el));
 });
 </script>
 </body>
