@@ -11,6 +11,7 @@
   --secondary: #25d366;
   --text-dark: #1c1c1c;
   --bg-gradient: linear-gradient(180deg,#ffffff 0%,#eaf8ff 100%);
+  --pulse-gradient: linear-gradient(135deg,#ff3b3b,#ff9800);
 }
 
 /* Reset e base */
@@ -45,7 +46,7 @@ nav a:hover{color: var(--primary);}
 
 /* Hero */
 .hero{
-  min-height:100vh;
+  min-height:90vh;
   display:flex;
   flex-direction:column;
   justify-content:center;
@@ -92,47 +93,31 @@ nav a:hover{color: var(--primary);}
   box-shadow:0 8px 30px rgba(0,123,255,0.5);
 }
 
-/* Texto e vídeo */
-.video-section{
-  margin-top:3rem;
-  text-align:center;
+/* Video Section */
+.video-section {
+  margin-top: 3rem;
+  text-align: center;
 }
-.video-section h2{
+.video-section h2 {
   color: var(--primary);
-  font-size:1.7rem;
-  font-weight:700;
-  margin-bottom:0.8rem;
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
 }
-.video-section p{
-  color:#444;
-  max-width:600px;
-  margin:0 auto 1.5rem;
-  font-size:1rem;
+.video-section p {
+  color: #555;
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
 }
-
-/* Card do vídeo */
-.video-card{
-  background:#fff;
-  border-radius:20px;
-  box-shadow:0 6px 20px rgba(0,0,0,0.1);
-  overflow:hidden;
-  transition: transform .3s, box-shadow .3s;
-  max-width:560px;
-  width:90%;
-  margin:0 auto;
-}
-.video-card:hover{
-  transform: scale(1.03);
-  box-shadow:0 10px 25px rgba(0,123,255,0.3);
-}
-.video-card iframe{
-  width:100%;
-  height:315px;
-  border:none;
-  border-radius:20px;
+.video-card {
+  max-width: 700px;
+  margin: 0 auto;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
 }
 
-/* Imagem com Parallax */
+/* Image Section com Parallax */
 .image-section{
   text-align:center;
   padding:3rem 1rem 5rem;
@@ -152,6 +137,9 @@ nav a:hover{color: var(--primary);}
   position:relative;
   display:inline-block;
   z-index:2;
+  perspective:1000px;
+  transform: translateY(0);
+  transition: transform 0.3s ease-out;
 }
 .image-container img{
   max-width:80%;
@@ -159,7 +147,7 @@ nav a:hover{color: var(--primary);}
   box-shadow:0 6px 25px rgba(0,0,0,0.1);
   transition: transform .5s;
 }
-.image-container img:hover{transform: scale(1.05) translateY(-5px);}
+.image-container img:hover{transform: scale(1.05) translateY(-5px) rotateX(2deg);}
 
 /* WhatsApp Float */
 .whatsapp-float{
@@ -176,7 +164,6 @@ nav a:hover{color: var(--primary);}
   text-decoration:none;
   box-shadow:0 4px 15px rgba(0,0,0,0.25);
   transition: transform .3s, box-shadow .3s;
-  z-index:1200;
 }
 .whatsapp-float:hover{
   transform: scale(1.15) rotate(-5deg);
@@ -194,29 +181,14 @@ footer{
   border-top:1px solid #e0f0ff;
 }
 
-/* Balões flutuantes */
-#photo-balloons{
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 0;
-  height: 0;
-  z-index: 950;
-  pointer-events: none;
-}
-.photo-balloon{
-  position: absolute;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  object-fit: cover;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.25);
-  animation: floatBalloon linear infinite;
-}
-@keyframes floatBalloon{
-  0% { transform: translateY(0) translateX(0) rotate(0deg);}
-  50% { transform: translateY(-80px) translateX(20px) rotate(15deg);}
-  100% { transform: translateY(0) translateX(-20px) rotate(-15deg);}
+/* Responsividade */
+@media(max-width:600px){
+  .hero{padding:6rem 1rem 2rem;}
+  .hero p{font-size:1rem;margin-bottom:1.8rem;}
+  .hero .cta{font-size:1rem;padding:0.9rem 2rem;}
+  .image-container img{max-width:92%;}
+  .image-bg{width:300px;height:300px;}
+  .whatsapp-float{width:55px;height:55px;font-size:1.6rem;}
 }
 </style>
 </head>
@@ -233,28 +205,31 @@ footer{
   </ul>
 </nav>
 
-<!-- Hero -->
+<!-- Hero Section -->
 <section class="hero" id="hero">
   <h1>Grandes Conquistas começam com pequenos passos</h1>
   <p>Participe da nossa <strong>Aula VIP</strong> e dê o primeiro passo rumo à sua aprovação com o time do AprovaMaisPB!</p>
   <a class="cta" href="https://wa.me/5583996627827" target="_blank">Garantir minha vaga 💬</a>
 
-  <!-- Seção do vídeo -->
+  <!-- Bloco do vídeo do último aulão -->
   <div class="video-section">
     <h2>🎬 Resumo do Último Aulão</h2>
     <p>Assista aos melhores momentos e sinta a energia de quem está mais perto da aprovação!</p>
     <div class="video-card">
-      <iframe 
-        src="https://www.youtube.com/embed/0QA9OgbnGEE" 
-        title="Resumo do Último Aulão AprovaMaisPB"
-        frameborder="0" 
-        allowfullscreen>
+      <iframe
+        src="https://player.vimeo.com/video/1131425559"
+        width="100%"
+        height="400"
+        frameborder="0"
+        allow="autoplay; fullscreen; picture-in-picture"
+        allowfullscreen
+        title="Resumo do Último Aulão">
       </iframe>
     </div>
   </div>
 </section>
 
-<!-- Imagem -->
+<!-- Imagem com Parallax -->
 <section class="image-section">
   <div class="image-bg"></div>
   <div class="image-container">
@@ -262,47 +237,27 @@ footer{
   </div>
 </section>
 
-<!-- Balões flutuantes -->
-<div id="photo-balloons"></div>
-
-<!-- WhatsApp -->
-<a href="https://wa.me/5583996627827" target="_blank" class="whatsapp-float">💬</a>
-
 <!-- Footer -->
 <footer>© 2025 AprovaMaisPB – Todos os direitos reservados</footer>
 
-<!-- Script -->
-<script>
-document.addEventListener("DOMContentLoaded", function(){
-  const balloonPhotos = [
-    './assets/img/aula1.jpeg',
-    './assets/img/aula2.jpeg'
-  ];
-  const container = document.getElementById('photo-balloons');
-  balloonPhotos.forEach((src, index)=>{
-    const img = document.createElement('img');
-    img.src = src;
-    img.className = 'photo-balloon';
-    img.style.bottom = `${Math.random()*20}px`;
-    img.style.right = `${index*70}px`;
-    img.style.animationDuration = `${4 + Math.random()*3}s`;
-    img.style.animationDelay = `${Math.random()*3}s`;
-    container.appendChild(img);
-  });
+<!-- Ícone flutuante do WhatsApp -->
+<a href="https://wa.me/5583996627827" class="whatsapp-float" target="_blank" aria-label="Fale conosco no WhatsApp">💬</a>
 
-  // Efeitos de entrada suaves
-  const revealElements = document.querySelectorAll('.hero h1, .hero p, .hero .cta, .video-section');
-  const observer = new IntersectionObserver(entries=>{
-    entries.forEach(entry=>{
-      if(entry.isIntersecting){
-        entry.target.style.opacity = 1;
-        entry.target.style.transform = 'translateY(0)';
-        observer.unobserve(entry.target);
-      }
-    });
-  },{threshold:0.2});
-  revealElements.forEach(el=>observer.observe(el));
-});
+<!-- Scripts -->
+<script>
+// Scroll Reveal
+const revealElements = document.querySelectorAll('.hero h1, .hero p, .hero .cta');
+const observer = new IntersectionObserver(entries=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      entry.target.style.opacity = 1;
+      entry.target.style.transform = 'translateY(0)';
+      observer.unobserve(entry.target);
+    }
+  });
+},{threshold:0.2});
+revealElements.forEach(el=>observer.observe(el));
 </script>
+
 </body>
 </html>
