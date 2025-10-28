@@ -93,7 +93,7 @@ nav a:hover{color: var(--primary);}
   box-shadow:0 8px 30px rgba(0,123,255,0.5);
 }
 
-/* Image Section com Parallax */
+/* Image Section */
 .image-section{
   text-align:center;
   padding:3rem 1rem 5rem;
@@ -125,6 +125,46 @@ nav a:hover{color: var(--primary);}
 }
 .image-container img:hover{transform: scale(1.05) translateY(-5px) rotateX(2deg);}
 
+/* Section Último Aulão */
+.last-class {
+  text-align:center;
+  padding:5rem 1rem;
+  background: #f7fbff;
+  position:relative;
+}
+.last-class h2{
+  color: var(--primary);
+  font-size:2rem;
+  margin-bottom:1rem;
+  font-weight:700;
+}
+.last-class p{
+  max-width:700px;
+  margin:0 auto 2rem;
+  font-size:1.05rem;
+  color:#444;
+}
+.video-card{
+  display:inline-block;
+  background:#fff;
+  border-radius:20px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.1);
+  overflow:hidden;
+  transition: transform .3s, box-shadow .3s;
+  max-width:560px;
+  width:90%;
+}
+.video-card:hover{
+  transform: scale(1.03);
+  box-shadow:0 10px 25px rgba(0,123,255,0.3);
+}
+.video-card iframe{
+  width:100%;
+  height:315px;
+  border:none;
+  border-radius:20px 20px 0 0;
+}
+
 /* WhatsApp Float */
 .whatsapp-float{
   position:fixed;
@@ -146,45 +186,24 @@ nav a:hover{color: var(--primary);}
   box-shadow:0 8px 25px rgba(0,0,0,0.35);
 }
 
-/* Botão flutuante */
-#floating-cta{
-  position:fixed;
-  bottom:100px; right:20px;
-  background: var(--primary);
-  color:#fff;
-  font-weight:600;
-  padding:1rem 2rem;
-  border-radius:50px;
-  font-size:1.1rem;
-  box-shadow:0 6px 20px rgba(0,123,255,0.4);
-  z-index:1200;
-  transition: transform .3s, box-shadow .3s;
-  cursor:pointer;
-}
-#floating-cta:hover{
-  transform: scale(1.1) rotate(-2deg);
-  box-shadow:0 8px 25px rgba(0,123,255,0.5);
+/* Footer */
+footer{
+  background:#f5faff;
+  padding:2rem 1rem;
+  text-align:center;
+  font-size:0.95rem;
+  color:#555;
+  margin-top:2rem;
+  border-top:1px solid #e0f0ff;
 }
 
-/* Last Spots com countdown */
-.last-spots{
-  position:fixed;
-  top:90px; right:20px;
-  background: var(--pulse-gradient);
-  color:#fff;
-  font-weight:700;
-  padding:0.8rem 1.2rem;
-  border-radius:12px;
-  box-shadow:0 4px 15px rgba(0,0,0,0.25);
-  font-size:1rem;
-  z-index:1100;
-  cursor:default;
-  display:flex; align-items:center; gap:0.5rem;
-  animation: pulse 1.2s infinite;
-}
-@keyframes pulse{
-  0%,100%{transform: scale(1);}
-  50%{transform: scale(1.05);}
+/* Responsividade */
+@media(max-width:600px){
+  .hero{padding:6rem 1rem 2rem;}
+  .hero p{font-size:1rem;margin-bottom:1.8rem;}
+  .hero .cta{font-size:1rem;padding:0.9rem 2rem;}
+  .image-container img{max-width:92%;}
+  .image-bg{width:300px;height:300px;}
 }
 
 /* Balões flutuantes */
@@ -211,44 +230,6 @@ nav a:hover{color: var(--primary);}
   50% { transform: translateY(-80px) translateX(20px) rotate(15deg);}
   100% { transform: translateY(0) translateX(-20px) rotate(-15deg);}
 }
-
-/* Footer */
-footer{
-  background:#f5faff;
-  padding:2rem 1rem;
-  text-align:center;
-  font-size:0.95rem;
-  color:#555;
-  margin-top:2rem;
-  border-top:1px solid #e0f0ff;
-}
-
-/* Responsividade */
-@media(max-width:600px){
-  .hero{padding:6rem 1rem 2rem;}
-  .hero p{font-size:1rem;margin-bottom:1.8rem;}
-  .hero .cta{font-size:1rem;padding:0.9rem 2rem;}
-  .image-container img{max-width:92%;}
-  .image-bg{width:300px;height:300px;}
-  .whatsapp-float{width:55px;height:55px;font-size:1.6rem;}
-  .last-spots{top:75px;right:10px;font-size:0.85rem;padding:0.6rem 0.9rem;}
-  #floating-cta{padding:0.9rem 1.8rem; font-size:1rem; bottom:80px;}
-}
-
-/* Partículas leves */
-#particles{position:fixed;bottom:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;}
-.particle{
-  position:absolute;
-  background: var(--primary);
-  border-radius:50%;
-  opacity:0.6;
-  animation: floatParticle 6s linear infinite;
-}
-@keyframes floatParticle{
-  0%{transform: translateY(0) scale(1);}
-  50%{transform: translateY(-50vh) scale(1.2);}
-  100%{transform: translateY(-100vh) scale(1);}
-}
 </style>
 </head>
 <body>
@@ -264,14 +245,14 @@ footer{
   </ul>
 </nav>
 
-<!-- Hero Section -->
+<!-- Hero -->
 <section class="hero" id="hero">
   <h1>Grandes Conquistas começam com pequenos passos</h1>
   <p>Participe da nossa <strong>Aula VIP</strong> e dê o primeiro passo rumo à sua aprovação com o time do AprovaMaisPB!</p>
   <a class="cta" href="https://wa.me/5583996627827" target="_blank">Garantir minha vaga 💬</a>
 </section>
 
-<!-- Imagem com Parallax -->
+<!-- Imagem -->
 <section class="image-section">
   <div class="image-bg"></div>
   <div class="image-container">
@@ -279,6 +260,15 @@ footer{
   </div>
 </section>
 
+<!-- Seção Último Aulão -->
+<section class="last-class">
+  <h2>Último Aulão AprovaMaisPB 🚀</h2>
+  <p>O último aulão foi simplesmente inesquecível! Tivemos casa cheia, energia lá em cima e muito conteúdo de qualidade com nossos professores especialistas.  
+  Se você perdeu, não se preocupe! Assista ao resumo completo abaixo e veja os principais momentos e dicas que fizeram desse evento um sucesso.</p>
+  <div class="video-card">
+    <iframe src="https://www.youtube.com/embed/0QA9OgbnGEE" title="Resumo do Último Aulão AprovaMaisPB" allowfullscreen></iframe>
+  </div>
+</section>
 
 <!-- Balões flutuantes -->
 <div id="photo-balloons"></div>
@@ -288,79 +278,22 @@ footer{
 
 <!-- Scripts -->
 <script>
-// Partículas interativas
 document.addEventListener("DOMContentLoaded", function(){
-  const particlesContainer = document.createElement("div");
-  particlesContainer.id = "particles";
-  document.body.appendChild(particlesContainer);
-  const totalParticles = window.innerWidth < 600 ? 10 : 25;
-  for(let i=0;i<totalParticles;i++){
-      const p=document.createElement("span");
-      p.className="particle";
-      const size=Math.random()*5+2;
-      Object.assign(p.style,{
-        width:`${size}px`,
-        height:`${size}px`,
-        left:`${Math.random()*100}%`,
-        bottom:'0px',
-        animationDelay:`${Math.random()*5}s`,
-        background: 'var(--primary)'
-      });
-      particlesContainer.appendChild(p);
-  }
-  document.addEventListener('mousemove', e => {
-    particlesContainer.childNodes.forEach(p => {
-      p.style.transform = `translate(${(e.clientX/window.innerWidth-0.5)*15}px, ${(e.clientY/window.innerHeight-0.5)*15}px)`;
-    });
+  const balloonPhotos = [
+    './assets/img/aula1.jpeg',
+    './assets/img/aula2.jpeg'
+  ];
+  const container = document.getElementById('photo-balloons');
+  balloonPhotos.forEach((src, index)=>{
+    const img = document.createElement('img');
+    img.src = src;
+    img.className = 'photo-balloon';
+    img.style.bottom = `${Math.random()*20}px`;
+    img.style.right = `${index*70}px`;
+    img.style.animationDuration = `${4 + Math.random()*3}s`;
+    img.style.animationDelay = `${Math.random()*3}s`;
+    container.appendChild(img);
   });
-});
-
-// Contagem regressiva real
-const countdownEl = document.getElementById('countdown');
-const eventTime = new Date();
-eventTime.setHours(eventTime.getHours() + 3); // exemplo: 3 horas a partir de agora
-setInterval(() => {
-  const now = new Date().getTime();
-  const distance = eventTime - now;
-  let vagas = Math.max(Math.ceil(distance/1000/60), 1); // diminui a cada minuto
-  countdownEl.textContent = vagas;
-}, 1000);
-
-// Scroll Reveal
-const revealElements = document.querySelectorAll('.hero h1, .hero p, .hero .cta, .image-section');
-const observer = new IntersectionObserver(entries=>{
-  entries.forEach(entry=>{
-    if(entry.isIntersecting){
-      entry.target.style.opacity = 1;
-      entry.target.style.transform = 'translateY(0)';
-      observer.unobserve(entry.target);
-    }
-  });
-},{threshold:0.2});
-revealElements.forEach(el=>observer.observe(el));
-
-// Parallax da imagem
-const imgContainer = document.querySelector('.image-container img');
-window.addEventListener('scroll', () => {
-  const scrollY = window.scrollY;
-  imgContainer.style.transform = `translateY(${scrollY*0.2}px) scale(1.02)`;
-});
-
-// Balões flutuantes
-const balloonPhotos = [
-  './assets/img/aula1.jpeg',
-  './assets/img/aula2.jpeg'
-];
-const container = document.getElementById('photo-balloons');
-balloonPhotos.forEach((src, index)=>{
-  const img = document.createElement('img');
-  img.src = src;
-  img.className = 'photo-balloon';
-  img.style.bottom = `${Math.random()*20}px`;
-  img.style.right = `${index*70}px`;
-  img.style.animationDuration = `${4 + Math.random()*3}s`;
-  img.style.animationDelay = `${Math.random()*3}s`;
-  container.appendChild(img);
 });
 </script>
 </body>
