@@ -1,178 +1,231 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ENEM PREP - João Pessoa</title>
-    <link rel="stylesheet" href="assets/css/style.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-</head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ENEM PREP — João Pessoa</title>
 
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
 <body>
 
-    <!-- NAVBAR -->
-    <header class="navbar">
-        <div class="logo">📘 ENEM PREP<br><span>João Pessoa - PB</span></div>
+  <!-- NAVBAR (apenas 1) -->
+  <header class="navbar">
+    <div class="nav-wrap">
+      <div class="brand">
+        <div class="logo">📘</div>
+        <div>
+          <div class="brand-title">ENEM PREP</div>
+          <div class="brand-sub">João Pessoa - PB</div>
+        </div>
+      </div>
 
-        <nav class="menu">
-            <a href="#cursos">Cursos</a>
-            <a href="#horarios">Horários</a>
-            <a href="#depoimentos">Depoimentos</a>
-            <a href="#contato">Contato</a>
-        </nav>
-
-        <a href="#" class="btn-matriculas">📚 Matrículas Abertas</a>
-
-        <!-- Menu mobile -->
-        <div class="menu-mobile-icon" onclick="toggleMenu()">☰</div>
-    </header>
-
-    <div class="menu-mobile" id="menuMobile">
+      <nav class="navlinks" id="navLinks">
         <a href="#cursos">Cursos</a>
         <a href="#horarios">Horários</a>
         <a href="#depoimentos">Depoimentos</a>
         <a href="#contato">Contato</a>
-        <a href="#" class="btn-matriculas-mobile">📚 Matrículas Abertas</a>
+      </nav>
+
+      <div class="nav-actions">
+        <!-- Removed top "Matrículas Abertas" as requested -->
+        <a class="btn-whatsapp" id="btnWhatsTop" href="https://wa.me/5583986627827?text=Olá,%20vim%20pelo%20site%20e%20quero%20tirar%20dúvidas%20do%20cursinho" target="_blank" rel="noopener">
+          💬 Falar no WhatsApp
+        </a>
+
+        <button class="hamburger" id="hamburger" aria-label="Abrir menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile menu -->
+  <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+    <a href="#cursos" onclick="closeMobile()">Cursos</a>
+    <a href="#horarios" onclick="closeMobile()">Horários</a>
+    <a href="#depoimentos" onclick="closeMobile()">Depoimentos</a>
+    <a href="#contato" onclick="closeMobile()">Contato</a>
+    <a class="btn-whatsapp" href="https://wa.me/5583986627827?text=Olá,%20vim%20pelo%20site%20e%20quero%20tirar%20dúvidas%20do%20cursinho" target="_blank" rel="noopener">💬 Falar no WhatsApp</a>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-inner">
+      <h1 class="fade-up">Realize seu sonho de <span>entrar na universidade</span></h1>
+      <p class="fade-up delay-1">O melhor cursinho preparatório para o ENEM de João Pessoa. Metodologia aprovada, professores especialistas e resultados comprovados.</p>
+
+      <div class="hero-ctas fade-up delay-2">
+        <a class="btn primary" href="#cursos">Ver Cursos</a>
+        <a class="btn whatsapp" href="https://wa.me/5583986627827?text=Olá,%20vim%20pelo%20site%20e%20quero%20tirar%20dúvidas%20do%20cursinho" target="_blank" rel="noopener">💬 Falar no WhatsApp</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- BENEFÍCIOS -->
+  <section class="beneficios wrap">
+    <div class="beneficio card-slide">
+      <div class="card-bg"></div>
+      <h3>Qualidade Comprovada</h3>
+      <p>Metodologia exclusiva com foco total no formato do ENEM</p>
     </div>
 
-    <!-- HERO -->
-    <section class="hero">
-        <h1>Realize seu sonho de <br><span>entrar na universidade</span></h1>
-        <p>O melhor cursinho preparatório para o ENEM de João Pessoa. Metodologia aprovada, professores especialistas e resultados comprovados.</p>
+    <div class="beneficio card-slide">
+      <div class="card-bg"></div>
+      <h3>Professores Experts</h3>
+      <p>Equipe formada por mestres e especialistas em cada área</p>
+    </div>
 
-        <div class="hero-buttons">
-            <a href="#" class="btn">Fazer Matrícula</a>
-            <a href="https://wa.me/5583986627827" class="btn whats">Falar no WhatsApp</a>
+    <div class="beneficio card-slide">
+      <div class="card-bg"></div>
+      <h3>Método Exclusivo</h3>
+      <p>Sistema de ensino focado especificamente no formato do ENEM</p>
+    </div>
+  </section>
+
+  <!-- CURSOS -->
+  <section id="cursos" class="cursos wrap">
+    <h2 class="fade-up">Nossos Cursos</h2>
+    <p class="subtitle fade-up delay-1">Escolha o curso que melhor se adapta ao seu perfil e ritmo de estudos</p>
+
+    <div class="curso-grid">
+      <div class="curso-card fade-up delay-2">
+        <h3>Curso Extensivo</h3>
+        <p class="muted">Plano completo para todo o ano letivo.</p>
+        <div class="curso-actions">
+          <!-- when clicked it opens the modal with course preselected -->
+          <button class="btn outline js-open-form" data-course="Curso Extensivo">Pré-matrícula</button>
         </div>
-    </section>
+      </div>
 
-    <!-- BENEFICIOS -->
-    <section class="beneficios">
-        <div class="beneficio-card">
-            <h3>Qualidade Comprovada</h3>
-            <p>Metodologia exclusiva com foco total no formato do ENEM</p>
+      <div class="curso-card fade-up delay-3">
+        <h3>Curso Semi-Intensivo</h3>
+        <p class="muted">Focado em revisão e intensivo pré-ENEM.</p>
+        <div class="curso-actions">
+          <button class="btn outline js-open-form" data-course="Curso Semi-Intensivo">Pré-matrícula</button>
         </div>
+      </div>
+    </div>
+  </section>
 
-        <div class="beneficio-card">
-            <h3>Professores Experts</h3>
-            <p>Equipe formada por mestres e especialistas em cada área</p>
-        </div>
+  <!-- EXPERIÊNCIA -->
+  <section class="experiencia wrap fade-up delay-2">
+    <h2>Experiência Pré-ENEM Completa</h2>
+    <ul>
+      <li>✔ Aulas semanais</li>
+      <li>✔ Plantão de dúvidas</li>
+      <li>✔ Aulas de redação especializadas</li>
+      <li>✔ Acompanhamento individual</li>
+    </ul>
+  </section>
 
-        <div class="beneficio-card">
-            <h3>Método Exclusivo</h3>
-            <p>Sistema de ensino focado especificamente no formato do ENEM</p>
-        </div>
-    </section>
+  <!-- HORÁRIOS -->
+  <section id="horarios" class="horarios wrap fade-up delay-2">
+    <h2>Horários das Aulas</h2>
+    <div class="horarios-grid">
+      <div class="horario-card">
+        <div class="row"><span>Segunda-feira</span><strong>Matemática</strong></div>
+        <div class="row"><span>Terça-feira</span><strong>Português</strong></div>
+        <div class="row"><span>Quarta-feira</span><strong>História</strong></div>
+        <div class="row"><span>Quinta-feira</span><strong>Geografia</strong></div>
+        <div class="row"><span>Sexta-feira</span><strong>Redação</strong></div>
+        <div class="row"><span>Sábado</span><strong>Química / Física / Biologia</strong></div>
+      </div>
 
-    <!-- CURSOS -->
-    <section id="cursos" class="cursos">
-        <h2>Nossos Cursos</h2>
-        <p>Escolha o curso que melhor se adapta ao seu perfil e ritmo de estudos</p>
-
-        <div class="cursos-grid">
-            <div class="curso-card">
-                <h3>Curso Extensivo</h3>
-                <a href="#" class="btn">Fazer Matrícula</a>
-            </div>
-
-            <div class="curso-card">
-                <h3>Curso Semi-Intensivo</h3>
-                <a href="#" class="btn">Fazer Matrícula</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- EXPERIENCIA -->
-    <section class="experiencia">
-        <h2>Experiência Pré-ENEM Completa</h2>
-        <ul>
-            <li>✔ Aulas semanais</li>
-            <li>✔ Plantão de dúvidas</li>
-            <li>✔ Aulas de redação especializadas</li>
-            <li>✔ Acompanhamento individual</li>
-        </ul>
-    </section>
-
-    <!-- HORÁRIOS -->
-    <section id="horarios" class="horarios">
-        <h2>Horários das Aulas</h2>
-
-        <div class="horarios-container">
-            <div class="tabela">
-                <h3>Horários Semanais</h3>
-                <p>Segunda — Matemática</p>
-                <p>Terça — Português</p>
-                <p>Quarta — História</p>
-                <p>Quinta — Geografia</p>
-                <p>Sexta — Redação</p>
-                <p>Sábado — Química / Física / Biologia</p>
-            </div>
-
-            <div class="card-vip">
-                <h3>Aulas VIP</h3>
-                <p>Veja como foram nossas aulas VIP anteriores.</p>
-                <a href="#" class="btn">Ver no Instagram</a>
-            </div>
-
-            <div class="card-duvidas">
-                <h3>Plantão de Dúvidas</h3>
-                <p>Seg a Sex: 17h às 19h</p>
-                <p>Sábados: 14h às 16h</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- DEPOIMENTOS -->
-    <section id="depoimentos" class="depoimentos">
-        <h2>Depoimentos dos Nossos Alunos</h2>
-
-        <div class="slider">
-            <div class="slide ativo">
-                <p>"O cursinho me ajudou muito a organizar os estudos. Professores explicam de forma clara e o material é excelente."</p>
-                <h4>Lucas Oliveira — 680 pontos no ENEM</h4>
-            </div>
-
-            <div class="slide">
-                <p>"Melhor preparação possível! Passei na UFPB graças ao método deles."</p>
-                <h4>Mariana Souza — Aprovada em Direito</h4>
-            </div>
-
-            <div class="slide">
-                <p>"O acompanhamento individual fez toda diferença. Recomendo demais."</p>
-                <h4>Carlos Lima — 720 pontos no ENEM</h4>
-            </div>
+      <div class="side-cards">
+        <div class="side vip">
+          <h4>Conheça nossas Aulas VIP</h4>
+          <p>Veja como foram nossas aulas VIP anteriores e a experiência dos nossos alunos.</p>
+          <a class="small-link" href="#" target="_blank">Ver no Instagram</a>
         </div>
 
-        <div class="slider-dots">
-            <span onclick="mudarSlide(0)" class="dot ativo"></span>
-            <span onclick="mudarSlide(1)" class="dot"></span>
-            <span onclick="mudarSlide(2)" class="dot"></span>
+        <div class="side plantao">
+          <h4>Plantão de Dúvidas</h4>
+          <p>Seg a Sex: 17h às 19h<br>Sábados: 14h às 16h</p>
         </div>
-    </section>
+      </div>
+    </div>
+  </section>
 
-    <!-- CONTATO -->
-    <section id="contato" class="contato">
-        <h2>Entre em Contato</h2>
+  <!-- DEPOIMENTOS -->
+  <section id="depoimentos" class="depoimentos wrap fade-up delay-2">
+    <h2>Depoimentos dos Nossos Alunos</h2>
 
-        <div class="contato-grid">
-            <div>
-                <p>📍 João Pessoa - PB</p>
-                <p>📱 WhatsApp: (83) 9 8662-7827</p>
-                <p>🕒 Seg a Sexta: 7h às 22h</p>
-            </div>
+    <div class="slider" id="slider">
+      <div class="slide active">
+        <blockquote>"O cursinho me ajudou muito a organizar os estudos. Professores explicam de forma clara e o material é excelente."</blockquote>
+        <cite>— Lucas Oliveira, 680 no ENEM</cite>
+      </div>
 
-            <div class="contato-card">
-                <a class="btn" href="#">Fazer Pré-Matrícula</a>
-                <a class="btn whats" href="https://wa.me/5583986627827">Conversar no WhatsApp</a>
-            </div>
+      <div class="slide">
+        <blockquote>"Melhor preparação possível! Passei na UFPB graças ao método deles."</blockquote>
+        <cite>— Mariana Souza</cite>
+      </div>
+    </div>
+    <div class="slider-controls">
+      <button id="prev">◀</button>
+      <button id="next">▶</button>
+    </div>
+  </section>
+
+  <!-- CONTATO -->
+  <section id="contato" class="contato wrap fade-up delay-2">
+    <h2>Entre em Contato</h2>
+    <div class="contato-grid">
+      <div class="info">
+        <p>📍 João Pessoa - PB — Centro</p>
+        <p>📱 WhatsApp: (83) 9 8662-7827</p>
+        <p>🕒 Seg a Sex: 7h às 22h — Sáb: 8h às 18h</p>
+      </div>
+      <div class="contato-actions">
+        <a class="btn whatsapp" href="https://wa.me/5583986627827?text=Olá,%20vim%20pelo%20site%20e%20quero%20tirar%20dúvidas%20do%20cursinho" target="_blank" rel="noopener">💬 Falar no WhatsApp</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FLOATING WHATSAPP -->
+  <a class="floating-whats" href="https://wa.me/5583986627827?text=Olá,%20vim%20pelo%20site%20e%20quero%20tirar%20dúvidas%20do%20cursinho" target="_blank" rel="noopener">💬</a>
+
+  <!-- MODAL FORM (used for pre-enrollment) -->
+  <div class="modal" id="formModal" aria-hidden="true">
+    <div class="modal-content">
+      <button class="modal-close" id="modalClose">✕</button>
+      <h3>Pré-matrícula — <span id="modalCourse">Curso</span></h3>
+
+      <form id="preForm" class="pre-form">
+        <label>Nome
+          <input type="text" id="nome" name="nome" placeholder="Seu nome completo" required>
+        </label>
+
+        <label>WhatsApp
+          <input type="tel" id="whatsapp" name="whatsapp" placeholder="Ex: 83999991234" required>
+        </label>
+
+        <label>E-mail
+          <input type="email" id="email" name="email" placeholder="seu@exemplo.com" required>
+        </label>
+
+        <label>Ano do ENEM
+          <input type="number" id="ano" name="ano" placeholder="Ex: 2026" min="2023" max="2030" required>
+        </label>
+
+        <label>Observações
+          <textarea id="observacoes" name="observacoes" rows="3" placeholder="Alguma observação (opcional)"></textarea>
+        </label>
+
+        <input type="hidden" id="cursoHidden" name="cursoHidden" value="">
+
+        <div class="form-actions">
+          <button type="button" class="btn outline" id="cancelForm">Cancelar</button>
+          <button type="submit" class="btn primary">Enviar para WhatsApp</button>
         </div>
-    </section>
+      </form>
+    </div>
+  </div>
 
-    <!-- BOTÃO WHATSAPP FLUTUANTE -->
-    <a href="https://wa.me/5583986627827" class="whats-flutuante">💬</a>
+  <footer class="site-footer">
+    <div class="wrap">© ENEM PREP — Transformando sonhos através da educação.</div>
+  </footer>
 
-    <script src="assets/js/script.js"></script>
+  <script src="assets/js/main.js"></script>
 </body>
 </html>
