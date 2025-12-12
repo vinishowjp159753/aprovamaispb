@@ -1,240 +1,123 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Poppins", sans-serif;
+/* ===== GLOBAL ===== */
+:root{
+  --bg: #f6f8ff;
+  --card: #fff;
+  --accent: #6b46ff;
+  --accent-2: #00c166;
+  --muted: #6b7280;
+  --radius: 14px;
+  --wrap: 1100px;
+  --shadow: 0 12px 30px rgba(11,22,60,0.06);
 }
 
-body {
-  background: #f7f8fc;
-  color: #222;
-}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Poppins',sans-serif;background:var(--bg);color:#081029;-webkit-font-smoothing:antialiased}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 20px}
 
-/* NAVBAR */
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 40px;
-  background: white;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  position: sticky;
-  top: 0;
-  z-index: 999;
-}
+/* ===== NAVBAR ===== */
+.navbar{background:#fff;box-shadow:0 6px 24px rgba(2,6,23,0.06);position:sticky;top:0;z-index:90}
+.nav-wrap{display:flex;align-items:center;justify-content:space-between;padding:14px 20px}
+.brand{display:flex;gap:12px;align-items:center}
+.logo{font-size:28px}
+.brand-title{font-weight:700}
+.brand-sub{font-size:12px;color:var(--muted)}
+.navlinks{display:flex;gap:18px}
+.navlinks a{text-decoration:none;color:var(--muted);font-weight:600}
+.nav-actions{display:flex;gap:12px;align-items:center}
+.btn-whatsapp{background:linear-gradient(90deg,var(--accent),#2b82ff);color:#fff;padding:8px 12px;border-radius:10px;text-decoration:none;font-weight:700}
+.hamburger{display:none;background:transparent;border:0;font-size:20px;cursor:pointer}
 
-.logo {
-  font-weight: 700;
-  font-size: 20px;
-  line-height: 1.2;
-}
-
-.menu a {
-  margin: 0 15px;
-  text-decoration: none;
-  color: #333;
-  font-weight: 500;
-}
-
-.btn-matriculas {
-  padding: 10px 18px;
-  background: #4f46e5;
-  color: white;
-  border-radius: 8px;
-  text-decoration: none;
-}
+/* MOBILE MENU */
+.mobile-menu{display:none;flex-direction:column;gap:8px;padding:12px 20px;background:#fff;box-shadow:0 10px 30px rgba(2,6,23,0.08)}
+.mobile-menu a{padding:10px 0;text-decoration:none;color:var(--muted);font-weight:700}
 
 /* HERO */
-.hero {
-  text-align: center;
-  padding: 90px 20px;
-  background: linear-gradient(135deg, #e0f0ff, #f5e8ff);
-}
+.hero{padding:80px 0 30px;background:linear-gradient(135deg,#eef6ff,#f9f0ff)}
+.hero-inner{text-align:center}
+.hero h1{font-size:42px;line-height:1.02;margin-bottom:10px}
+.hero h1 span{color:var(--accent);display:block}
+.hero p{color:var(--muted);max-width:720px;margin:12px auto}
+.hero-ctas{margin-top:18px}
+.btn{padding:10px 18px;border-radius:10px;text-decoration:none;color:#fff;font-weight:700;display:inline-block}
+.btn.primary{background:linear-gradient(90deg,var(--accent),#2b82ff)}
+.btn.whatsapp{background:linear-gradient(90deg,#00c166,#069955)}
 
-.hero h1 {
-  font-size: 42px;
-  font-weight: 700;
-}
-
-.hero h1 span {
-  color: #4f46e5;
-}
-
-.hero p {
-  margin: 20px auto;
-  max-width: 600px;
-  font-size: 16px;
-  color: #444;
-}
-
-.hero-buttons {
-  margin-top: 20px;
-}
-
-.btn {
-  padding: 12px 26px;
-  border-radius: 8px;
-  background: #4f46e5;
-  color: white;
-  margin: 5px;
-  text-decoration: none;
-  display: inline-block;
-}
-
-.btn.whats {
-  background: #0bbf4f;
-}
-
-/* BENEFÍCIOS */
-.beneficios {
-  margin: 50px auto;
-  display: flex;
-  justify-content: center;
-  gap: 30px;
-}
-
-.beneficio-card {
-  background: white;
-  padding: 25px;
-  width: 260px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.07);
-  text-align: center;
-}
+/* BENEFÍCIO CARDS */
+.beneficios{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin:30px auto;padding:0 20px}
+.beneficio{position:relative;background:var(--card);padding:26px;border-radius:16px;overflow:hidden;box-shadow:var(--shadow);transform:translateY(0);transition:transform .3s}
+.beneficio:hover{transform:translateY(-6px)}
+.beneficio .card-bg{position:absolute;inset:0;background:linear-gradient(135deg,#f3e8ff,#e6f6ff);z-index:0;opacity:0.9;border-radius:16px;transform:scale(1.06)}
+.beneficio > *{position:relative;z-index:1}
+.beneficio h3{margin-bottom:8px}
 
 /* CURSOS */
-.cursos {
-  text-align: center;
-  padding: 70px 20px;
-}
-
-.cursos-grid {
-  margin-top: 40px;
-  display: flex;
-  justify-content: center;
-  gap: 30px;
-}
-
-.curso-card {
-  background: white;
-  padding: 30px;
-  width: 280px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
+.cursos{padding:40px 20px;text-align:center}
+.subtitle{color:var(--muted);margin-top:8px}
+.curso-grid{display:flex;gap:20px;justify-content:center;margin-top:18px}
+.curso-card{background:var(--card);padding:24px;border-radius:14px;box-shadow:var(--shadow);width:330px;display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+.curso-actions{margin-top:auto}
+.btn.outline{background:transparent;color:var(--accent);border:2px solid rgba(107,70,255,0.12);padding:10px 14px;border-radius:10px;cursor:pointer}
 
 /* EXPERIÊNCIA */
-.experiencia {
-  margin: 60px auto;
-  padding: 40px;
-  background: linear-gradient(135deg, #7f5af0, #4f46e5);
-  color: white;
-  text-align: center;
-  border-radius: 15px;
-  max-width: 900px;
-}
-
-.experiencia ul {
-  list-style: none;
-  margin-top: 20px;
-  line-height: 2;
-}
+.experiencia{margin:32px auto;padding:28px;border-radius:16px;background:linear-gradient(90deg,#8b4dff,#2b82ff);color:#fff;text-align:center}
+.experiencia ul{margin-top:12px;list-style:none;display:inline-block;text-align:left}
 
 /* HORÁRIOS */
-.horarios {
-  padding: 60px 20px;
-  text-align: center;
-}
-
-.horarios-container {
-  display: flex;
-  justify-content: center;
-  gap: 25px;
-  margin-top: 40px;
-}
-
-.tabela, .card-vip, .card-duvidas {
-  background: white;
-  padding: 25px;
-  width: 280px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-}
+.horarios{padding:40px 20px}
+.horarios-grid{display:flex;gap:20px;justify-content:center;align-items:flex-start}
+.horario-card{background:var(--card);padding:18px;border-radius:12px;box-shadow:var(--shadow);width:360px}
+.horario-card .row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f1f5f9}
+.side-cards{display:flex;flex-direction:column;gap:12px;width:320px}
+.side{padding:16px;border-radius:12px;color:#fff}
+.side.vip{background:linear-gradient(90deg,#8b4dff,#2b82ff)}
+.side.plantao{background:linear-gradient(90deg,#00c166,#069955)}
 
 /* DEPOIMENTOS */
-.depoimentos {
-  text-align: center;
-  padding: 70px 20px;
-}
-
-.slider {
-  position: relative;
-  width: 80%;
-  margin: auto;
-}
-
-.slide {
-  display: none;
-  opacity: 0;
-  transition: 0.5s;
-}
-
-.slide.ativo {
-  display: block;
-  opacity: 1;
-}
-
-.slider-dots {
-  margin-top: 20px;
-}
-
-.dot {
-  height: 12px;
-  width: 12px;
-  background: #bbb;
-  display: inline-block;
-  margin: 0 5px;
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-.dot.ativo {
-  background: #4f46e5;
-}
+.depoimentos{padding:40px 20px;text-align:center}
+.slider{max-width:760px;margin:18px auto}
+.slide{display:none;background:var(--card);padding:24px;border-radius:14px;box-shadow:var(--shadow)}
+.slide.active{display:block}
+blockquote{font-style:italic;color:var(--muted);margin-bottom:10px}
+.slider-controls{display:flex;gap:8px;justify-content:center;margin-top:12px}
+.slider-controls button{background:#fff;border:1px solid #eee;padding:8px 12px;border-radius:8px;cursor:pointer}
 
 /* CONTATO */
-.contato {
-  padding: 70px 20px;
-  background: #f3f4ff;
-}
+.contato{padding:60px 20px;background:linear-gradient(180deg,#f0f7ff,transparent)}
+.contato-grid{max-width:var(--wrap);margin:0 auto;display:flex;justify-content:space-between;gap:20px;align-items:center}
+.info{flex:1}
+.contato-actions{width:260px;text-align:right}
 
-.contato-grid {
-  max-width: 900px;
-  margin: auto;
-  display: flex;
-  justify-content: space-between;
-  gap: 40px;
-}
+/* FLOATING WHATS */
+.floating-whats{position:fixed;right:18px;bottom:18px;background:linear-gradient(90deg,#00c166,#008f4a);color:#fff;padding:12px 14px;border-radius:50px;box-shadow:0 10px 30px rgba(2,6,23,0.18);text-decoration:none;font-size:20px}
 
-.contato-card {
-  background: white;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-  width: 280px;
-  text-align: center;
-}
+/* MODAL */
+.modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(2,6,23,0.45);z-index:200;opacity:0;pointer-events:none;transition:opacity .25s}
+.modal[aria-hidden="false"]{opacity:1;pointer-events:auto}
+.modal-content{width:100%;max-width:520px;background:var(--card);padding:20px;border-radius:12px;position:relative;box-shadow:0 20px 60px rgba(2,6,23,0.2)}
+.modal-close{position:absolute;right:14px;top:10px;border:0;background:transparent;font-size:20px;cursor:pointer}
+.pre-form label{display:block;margin-bottom:10px;font-size:14px;color:#333}
+.pre-form input,.pre-form textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #eef2f6;margin-top:6px}
+.form-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:12px}
 
-/* WHATSAPP FLUTUANTE */
-.whats-flutuante {
-  position: fixed;
-  bottom: 25px;
-  right: 25px;
-  text-decoration: none;
-  background: #0bbf4f;
-  color: white;
-  font-size: 25px;
-  padding: 14px 18px;
-  border-radius: 50%;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+/* FOOTER */
+.site-footer{padding:24px 0;text-align:center;color:var(--muted)}
+
+/* ===== ANIMATIONS ===== */
+.fade-up{opacity:0;transform:translateY(18px);animation:fadeUp .6s forwards}
+.fade-up.delay-1{animation-delay:.15s}
+.fade-up.delay-2{animation-delay:.3s}
+.fade-up.delay-3{animation-delay:.45s}
+@keyframes fadeUp{to{opacity:1;transform:none}}
+
+/* small screens */
+@media (max-width:900px){
+  .navlinks{display:none}
+  .hamburger{display:inline-block}
+  .mobile-menu{display:flex}
+  .beneficios{grid-template-columns:1fr}
+  .curso-grid{flex-direction:column;align-items:center}
+  .horarios-grid{flex-direction:column;align-items:center}
+  .contato-grid{flex-direction:column;gap:16px}
+  .side-cards{width:100%}
 }
