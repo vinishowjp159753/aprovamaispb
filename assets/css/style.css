@@ -164,4 +164,77 @@ body {
 /* DEPOIMENTOS */
 .depoimentos {
   text-align: center;
-  padding: 70px
+  padding: 70px 20px;
+}
+
+.slider {
+  position: relative;
+  width: 80%;
+  margin: auto;
+}
+
+.slide {
+  display: none;
+  opacity: 0;
+  transition: 0.5s;
+}
+
+.slide.ativo {
+  display: block;
+  opacity: 1;
+}
+
+.slider-dots {
+  margin-top: 20px;
+}
+
+.dot {
+  height: 12px;
+  width: 12px;
+  background: #bbb;
+  display: inline-block;
+  margin: 0 5px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.dot.ativo {
+  background: #4f46e5;
+}
+
+/* CONTATO */
+.contato {
+  padding: 70px 20px;
+  background: #f3f4ff;
+}
+
+.contato-grid {
+  max-width: 900px;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+}
+
+.contato-card {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  width: 280px;
+  text-align: center;
+}
+
+/* WHATSAPP FLUTUANTE */
+.whats-flutuante {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  text-decoration: none;
+  background: #0bbf4f;
+  color: white;
+  font-size: 25px;
+  padding: 14px 18px;
+  border-radius: 50%;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+}
