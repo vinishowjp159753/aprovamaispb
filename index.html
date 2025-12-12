@@ -1,263 +1,405 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AprovaMaisPB – Aula VIP</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-<style>
-:root {
-  --primary: #007BFF;
-  --secondary: #25d366;
-  --text-dark: #1c1c1c;
-  --bg-gradient: linear-gradient(180deg,#ffffff 0%,#eaf8ff 100%);
-  --pulse-gradient: linear-gradient(135deg,#ff3b3b,#ff9800);
-}
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ENEM PREP • João Pessoa - PB</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-/* Reset e base */
-*{margin:0;padding:0;box-sizing:border-box;}
-body{
-  font-family:'Poppins',sans-serif;
-  background: var(--bg-gradient);
-  color: var(--text-dark);
-  overflow-x:hidden;
-  scroll-behavior:smooth;
-}
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:'Poppins', sans-serif;
+        }
 
-/* Navbar */
-nav{
-  width:100%;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:1rem 2rem;
-  position:fixed;
-  top:0; left:0;
-  background: rgba(255,255,255,0.95);
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-  z-index:1000;
-  backdrop-filter: blur(6px);
-}
-nav .brand{display:flex;align-items:center;gap:0.6rem;font-weight:700;font-size:1.3rem;color: var(--primary);}
-nav .brand img{width:38px;}
-nav ul{list-style:none;display:flex;gap:1.4rem;}
-nav a{color: var(--text-dark);text-decoration:none;font-weight:600;transition:color .3s;}
-nav a:hover{color: var(--primary);}
+        body{
+            background:#f5f7fb;
+            color:#1a1a1a;
+        }
 
-/* Hero */
-.hero{
-  min-height:90vh;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  text-align:center;
-  padding:7rem 1.5rem 3rem;
-}
-.hero h1{
-  color: var(--primary);
-  font-size:clamp(1.8rem,5vw,3rem);
-  font-weight:700;
-  margin-bottom:1rem;
-  line-height:1.3;
-  opacity:0;
-  transform: translateY(20px);
-  transition: all 1s ease;
-}
-.hero p{
-  max-width:650px;
-  font-size:1.05rem;
-  color:#444;
-  margin-bottom:2.2rem;
-  padding:0 0.5rem;
-  opacity:0;
-  transform: translateY(20px);
-  transition: all 1s ease;
-}
-.hero .cta{
-  display:inline-block;
-  background: var(--primary);
-  color:#fff;
-  font-weight:600;
-  padding:1rem 2.3rem;
-  border-radius:50px;
-  font-size:1.15rem;
-  box-shadow:0 4px 20px rgba(0,123,255,0.3);
-  text-decoration:none;
-  opacity:0;
-  transform: translateY(20px);
-  transition: all 0.5s ease, transform 0.3s;
-}
-.hero .cta:hover{
-  transform: scale(1.1) rotate(-1deg);
-  box-shadow:0 8px 30px rgba(0,123,255,0.5);
-}
+        header{
+            width:100%;
+            background:#ffffff;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            padding:20px 50px;
+            box-shadow:0 2px 15px rgba(0,0,0,0.07);
+            position:sticky;
+            top:0;
+            z-index:10;
+        }
 
-/* Video Section */
-.video-section {
-  margin-top: 3rem;
-  text-align: center;
-}
-.video-section h2 {
-  color: var(--primary);
-  font-size: 1.6rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-}
-.video-section p {
-  color: #555;
-  margin-bottom: 1.5rem;
-  font-size: 1rem;
-}
-.video-card {
-  max-width: 700px;
-  margin: 0 auto;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
-}
+        header .logo{
+            display:flex;
+            align-items:center;
+            gap:10px;
+            font-weight:600;
+            font-size:20px;
+        }
 
-/* Image Section com Parallax */
-.image-section{
-  text-align:center;
-  padding:3rem 1rem 5rem;
-  position:relative;
-  overflow:hidden;
-}
-.image-bg{
-  position:absolute;
-  top:50%; left:50%;
-  width:400px; height:400px;
-  background: radial-gradient(circle, rgba(0,123,255,0.12) 0%, transparent 70%);
-  transform: translate(-50%,-50%);
-  filter:blur(70px);
-  z-index:0;
-}
-.image-container{
-  position:relative;
-  display:inline-block;
-  z-index:2;
-  perspective:1000px;
-  transform: translateY(0);
-  transition: transform 0.3s ease-out;
-}
-.image-container img{
-  max-width:80%;
-  border-radius:20px;
-  box-shadow:0 6px 25px rgba(0,0,0,0.1);
-  transition: transform .5s;
-}
-.image-container img:hover{transform: scale(1.05) translateY(-5px) rotateX(2deg);}
+        header nav ul{
+            display:flex;
+            list-style:none;
+            gap:40px;
+        }
 
-/* WhatsApp Float */
-.whatsapp-float{
-  position:fixed;
-  bottom:20px; right:20px;
-  background: var(--secondary);
-  color:white;
-  width:60px; height:60px;
-  border-radius:50%;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-size:1.8rem;
-  text-decoration:none;
-  box-shadow:0 4px 15px rgba(0,0,0,0.25);
-  transition: transform .3s, box-shadow .3s;
-}
-.whatsapp-float:hover{
-  transform: scale(1.15) rotate(-5deg);
-  box-shadow:0 8px 25px rgba(0,0,0,0.35);
-}
+        header nav a{
+            text-decoration:none;
+            font-weight:500;
+            color:#222;
+        }
 
-/* Footer */
-footer{
-  background:#f5faff;
-  padding:2rem 1rem;
-  text-align:center;
-  font-size:0.95rem;
-  color:#555;
-  margin-top:2rem;
-  border-top:1px solid #e0f0ff;
-}
+        .btn-top{
+            background:#0ad18c;
+            padding:10px 22px;
+            border-radius:8px;
+            color:#fff;
+            font-weight:600;
+            text-decoration:none;
+        }
 
-/* Responsividade */
-@media(max-width:600px){
-  .hero{padding:6rem 1rem 2rem;}
-  .hero p{font-size:1rem;margin-bottom:1.8rem;}
-  .hero .cta{font-size:1rem;padding:0.9rem 2rem;}
-  .image-container img{max-width:92%;}
-  .image-bg{width:300px;height:300px;}
-  .whatsapp-float{width:55px;height:55px;font-size:1.6rem;}
-}
-</style>
+        /* HERO */
+        .hero{
+            text-align:center;
+            padding:90px 20px;
+            background:linear-gradient(120deg,#dde6ff,#ffffff);
+        }
+        .hero h1{
+            font-size:44px;
+            font-weight:700;
+        }
+        .hero h1 span{
+            color:#3e57ff;
+        }
+        .hero p{
+            margin-top:15px;
+            font-size:18px;
+            opacity:0.8;
+        }
+        .hero .btns{
+            margin-top:30px;
+            display:flex;
+            justify-content:center;
+            gap:15px;
+        }
+        .btn{
+            padding:12px 26px;
+            border-radius:10px;
+            text-decoration:none;
+            color:#fff;
+            font-weight:600;
+        }
+        .btn-blue{
+            background:#3e57ff;
+        }
+        .btn-green{
+            background:#00c166;
+        }
+
+        /* 3 CARDS */
+        .features{
+            display:flex;
+            justify-content:center;
+            gap:25px;
+            margin:60px auto;
+            padding:0 20px;
+            max-width:1100px;
+        }
+        .card{
+            flex:1;
+            background:#fff;
+            padding:25px;
+            border-radius:15px;
+            box-shadow:0 4px 20px rgba(0,0,0,0.05);
+            text-align:center;
+        }
+        .card h3{
+            margin-bottom:10px;
+            font-size:18px;
+        }
+        .card p{
+            opacity:0.8;
+            font-size:15px;
+        }
+
+        /* Cursos */
+        .section-title{
+            text-align:center;
+            margin-top:60px;
+        }
+        .cursos{
+            display:flex;
+            justify-content:center;
+            gap:30px;
+            padding:40px 20px;
+        }
+        .curso-card{
+            width:300px;
+            background:#fff;
+            padding:30px;
+            border-radius:15px;
+            text-align:center;
+            box-shadow:0 4px 20px rgba(0,0,0,0.06);
+        }
+
+        /* Experiência */
+        .experiencia{
+            max-width:900px;
+            margin:60px auto;
+            padding:40px;
+            background:linear-gradient(135deg,#8b4dff,#2b82ff);
+            color:#fff;
+            border-radius:20px;
+            text-align:left;
+        }
+        .experiencia ul{
+            margin-top:20px;
+            columns:2;
+        }
+        .experiencia li{
+            margin-bottom:10px;
+        }
+
+        /* Horários */
+        .horarios-box{
+            display:flex;
+            max-width:1100px;
+            gap:30px;
+            margin:40px auto;
+            padding:20px;
+        }
+        .horarios-list{
+            flex:1;
+            background:#fff;
+            border-radius:15px;
+            padding:25px;
+            box-shadow:0 4px 15px rgba(0,0,0,0.06);
+        }
+        .horarios-list .item{
+            display:flex;
+            justify-content:space-between;
+            padding:10px 0;
+            border-bottom:1px solid #eee;
+        }
+        .horarios-side{
+            flex:1;
+            display:flex;
+            flex-direction:column;
+            gap:20px;
+        }
+        .side-box{
+            background:linear-gradient(135deg,#8b4dff,#2b82ff);
+            padding:25px;
+            color:#fff;
+            border-radius:15px;
+            box-shadow:0 4px 15px rgba(0,0,0,0.06);
+        }
+        .side-box-green{
+            background:#0ad18c;
+        }
+
+        /* Depoimentos */
+        .depoimentos{
+            text-align:center;
+            margin-top:80px;
+        }
+        .depo-card{
+            max-width:700px;
+            margin:40px auto;
+            background:#fff;
+            padding:35px;
+            border-radius:20px;
+            box-shadow:0 4px 20px rgba(0,0,0,0.06);
+            text-align:left;
+        }
+
+        /* Contato */
+        .contato{
+            background:#eef3ff;
+            padding:60px 20px;
+            margin-top:50px;
+        }
+        .contato-box{
+            max-width:1100px;
+            margin:auto;
+            display:flex;
+            justify-content:space-between;
+            gap:40px;
+        }
+        .contato-left p{
+            margin-bottom:15px;
+        }
+        .contato-right{
+            background:#fff;
+            padding:30px;
+            border-radius:15px;
+            box-shadow:0 4px 15px rgba(0,0,0,0.06);
+            width:340px;
+        }
+
+        /* Rodapé */
+        footer{
+            background:#121c33;
+            padding:30px;
+            text-align:center;
+            color:#fff;
+            margin-top:40px;
+        }
+
+        @media(max-width:900px){
+            .features,
+            .cursos,
+            .horarios-box,
+            .contato-box{
+                flex-direction:column;
+            }
+            header nav{
+                display:none;
+            }
+        }
+    </style>
 </head>
 <body>
 
-<!-- Navbar -->
-<nav>
-  <div class="brand">
-    <img src="./assets/img/logo_aprovamaispb.png" alt="Logo AprovaMaisPB">
-    AprovaMaisPB
-  </div>
-  <ul>
-    <li><a href="#hero">Início</a></li>
-  </ul>
-</nav>
+    <header>
+        <div class="logo">
+            <strong>📘 ENEM PREP</strong>
+        </div>
 
-<!-- Hero Section -->
-<section class="hero" id="hero">
-  <h1>Grandes Conquistas começam com pequenos passos</h1>
-  <p>Participe da nossa <strong>Aula VIP</strong> e dê o primeiro passo rumo à sua aprovação com o time do AprovaMaisPB!</p>
-  <a class="cta" href="https://wa.me/5583996627827" target="_blank">Garantir minha vaga 💬</a>
+        <nav>
+            <ul>
+                <li><a href="#">Cursos</a></li>
+                <li><a href="#">Horários</a></li>
+                <li><a href="#">Depoimentos</a></li>
+                <li><a href="#">Contato</a></li>
+            </ul>
+        </nav>
 
-  <!-- Bloco do vídeo do último aulão -->
-  <div class="video-section">
-    <h2>🎬 Resumo do Último Aulão</h2>
-    <p>Assista aos melhores momentos e sinta a energia de quem está mais perto da aprovação!</p>
-    <div class="video-card">
-      <iframe
-        src="https://player.vimeo.com/video/1131425559"
-        width="100%"
-        height="400"
-        frameborder="0"
-        allow="autoplay; fullscreen; picture-in-picture"
-        allowfullscreen
-        title="Resumo do Último Aulão">
-      </iframe>
-    </div>
-  </div>
-</section>
+        <a href="#" class="btn-top">📘 Matrículas Abertas</a>
+    </header>
 
-<!-- Imagem com Parallax -->
-<section class="image-section">
-  <div class="image-bg"></div>
-  <div class="image-container">
-    <img src="./assets/img/aula-vip-aprovamaispb.jpeg" alt="Participantes assistindo Aula VIP AprovaMaisPB">
-  </div>
-</section>
+    <section class="hero">
+        <h1>Realize seu sonho de <span>entrar na universidade</span></h1>
+        <p>O melhor cursinho preparatório para o ENEM de João Pessoa. Metodologia aprovada, professores especialistas e resultados comprovados.</p>
 
-<!-- Footer -->
-<footer>© 2025 AprovaMaisPB – Todos os direitos reservados</footer>
+        <div class="btns">
+            <a href="#" class="btn btn-blue">Fazer Matrícula</a>
+            <a href="#" class="btn btn-green">Falar no WhatsApp</a>
+        </div>
+    </section>
 
-<!-- Ícone flutuante do WhatsApp -->
-<a href="https://wa.me/5583996627827" class="whatsapp-float" target="_blank" aria-label="Fale conosco no WhatsApp">💬</a>
+    <section class="features">
+        <div class="card">
+            <h3>Qualidade Comprovada</h3>
+            <p>Metodologia exclusiva com foco total no ENEM.</p>
+        </div>
+        <div class="card">
+            <h3>Professores Experts</h3>
+            <p>Equipe formada por mestres e especialistas.</p>
+        </div>
+        <div class="card">
+            <h3>Método Exclusivo</h3>
+            <p>Sistema de ensino focado especificamente no ENEM.</p>
+        </div>
+    </section>
 
-<!-- Scripts -->
-<script>
-// Scroll Reveal
-const revealElements = document.querySelectorAll('.hero h1, .hero p, .hero .cta');
-const observer = new IntersectionObserver(entries=>{
-  entries.forEach(entry=>{
-    if(entry.isIntersecting){
-      entry.target.style.opacity = 1;
-      entry.target.style.transform = 'translateY(0)';
-      observer.unobserve(entry.target);
-    }
-  });
-},{threshold:0.2});
-revealElements.forEach(el=>observer.observe(el));
-</script>
+    <h2 class="section-title">Nossos Cursos</h2>
+    <p style="text-align:center; opacity:0.7;">Escolha o curso que melhor combina com você</p>
+
+    <section class="cursos">
+        <div class="curso-card">
+            <h3>Curso Extensivo</h3>
+            <br>
+            <a href="#" class="btn btn-blue">Fazer Matrícula</a>
+        </div>
+
+        <div class="curso-card">
+            <h3>Curso Semi-Intensivo</h3>
+            <br>
+            <a href="#" class="btn btn-blue">Fazer Matrícula</a>
+        </div>
+    </section>
+
+    <section class="experiencia">
+        <h2>Experiência Pré-ENEM Completa</h2>
+        <p>Material exclusivo, aulas específicas e acompanhamento individual.</p>
+
+        <ul>
+            <li>✔ Semanais</li>
+            <li>✔ Redação</li>
+            <li>✔ Acompanhamento</li>
+            <li>✔ Plantão de dúvidas</li>
+        </ul>
+    </section>
+
+    <h2 class="section-title">Horários das Aulas</h2>
+    <p style="text-align:center; opacity:0.7;">Grade organizada para otimizar seu aprendizado</p>
+
+    <section class="horarios-box">
+
+        <div class="horarios-list">
+            <div class="item"><span>Segunda-feira</span><strong>Matemática</strong></div>
+            <div class="item"><span>Terça-feira</span><strong>Português</strong></div>
+            <div class="item"><span>Quarta-feira</span><strong>História</strong></div>
+            <div class="item"><span>Quinta-feira</span><strong>Geografia</strong></div>
+            <div class="item"><span>Sexta-feira</span><strong>Redação</strong></div>
+            <div class="item"><span>Sábado</span><strong>Química / Física / Biologia</strong></div>
+        </div>
+
+        <div class="horarios-side">
+
+            <div class="side-box">
+                <h3>📸 Aulas VIP</h3>
+                <p>Veja como foram as aulas VIP anteriores.</p>
+                <a href="#" style="color:#fff; text-decoration:underline;">Ver no Instagram</a>
+            </div>
+
+            <div class="side-box side-box-green">
+                <h3>Plantão de Dúvidas</h3>
+                <p>Seg a Sex: 17h às 19h<br>Sábados: 14h às 16h</p>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="depoimentos">
+        <h2>Depoimentos dos Nossos Alunos</h2>
+
+        <div class="depo-card">
+            <p>"O cursinho me ajudou muito a organizar os estudos. Os professores explicam de forma clara e o material é bem completo."</p>
+            <br>
+            <strong>Lucas Oliveira</strong><br>
+            <span style="opacity:0.7;">680 pontos no ENEM — Pedagogia / UFPB</span>
+        </div>
+    </section>
+
+    <section class="contato">
+        <h2 class="section-title">Entre em Contato</h2>
+        <p style="text-align:center; opacity:0.7;">Estamos prontos para ajudar você a conquistar sua vaga</p>
+
+        <div class="contato-box">
+
+            <div class="contato-left">
+                <p><strong>📍 Localização:</strong><br>João Pessoa - PB</p>
+                <p><strong>📱 WhatsApp:</strong><br>(83) 9 9862-7827</p>
+                <p><strong>⏰ Funcionamento:</strong><br>
+                Seg a Sex: 7h às 22h <br> Sábado: 8h às 18h <br> Domingo: 14h às 18h</p>
+            </div>
+
+            <div class="contato-right">
+                <a class="btn btn-blue" style="display:block; text-align:center; margin-bottom:10px;">Fazer Pré-Matrícula</a>
+                <a class="btn btn-green" style="display:block; text-align:center;">Conversar no WhatsApp</a>
+            </div>
+
+        </div>
+    </section>
+
+    <footer>
+        © ENEM PREP – Transformando sonhos através da educação.
+    </footer>
 
 </body>
 </html>
