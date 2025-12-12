@@ -1,15 +1,21 @@
-// main.js - mobile menu, modal, slider, form -> whatsapp
+/* main.js
+ - mobile menu
+ - reveal on scroll
+ - tilt micro-interaction
+ - testimonials slider
+ - modal form + assemble WhatsApp message and open wa.me
+*/
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', () => {
 
   /* ---------- Mobile menu ---------- */
   const hamburger = document.getElementById('hamburger');
   const mobileMenu = document.getElementById('mobileMenu');
 
-  hamburger && hamburger.addEventListener('click', function(){
-    const visible = mobileMenu.getAttribute('aria-hidden') === 'false';
-    mobileMenu.setAttribute('aria-hidden', visible ? 'true' : 'false');
-    mobileMenu.style.display = visible ? 'none' : 'flex';
+  hamburger && hamburger.addEventListener('click', () => {
+    const hidden = mobileMenu.getAttribute('aria-hidden') === 'true';
+    mobileMenu.setAttribute('aria-hidden', hidden ? 'false' : 'true');
+    mobileMenu.style.display = hidden ? 'flex' : 'none';
   });
 
   window.closeMobile = function(){
@@ -17,46 +23,73 @@ document.addEventListener('DOMContentLoaded', function() {
     mobileMenu.style.display = 'none';
   }
 
-  /* ---------- Slider (Depoimentos) ---------- */
-  const slides = Array.from(document.querySelectorAll('.slide'));
-  let slideIndex = 0;
-  const nextBtn = document.getElementById('next');
-  const prevBtn = document.getElementById('prev');
+  /* ---------- Reveal on scroll (IntersectionObserver) ---------- */
+  const reveals = document.querySelectorAll('.reveal');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        entry.target.classList.add('active');
+      }
+    });
+  }, { threshold: 0.15 });
 
-  function showSlide(i){
+  reveals.forEach(r => obs.observe(r));
+
+  /* ---------- Tilt micro effect for cards ---------- */
+  const tilts = document.querySelectorAll('[data-tilt]');
+  tilts.forEach(el => {
+    el.addEventListener('mousemove', (e) => {
+      const rect = el.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width;
+      const y = (e.clientY - rect.top) / rect.height;
+      const rx = (y - 0.5) * 8; // rotateX
+      const ry = (x - 0.5) * -8; // rotateY
+      el.style.transform = `perspective(800px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-6px)`;
+    });
+    el.addEventListener('mouseleave', () => {
+      el.style.transform = '';
+    });
+  });
+
+  /* ---------- Testimonials slider ---------- */
+  const slides = Array.from(document.querySelectorAll('.ts-slide'));
+  let sIndex = 0;
+  const nextBtn = document.getElementById('tsNext');
+  const prevBtn = document.getElementById('tsPrev');
+
+  function showTestimonial(i){
     slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
   }
-
   if(slides.length){
-    showSlide(0);
-    // controls
-    nextBtn && nextBtn.addEventListener('click', function(){ slideIndex = (slideIndex+1)%slides.length; showSlide(slideIndex); });
-    prevBtn && prevBtn.addEventListener('click', function(){ slideIndex = (slideIndex-1+slides.length)%slides.length; showSlide(slideIndex); });
-    // auto
-    setInterval(function(){ slideIndex = (slideIndex+1)%slides.length; showSlide(slideIndex); }, 6000);
+    showTestimonial(0);
+    nextBtn && nextBtn.addEventListener('click', () => { sIndex = (sIndex+1)%slides.length; showTestimonial(sIndex); });
+    prevBtn && prevBtn.addEventListener('click', () => { sIndex = (sIndex-1+slides.length)%slides.length; showTestimonial(sIndex); });
+    setInterval(()=>{ sIndex = (sIndex+1)%slides.length; showTestimonial(sIndex); }, 6000);
   }
 
-  /* ---------- Modal form for pre-enrollment ---------- */
+  /* ---------- Modal & PRE-FILL form logic ---------- */
   const modal = document.getElementById('formModal');
   const modalClose = document.getElementById('modalClose');
   const openButtons = Array.from(document.querySelectorAll('.js-open-form'));
-  const courseLabel = document.getElementById('modalCourse');
+  const modalCourse = document.getElementById('modalCourse');
   const cursoHidden = document.getElementById('cursoHidden');
   const preForm = document.getElementById('preForm');
   const cancelForm = document.getElementById('cancelForm');
 
   function openModal(courseName){
     modal.setAttribute('aria-hidden','false');
-    courseLabel.textContent = courseName;
+    modal.style.display = 'flex';
+    modalCourse.textContent = courseName;
     cursoHidden.value = courseName;
   }
 
   function closeModal(){
     modal.setAttribute('aria-hidden','true');
+    modal.style.display = 'none';
   }
 
-  openButtons.forEach(btn=>{
-    btn.addEventListener('click', function(){
+  openButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
       const course = btn.dataset.course || 'Curso';
       openModal(course);
     });
@@ -65,37 +98,37 @@ document.addEventListener('DOMContentLoaded', function() {
   modalClose && modalClose.addEventListener('click', closeModal);
   cancelForm && cancelForm.addEventListener('click', closeModal);
 
-  // When user submits the form, construct the WhatsApp message and open wa.me
-  preForm && preForm.addEventListener('submit', function(e){
+  // Build WhatsApp message and open wa.me with encoded text
+  preForm && preForm.addEventListener('submit', (e) => {
     e.preventDefault();
-
     const nome = document.getElementById('nome').value.trim() || 'Não informado';
     const whatsapp = document.getElementById('whatsapp').value.trim() || 'Não informado';
     const email = document.getElementById('email').value.trim() || 'Não informado';
     const ano = document.getElementById('ano').value.trim() || 'Não informado';
     const observacoes = document.getElementById('observacoes').value.trim() || 'Nenhuma observação';
-    const curso = cursoHidden.value || 'Curso não selecionado';
+    const curso = document.getElementById('cursoHidden').value || 'Curso não informado';
 
-    // Build message exactly as requested
-    let msg = "🎓 NOVA PRÉ-MATRÍCULA - ENEM PREP\n\n";
-    msg += "👤 Nome: " + nome + "\n";
-    msg += "📱 WhatsApp: " + whatsapp + "\n";
-    msg += "📧 E-mail: " + email + "\n";
-    msg += "📚 Curso de Interesse: " + curso + "\n";
-    msg += "📅 Ano do ENEM: " + ano + "\n\n";
-    msg += "💭 Observações:\n" + observacoes + "\n\n";
-    msg += "---\nMensagem enviada através do site";
+    const msg =
+`🎓 NOVA PRÉ-MATRÍCULA - ENEM PREP
 
-    const phone = "5583986627827"; // ENEM PREP number (country code 55)
-    const url = "https://wa.me/" + phone + "?text=" + encodeURIComponent(msg);
+👤 Nome: ${nome}
+📱 WhatsApp: ${whatsapp}
+📧 E-mail: ${email}
+📚 Curso de Interesse: ${curso}
+📅 Ano do ENEM: ${ano}
 
-    // Open new window/tab
-    window.open(url, '_blank');
+💭 Observações:
+${observacoes}
 
-    // Optional: close modal after sending
+---
+Mensagem enviada através do site`;
+
+    const phone = '5583986627827'; // BR number with country code
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+    window.open(url,'_blank');
+
+    // Close and reset
     closeModal();
-
-    // You can also clear the form fields if desired:
     preForm.reset();
   });
 
