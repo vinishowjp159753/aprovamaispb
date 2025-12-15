@@ -1,60 +1,123 @@
-document.addEventListener('DOMContentLoaded',()=>{
+document.addEventListener('DOMContentLoaded', () => {
 
-  const hamburger=document.getElementById('hamburger')
-  const mobileMenu=document.getElementById('mobileMenu')
+  /* ===== MENU MOBILE ===== */
+  const hamburger = document.getElementById('hamburger')
+  const mobileMenu = document.getElementById('mobileMenu')
 
-  hamburger.onclick=()=>{
-    const open=mobileMenu.getAttribute('aria-hidden')==="true"
-    mobileMenu.setAttribute('aria-hidden',!open)
-    mobileMenu.style.display=open?'flex':'none'
-    document.body.style.overflow=open?'hidden':''
-  }
+  if (hamburger && mobileMenu) {
+    hamburger.addEventListener('click', () => {
+      const isHidden = mobileMenu.getAttribute('aria-hidden') === 'true'
 
-  window.closeMobile=()=>{
-    mobileMenu.setAttribute('aria-hidden','true')
-    mobileMenu.style.display='none'
-    document.body.style.overflow=''
-  }
-
-  const reveals=document.querySelectorAll('.reveal')
-  const obs=new IntersectionObserver(entries=>{
-    entries.forEach(e=>{
-      if(e.isIntersecting)e.target.classList.add('active')
+      mobileMenu.setAttribute('aria-hidden', isHidden ? 'false' : 'true')
+      mobileMenu.style.display = isHidden ? 'flex' : 'none'
+      document.body.style.overflow = isHidden ? 'hidden' : ''
     })
-  },{threshold:.15})
-  reveals.forEach(r=>obs.observe(r))
+  }
 
-  const slides=[...document.querySelectorAll('.ts-slide')]
-  let idx=0
-  const show=i=>slides.forEach((s,n)=>s.classList.toggle('active',n===i))
-  show(0)
+  window.closeMobile = () => {
+    if (!mobileMenu) return
+    mobileMenu.setAttribute('aria-hidden', 'true')
+    mobileMenu.style.display = 'none'
+    document.body.style.overflow = ''
+  }
 
-  document.getElementById('tsNext')?.onclick=()=>show(idx=(idx+1)%slides.length)
-  document.getElementById('tsPrev')?.onclick=()=>show(idx=(idx-1+slides.length)%slides.length)
+  /* ===== REVEAL ON SCROLL ===== */
+  const reveals = document.querySelectorAll('.reveal')
 
-  const modal=document.getElementById('formModal')
-  const courseSpan=document.getElementById('modalCourse')
-  const courseInput=document.getElementById('cursoHidden')
+  if (reveals.length) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('active')
+        }
+      })
+    }, { threshold: 0.15 })
 
-  document.querySelectorAll('.js-open-form').forEach(btn=>{
-    btn.onclick=()=>{
-      modal.setAttribute('aria-hidden','false')
-      courseSpan.textContent=btn.dataset.course
-      courseInput.value=btn.dataset.course
-    }
+    reveals.forEach(el => observer.observe(el))
+  }
+
+  /* ===== SLIDER DE DEPOIMENTOS ===== */
+  const slides = Array.from(document.querySelectorAll('.ts-slide'))
+  const nextBtn = document.getElementById('tsNext')
+  const prevBtn = document.getElementById('tsPrev')
+  let index = 0
+
+  function showSlide(i) {
+    slides.forEach((slide, idx) => {
+      slide.classList.toggle('active', idx === i)
+    })
+  }
+
+  if (slides.length) {
+    showSlide(0)
+
+    nextBtn && nextBtn.addEventListener('click', () => {
+      index = (index + 1) % slides.length
+      showSlide(index)
+    })
+
+    prevBtn && prevBtn.addEventListener('click', () => {
+      index = (index - 1 + slides.length) % slides.length
+      showSlide(index)
+    })
+  }
+
+  /* ===== MODAL PRÉ-MATRÍCULA ===== */
+  const modal = document.getElementById('formModal')
+  const modalClose = document.getElementById('modalClose')
+  const cancelForm = document.getElementById('cancelForm')
+  const modalCourse = document.getElementById('modalCourse')
+  const cursoHidden = document.getElementById('cursoHidden')
+  const preForm = document.getElementById('preForm')
+
+  document.querySelectorAll('.js-open-form').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const course = btn.dataset.course || 'Curso'
+      modal.setAttribute('aria-hidden', 'false')
+      modal.style.display = 'flex'
+      modalCourse.textContent = course
+      cursoHidden.value = course
+    })
   })
 
-  document.getElementById('modalClose').onclick=
-  document.getElementById('cancelForm').onclick=()=>{
-    modal.setAttribute('aria-hidden','true')
+  function closeModal() {
+    modal.setAttribute('aria-hidden', 'true')
+    modal.style.display = 'none'
   }
 
-  document.getElementById('preForm').onsubmit=e=>{
+  modalClose && modalClose.addEventListener('click', closeModal)
+  cancelForm && cancelForm.addEventListener('click', closeModal)
+
+  /* ===== ENVIO PARA WHATSAPP ===== */
+  preForm && preForm.addEventListener('submit', (e) => {
     e.preventDefault()
-    const msg=`Pré-matrícula ENEM\nNome:${nome.value}\nCurso:${cursoHidden.value}`
-    window.open(`https://wa.me/5583986627827?text=${encodeURIComponent(msg)}`,'_blank')
-    modal.setAttribute('aria-hidden','true')
-    e.target.reset()
-  }
+
+    const nome = document.getElementById('nome').value
+    const whatsapp = document.getElementById('whatsapp').value
+    const email = document.getElementById('email').value
+    const ano = document.getElementById('ano').value
+    const curso = cursoHidden.value
+    const obs = document.getElementById('observacoes').value || 'Nenhuma observação'
+
+    const mensagem =
+`📚 PRÉ-MATRÍCULA ENEM
+
+👤 Nome: ${nome}
+📱 WhatsApp: ${whatsapp}
+📧 Email: ${email}
+📅 Ano ENEM: ${ano}
+🎓 Curso: ${curso}
+
+📝 Observações:
+${obs}`
+
+    window.open(
+      `https://wa.me/5583986627827?text=${encodeURIComponent(mensagem)}`,
+      '_blank'
+    )
+
+    closeModal()
+    preForm.reset()
+  })
 
 })
