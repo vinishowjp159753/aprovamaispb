@@ -2,167 +2,849 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>AprovaMaisPB</title>
+  <title>AprovaMaisPB - Preparatório ENEM</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <!-- GOOGLE FONTS -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- ================= CSS TOTAL EMBUTIDO ================= -->
+  <!-- ================= CSS COM NOVA PALETA ================= -->
   <style>
+    :root {
+      --primary: #64b0d9;
+      --primary-dark: #4a9bc4;
+      --secondary: #0a0a0a;
+      --secondary-light: #1a1a1a;
+      --accent: #ff6b35;
+      --light: #ffffff;
+      --dark: #0a0a0a;
+      --gray: #666666;
+      --light-gray: #f0f0f0;
+      --gradient: linear-gradient(135deg, #64b0d9 0%, #4a9bc4 100%);
+      --gradient-dark: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+      --shadow: 0 10px 25px rgba(0,0,0,0.15);
+      --shadow-lg: 0 20px 40px rgba(0,0,0,0.2);
+      --radius: 12px;
+      --transition: all 0.3s ease;
+    }
+
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Inter', sans-serif;
     }
 
     body {
-      background: #f5f7fb;
-      color: #1f2937;
+      font-family: 'Inter', sans-serif;
+      background: var(--light);
+      color: var(--dark);
       line-height: 1.6;
+      overflow-x: hidden;
     }
 
-    /* HEADER */
+    h1, h2, h3, h4 {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 28px;
+      border-radius: var(--radius);
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      transition: var(--transition);
+      border: none;
+      outline: none;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: 0.5s;
+    }
+
+    .btn:hover:before {
+      left: 100%;
+    }
+
+    .btn-primary {
+      background: var(--gradient);
+      color: var(--light);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow);
+    }
+
+    .btn-secondary {
+      background: var(--secondary);
+      color: var(--light);
+    }
+
+    .btn-secondary:hover {
+      background: var(--secondary-light);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+    }
+
+    .btn-outline:hover {
+      background: var(--primary);
+      color: var(--light);
+      transform: translateY(-3px);
+    }
+
+    .btn-dark {
+      background: var(--secondary);
+      color: var(--light);
+    }
+
+    .btn-dark:hover {
+      background: var(--primary);
+      transform: translateY(-3px);
+    }
+
+    /* HEADER MODERNO */
     header {
       position: fixed;
       top: 0;
       width: 100%;
-      background: #fff;
-      box-shadow: 0 4px 20px rgba(0,0,0,.08);
+      background: rgba(10, 10, 10, 0.95);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
       z-index: 1000;
+      padding: 15px 0;
     }
 
     .navbar {
-      max-width: 1200px;
-      margin: auto;
-      padding: 15px 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
 
     .logo {
+      font-size: 24px;
       font-weight: 700;
-      font-size: 18px;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .logo i {
+      font-size: 26px;
+      color: var(--light);
+      background: var(--gradient);
+      padding: 8px;
+      border-radius: 8px;
     }
 
     .menu {
       display: flex;
-      gap: 20px;
+      gap: 30px;
       list-style: none;
     }
 
     .menu a {
-      text-decoration: none;
-      color: #374151;
       font-weight: 500;
+      color: var(--light);
+      position: relative;
+      padding: 5px 0;
+      transition: var(--transition);
+    }
+
+    .menu a:hover {
+      color: var(--primary);
+    }
+
+    .menu a:after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--primary);
+      transition: var(--transition);
+    }
+
+    .menu a:hover:after {
+      width: 100%;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 15px;
     }
 
     .btn-whatsapp {
-      background: #22c55e;
-      color: #fff;
-      padding: 10px 16px;
-      border-radius: 8px;
-      text-decoration: none;
+      background: #25D366;
+      color: var(--light);
+      padding: 10px 20px;
+      border-radius: var(--radius);
       font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: var(--transition);
     }
 
-    /* HERO */
+    .btn-whatsapp:hover {
+      background: #128C7E;
+      transform: translateY(-2px);
+    }
+
+    .menu-toggle {
+      display: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: var(--light);
+    }
+
+    /* HERO MODERNO */
     .hero {
-      max-width: 1200px;
-      margin: 140px auto 80px;
-      padding: 0 20px;
+      padding: 180px 0 100px;
+      background: var(--gradient-dark);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 20% 80%, rgba(100, 176, 217, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(100, 176, 217, 0.1) 0%, transparent 50%);
+    }
+
+    .hero .container {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 40px;
+      gap: 50px;
       align-items: center;
+      position: relative;
+      z-index: 1;
     }
 
-    .hero h1 {
-      font-size: 40px;
-      line-height: 1.2;
+    .hero-content h1 {
+      font-size: 48px;
       margin-bottom: 20px;
+      color: var(--light);
     }
 
-    .hero h1 span {
-      color: #6366f1;
+    .hero-content h1 span {
+      color: var(--primary);
+      position: relative;
     }
 
-    .hero p {
-      margin-bottom: 25px;
-      color: #4b5563;
+    .hero-content h1 span:after {
+      content: '';
+      position: absolute;
+      bottom: 5px;
+      left: 0;
+      width: 100%;
+      height: 8px;
+      background: rgba(100, 176, 217, 0.3);
+      z-index: -1;
+    }
+
+    .hero-content p {
+      font-size: 18px;
+      color: #cccccc;
+      margin-bottom: 30px;
+      max-width: 500px;
     }
 
     .hero-buttons {
       display: flex;
       gap: 15px;
+      flex-wrap: wrap;
     }
 
-    .btn-primary {
-      background: #6366f1;
-      color: #fff;
-      padding: 12px 22px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: 600;
+    .hero-image {
+      position: relative;
     }
 
-    .btn-outline {
-      border: 2px solid #6366f1;
-      color: #6366f1;
-      padding: 10px 20px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: 600;
+    .hero-image img {
+      width: 100%;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
     }
 
-    /* SECTIONS */
-    section {
-      max-width: 1200px;
-      margin: 60px auto;
-      padding: 0 20px;
+    .stats {
+      display: flex;
+      justify-content: space-between;
+      background: rgba(10, 10, 10, 0.9);
+      padding: 30px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-top: -40px;
+      position: relative;
+      z-index: 1;
+      max-width: 90%;
+      border: 1px solid rgba(100, 176, 217, 0.1);
     }
 
-    .cards {
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 5px;
+    }
+
+    .stat-label {
+      font-size: 14px;
+      color: #cccccc;
+    }
+
+    /* BENEFÍCIOS */
+    .section-title {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .section-title h2 {
+      font-size: 36px;
+      color: var(--secondary);
+      margin-bottom: 15px;
+      position: relative;
+      display: inline-block;
+    }
+
+    .section-title h2:after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 4px;
+      background: var(--primary);
+      border-radius: 2px;
+    }
+
+    .section-title p {
+      color: var(--gray);
+      max-width: 600px;
+      margin: 0 auto;
+      font-size: 18px;
+    }
+
+    .benefits {
+      padding: 100px 0;
+      background: var(--light);
+    }
+
+    .benefits-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
+      gap: 30px;
     }
 
-    .card {
-      background: #fff;
+    .benefit-card {
+      background: var(--light);
+      padding: 35px 25px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+      text-align: center;
+      border-top: 4px solid var(--primary);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .benefit-card:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: var(--gradient);
+    }
+
+    .benefit-card:hover {
+      transform: translateY(-10px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .benefit-icon {
+      width: 70px;
+      height: 70px;
+      background: var(--gradient);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      color: var(--light);
+      font-size: 28px;
+    }
+
+    .benefit-card h3 {
+      margin-bottom: 15px;
+      font-size: 20px;
+      color: var(--secondary);
+    }
+
+    .benefit-card p {
+      color: var(--gray);
+    }
+
+    /* CURSOS */
+    .courses {
+      padding: 100px 0;
+      background: linear-gradient(to bottom, var(--light) 0%, #f5f5f5 100%);
+    }
+
+    .courses-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+    }
+
+    .course-card {
+      background: var(--light);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+      border: 1px solid rgba(100, 176, 217, 0.1);
+    }
+
+    .course-card:hover {
+      transform: translateY(-10px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .course-header {
+      background: var(--gradient-dark);
+      color: var(--light);
       padding: 25px;
-      border-radius: 14px;
-      box-shadow: 0 10px 30px rgba(0,0,0,.08);
+      text-align: center;
+      position: relative;
     }
 
-    .card h3 {
+    .course-header:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gradient);
+    }
+
+    .course-header h3 {
+      font-size: 22px;
       margin-bottom: 10px;
+    }
+
+    .course-time {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 14px;
+      opacity: 0.9;
+      color: var(--primary);
+    }
+
+    .course-body {
+      padding: 25px;
+    }
+
+    .course-features {
+      list-style: none;
+      margin-bottom: 25px;
+    }
+
+    .course-features li {
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(100, 176, 217, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--gray);
+    }
+
+    .course-features li:last-child {
+      border-bottom: none;
+    }
+
+    .course-features li i {
+      color: var(--primary);
+      font-size: 14px;
+    }
+
+    .course-price {
+      text-align: center;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--secondary);
+      margin: 20px 0;
+      padding: 15px;
+      background: rgba(100, 176, 217, 0.1);
+      border-radius: var(--radius);
+    }
+
+    .course-price span {
+      font-size: 16px;
+      color: var(--gray);
+      font-weight: 400;
+      display: block;
+      margin-top: 5px;
+    }
+
+    /* MODAL */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(10, 10, 10, 0.9);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal-content {
+      background: var(--light);
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 500px;
+      position: relative;
+      animation: slideUp 0.4s ease;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+      border: 2px solid var(--primary);
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal-header {
+      background: var(--gradient-dark);
+      color: var(--light);
+      padding: 25px;
+      border-radius: var(--radius) var(--radius) 0 0;
+      position: relative;
+    }
+
+    .modal-header:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gradient);
+    }
+
+    .modal-header h3 {
+      font-size: 24px;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 24px;
+      cursor: pointer;
+      color: var(--light);
+      background: rgba(255,255,255,0.1);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+
+    .close-modal:hover {
+      background: var(--primary);
+      transform: rotate(90deg);
+    }
+
+    .modal-body {
+      padding: 30px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--secondary);
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid rgba(100, 176, 217, 0.3);
+      border-radius: 8px;
+      font-size: 16px;
+      transition: var(--transition);
+      background: var(--light);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(100, 176, 217, 0.1);
     }
 
     /* FOOTER */
     footer {
-      background: #111827;
-      color: #fff;
-      padding: 30px 20px;
+      background: var(--secondary);
+      color: var(--light);
+      padding: 70px 0 30px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    footer:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gradient);
+    }
+
+    .footer-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 40px;
+      margin-bottom: 40px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .footer-logo {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: var(--light);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .footer-logo i {
+      color: var(--primary);
+      background: rgba(255,255,255,0.1);
+      padding: 8px;
+      border-radius: 8px;
+    }
+
+    .footer-about p {
+      color: #aaaaaa;
+      margin-bottom: 20px;
+      line-height: 1.8;
+    }
+
+    .footer-links h4 {
+      font-size: 18px;
+      margin-bottom: 20px;
+      color: var(--primary);
+      position: relative;
+      padding-bottom: 10px;
+    }
+
+    .footer-links h4:after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 40px;
+      height: 3px;
+      background: var(--primary);
+    }
+
+    .footer-links ul {
+      list-style: none;
+    }
+
+    .footer-links li {
+      margin-bottom: 12px;
+    }
+
+    .footer-links a {
+      color: #aaaaaa;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .footer-links a:hover {
+      color: var(--primary);
+      padding-left: 5px;
+    }
+
+    .footer-links a i {
+      font-size: 12px;
+    }
+
+    .contact-info {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      color: #aaaaaa;
+    }
+
+    .contact-item i {
+      color: var(--primary);
+      font-size: 18px;
+      width: 24px;
+    }
+
+    .footer-bottom {
       text-align: center;
-      margin-top: 80px;
+      padding-top: 30px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      color: #888888;
+      font-size: 14px;
+      position: relative;
+      z-index: 1;
     }
 
     /* RESPONSIVO */
-    @media (max-width: 900px) {
-      .hero {
+    @media (max-width: 992px) {
+      .hero .container {
         grid-template-columns: 1fr;
         text-align: center;
+      }
+
+      .hero-content p {
+        margin: 0 auto 30px;
       }
 
       .hero-buttons {
         justify-content: center;
       }
 
+      .stats {
+        max-width: 100%;
+      }
+    }
+
+    @media (max-width: 768px) {
       .menu {
         display: none;
+        position: fixed;
+        top: 70px;
+        left: 0;
+        width: 100%;
+        background: var(--secondary);
+        flex-direction: column;
+        padding: 20px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        text-align: center;
+        border-top: 2px solid var(--primary);
+      }
+
+      .menu.active {
+        display: flex;
+      }
+
+      .menu-toggle {
+        display: block;
+      }
+
+      .hero-content h1 {
+        font-size: 36px;
+      }
+
+      .stats {
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .section-title h2 {
+        font-size: 28px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero-buttons {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .hero-content h1 {
+        font-size: 30px;
+      }
+
+      .section-title h2 {
+        font-size: 24px;
       }
     }
   </style>
@@ -171,64 +853,499 @@
 
   <!-- HEADER -->
   <header>
-    <div class="navbar">
-      <div class="logo">AprovaMaisPB</div>
-      <ul class="menu">
-        <li><a href="#cursos">Cursos</a></li>
-        <li><a href="#horarios">Horários</a></li>
-        <li><a href="#depoimentos">Depoimentos</a></li>
-        <li><a href="#contato">Contato</a></li>
-      </ul>
-      <a class="btn-whatsapp" href="https://wa.me/5599999999999" target="_blank">WhatsApp</a>
+    <div class="container">
+      <nav class="navbar">
+        <a href="#" class="logo">
+          <i class="fas fa-graduation-cap"></i>
+          AprovaMaisPB
+        </a>
+        
+        <ul class="menu">
+          <li><a href="#home">Início</a></li>
+          <li><a href="#benefits">Benefícios</a></li>
+          <li><a href="#courses">Cursos</a></li>
+          <li><a href="#contact">Contato</a></li>
+        </ul>
+        
+        <div class="header-actions">
+          <a href="https://wa.me/5583996627827" class="btn-whatsapp" target="_blank">
+            <i class="fab fa-whatsapp"></i>
+            WhatsApp
+          </a>
+          <div class="menu-toggle" id="menuToggle">
+            <i class="fas fa-bars"></i>
+          </div>
+        </div>
+      </nav>
     </div>
   </header>
 
   <!-- HERO -->
-  <div class="hero">
-    <div>
-      <h1>Transforme seu ENEM<br><span>em conquista real</span></h1>
-      <p>Metodologia focada, acompanhamento próximo e resultados reais.</p>
-      <div class="hero-buttons">
-        <a href="#cursos" class="btn-primary">Ver Cursos</a>
-        <a href="https://wa.me/5599999999999" class="btn-outline">WhatsApp</a>
+  <section class="hero" id="home">
+    <div class="container">
+      <div class="hero-content">
+        <h1>Transforme seu ENEM em <span>conquista real</span></h1>
+        <p>Metodologia focada, acompanhamento próximo e resultados reais. Mais de 500 aprovados nos últimos 3 anos.</p>
+        <div class="hero-buttons">
+          <a href="#courses" class="btn btn-primary">
+            <i class="fas fa-book-open"></i>
+            Ver Cursos
+          </a>
+          <a href="https://wa.me/5583996627827" class="btn btn-outline" target="_blank">
+            <i class="fab fa-whatsapp"></i>
+            Fale Conosco
+          </a>
+        </div>
+      </div>
+      <div class="hero-image">
+        <div class="stats">
+          <div class="stat-item">
+            <div class="stat-number">98%</div>
+            <div class="stat-label">Taxa de Aprovação</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">500+</div>
+            <div class="stat-label">Estudantes Aprovados</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">4.9</div>
+            <div class="stat-label">Avaliação Média</div>
+          </div>
+        </div>
       </div>
     </div>
+  </section>
 
-    <div class="cards">
-      <div class="card">
-        <h3>Ensino estratégico</h3>
-        <p>Baseado no que realmente cai no ENEM.</p>
+  <!-- BENEFÍCIOS -->
+  <section class="benefits" id="benefits">
+    <div class="container">
+      <div class="section-title">
+        <h2>Por que escolher o AprovaMaisPB?</h2>
+        <p>Nossa metodologia foi desenvolvida para garantir que você atinja seu máximo potencial no ENEM</p>
       </div>
-      <div class="card">
-        <h3>Equipe experiente</h3>
-        <p>Professores especialistas.</p>
+      
+      <div class="benefits-grid">
+        <div class="benefit-card">
+          <div class="benefit-icon">
+            <i class="fas fa-bullseye"></i>
+          </div>
+          <h3>Ensino Direcionado</h3>
+          <p>Foco total no que realmente cai no ENEM, com material atualizado anualmente.</p>
+        </div>
+        
+        <div class="benefit-card">
+          <div class="benefit-icon">
+            <i class="fas fa-chalkboard-teacher"></i>
+          </div>
+          <h3>Professores Especialistas</h3>
+          <p>Equipe experiente com anos de preparação para vestibulares e ENEM.</p>
+        </div>
+        
+        <div class="benefit-card">
+          <div class="benefit-icon">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <h3>Resultados Comprovados</h3>
+          <p>Centenas de aprovações em universidades públicas em todo o Brasil.</p>
+        </div>
+        
+        <div class="benefit-card">
+          <div class="benefit-icon">
+            <i class="fas fa-headset"></i>
+          </div>
+          <h3>Acompanhamento Personalizado</h3>
+          <p>Suporte individual para identificar e superar suas dificuldades.</p>
+        </div>
       </div>
-      <div class="card">
-        <h3>Resultados comprovados</h3>
-        <p>Aprovações reais.</p>
+    </div>
+  </section>
+
+  <!-- CURSOS -->
+  <section class="courses" id="courses">
+    <div class="container">
+      <div class="section-title">
+        <h2>Nossos Cursos</h2>
+        <p>Escolha o plano ideal para sua preparação e conquiste sua vaga na universidade</p>
+      </div>
+      
+      <div class="courses-grid">
+        <!-- CURSO INTENSIVO -->
+        <div class="course-card">
+          <div class="course-header">
+            <h3>Curso Intensivo</h3>
+            <div class="course-time">
+              <i class="far fa-calendar-alt"></i>
+              Segunda a Sexta
+            </div>
+          </div>
+          <div class="course-body">
+            <div class="course-time">
+              <i class="far fa-clock"></i>
+              14:00 às 17:00
+            </div>
+            
+            <ul class="course-features">
+              <li><i class="fas fa-check-circle"></i> Aulas diárias presenciais</li>
+              <li><i class="fas fa-check-circle"></i> Material exclusivo impresso</li>
+              <li><i class="fas fa-check-circle"></i> Simulados semanais</li>
+              <li><i class="fas fa-check-circle"></i> Plantão de dúvidas diário</li>
+              <li><i class="fas fa-check-circle"></i> Correção de redação individual</li>
+              <li><i class="fas fa-check-circle"></i> Acompanhamento personalizado</li>
+            </ul>
+            
+            <div class="course-price">
+              Consulte Valores
+              <span>Pagamento facilitado em até 12x</span>
+            </div>
+            
+            <button class="btn btn-dark btn-matricula" data-curso="Curso Intensivo" style="width: 100%;">
+              <i class="fas fa-edit"></i>
+              Fazer Pré-matrícula
+            </button>
+          </div>
+        </div>
+        
+        <!-- CURSO SEMI-INTENSIVO -->
+        <div class="course-card">
+          <div class="course-header">
+            <h3>Curso Semi-Intensivo</h3>
+            <div class="course-time">
+              <i class="far fa-calendar-alt"></i>
+              Aos Sábados
+            </div>
+          </div>
+          <div class="course-body">
+            <div class="course-time">
+              <i class="far fa-clock"></i>
+              08:00 às 12:00 e 14:00 às 18:00
+            </div>
+            
+            <ul class="course-features">
+              <li><i class="fas fa-check-circle"></i> Aulas intensivas aos sábados</li>
+              <li><i class="fas fa-check-circle"></i> Material completo digital</li>
+              <li><i class="fas fa-check-circle"></i> Simulados quinzenais</li>
+              <li><i class="fas fa-check-circle"></i> Suporte por WhatsApp 24h</li>
+              <li><i class="fas fa-check-circle"></i> Revisão focada nos conteúdos</li>
+              <li><i class="fas fa-check-circle"></i> Grupo exclusivo de estudos</li>
+            </ul>
+            
+            <div class="course-price">
+              Consulte Valores
+              <span>Pagamento facilitado em até 10x</span>
+            </div>
+            
+            <button class="btn btn-dark btn-matricula" data-curso="Curso Semi-Intensivo" style="width: 100%;">
+              <i class="fas fa-edit"></i>
+              Fazer Pré-matrícula
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODAL DE MATRÍCULA -->
+  <div id="modalMatricula" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Pré-matrícula AprovaMaisPB</h3>
+        <div class="close-modal">&times;</div>
+      </div>
+      <div class="modal-body">
+        <form id="formMatricula">
+          <div class="form-group">
+            <label for="nome">Nome Completo *</label>
+            <input type="text" id="nome" class="form-control" required placeholder="Digite seu nome completo">
+          </div>
+          
+          <div class="form-group">
+            <label for="email">E-mail *</label>
+            <input type="email" id="email" class="form-control" required placeholder="seu.email@exemplo.com">
+          </div>
+          
+          <div class="form-group">
+            <label for="telefone">Telefone/WhatsApp *</label>
+            <input type="tel" id="telefone" class="form-control" required placeholder="(83) 9XXXX-XXXX">
+          </div>
+          
+          <div class="form-group">
+            <label for="curso">Curso Escolhido *</label>
+            <select id="curso" class="form-control" required>
+              <option value="">Selecione um curso</option>
+              <option value="Curso Intensivo">Curso Intensivo (Segunda a Sexta - 14:00 às 17:00)</option>
+              <option value="Curso Semi-Intensivo">Curso Semi-Intensivo (Sábados - 08:00 às 18:00)</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="observacoes">Observações ou Dúvidas</label>
+            <textarea id="observacoes" class="form-control" rows="3" placeholder="Alguma dúvida sobre o curso ou informação adicional que deseja compartilhar?"></textarea>
+          </div>
+          
+          <button type="submit" class="btn btn-primary" style="width: 100%;">
+            <i class="fab fa-whatsapp"></i>
+            Enviar para WhatsApp
+          </button>
+          
+          <p style="text-align: center; margin-top: 15px; font-size: 14px; color: var(--gray);">
+            Em até 24h entraremos em contato para confirmar sua pré-matrícula.
+          </p>
+        </form>
       </div>
     </div>
   </div>
 
   <!-- FOOTER -->
-  <footer>
-    <p>📍 João Pessoa - PB</p>
-    <p>AprovaMaisPB © 2025</p>
+  <footer id="contact">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-about">
+          <div class="footer-logo">
+            <i class="fas fa-graduation-cap"></i>
+            AprovaMaisPB
+          </div>
+          <p>Preparatório especializado no ENEM com metodologia comprovada e resultados reais em João Pessoa - PB. Transformando sonhos em conquistas desde 2018.</p>
+          <a href="https://wa.me/5583996627827" class="btn btn-primary" target="_blank">
+            <i class="fab fa-whatsapp"></i>
+            Fale Conosco no WhatsApp
+          </a>
+        </div>
+        
+        <div class="footer-links">
+          <h4>Links Rápidos</h4>
+          <ul>
+            <li><a href="#home"><i class="fas fa-chevron-right"></i> Início</a></li>
+            <li><a href="#benefits"><i class="fas fa-chevron-right"></i> Benefícios</a></li>
+            <li><a href="#courses"><i class="fas fa-chevron-right"></i> Cursos</a></li>
+            <li><a href="#contact"><i class="fas fa-chevron-right"></i> Contato</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-contact">
+          <h4>Entre em Contato</h4>
+          <div class="contact-info">
+            <div class="contact-item">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>João Pessoa - Paraíba</span>
+            </div>
+            <div class="contact-item">
+              <i class="fas fa-phone"></i>
+              <span>(83) 99662-7827</span>
+            </div>
+            <div class="contact-item">
+              <i class="fas fa-envelope"></i>
+              <span>contato@aprovamaispb.com</span>
+            </div>
+            <div class="contact-item">
+              <i class="fab fa-whatsapp"></i>
+              <span>WhatsApp: (83) 99662-7827</span>
+            </div>
+            <div class="contact-item">
+              <i class="fas fa-clock"></i>
+              <span>Seg-Sex: 8h-18h | Sáb: 8h-12h</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>&copy; 2025 AprovaMaisPB - Todos os direitos reservados. CNPJ: XX.XXX.XXX/XXXX-XX</p>
+      </div>
+    </div>
   </footer>
 
-  <!-- ================= JS TOTAL EMBUTIDO ================= -->
+  <!-- ================= JS ================= -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      console.log("Site carregado com sucesso 🚀");
+      console.log("AprovaMaisPB - Site com nova paleta carregado 🎨");
 
-      // Exemplo: scroll suave
-      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener("click", function (e) {
-          e.preventDefault();
-          document.querySelector(this.getAttribute("href"))
-            ?.scrollIntoView({ behavior: "smooth" });
+      // Menu mobile
+      const menuToggle = document.getElementById('menuToggle');
+      const menu = document.querySelector('.menu');
+      
+      menuToggle.addEventListener('click', () => {
+        menu.classList.toggle('active');
+        menuToggle.querySelector('i').classList.toggle('fa-bars');
+        menuToggle.querySelector('i').classList.toggle('fa-times');
+      });
+
+      // Fechar menu ao clicar em um link
+      document.querySelectorAll('.menu a').forEach(link => {
+        link.addEventListener('click', () => {
+          menu.classList.remove('active');
+          menuToggle.querySelector('i').classList.add('fa-bars');
+          menuToggle.querySelector('i').classList.remove('fa-times');
         });
       });
+
+      // Scroll suave
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+          e.preventDefault();
+          const targetId = this.getAttribute('href');
+          if (targetId === '#') return;
+          
+          const targetElement = document.querySelector(targetId);
+          if (targetElement) {
+            window.scrollTo({
+              top: targetElement.offsetTop - 80,
+              behavior: 'smooth'
+            });
+          }
+        });
+      });
+
+      // Modal de pré-matrícula
+      const modal = document.getElementById('modalMatricula');
+      const closeModal = document.querySelector('.close-modal');
+      const btnsMatricula = document.querySelectorAll('.btn-matricula');
+      const form = document.getElementById('formMatricula');
+      const cursoSelect = document.getElementById('curso');
+
+      // Abrir modal
+      btnsMatricula.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const cursoSelecionado = btn.getAttribute('data-curso');
+          cursoSelect.value = cursoSelecionado;
+          modal.style.display = 'flex';
+          document.body.style.overflow = 'hidden';
+        });
+      });
+
+      // Fechar modal
+      closeModal.addEventListener('click', () => {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+      });
+
+      // Fechar modal clicando fora
+      window.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.style.display = 'none';
+          document.body.style.overflow = 'auto';
+        }
+      });
+
+      // Formatação de telefone
+      const telefoneInput = document.getElementById('telefone');
+      telefoneInput.addEventListener('input', (e) => {
+        let value = e.target.value.replace(/\D/g, '');
+        
+        if (value.length > 0) {
+          if (value.length <= 2) {
+            value = '(' + value;
+          } else if (value.length <= 7) {
+            value = '(' + value.substring(0,2) + ') ' + value.substring(2);
+          } else if (value.length <= 11) {
+            value = '(' + value.substring(0,2) + ') ' + value.substring(2,7) + '-' + value.substring(7);
+          } else {
+            value = '(' + value.substring(0,2) + ') ' + value.substring(2,7) + '-' + value.substring(7,11);
+          }
+        }
+        
+        e.target.value = value;
+      });
+
+      // Enviar formulário
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        // Coletar dados
+        const nome = document.getElementById('nome').value;
+        const email = document.getElementById('email').value;
+        const telefone = document.getElementById('telefone').value;
+        const curso = document.getElementById('curso').value;
+        const observacoes = document.getElementById('observacoes').value;
+        
+        // Validar dados
+        if (!nome || !email || !telefone || !curso) {
+          alert('Por favor, preencha todos os campos obrigatórios!');
+          return;
+        }
+        
+        // Validar e-mail
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          alert('Por favor, insira um e-mail válido!');
+          return;
+        }
+        
+        // Validar telefone (mínimo 14 caracteres com formatação)
+        if (telefone.replace(/\D/g, '').length < 10) {
+          alert('Por favor, insira um número de telefone válido!');
+          return;
+        }
+        
+        // Formatando a mensagem para WhatsApp
+        const mensagem = `*PRÉ-MATRÍCULA - APROVA MAIS PB*%0A%0A` +
+                         `👤 *Nome:* ${nome}%0A` +
+                         `📧 *E-mail:* ${email}%0A` +
+                         `📱 *Telefone:* ${telefone}%0A` +
+                         `🎓 *Curso escolhido:* ${curso}%0A` +
+                         `📝 *Observações:* ${observacoes || 'Nenhuma'}%0A%0A` +
+                         `📅 *Data do cadastro:* ${new Date().toLocaleDateString('pt-BR')}%0A` +
+                         `_Esta mensagem foi enviada através do site oficial_`;
+        
+        // Número do WhatsApp
+        const numeroWhatsApp = '5583996627827';
+        
+        // Redirecionar para WhatsApp
+        window.open(`https://wa.me/${numeroWhatsApp}?text=${mensagem}`, '_blank');
+        
+        // Limpar formulário
+        form.reset();
+        
+        // Fechar modal
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        
+        // Mensagem de confirmação
+        alert('✅ Pré-matrícula enviada com sucesso! Você será redirecionado para o WhatsApp.');
+      });
+
+      // Animar elementos ao scroll
+      const animateOnScroll = () => {
+        const elements = document.querySelectorAll('.benefit-card, .course-card');
+        
+        elements.forEach(element => {
+          const elementPosition = element.getBoundingClientRect().top;
+          const screenPosition = window.innerHeight / 1.2;
+          
+          if (elementPosition < screenPosition) {
+            element.style.opacity = '1';
+            element.style.transform = 'translateY(0)';
+          }
+        });
+      };
+
+      // Inicializar animações
+      document.querySelectorAll('.benefit-card, .course-card').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+      });
+
+      window.addEventListener('scroll', animateOnScroll);
+      animateOnScroll(); // Executar uma vez no carregamento
+
+      // Efeito de digitação no título (opcional)
+      const heroTitle = document.querySelector('.hero-content h1 span');
+      if (heroTitle) {
+        const text = heroTitle.textContent;
+        heroTitle.textContent = '';
+        
+        let i = 0;
+        const typeWriter = () => {
+          if (i < text.length) {
+            heroTitle.textContent += text.charAt(i);
+            i++;
+            setTimeout(typeWriter, 100);
+          }
+        };
+        
+        // Iniciar após 1 segundo
+        setTimeout(typeWriter, 1000);
+      }
     });
   </script>
 
