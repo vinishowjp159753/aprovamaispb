@@ -4,47 +4,55 @@
   <meta charset="UTF-8">
   <title>AprovaMaisPB - Preparatório ENEM</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0a0a0a">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <!-- GOOGLE FONTS -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- ================= CSS COM NOVA PALETA ================= -->
+  <!-- ================= CSS MOBILE FIRST ================= -->
   <style>
     :root {
       --primary: #64b0d9;
       --primary-dark: #4a9bc4;
       --secondary: #0a0a0a;
       --secondary-light: #1a1a1a;
-      --accent: #ff6b35;
       --light: #ffffff;
       --dark: #0a0a0a;
       --gray: #666666;
-      --light-gray: #f0f0f0;
+      --light-gray: #f5f5f5;
       --gradient: linear-gradient(135deg, #64b0d9 0%, #4a9bc4 100%);
       --gradient-dark: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-      --shadow: 0 10px 25px rgba(0,0,0,0.15);
-      --shadow-lg: 0 20px 40px rgba(0,0,0,0.2);
+      --shadow: 0 4px 12px rgba(0,0,0,0.1);
+      --shadow-lg: 0 8px 24px rgba(0,0,0,0.15);
       --radius: 12px;
-      --transition: all 0.3s ease;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
     }
 
     body {
-      font-family: 'Inter', sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       background: var(--light);
       color: var(--dark);
-      line-height: 1.6;
+      line-height: 1.5;
       overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
     h1, h2, h3, h4 {
-      font-family: 'Poppins', sans-serif;
+      font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
       font-weight: 700;
       line-height: 1.2;
     }
@@ -55,51 +63,40 @@
     }
 
     .container {
+      width: 100%;
       max-width: 1200px;
       margin: 0 auto;
       padding: 0 20px;
     }
 
+    /* Botões Mobile-Optimizados */
     .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      padding: 14px 28px;
+      padding: 16px 24px;
       border-radius: var(--radius);
       font-weight: 600;
-      font-size: 16px;
+      font-size: 1rem;
       cursor: pointer;
       transition: var(--transition);
       border: none;
       outline: none;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .btn:before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-      transition: 0.5s;
-    }
-
-    .btn:hover:before {
-      left: 100%;
+      min-height: 52px;
+      min-width: 44px;
+      touch-action: manipulation;
+      user-select: none;
     }
 
     .btn-primary {
       background: var(--gradient);
       color: var(--light);
+      font-size: 1rem;
     }
 
-    .btn-primary:hover {
-      transform: translateY(-3px);
-      box-shadow: var(--shadow);
+    .btn-primary:active {
+      transform: scale(0.98);
     }
 
     .btn-secondary {
@@ -107,10 +104,8 @@
       color: var(--light);
     }
 
-    .btn-secondary:hover {
-      background: var(--secondary-light);
-      transform: translateY(-3px);
-      box-shadow: var(--shadow);
+    .btn-secondary:active {
+      transform: scale(0.98);
     }
 
     .btn-outline {
@@ -119,300 +114,274 @@
       border: 2px solid var(--primary);
     }
 
-    .btn-outline:hover {
+    .btn-outline:active {
       background: var(--primary);
       color: var(--light);
-      transform: translateY(-3px);
     }
 
-    .btn-dark {
-      background: var(--secondary);
-      color: var(--light);
-    }
-
-    .btn-dark:hover {
-      background: var(--primary);
-      transform: translateY(-3px);
-    }
-
-    /* HEADER MODERNO */
+    /* Header Mobile-First */
     header {
       position: fixed;
       top: 0;
       width: 100%;
-      background: rgba(10, 10, 10, 0.95);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      background: var(--secondary);
       z-index: 1000;
-      padding: 15px 0;
+      padding: 12px 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      height: 60px;
     }
 
     .navbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      height: 100%;
     }
 
     .logo {
-      font-size: 24px;
+      font-size: 1.1rem;
       font-weight: 700;
-      color: var(--primary);
+      color: var(--light);
       display: flex;
       align-items: center;
       gap: 8px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      z-index: 1001;
     }
 
     .logo i {
-      font-size: 26px;
-      color: var(--light);
-      background: var(--gradient);
-      padding: 8px;
-      border-radius: 8px;
-    }
-
-    .menu {
-      display: flex;
-      gap: 30px;
-      list-style: none;
-    }
-
-    .menu a {
-      font-weight: 500;
-      color: var(--light);
-      position: relative;
-      padding: 5px 0;
-      transition: var(--transition);
-    }
-
-    .menu a:hover {
+      font-size: 1.2rem;
       color: var(--primary);
     }
 
-    .menu a:after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 0;
-      height: 2px;
-      background: var(--primary);
-      transition: var(--transition);
-    }
-
-    .menu a:hover:after {
-      width: 100%;
-    }
-
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-
-    .btn-whatsapp {
-      background: #25D366;
-      color: var(--light);
-      padding: 10px 20px;
-      border-radius: var(--radius);
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: var(--transition);
-    }
-
-    .btn-whatsapp:hover {
-      background: #128C7E;
-      transform: translateY(-2px);
-    }
-
-    .menu-toggle {
-      display: none;
-      font-size: 24px;
-      cursor: pointer;
-      color: var(--light);
-    }
-
-    /* HERO MODERNO */
-    .hero {
-      padding: 180px 0 100px;
-      background: var(--gradient-dark);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero:before {
-      content: '';
-      position: absolute;
+    /* Menu Mobile */
+    .menu {
+      position: fixed;
       top: 0;
       left: 0;
-      right: 0;
-      bottom: 0;
-      background: 
-        radial-gradient(circle at 20% 80%, rgba(100, 176, 217, 0.15) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(100, 176, 217, 0.1) 0%, transparent 50%);
+      width: 100%;
+      height: 100vh;
+      background: var(--secondary);
+      padding: 80px 20px 40px;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 999;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
-    .hero .container {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 50px;
+    .menu.active {
+      transform: translateX(0);
+    }
+
+    .menu li {
+      list-style: none;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+    }
+
+    .menu.active li {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .menu li:nth-child(1) { transition-delay: 0.1s; }
+    .menu li:nth-child(2) { transition-delay: 0.2s; }
+    .menu li:nth-child(3) { transition-delay: 0.3s; }
+    .menu li:nth-child(4) { transition-delay: 0.4s; }
+
+    .menu a {
+      display: block;
+      padding: 18px 0;
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: var(--light);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      transition: var(--transition);
+    }
+
+    .menu a:active {
+      background: rgba(100, 176, 217, 0.1);
+      padding-left: 10px;
+    }
+
+    /* Menu Toggle (Hamburger) */
+    .menu-toggle {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 28px;
+      height: 24px;
+      cursor: pointer;
+      z-index: 1001;
+      background: none;
+      border: none;
+      padding: 0;
+    }
+
+    .menu-toggle span {
+      display: block;
+      width: 100%;
+      height: 3px;
+      background: var(--primary);
+      border-radius: 2px;
+      transition: var(--transition);
+    }
+
+    .menu-toggle.active span:nth-child(1) {
+      transform: rotate(45deg) translate(6px, 6px);
+    }
+
+    .menu-toggle.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .menu-toggle.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(7px, -7px);
+    }
+
+    /* Botão WhatsApp fixo no mobile */
+    .floating-whatsapp {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      background: #25D366;
+      border-radius: 50%;
+      display: flex;
       align-items: center;
-      position: relative;
-      z-index: 1;
+      justify-content: center;
+      color: white;
+      font-size: 28px;
+      box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+      z-index: 999;
+      transition: var(--transition);
+      text-decoration: none;
+    }
+
+    .floating-whatsapp:active {
+      transform: scale(0.9);
+      box-shadow: 0 2px 10px rgba(37, 211, 102, 0.6);
+    }
+
+    /* Hero Section Mobile */
+    .hero {
+      padding: 100px 0 60px;
+      background: var(--gradient-dark);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+    }
+
+    .hero-content {
+      text-align: center;
     }
 
     .hero-content h1 {
-      font-size: 48px;
+      font-size: 2.2rem;
       margin-bottom: 20px;
       color: var(--light);
+      line-height: 1.1;
     }
 
     .hero-content h1 span {
       color: var(--primary);
-      position: relative;
-    }
-
-    .hero-content h1 span:after {
-      content: '';
-      position: absolute;
-      bottom: 5px;
-      left: 0;
-      width: 100%;
-      height: 8px;
-      background: rgba(100, 176, 217, 0.3);
-      z-index: -1;
+      display: block;
     }
 
     .hero-content p {
-      font-size: 18px;
-      color: #cccccc;
+      font-size: 1.1rem;
+      color: rgba(255,255,255,0.9);
       margin-bottom: 30px;
-      max-width: 500px;
+      line-height: 1.6;
     }
 
     .hero-buttons {
       display: flex;
+      flex-direction: column;
       gap: 15px;
-      flex-wrap: wrap;
-    }
-
-    .hero-image {
-      position: relative;
-    }
-
-    .hero-image img {
-      width: 100%;
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-lg);
+      margin-bottom: 40px;
     }
 
     .stats {
-      display: flex;
-      justify-content: space-between;
-      background: rgba(10, 10, 10, 0.9);
-      padding: 30px;
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      margin-top: -40px;
-      position: relative;
-      z-index: 1;
-      max-width: 90%;
-      border: 1px solid rgba(100, 176, 217, 0.1);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-top: 40px;
     }
 
     .stat-item {
+      background: rgba(255,255,255,0.1);
+      padding: 20px 10px;
+      border-radius: var(--radius);
       text-align: center;
+      backdrop-filter: blur(10px);
     }
 
     .stat-number {
-      font-size: 32px;
+      font-size: 1.8rem;
       font-weight: 700;
       color: var(--primary);
       margin-bottom: 5px;
     }
 
     .stat-label {
-      font-size: 14px;
-      color: #cccccc;
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.8);
+      line-height: 1.3;
     }
 
-    /* BENEFÍCIOS */
+    /* Seções Gerais */
+    section {
+      padding: 60px 0;
+    }
+
     .section-title {
       text-align: center;
-      margin-bottom: 60px;
+      margin-bottom: 40px;
     }
 
     .section-title h2 {
-      font-size: 36px;
+      font-size: 1.8rem;
       color: var(--secondary);
       margin-bottom: 15px;
-      position: relative;
-      display: inline-block;
-    }
-
-    .section-title h2:after {
-      content: '';
-      position: absolute;
-      bottom: -10px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 60px;
-      height: 4px;
-      background: var(--primary);
-      border-radius: 2px;
     }
 
     .section-title p {
       color: var(--gray);
+      font-size: 1rem;
       max-width: 600px;
       margin: 0 auto;
-      font-size: 18px;
     }
 
-    .benefits {
-      padding: 100px 0;
-      background: var(--light);
-    }
-
+    /* Benefits Mobile */
     .benefits-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 30px;
+      grid-template-columns: 1fr;
+      gap: 20px;
     }
 
     .benefit-card {
       background: var(--light);
-      padding: 35px 25px;
+      padding: 25px 20px;
       border-radius: var(--radius);
       box-shadow: var(--shadow);
-      transition: var(--transition);
       text-align: center;
       border-top: 4px solid var(--primary);
-      position: relative;
-      overflow: hidden;
+      transition: var(--transition);
     }
 
-    .benefit-card:before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 5px;
-      background: var(--gradient);
-    }
-
-    .benefit-card:hover {
-      transform: translateY(-10px);
+    .benefit-card:active {
+      transform: translateY(-5px);
       box-shadow: var(--shadow-lg);
     }
 
     .benefit-icon {
-      width: 70px;
-      height: 70px;
+      width: 60px;
+      height: 60px;
       background: var(--gradient);
       border-radius: 50%;
       display: flex;
@@ -420,29 +389,20 @@
       justify-content: center;
       margin: 0 auto 20px;
       color: var(--light);
-      font-size: 28px;
+      font-size: 24px;
     }
 
     .benefit-card h3 {
-      margin-bottom: 15px;
-      font-size: 20px;
+      font-size: 1.2rem;
+      margin-bottom: 10px;
       color: var(--secondary);
     }
 
-    .benefit-card p {
-      color: var(--gray);
-    }
-
-    /* CURSOS */
-    .courses {
-      padding: 100px 0;
-      background: linear-gradient(to bottom, var(--light) 0%, #f5f5f5 100%);
-    }
-
+    /* Courses Mobile */
     .courses-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 30px;
+      grid-template-columns: 1fr;
+      gap: 20px;
     }
 
     .course-card {
@@ -450,35 +410,18 @@
       border-radius: var(--radius);
       overflow: hidden;
       box-shadow: var(--shadow);
-      transition: var(--transition);
-      border: 1px solid rgba(100, 176, 217, 0.1);
-    }
-
-    .course-card:hover {
-      transform: translateY(-10px);
-      box-shadow: var(--shadow-lg);
+      margin-bottom: 20px;
     }
 
     .course-header {
       background: var(--gradient-dark);
       color: var(--light);
-      padding: 25px;
+      padding: 25px 20px;
       text-align: center;
-      position: relative;
-    }
-
-    .course-header:before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: var(--gradient);
     }
 
     .course-header h3 {
-      font-size: 22px;
+      font-size: 1.3rem;
       margin-bottom: 10px;
     }
 
@@ -487,27 +430,27 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      font-size: 14px;
-      opacity: 0.9;
+      font-size: 0.9rem;
       color: var(--primary);
     }
 
     .course-body {
-      padding: 25px;
+      padding: 20px;
     }
 
     .course-features {
       list-style: none;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
     }
 
     .course-features li {
-      padding: 10px 0;
+      padding: 12px 0;
       border-bottom: 1px solid rgba(100, 176, 217, 0.1);
       display: flex;
-      align-items: center;
-      gap: 10px;
+      align-items: flex-start;
+      gap: 12px;
       color: var(--gray);
+      font-size: 0.95rem;
     }
 
     .course-features li:last-child {
@@ -517,28 +460,30 @@
     .course-features li i {
       color: var(--primary);
       font-size: 14px;
+      margin-top: 3px;
+      flex-shrink: 0;
     }
 
     .course-price {
       text-align: center;
-      font-size: 28px;
+      font-size: 1.5rem;
       font-weight: 700;
       color: var(--secondary);
-      margin: 20px 0;
-      padding: 15px;
+      margin: 25px 0;
+      padding: 20px;
       background: rgba(100, 176, 217, 0.1);
       border-radius: var(--radius);
     }
 
     .course-price span {
-      font-size: 16px;
+      display: block;
+      font-size: 0.9rem;
       color: var(--gray);
       font-weight: 400;
-      display: block;
-      margin-top: 5px;
+      margin-top: 8px;
     }
 
-    /* MODAL */
+    /* Modal Mobile */
     .modal {
       display: none;
       position: fixed;
@@ -546,11 +491,10 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(10, 10, 10, 0.9);
+      background: rgba(10, 10, 10, 0.95);
       z-index: 2000;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
+      align-items: flex-end;
+      padding: 0;
       animation: fadeIn 0.3s ease;
     }
 
@@ -561,66 +505,53 @@
 
     .modal-content {
       background: var(--light);
-      border-radius: var(--radius);
+      border-radius: 20px 20px 0 0;
       width: 100%;
-      max-width: 500px;
+      max-height: 90vh;
       position: relative;
       animation: slideUp 0.4s ease;
-      box-shadow: 0 25px 50px rgba(0,0,0,0.3);
-      border: 2px solid var(--primary);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     @keyframes slideUp {
-      from { transform: translateY(30px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
     }
 
     .modal-header {
       background: var(--gradient-dark);
       color: var(--light);
-      padding: 25px;
-      border-radius: var(--radius) var(--radius) 0 0;
-      position: relative;
-    }
-
-    .modal-header:before {
-      content: '';
-      position: absolute;
+      padding: 25px 20px;
+      position: sticky;
       top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: var(--gradient);
+      z-index: 1;
     }
 
     .modal-header h3 {
-      font-size: 24px;
+      font-size: 1.3rem;
+      margin-right: 40px;
     }
 
     .close-modal {
       position: absolute;
       top: 20px;
       right: 20px;
-      font-size: 24px;
-      cursor: pointer;
-      color: var(--light);
-      background: rgba(255,255,255,0.1);
-      width: 36px;
-      height: 36px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
+      background: rgba(255,255,255,0.1);
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: var(--transition);
-    }
-
-    .close-modal:hover {
-      background: var(--primary);
-      transform: rotate(90deg);
+      cursor: pointer;
+      font-size: 24px;
+      color: var(--light);
+      border: none;
     }
 
     .modal-body {
-      padding: 30px;
+      padding: 20px;
     }
 
     .form-group {
@@ -632,16 +563,18 @@
       margin-bottom: 8px;
       font-weight: 600;
       color: var(--secondary);
+      font-size: 0.95rem;
     }
 
     .form-control {
       width: 100%;
-      padding: 12px 16px;
+      padding: 16px;
       border: 1px solid rgba(100, 176, 217, 0.3);
       border-radius: 8px;
-      font-size: 16px;
-      transition: var(--transition);
+      font-size: 1rem;
       background: var(--light);
+      -webkit-appearance: none;
+      appearance: none;
     }
 
     .form-control:focus {
@@ -650,38 +583,31 @@
       box-shadow: 0 0 0 3px rgba(100, 176, 217, 0.1);
     }
 
-    /* FOOTER */
+    select.form-control {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364b0d9' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      background-size: 16px;
+      padding-right: 40px;
+    }
+
+    /* Footer Mobile */
     footer {
       background: var(--secondary);
       color: var(--light);
-      padding: 70px 0 30px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    footer:before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: var(--gradient);
+      padding: 50px 0 30px;
     }
 
     .footer-content {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 40px;
-      margin-bottom: 40px;
-      position: relative;
-      z-index: 1;
+      grid-template-columns: 1fr;
+      gap: 30px;
     }
 
     .footer-logo {
-      font-size: 24px;
+      font-size: 1.3rem;
       font-weight: 700;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
       color: var(--light);
       display: flex;
       align-items: center;
@@ -690,33 +616,19 @@
 
     .footer-logo i {
       color: var(--primary);
-      background: rgba(255,255,255,0.1);
-      padding: 8px;
-      border-radius: 8px;
     }
 
     .footer-about p {
-      color: #aaaaaa;
+      color: rgba(255,255,255,0.8);
       margin-bottom: 20px;
-      line-height: 1.8;
+      line-height: 1.6;
+      font-size: 0.95rem;
     }
 
     .footer-links h4 {
-      font-size: 18px;
-      margin-bottom: 20px;
+      font-size: 1.1rem;
+      margin-bottom: 15px;
       color: var(--primary);
-      position: relative;
-      padding-bottom: 10px;
-    }
-
-    .footer-links h4:after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 40px;
-      height: 3px;
-      background: var(--primary);
     }
 
     .footer-links ul {
@@ -728,20 +640,12 @@
     }
 
     .footer-links a {
-      color: #aaaaaa;
-      transition: var(--transition);
+      color: rgba(255,255,255,0.8);
       display: flex;
       align-items: center;
       gap: 8px;
-    }
-
-    .footer-links a:hover {
-      color: var(--primary);
-      padding-left: 5px;
-    }
-
-    .footer-links a i {
-      font-size: 12px;
+      font-size: 0.95rem;
+      padding: 5px 0;
     }
 
     .contact-info {
@@ -752,99 +656,169 @@
 
     .contact-item {
       display: flex;
-      align-items: center;
-      gap: 15px;
-      color: #aaaaaa;
+      align-items: flex-start;
+      gap: 12px;
+      color: rgba(255,255,255,0.8);
+      font-size: 0.95rem;
     }
 
     .contact-item i {
       color: var(--primary);
       font-size: 18px;
-      width: 24px;
+      margin-top: 2px;
+      flex-shrink: 0;
     }
 
     .footer-bottom {
       text-align: center;
       padding-top: 30px;
       border-top: 1px solid rgba(255,255,255,0.1);
-      color: #888888;
-      font-size: 14px;
-      position: relative;
-      z-index: 1;
+      color: rgba(255,255,255,0.6);
+      font-size: 0.85rem;
+      margin-top: 30px;
     }
 
-    /* RESPONSIVO */
-    @media (max-width: 992px) {
-      .hero .container {
-        grid-template-columns: 1fr;
-        text-align: center;
+    /* Tablet */
+    @media (min-width: 768px) {
+      html {
+        font-size: 17px;
       }
 
-      .hero-content p {
-        margin: 0 auto 30px;
+      .container {
+        padding: 0 30px;
+      }
+
+      header {
+        height: 70px;
+        padding: 15px 0;
+      }
+
+      .hero {
+        padding: 120px 0 80px;
+      }
+
+      .hero-content h1 {
+        font-size: 2.8rem;
       }
 
       .hero-buttons {
+        flex-direction: row;
         justify-content: center;
       }
 
-      .stats {
-        max-width: 100%;
+      .benefits-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .courses-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+      }
+
+      .footer-content {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 40px;
+      }
+
+      .floating-whatsapp {
+        width: 70px;
+        height: 70px;
+        font-size: 32px;
+        bottom: 30px;
+        right: 30px;
       }
     }
 
-    @media (max-width: 768px) {
+    /* Desktop */
+    @media (min-width: 1024px) {
       .menu {
-        display: none;
-        position: fixed;
-        top: 70px;
-        left: 0;
-        width: 100%;
-        background: var(--secondary);
-        flex-direction: column;
-        padding: 20px;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-        text-align: center;
-        border-top: 2px solid var(--primary);
+        position: static;
+        height: auto;
+        flex-direction: row;
+        padding: 0;
+        transform: none;
+        width: auto;
+        background: transparent;
       }
 
-      .menu.active {
-        display: flex;
+      .menu li {
+        opacity: 1;
+        transform: none;
+      }
+
+      .menu a {
+        padding: 5px 0;
+        font-size: 1rem;
+        border-bottom: none;
+        margin: 0 15px;
+      }
+
+      .menu a:hover {
+        color: var(--primary);
+      }
+
+      .menu a:active {
+        background: transparent;
+        padding-left: 0;
       }
 
       .menu-toggle {
-        display: block;
+        display: none;
+      }
+
+      .hero {
+        padding: 140px 0 100px;
       }
 
       .hero-content h1 {
-        font-size: 36px;
+        font-size: 3.5rem;
       }
 
-      .stats {
-        flex-direction: column;
-        gap: 20px;
+      .benefits-grid {
+        grid-template-columns: repeat(4, 1fr);
       }
 
-      .section-title h2 {
-        font-size: 28px;
+      .footer-content {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .modal {
+        align-items: center;
+        padding: 20px;
+      }
+
+      .modal-content {
+        max-width: 500px;
+        border-radius: var(--radius);
+        max-height: 80vh;
+        animation: slideUpDesktop 0.4s ease;
+      }
+
+      @keyframes slideUpDesktop {
+        from { transform: translateY(30px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+
+      .floating-whatsapp {
+        display: none;
       }
     }
 
-    @media (max-width: 480px) {
-      .hero-buttons {
-        flex-direction: column;
+    /* Telas muito grandes */
+    @media (min-width: 1200px) {
+      .container {
+        padding: 0 40px;
       }
+    }
 
-      .btn {
-        width: 100%;
+    /* Ajustes para iOS */
+    @supports (-webkit-touch-callout: none) {
+      .hero {
+        min-height: -webkit-fill-available;
       }
-
-      .hero-content h1 {
-        font-size: 30px;
-      }
-
-      .section-title h2 {
-        font-size: 24px;
+      
+      .modal-content {
+        max-height: 85vh;
       }
     }
   </style>
@@ -860,32 +834,34 @@
           AprovaMaisPB
         </a>
         
-        <ul class="menu">
+        <button class="menu-toggle" id="menuToggle">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        
+        <ul class="menu" id="menu">
           <li><a href="#home">Início</a></li>
           <li><a href="#benefits">Benefícios</a></li>
           <li><a href="#courses">Cursos</a></li>
           <li><a href="#contact">Contato</a></li>
         </ul>
-        
-        <div class="header-actions">
-          <a href="https://wa.me/5583996627827" class="btn-whatsapp" target="_blank">
-            <i class="fab fa-whatsapp"></i>
-            WhatsApp
-          </a>
-          <div class="menu-toggle" id="menuToggle">
-            <i class="fas fa-bars"></i>
-          </div>
-        </div>
       </nav>
     </div>
   </header>
+
+  <!-- Botão WhatsApp Flutuante (Mobile) -->
+  <a href="https://wa.me/5583996627827" class="floating-whatsapp" target="_blank" aria-label="WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+  </a>
 
   <!-- HERO -->
   <section class="hero" id="home">
     <div class="container">
       <div class="hero-content">
-        <h1>Transforme seu ENEM em <span>conquista real</span></h1>
-        <p>Metodologia focada, acompanhamento próximo e resultados reais.</p>
+        <h1>Transforme seu ENEM<br><span>em conquista real</span></h1>
+        <p>Metodologia focada, acompanhamento próximo e resultados reais. Mais de 500 aprovados nos últimos 3 anos.</p>
+        
         <div class="hero-buttons">
           <a href="#courses" class="btn btn-primary">
             <i class="fas fa-book-open"></i>
@@ -895,7 +871,22 @@
             <i class="fab fa-whatsapp"></i>
             Fale Conosco
           </a>
-        </div>        </div>
+        </div>
+
+        <div class="stats">
+          <div class="stat-item">
+            <div class="stat-number">98%</div>
+            <div class="stat-label">Aprovação</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">500+</div>
+            <div class="stat-label">Aprovados</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">4.9</div>
+            <div class="stat-label">Avaliação</div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -905,7 +896,7 @@
     <div class="container">
       <div class="section-title">
         <h2>Por que escolher o AprovaMaisPB?</h2>
-        <p>Nossa metodologia foi desenvolvida para garantir que você atinja seu máximo potencial no ENEM</p>
+        <p>Nossa metodologia foi desenvolvida para garantir seu máximo potencial no ENEM</p>
       </div>
       
       <div class="benefits-grid">
@@ -913,37 +904,32 @@
           <div class="benefit-icon">
             <i class="fas fa-bullseye"></i>
           </div>
-          <h3>Objetivo</h3>
-          <p>Preparar estudantes para o ENEM e demais vestibulares por meio de um ensino de qualidade, acessível e humanizado, promovendo o desenvolvimento de habilidades e competências necessárias para que alcancem seus objetivos educacionais.</p>
+          <h3>Ensino Direcionado</h3>
+          <p>Foco total no que realmente cai no ENEM, com material atualizado.</p>
         </div>
         
         <div class="benefit-card">
           <div class="benefit-icon">
             <i class="fas fa-chalkboard-teacher"></i>
           </div>
-          <h3>Compromisso</h3>
-          <p>Buscar a excelência no ensino por meio da qualidade pedagógica, da atualização constante e da aplicação de metodologias eficazes e inovadoras.</p>
+          <h3>Professores Especialistas</h3>
+          <p>Equipe experiente com anos de preparação para vestibulares.</p>
         </div>
         
         <div class="benefit-card">
           <div class="benefit-icon">
             <i class="fas fa-chart-line"></i>
           </div>
-          <h3>Professores Especialistas</h3>
-          <p>Equipe experiente com anos de preparação para vestibulares e ENEM.</p>
+          <h3>Resultados Comprovados</h3>
+          <p>Centenas de aprovações em universidades públicas em todo o Brasil.</p>
         </div>
         
         <div class="benefit-card">
           <div class="benefit-icon">
             <i class="fas fa-headset"></i>
           </div>
-          <h3>Serviços</h3>
-          <p>- Material digital e Impresso<p>
-            <p>- Mentoria Online</p>
-          <p>- Simulados</p>
-          <p>- Momentos de interação</p>
-          <p>- Aulões e aulas VIPS</p>
-          </p>
+          <h3>Acompanhamento Personalizado</h3>
+          <p>Suporte individual para identificar e superar suas dificuldades.</p>
         </div>
       </div>
     </div>
@@ -958,10 +944,10 @@
       </div>
       
       <div class="courses-grid">
-        <!-- CURSO EXTENSIVO (SEMANAL) -->
+        <!-- CURSO INTENSIVO -->
         <div class="course-card">
           <div class="course-header">
-            <h3>Curso Extensivo</h3>
+            <h3>Curso Intensivo</h3>
             <div class="course-time">
               <i class="far fa-calendar-alt"></i>
               Segunda a Sexta
@@ -976,7 +962,7 @@
             <ul class="course-features">
               <li><i class="fas fa-check-circle"></i> Aulas diárias presenciais</li>
               <li><i class="fas fa-check-circle"></i> Material exclusivo impresso</li>
-              <li><i class="fas fa-check-circle"></i> Simulados </li>
+              <li><i class="fas fa-check-circle"></i> Simulados semanais</li>
               <li><i class="fas fa-check-circle"></i> Plantão de dúvidas diário</li>
               <li><i class="fas fa-check-circle"></i> Correção de redação individual</li>
               <li><i class="fas fa-check-circle"></i> Acompanhamento personalizado</li>
@@ -987,17 +973,17 @@
               <span>Pagamento facilitado em até 12x</span>
             </div>
             
-            <button class="btn btn-dark btn-matricula" data-curso="Curso EXTENSIVO" style="width: 100%;">
+            <button class="btn btn-primary btn-matricula" data-curso="Curso Intensivo" style="width: 100%;">
               <i class="fas fa-edit"></i>
               Fazer Pré-matrícula
             </button>
           </div>
         </div>
         
-        <!-- CURSO EXTENSIVO (SÁBADO) -->
+        <!-- CURSO SEMI-INTENSIVO -->
         <div class="course-card">
           <div class="course-header">
-            <h3>Curso Extensivo (Sábado)</h3>
+            <h3>Curso Semi-Intensivo</h3>
             <div class="course-time">
               <i class="far fa-calendar-alt"></i>
               Aos Sábados
@@ -1006,14 +992,14 @@
           <div class="course-body">
             <div class="course-time">
               <i class="far fa-clock"></i>
-              08:00 às 12:00 e 14:00 às 18:00
+              08:00 às 18:00
             </div>
             
             <ul class="course-features">
               <li><i class="fas fa-check-circle"></i> Aulas intensivas aos sábados</li>
               <li><i class="fas fa-check-circle"></i> Material completo digital</li>
-              <li><i class="fas fa-check-circle"></i> Simulados </li>
-              <li><i class="fas fa-check-circle"></i> Suporte </li>
+              <li><i class="fas fa-check-circle"></i> Simulados quinzenais</li>
+              <li><i class="fas fa-check-circle"></i> Suporte por WhatsApp 24h</li>
               <li><i class="fas fa-check-circle"></i> Revisão focada nos conteúdos</li>
               <li><i class="fas fa-check-circle"></i> Grupo exclusivo de estudos</li>
             </ul>
@@ -1023,7 +1009,7 @@
               <span>Pagamento facilitado em até 10x</span>
             </div>
             
-            <button class="btn btn-dark btn-matricula" data-curso="Curso Extensivo (Sábado)" style="width: 100%;">
+            <button class="btn btn-primary btn-matricula" data-curso="Curso Semi-Intensivo" style="width: 100%;">
               <i class="fas fa-edit"></i>
               Fazer Pré-matrícula
             </button>
@@ -1038,7 +1024,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h3>Pré-matrícula AprovaMaisPB</h3>
-        <div class="close-modal">&times;</div>
+        <button class="close-modal" aria-label="Fechar">&times;</button>
       </div>
       <div class="modal-body">
         <form id="formMatricula">
@@ -1061,14 +1047,14 @@
             <label for="curso">Curso Escolhido *</label>
             <select id="curso" class="form-control" required>
               <option value="">Selecione um curso</option>
-                <option value="Curso Extensivo (Semanal)">Curso Extensivo (Semanal) (Segunda a Sexta - 14:00 às 17:00)</option>
-              <option value="Curso Extensivo (Sábado)>Curso Extensivo (Sábado) (Sábados - 08:00 às 18:00)</option>
+              <option value="Curso Intensivo">Curso Intensivo (Segunda a Sexta - 14:00 às 17:00)</option>
+              <option value="Curso Semi-Intensivo">Curso Semi-Intensivo (Sábados - 08:00 às 18:00)</option>
             </select>
           </div>
           
           <div class="form-group">
             <label for="observacoes">Observações ou Dúvidas</label>
-            <textarea id="observacoes" class="form-control" rows="3" placeholder="Alguma dúvida sobre o curso ou informação adicional que deseja compartilhar?"></textarea>
+            <textarea id="observacoes" class="form-control" rows="3" placeholder="Alguma dúvida ou informação adicional?"></textarea>
           </div>
           
           <button type="submit" class="btn btn-primary" style="width: 100%;">
@@ -1093,10 +1079,10 @@
             <i class="fas fa-graduation-cap"></i>
             AprovaMaisPB
           </div>
-          <p>Preparatório especializado no ENEM com metodologia comprovada e resultados reais em João Pessoa - PB. Transformando sonhos em conquistas desde 2018.</p>
-          <a href="https://wa.me/5583996627827" class="btn btn-primary" target="_blank">
+          <p>Preparatório especializado no ENEM com metodologia comprovada e resultados reais em João Pessoa - PB.</p>
+          <a href="https://wa.me/5583996627827" class="btn btn-outline" target="_blank" style="margin-top: 10px;">
             <i class="fab fa-whatsapp"></i>
-            Fale Conosco no WhatsApp
+            Fale Conosco
           </a>
         </div>
         
@@ -1122,64 +1108,82 @@
               <span>(83) 99662-7827</span>
             </div>
             <div class="contact-item">
-              <i class="fas fa-envelope"></i>
-              <span>contato@aprovamaispb.com</span>
-            </div>
-            <div class="contact-item">
               <i class="fab fa-whatsapp"></i>
               <span>WhatsApp: (83) 99662-7827</span>
             </div>
             <div class="contact-item">
               <i class="fas fa-clock"></i>
-              <span>Seg-Sex: 8h-18h | Sáb: 8h-12h</span>
+              <span>Seg-Sex: 8h-18h</span>
             </div>
           </div>
         </div>
       </div>
       
       <div class="footer-bottom">
-        <p>&copy; 2025 AprovaMaisPB - Todos os direitos reservados. CNPJ: XX.XXX.XXX/XXXX-XX</p>
+        <p>&copy; 2025 AprovaMaisPB - Todos os direitos reservados.</p>
       </div>
     </div>
   </footer>
 
-  <!-- ================= JS ================= -->
+  <!-- ================= JS MOBILE OPTIMIZED ================= -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      console.log("AprovaMaisPB - Site com nova paleta carregado 🎨");
+      console.log("AprovaMaisPB - Mobile otimizado carregado 📱");
 
-      // Menu mobile
+      // Menu mobile com animação
       const menuToggle = document.getElementById('menuToggle');
-      const menu = document.querySelector('.menu');
-      
-      menuToggle.addEventListener('click', () => {
-        menu.classList.toggle('active');
-        menuToggle.querySelector('i').classList.toggle('fa-bars');
-        menuToggle.querySelector('i').classList.toggle('fa-times');
-      });
+      const menu = document.getElementById('menu');
+      let menuOpen = false;
+
+      const toggleMenu = () => {
+        menuOpen = !menuOpen;
+        menuToggle.classList.toggle('active', menuOpen);
+        menu.classList.toggle('active', menuOpen);
+        
+        // Bloquear scroll quando menu aberto
+        document.body.style.overflow = menuOpen ? 'hidden' : '';
+        
+        // Adicionar efeito de fundo no header
+        document.querySelector('header').style.background = menuOpen ? 
+          'var(--secondary)' : 'var(--secondary)';
+      };
+
+      menuToggle.addEventListener('click', toggleMenu);
 
       // Fechar menu ao clicar em um link
       document.querySelectorAll('.menu a').forEach(link => {
         link.addEventListener('click', () => {
-          menu.classList.remove('active');
-          menuToggle.querySelector('i').classList.add('fa-bars');
-          menuToggle.querySelector('i').classList.remove('fa-times');
+          if (menuOpen) toggleMenu();
         });
       });
 
-      // Scroll suave
+      // Fechar menu ao tocar fora (apenas mobile)
+      document.addEventListener('click', (e) => {
+        if (menuOpen && !menu.contains(e.target) && !menuToggle.contains(e.target)) {
+          toggleMenu();
+        }
+      });
+
+      // Scroll suave otimizado para mobile
       document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
-          e.preventDefault();
           const targetId = this.getAttribute('href');
           if (targetId === '#') return;
           
+          e.preventDefault();
           const targetElement = document.querySelector(targetId);
+          
           if (targetElement) {
+            const headerHeight = document.querySelector('header').offsetHeight;
+            const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset;
+            
             window.scrollTo({
-              top: targetElement.offsetTop - 80,
+              top: targetPosition - headerHeight - 10,
               behavior: 'smooth'
             });
+            
+            // Fechar menu se estiver aberto
+            if (menuOpen) toggleMenu();
           }
         });
       });
@@ -1191,7 +1195,7 @@
       const form = document.getElementById('formMatricula');
       const cursoSelect = document.getElementById('curso');
 
-      // Abrir modal
+      // Abrir modal com swipe down para fechar
       btnsMatricula.forEach(btn => {
         btn.addEventListener('click', () => {
           const cursoSelecionado = btn.getAttribute('data-curso');
@@ -1202,21 +1206,40 @@
       });
 
       // Fechar modal
-      closeModal.addEventListener('click', () => {
+      const closeModalFunc = () => {
         modal.style.display = 'none';
-        document.body.style.overflow = 'auto';
-      });
+        document.body.style.overflow = '';
+      };
 
-      // Fechar modal clicando fora
-      window.addEventListener('click', (e) => {
+      closeModal.addEventListener('click', closeModalFunc);
+
+      // Fechar modal ao clicar fora ou arrastar para baixo (mobile)
+      modal.addEventListener('click', (e) => {
         if (e.target === modal) {
-          modal.style.display = 'none';
-          document.body.style.overflow = 'auto';
+          closeModalFunc();
         }
       });
 
-      // Formatação de telefone
+      // Suporte para fechar modal com gesto de swipe (mobile)
+      let startY = 0;
+      modal.addEventListener('touchstart', (e) => {
+        startY = e.touches[0].clientY;
+      }, { passive: true });
+
+      modal.addEventListener('touchmove', (e) => {
+        if (window.innerWidth < 1024) {
+          const currentY = e.touches[0].clientY;
+          const diff = currentY - startY;
+          
+          if (diff > 50) { // Swipe para baixo significativo
+            closeModalFunc();
+          }
+        }
+      }, { passive: true });
+
+      // Formatação de telefone com validação em tempo real
       const telefoneInput = document.getElementById('telefone');
+      
       telefoneInput.addEventListener('input', (e) => {
         let value = e.target.value.replace(/\D/g, '');
         
@@ -1235,20 +1258,27 @@
         e.target.value = value;
       });
 
-      // Enviar formulário
+      // Validar formulário antes de enviar
       form.addEventListener('submit', (e) => {
         e.preventDefault();
         
         // Coletar dados
-        const nome = document.getElementById('nome').value;
-        const email = document.getElementById('email').value;
+        const nome = document.getElementById('nome').value.trim();
+        const email = document.getElementById('email').value.trim();
         const telefone = document.getElementById('telefone').value;
         const curso = document.getElementById('curso').value;
-        const observacoes = document.getElementById('observacoes').value;
+        const observacoes = document.getElementById('observacoes').value.trim();
         
-        // Validar dados
-        if (!nome || !email || !telefone || !curso) {
-          alert('Por favor, preencha todos os campos obrigatórios!');
+        // Validação mobile-friendly
+        let errors = [];
+        
+        if (!nome) errors.push('Nome completo');
+        if (!email) errors.push('E-mail');
+        if (!telefone.replace(/\D/g, '')) errors.push('Telefone');
+        if (!curso) errors.push('Curso escolhido');
+        
+        if (errors.length > 0) {
+          alert('Por favor, preencha: ' + errors.join(', '));
           return;
         }
         
@@ -1259,9 +1289,10 @@
           return;
         }
         
-        // Validar telefone (mínimo 14 caracteres com formatação)
-        if (telefone.replace(/\D/g, '').length < 10) {
-          alert('Por favor, insira um número de telefone válido!');
+        // Validar telefone
+        const telefoneDigits = telefone.replace(/\D/g, '');
+        if (telefoneDigits.length < 10) {
+          alert('Por favor, insira um número de telefone válido com DDD!');
           return;
         }
         
@@ -1272,69 +1303,101 @@
                          `📱 *Telefone:* ${telefone}%0A` +
                          `🎓 *Curso escolhido:* ${curso}%0A` +
                          `📝 *Observações:* ${observacoes || 'Nenhuma'}%0A%0A` +
-                         `📅 *Data do cadastro:* ${new Date().toLocaleDateString('pt-BR')}%0A` +
-                         `_Esta mensagem foi enviada através do site oficial_`;
+                         `_Enviado via site em ${new Date().toLocaleDateString('pt-BR')}_`;
         
         // Número do WhatsApp
         const numeroWhatsApp = '5583996627827';
         
         // Redirecionar para WhatsApp
-        window.open(`https://wa.me/${numeroWhatsApp}?text=${mensagem}`, '_blank');
+        setTimeout(() => {
+          window.open(`https://wa.me/${numeroWhatsApp}?text=${mensagem}`, '_blank');
+        }, 300);
         
         // Limpar formulário
         form.reset();
         
         // Fechar modal
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto';
+        closeModalFunc();
         
-        // Mensagem de confirmação
-        alert('✅ Pré-matrícula enviada com sucesso! Você será redirecionado para o WhatsApp.');
+        // Feedback tátil (vibração se suportado)
+        if (navigator.vibrate) {
+          navigator.vibrate([100, 50, 100]);
+        }
+        
+        // Mensagem de confirmação mobile-friendly
+        alert('✅ Pré-matrícula enviada! Você será redirecionado para o WhatsApp.');
       });
 
-      // Animar elementos ao scroll
-      const animateOnScroll = () => {
-        const elements = document.querySelectorAll('.benefit-card, .course-card');
-        
-        elements.forEach(element => {
-          const elementPosition = element.getBoundingClientRect().top;
-          const screenPosition = window.innerHeight / 1.2;
-          
-          if (elementPosition < screenPosition) {
-            element.style.opacity = '1';
-            element.style.transform = 'translateY(0)';
-          }
-        });
+      // Otimização de performance - carregamento lazy de animações
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '50px'
       };
 
-      // Inicializar animações
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animated');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, observerOptions);
+
+      // Observar elementos para animação
       document.querySelectorAll('.benefit-card, .course-card').forEach(el => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(20px)';
-        el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        observer.observe(el);
       });
 
-      window.addEventListener('scroll', animateOnScroll);
-      animateOnScroll(); // Executar uma vez no carregamento
+      // Prevenir zoom em inputs em iOS
+      document.addEventListener('touchstart', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+          document.body.style.zoom = "100%";
+        }
+      }, { passive: true });
 
-      // Efeito de digitação no título (opcional)
-      const heroTitle = document.querySelector('.hero-content h1 span');
-      if (heroTitle) {
-        const text = heroTitle.textContent;
-        heroTitle.textContent = '';
-        
-        let i = 0;
-        const typeWriter = () => {
-          if (i < text.length) {
-            heroTitle.textContent += text.charAt(i);
-            i++;
-            setTimeout(typeWriter, 100);
-          }
-        };
-        
-        // Iniciar após 1 segundo
-        setTimeout(typeWriter, 1000);
+      // Detectar dispositivo para otimizações
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+      if (isIOS) {
+        // Ajustes específicos para iOS
+        document.documentElement.style.setProperty('--safe-area-inset-bottom', 'env(safe-area-inset-bottom)');
       }
+
+      // Feedback tátil para interações
+      document.querySelectorAll('.btn, .benefit-card, .course-card').forEach(el => {
+        el.addEventListener('touchstart', () => {
+          if (isMobile) {
+            el.style.transform = 'scale(0.98)';
+          }
+        }, { passive: true });
+
+        el.addEventListener('touchend', () => {
+          if (isMobile) {
+            el.style.transform = '';
+          }
+        }, { passive: true });
+      });
+
+      // Prevenir scroll duplo no modal (iOS)
+      if (isIOS) {
+        const modalContent = document.querySelector('.modal-content');
+        if (modalContent) {
+          modalContent.addEventListener('touchmove', (e) => {
+            e.stopPropagation();
+          }, { passive: false });
+        }
+      }
+
+      // Ajustar altura do viewport para mobile
+      const setVH = () => {
+        let vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+      };
+
+      setVH();
+      window.addEventListener('resize', setVH);
+      window.addEventListener('orientationchange', setVH);
     });
   </script>
 
