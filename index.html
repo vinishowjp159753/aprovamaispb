@@ -5,424 +5,1502 @@
   <title>AprovaMaisPB - Preparatório ENEM</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#0a0a0a">
-
-  <!-- SEO -->
-  <meta name="description" content="Preparatório ENEM em João Pessoa - PB com metodologia humanizada, professores experientes e foco em aprovação.">
-  <meta name="keywords" content="ENEM, vestibular, cursinho, João Pessoa, AprovaMaisPB">
-
-  <!-- FAVICON -->
+  
+  <!-- FAVICON ATUALIZADO -->
   <link rel="icon" type="image/png" href="assets/img/logo_aprovamaispb.png">
   <link rel="apple-touch-icon" href="assets/img/logo_aprovamaispb.png">
-
-  <!-- ICONS & FONTS -->
+  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
+  <!-- GOOGLE FONTS -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- ================= CSS MOBILE FIRST ================= -->
   <style>
     :root {
       --primary: #64b0d9;
       --primary-dark: #4a9bc4;
       --secondary: #0a0a0a;
+      --secondary-light: #1a1a1a;
       --light: #ffffff;
-      --gray: #666;
-      --gradient: linear-gradient(135deg, #64b0d9, #4a9bc4);
-      --gradient-dark: linear-gradient(135deg, #0a0a0a, #1a1a1a);
+      --dark: #0a0a0a;
+      --gray: #666666;
+      --light-gray: #f5f5f5;
+      --gradient: linear-gradient(135deg, #64b0d9 0%, #4a9bc4 100%);
+      --gradient-dark: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+      --shadow: 0 4px 12px rgba(0,0,0,0.1);
+      --shadow-lg: 0 8px 24px rgba(0,0,0,0.15);
       --radius: 12px;
-      --transition: all .3s ease;
-      --shadow: 0 4px 12px rgba(0,0,0,.1);
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    * { margin:0; padding:0; box-sizing:border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+    }
+
     body {
-      font-family: 'Inter', sans-serif;
-      color:#000;
-      line-height:1.5;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--light);
+      color: var(--dark);
+      line-height: 1.5;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
-    a { text-decoration:none; color:inherit; }
+    h1, h2, h3, h4 {
+      font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
 
     .container {
-      max-width:1200px;
-      margin:auto;
-      padding:0 20px;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
     }
 
-    /* HEADER */
-    header {
-      position:fixed;
-      top:0;
-      width:100%;
-      height:60px;
-      background:#0a0a0a;
-      z-index:1000;
-    }
-
-    .navbar {
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      height:100%;
-    }
-
-    .logo {
-      color:#fff;
-      font-weight:700;
-      display:flex;
-      gap:8px;
-      align-items:center;
-    }
-
-    .menu {
-      list-style:none;
-      display:flex;
-      gap:20px;
-    }
-
-    .menu a { color:#fff; }
-    .menu-toggle { display:none; }
-
-    /* HERO */
-    .hero {
-      min-height:100vh;
-      background:var(--gradient-dark);
-      display:flex;
-      align-items:center;
-      padding-top:80px;
-      color:#fff;
-      text-align:center;
-    }
-
-    .hero h1 {
-      font-family:'Poppins';
-      font-size:2.5rem;
-    }
-
-    .hero h1 span { color:var(--primary); }
-
-    .hero-buttons {
-      margin-top:30px;
-      display:flex;
-      flex-direction:column;
-      gap:15px;
-    }
-
+    /* Botões Mobile-Optimizados */
     .btn {
-      padding:15px;
-      border-radius:var(--radius);
-      border:none;
-      font-weight:600;
-      cursor:pointer;
-      display:inline-flex;
-      gap:8px;
-      align-items:center;
-      justify-content:center;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 16px 24px;
+      border-radius: var(--radius);
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: var(--transition);
+      border: none;
+      outline: none;
+      min-height: 52px;
+      min-width: 44px;
+      touch-action: manipulation;
+      user-select: none;
     }
 
     .btn-primary {
-      background:var(--gradient);
-      color:#fff;
+      background: var(--gradient);
+      color: var(--light);
+      font-size: 1rem;
+    }
+
+    .btn-primary:active {
+      transform: scale(0.98);
+    }
+
+    .btn-secondary {
+      background: var(--secondary);
+      color: var(--light);
+    }
+
+    .btn-secondary:active {
+      transform: scale(0.98);
     }
 
     .btn-outline {
-      border:2px solid var(--primary);
-      color:var(--primary);
-      background:none;
+      background: transparent;
+      color: var(--primary);
+      border: 2px solid var(--primary);
     }
 
-    /* SECTIONS */
-    section { padding:60px 0; }
+    .btn-outline:active {
+      background: var(--primary);
+      color: var(--light);
+    }
+
+    /* Header Mobile-First */
+    header {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: var(--secondary);
+      z-index: 1000;
+      padding: 12px 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      height: 60px;
+    }
+
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 100%;
+    }
+
+    .logo {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--light);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 1001;
+    }
+
+    .logo i {
+      font-size: 1.2rem;
+      color: var(--primary);
+    }
+
+    /* Menu Mobile */
+    .menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background: var(--secondary);
+      padding: 80px 20px 40px;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 999;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .menu.active {
+      transform: translateX(0);
+    }
+
+    .menu li {
+      list-style: none;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+    }
+
+    .menu.active li {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .menu li:nth-child(1) { transition-delay: 0.1s; }
+    .menu li:nth-child(2) { transition-delay: 0.2s; }
+    .menu li:nth-child(3) { transition-delay: 0.3s; }
+    .menu li:nth-child(4) { transition-delay: 0.4s; }
+
+    .menu a {
+      display: block;
+      padding: 18px 0;
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: var(--light);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      transition: var(--transition);
+    }
+
+    .menu a:active {
+      background: rgba(100, 176, 217, 0.1);
+      padding-left: 10px;
+    }
+
+    /* Menu Toggle (Hamburger) */
+    .menu-toggle {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 28px;
+      height: 24px;
+      cursor: pointer;
+      z-index: 1001;
+      background: none;
+      border: none;
+      padding: 0;
+    }
+
+    .menu-toggle span {
+      display: block;
+      width: 100%;
+      height: 3px;
+      background: var(--primary);
+      border-radius: 2px;
+      transition: var(--transition);
+    }
+
+    .menu-toggle.active span:nth-child(1) {
+      transform: rotate(45deg) translate(6px, 6px);
+    }
+
+    .menu-toggle.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .menu-toggle.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(7px, -7px);
+    }
+
+    /* Botão WhatsApp fixo no mobile */
+    .floating-whatsapp {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      background: #25D366;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 28px;
+      box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+      z-index: 999;
+      transition: var(--transition);
+      text-decoration: none;
+    }
+
+    .floating-whatsapp:active {
+      transform: scale(0.9);
+      box-shadow: 0 2px 10px rgba(37, 211, 102, 0.6);
+    }
+
+    /* Hero Section Mobile */
+    .hero {
+      padding: 100px 0 60px;
+      background: var(--gradient-dark);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+    }
+
+    .hero-content {
+      text-align: center;
+    }
+
+    .hero-content h1 {
+      font-size: 2.2rem;
+      margin-bottom: 20px;
+      color: var(--light);
+      line-height: 1.1;
+    }
+
+    .hero-content h1 span {
+      color: var(--primary);
+      display: block;
+    }
+
+    .hero-content p {
+      font-size: 1.1rem;
+      color: rgba(255,255,255,0.9);
+      margin-bottom: 30px;
+      line-height: 1.6;
+    }
+
+    .hero-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 40px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-top: 40px;
+    }
+
+    .stat-item {
+      background: rgba(255,255,255,0.1);
+      padding: 20px 10px;
+      border-radius: var(--radius);
+      text-align: center;
+      backdrop-filter: blur(10px);
+    }
+
+    .stat-number {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 5px;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.8);
+      line-height: 1.3;
+    }
+
+    /* Seções Gerais */
+    section {
+      padding: 60px 0;
+    }
 
     .section-title {
-      text-align:center;
-      margin-bottom:40px;
+      text-align: center;
+      margin-bottom: 40px;
     }
 
-    .benefits-grid, .courses-grid {
-      display:grid;
-      gap:20px;
+    .section-title h2 {
+      font-size: 1.8rem;
+      color: var(--secondary);
+      margin-bottom: 15px;
     }
 
-    .benefits-grid { grid-template-columns:1fr; }
-    .courses-grid { grid-template-columns:1fr; }
+    .section-title p {
+      color: var(--gray);
+      font-size: 1rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
 
-    .benefit-card, .course-card {
-      background:#fff;
-      padding:25px;
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
+    /* Benefits Mobile */
+    .benefits-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .benefit-card {
+      background: var(--light);
+      padding: 25px 20px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      text-align: center;
+      border-top: 4px solid var(--primary);
+      transition: var(--transition);
+    }
+
+    .benefit-card:active {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
     }
 
     .benefit-icon {
-      width:60px;
-      height:60px;
-      background:var(--gradient);
-      border-radius:50%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      color:#fff;
-      margin-bottom:15px;
+      width: 60px;
+      height: 60px;
+      background: var(--gradient);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      color: var(--light);
+      font-size: 24px;
+    }
+
+    .benefit-card h3 {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+      color: var(--secondary);
+    }
+
+    /* Courses Mobile */
+    .courses-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .course-card {
+      background: var(--light);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
     }
 
     .course-header {
-      background:var(--gradient-dark);
-      color:#fff;
-      padding:20px;
-      border-radius:var(--radius);
-      margin-bottom:15px;
-      text-align:center;
+      background: var(--gradient-dark);
+      color: var(--light);
+      padding: 25px 20px;
+      text-align: center;
+    }
+
+    .course-header h3 {
+      font-size: 1.3rem;
+      margin-bottom: 10px;
+    }
+
+    .course-time {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: var(--primary);
+    }
+
+    .course-body {
+      padding: 20px;
     }
 
     .course-features {
-      list-style:none;
-      margin:20px 0;
+      list-style: none;
+      margin-bottom: 20px;
     }
 
     .course-features li {
-      margin-bottom:10px;
-      display:flex;
-      gap:8px;
-      color:var(--gray);
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(100, 176, 217, 0.1);
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      color: var(--gray);
+      font-size: 0.95rem;
+    }
+
+    .course-features li:last-child {
+      border-bottom: none;
+    }
+
+    .course-features li i {
+      color: var(--primary);
+      font-size: 14px;
+      margin-top: 3px;
+      flex-shrink: 0;
     }
 
     .course-price {
-      text-align:center;
-      font-weight:700;
-      margin:20px 0;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--secondary);
+      margin: 25px 0;
+      padding: 20px;
+      background: rgba(100, 176, 217, 0.1);
+      border-radius: var(--radius);
     }
 
-    /* MODAL */
+    .course-price span {
+      display: block;
+      font-size: 0.9rem;
+      color: var(--gray);
+      font-weight: 400;
+      margin-top: 8px;
+    }
+
+    /* Modal Mobile */
     .modal {
-      display:none;
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,.9);
-      justify-content:center;
-      align-items:center;
-      z-index:2000;
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(10, 10, 10, 0.95);
+      z-index: 2000;
+      align-items: flex-end;
+      padding: 0;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
     .modal-content {
-      background:#fff;
-      width:100%;
-      max-width:500px;
-      border-radius:var(--radius);
-      padding:20px;
+      background: var(--light);
+      border-radius: 20px 20px 0 0;
+      width: 100%;
+      max-height: 90vh;
+      position: relative;
+      animation: slideUp 0.4s ease;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .modal-header {
+      background: var(--gradient-dark);
+      color: var(--light);
+      padding: 25px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    .modal-header h3 {
+      font-size: 1.3rem;
+      margin-right: 40px;
     }
 
     .close-modal {
-      float:right;
-      font-size:24px;
-      cursor:pointer;
-      background:none;
-      border:none;
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 24px;
+      color: var(--light);
+      border: none;
+    }
+
+    .modal-body {
+      padding: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--secondary);
+      font-size: 0.95rem;
     }
 
     .form-control {
-      width:100%;
-      padding:12px;
-      margin-bottom:15px;
-      border-radius:8px;
-      border:1px solid #ccc;
+      width: 100%;
+      padding: 16px;
+      border: 1px solid rgba(100, 176, 217, 0.3);
+      border-radius: 8px;
+      font-size: 1rem;
+      background: var(--light);
+      -webkit-appearance: none;
+      appearance: none;
     }
 
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(100, 176, 217, 0.1);
+    }
+
+    select.form-control {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364b0d9' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      background-size: 16px;
+      padding-right: 40px;
+    }
+
+    /* Status do formulário */
     .form-status {
-      display:none;
-      margin-bottom:10px;
-      padding:10px;
-      border-radius:8px;
-      text-align:center;
+      display: none;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: var(--radius);
+      text-align: center;
+      font-weight: 500;
     }
 
-    .success { background:#dcfce7; color:#166534; }
-    .error { background:#fee2e2; color:#991b1b; }
-
-    /* WHATSAPP */
-    .floating-whatsapp {
-      position:fixed;
-      right:20px;
-      bottom:20px;
-      width:60px;
-      height:60px;
-      background:#25D366;
-      border-radius:50%;
-      color:#fff;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:28px;
-      z-index:999;
+    .form-status.success {
+      background: rgba(34, 197, 94, 0.1);
+      color: #16a34a;
+      border: 1px solid rgba(34, 197, 94, 0.2);
     }
 
-    /* FOOTER */
+    .form-status.error {
+      background: rgba(239, 68, 68, 0.1);
+      color: #dc2626;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    /* Footer Mobile */
     footer {
-      background:#0a0a0a;
-      color:#fff;
-      padding:40px 0;
-      text-align:center;
+      background: var(--secondary);
+      color: var(--light);
+      padding: 50px 0 30px;
     }
 
-    @media(min-width:768px){
-      .hero-buttons { flex-direction:row; justify-content:center; }
-      .benefits-grid { grid-template-columns:repeat(4,1fr); }
-      .courses-grid { grid-template-columns:repeat(2,1fr); }
+    .footer-content {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 30px;
+    }
+
+    .footer-logo {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+      color: var(--light);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .footer-logo i {
+      color: var(--primary);
+    }
+
+    .footer-about p {
+      color: rgba(255,255,255,0.8);
+      margin-bottom: 20px;
+      line-height: 1.6;
+      font-size: 0.95rem;
+    }
+
+    .footer-links h4 {
+      font-size: 1.1rem;
+      margin-bottom: 15px;
+      color: var(--primary);
+    }
+
+    .footer-links ul {
+      list-style: none;
+    }
+
+    .footer-links li {
+      margin-bottom: 12px;
+    }
+
+    .footer-links a {
+      color: rgba(255,255,255,0.8);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem;
+      padding: 5px 0;
+    }
+
+    .contact-info {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      color: rgba(255,255,255,0.8);
+      font-size: 0.95rem;
+    }
+
+    .contact-item i {
+      color: var(--primary);
+      font-size: 18px;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .footer-bottom {
+      text-align: center;
+      padding-top: 30px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.6);
+      font-size: 0.85rem;
+      margin-top: 30px;
+    }
+
+    /* Tablet */
+    @media (min-width: 768px) {
+      html {
+        font-size: 17px;
+      }
+
+      .container {
+        padding: 0 30px;
+      }
+
+      header {
+        height: 70px;
+        padding: 15px 0;
+      }
+
+      .hero {
+        padding: 120px 0 80px;
+      }
+
+      .hero-content h1 {
+        font-size: 2.8rem;
+      }
+
+      .hero-buttons {
+        flex-direction: row;
+        justify-content: center;
+      }
+
+      .benefits-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .courses-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+      }
+
+      .footer-content {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 40px;
+      }
+
+      .floating-whatsapp {
+        width: 70px;
+        height: 70px;
+        font-size: 32px;
+        bottom: 30px;
+        right: 30px;
+      }
+    }
+
+    /* Desktop */
+    @media (min-width: 1024px) {
+      .menu {
+        position: static;
+        height: auto;
+        flex-direction: row;
+        padding: 0;
+        transform: none;
+        width: auto;
+        background: transparent;
+      }
+
+      .menu li {
+        opacity: 1;
+        transform: none;
+      }
+
+      .menu a {
+        padding: 5px 0;
+        font-size: 1rem;
+        border-bottom: none;
+        margin: 0 15px;
+      }
+
+      .menu a:hover {
+        color: var(--primary);
+      }
+
+      .menu a:active {
+        background: transparent;
+        padding-left: 0;
+      }
+
+      .menu-toggle {
+        display: none;
+      }
+
+      .hero {
+        padding: 140px 0 100px;
+      }
+
+      .hero-content h1 {
+        font-size: 3.5rem;
+      }
+
+      .benefits-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .footer-content {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .modal {
+        align-items: center;
+        padding: 20px;
+      }
+
+      .modal-content {
+        max-width: 500px;
+        border-radius: var(--radius);
+        max-height: 80vh;
+        animation: slideUpDesktop 0.4s ease;
+      }
+
+      @keyframes slideUpDesktop {
+        from { transform: translateY(30px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+
+      .floating-whatsapp {
+        display: none;
+      }
+    }
+
+    /* Telas muito grandes */
+    @media (min-width: 1200px) {
+      .container {
+        padding: 0 40px;
+      }
+    }
+
+    /* Ajustes para iOS */
+    @supports (-webkit-touch-callout: none) {
+      .hero {
+        min-height: -webkit-fill-available;
+      }
+      
+      .modal-content {
+        max-height: 85vh;
+      }
     }
   </style>
 </head>
-
 <body>
 
-<header>
-  <div class="container navbar">
-    <a href="#home" class="logo"><i class="fas fa-graduation-cap"></i>AprovaMaisPB</a>
-  </div>
-</header>
-
-<a href="https://wa.me/5583996627827" class="floating-whatsapp" target="_blank">
-  <i class="fab fa-whatsapp"></i>
-</a>
-
-<section class="hero" id="home">
-  <div class="container">
-    <h1>Transforme seu ENEM<br><span>em conquista real</span></h1>
-    <p>Metodologia focada e acompanhamento próximo.</p>
-    <div class="hero-buttons">
-      <a href="#courses" class="btn btn-primary">Ver Cursos</a>
-      <a href="https://wa.me/5583996627827" class="btn btn-outline">Fale Conosco</a>
-    </div>
-  </div>
-</section>
-
-<section id="benefits">
-  <div class="container">
-    <div class="section-title">
-      <h2>Por que escolher o AprovaMaisPB?</h2>
-    </div>
-    <div class="benefits-grid">
-      <div class="benefit-card">
-        <div class="benefit-icon"><i class="fas fa-bullseye"></i></div>
-        <p>Ensino humanizado e focado em resultados.</p>
-      </div>
-      <div class="benefit-card">
-        <div class="benefit-icon"><i class="fas fa-chalkboard-teacher"></i></div>
-        <p>Professores experientes.</p>
-      </div>
-      <div class="benefit-card">
-        <div class="benefit-icon"><i class="fas fa-chart-line"></i></div>
-        <p>Simulados frequentes.</p>
-      </div>
-      <div class="benefit-card">
-        <div class="benefit-icon"><i class="fas fa-headset"></i></div>
-        <ul>
-          <li>Material didático</li>
-          <li>Mentoria</li>
-          <li>Aulões</li>
+  <!-- HEADER -->
+  <header>
+    <div class="container">
+      <nav class="navbar">
+        <a href="#" class="logo">
+          <i class="fas fa-graduation-cap"></i>
+          AprovaMaisPB
+        </a>
+        
+        <button class="menu-toggle" id="menuToggle">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        
+        <ul class="menu" id="menu">
+          <li><a href="#home">Início</a></li>
+          <li><a href="#benefits">Benefícios</a></li>
+          <li><a href="#courses">Cursos</a></li>
+          <li><a href="#contact">Contato</a></li>
         </ul>
-      </div>
+      </nav>
     </div>
-  </div>
-</section>
+  </header>
 
-<section id="courses">
-  <div class="container">
-    <div class="section-title">
-      <h2>Nossos Cursos</h2>
-    </div>
+  <!-- Botão WhatsApp Flutuante (Mobile) -->
+  <a href="https://wa.me/5583996627827" class="floating-whatsapp" target="_blank" aria-label="WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+  </a>
 
-    <div class="courses-grid">
-      <div class="course-card">
-        <div class="course-header">
-          <h3>Extensivo Semanal</h3>
-          <p>Segunda a Sexta • 14h às 17h</p>
+  <!-- HERO -->
+  <section class="hero" id="home">
+    <div class="container">
+      <div class="hero-content">
+        <h1>Transforme seu ENEM<br><span>em conquista real</span></h1>
+        <p>Metodologia focada, acompanhamento próximo e resultados reais.</p>
+        
+        <div class="hero-buttons">
+          <a href="#courses" class="btn btn-primary">
+            <i class="fas fa-book-open"></i>
+            Ver Cursos
+          </a>
+          <a href="https://wa.me/5583996627827" class="btn btn-outline" target="_blank">
+            <i class="fab fa-whatsapp"></i>
+            Fale Conosco
+          </a>
         </div>
-        <ul class="course-features">
-          <li><i class="fas fa-check"></i>Aulas presenciais</li>
-          <li><i class="fas fa-check"></i>Redação corrigida</li>
-        </ul>
-        <div class="course-price">Consulte valores</div>
-        <button class="btn btn-primary btn-matricula" data-curso="Extensivo Semanal">Pré-matrícula</button>
-      </div>
 
-      <div class="course-card">
-        <div class="course-header">
-          <h3>Extensivo Sábado</h3>
-          <p>08h às 18h</p>
+         </div>
+    </div>
+  </section>
+
+  <!-- BENEFÍCIOS -->
+  <section class="benefits" id="benefits">
+    <div class="container">
+      <div class="section-title">
+        <h2>Por que escolher o AprovaMaisPB?</h2>
+        <p>Nossa metodologia foi desenvolvida para garantir seu máximo potencial no ENEM</p>
+      </div>
+      
+      <div class="benefits-grid">
+        <div class="benefit-card">
+          <div class="benefit-icon">
+            <i class="fas fa-bullseye"></i>
+          </div>
+          <h3>Objetivo</h3>
+          <p>Preparar estudantes para o ENEM e demais vestibulares por meio de um ensino de qualidade, acessível e humanizado, promovendo o desenvolvimento de habilidades e competências necessárias para que alcancem seus objetivos educacionais.</p>
         </div>
-        <ul class="course-features">
-          <li><i class="fas fa-check"></i>Aulas intensivas</li>
-          <li><i class="fas fa-check"></i>Grupo de estudos</li>
-        </ul>
-        <div class="course-price">Consulte valores</div>
-        <button class="btn btn-primary btn-matricula" data-curso="Extensivo Sábado">Pré-matrícula</button>
+        
+        <div class="benefit-card">
+          <div class="benefit-icon">
+            <i class="fas fa-chalkboard-teacher"></i>
+          </div>
+          <h3>Compromisso</h3>
+          <p>Buscar a excelência no ensino por meio da qualidade pedagógica, da atualização constante e da aplicação de metodologias eficazes e inovadoras.</p>
+        </div>
+        
+        <div class="benefit-card">
+          <div class="benefit-icon">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <h3>Professores Especialistas</h3>
+          <p>Equipe experiente com anos de preparação para vestibulares.</p>
+        </div>
+        
+        <div class="benefit-card">
+          <div class="benefit-icon">
+            <i class="fas fa-headset"></i>
+          </div>
+          <h3>Serviços</h3>
+          <p>-Material Digital e Impresso</p>
+            <p>-Mentoria Online</p>
+            <p>-Simulados</p>
+            <p>-Momentos de Interações</p>
+            <p>-Aulões e aulas VIPS</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CURSOS -->
+  <section class="courses" id="courses">
+    <div class="container">
+      <div class="section-title">
+        <h2>Nossos Cursos</h2>
+        <p>Escolha o plano ideal para sua preparação e conquiste sua vaga na universidade</p>
+      </div>
+      
+      <div class="courses-grid">
+        <!-- CURSO EXTENSIVO -->
+        <div class="course-card">
+          <div class="course-header">
+            <h3>Curso Extensivo (Semanal)</h3>
+            <div class="course-time">
+              <i class="far fa-calendar-alt"></i>
+              Segunda a Sexta
+            </div>
+          </div>
+          <div class="course-body">
+            <div class="course-time">
+              <i class="far fa-clock"></i>
+              14:00 às 17:00
+            </div>
+            
+            <ul class="course-features">
+              <li><i class="fas fa-check-circle"></i> Aulas diárias presenciais</li>
+              <li><i class="fas fa-check-circle"></i> Material exclusivo impresso</li>
+              <li><i class="fas fa-check-circle"></i> Simulados </li>
+              <li><i class="fas fa-check-circle"></i> Plantão de dúvidas </li>
+              <li><i class="fas fa-check-circle"></i> Correção de redação individual</li>
+              <li><i class="fas fa-check-circle"></i> Acompanhamento personalizado</li>
+            </ul>
+            
+            <div class="course-price">
+              Consulte Valores
+              <span>Pagamento facilitado.</span>
+            </div>
+            
+            <button class="btn btn-primary btn-matricula" data-curso="Curso Extensivo (Semanal)" style="width: 100%;">
+              <i class="fas fa-edit"></i>
+              Fazer Pré-matrícula
+            </button>
+          </div>
+        </div>
+        
+        <!-- CURSO EXTENSIVO -->
+        <div class="course-card">
+          <div class="course-header">
+            <h3>Curso Extensivo (Sábado)</h3>
+            <div class="course-time">
+              <i class="far fa-calendar-alt"></i>
+              Aos Sábados
+            </div>
+          </div>
+          <div class="course-body">
+            <div class="course-time">
+              <i class="far fa-clock"></i>
+              08:00 às 18:00
+            </div>
+            
+            <ul class="course-features">
+              <li><i class="fas fa-check-circle"></i> Aulas intensivas aos sábados</li>
+              <li><i class="fas fa-check-circle"></i> Material completo digital</li>
+              <li><i class="fas fa-check-circle"></i> Simulados </li>
+              <li><i class="fas fa-check-circle"></i> Suporte </li>
+              <li><i class="fas fa-check-circle"></i> Revisão focada nos conteúdos</li>
+              <li><i class="fas fa-check-circle"></i> Grupo exclusivo de estudos</li>
+            </ul>
+            
+            <div class="course-price">
+              Consulte Valores
+              <span>Pagamento facilitado.</span>
+            </div>
+            
+            <button class="btn btn-primary btn-matricula" data-curso="Curso Extensivo (Sábado)" style="width: 100%;">
+              <i class="fas fa-edit"></i>
+              Fazer Pré-matrícula
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODAL DE MATRÍCULA -->
+  <div id="modalMatricula" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Pré-matrícula AprovaMaisPB</h3>
+        <button class="close-modal" aria-label="Fechar">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="formMatricula">
+          <div class="form-group">
+            <label for="nome">Nome Completo *</label>
+            <input type="text" id="nome" class="form-control" required placeholder="Digite seu nome completo">
+          </div>
+          
+          <div class="form-group">
+            <label for="email">E-mail *</label>
+            <input type="email" id="email" class="form-control" required placeholder="seu.email@exemplo.com">
+          </div>
+          
+          <div class="form-group">
+            <label for="telefone">Telefone/WhatsApp *</label>
+            <input type="tel" id="telefone" class="form-control" required placeholder="(83) 9XXXX-XXXX">
+          </div>
+          
+          <div class="form-group">
+            <label for="curso">Curso Escolhido *</label>
+            <select id="curso" class="form-control" required>
+              <option value="">Selecione um curso</option>
+              <option value="Curso Extensivo (Semanal)">Curso Extensivo (Segunda a Sexta - 14:00 às 17:00)</option>
+              <option value="Curso Extensivo (Sábado)">Curso Extensivo (Sábados - 08:00 às 18:00)</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="observacoes">Observações ou Dúvidas</label>
+            <textarea id="observacoes" class="form-control" rows="3" placeholder="Alguma dúvida ou informação adicional?"></textarea>
+          </div>
+          
+          <div id="formStatus" class="form-status" style="display: none;"></div>
+          
+          <button type="button" id="btnEnviarWhatsApp" class="btn btn-primary" style="width: 100%;">
+            <i class="fab fa-whatsapp"></i>
+            Enviar pelo WhatsApp
+          </button>
+          
+          <p style="text-align: center; margin-top: 15px; font-size: 14px; color: var(--gray);">
+            Em até 24h entraremos em contato para confirmar sua pré-matrícula.
+          </p>
+        </form>
       </div>
     </div>
   </div>
-</section>
 
-<!-- MODAL -->
-<div class="modal" id="modalMatricula">
-  <div class="modal-content">
-    <button class="close-modal">&times;</button>
-    <h3>Pré-matrícula</h3>
+  <!-- FOOTER -->
+  <footer id="contact">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-about">
+          <div class="footer-logo">
+            <i class="fas fa-graduation-cap"></i>
+            AprovaMaisPB
+          </div>
+          <p>Preparatório especializado no ENEM com metodologia comprovada e resultados reais em João Pessoa - PB.</p>
+          <a href="https://wa.me/5583996627827" class="btn btn-outline" target="_blank" style="margin-top: 10px;">
+            <i class="fab fa-whatsapp"></i>
+            Fale Conosco
+          </a>
+        </div>
+        
+        <div class="footer-links">
+          <h4>Links Rápidos</h4>
+          <ul>
+            <li><a href="#home"><i class="fas fa-chevron-right"></i> Início</a></li>
+            <li><a href="#benefits"><i class="fas fa-chevron-right"></i> Benefícios</a></li>
+            <li><a href="#courses"><i class="fas fa-chevron-right"></i> Cursos</a></li>
+            <li><a href="#contact"><i class="fas fa-chevron-right"></i> Contato</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-contact">
+          <h4>Entre em Contato</h4>
+          <div class="contact-info">
+            <div class="contact-item">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>João Pessoa - Paraíba</span>
+            </div>
+            <div class="contact-item">
+              <i class="fas fa-phone"></i>
+              <span>(83) 99662-7827</span>
+            </div>
+            <div class="contact-item">
+              <i class="fab fa-whatsapp"></i>
+              <span>WhatsApp: (83) 99662-7827</span>
+            </div>
+            <div class="contact-item">
+              <i class="fas fa-clock"></i>
+              <span>Seg-Sex: 8h-18h</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>&copy; 2025 AprovaMaisPB - Todos os direitos reservados.</p>
+      </div>
+    </div>
+  </footer>
 
-    <input class="form-control" id="nome" placeholder="Nome completo">
-    <input class="form-control" id="email" placeholder="E-mail">
-    <input class="form-control" id="telefone" placeholder="Telefone">
-    <select class="form-control" id="curso">
-      <option value="">Selecione o curso</option>
-      <option>Extensivo Semanal</option>
-      <option>Extensivo Sábado</option>
-    </select>
+  <!-- ================= JS CORRIGIDO PARA MOBILE ================= -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      console.log("AprovaMaisPB - Sistema corrigido para mobile ✅");
 
-    <div id="formStatus" class="form-status"></div>
+      // Menu mobile
+      const menuToggle = document.getElementById('menuToggle');
+      const menu = document.getElementById('menu');
+      let menuOpen = false;
 
-    <button class="btn btn-primary" id="btnEnviarWhatsApp">
-      Enviar pelo WhatsApp
-    </button>
-  </div>
-</div>
+      const toggleMenu = () => {
+        menuOpen = !menuOpen;
+        menuToggle.classList.toggle('active', menuOpen);
+        menu.classList.toggle('active', menuOpen);
+        document.body.style.overflow = menuOpen ? 'hidden' : '';
+      };
 
-<footer>
-  <p>&copy; 2025 AprovaMaisPB - João Pessoa PB</p>
-</footer>
+      menuToggle.addEventListener('click', toggleMenu);
 
-<script>
-const modal = document.getElementById("modalMatricula");
-const statusBox = document.getElementById("formStatus");
+      document.querySelectorAll('.menu a').forEach(link => {
+        link.addEventListener('click', () => {
+          if (menuOpen) toggleMenu();
+        });
+      });
 
-document.querySelectorAll(".btn-matricula").forEach(btn=>{
-  btn.onclick=()=>{
-    document.getElementById("curso").value=btn.dataset.curso;
-    modal.style.display="flex";
-  }
-});
+      document.addEventListener('click', (e) => {
+        if (menuOpen && !menu.contains(e.target) && !menuToggle.contains(e.target)) {
+          toggleMenu();
+        }
+      });
 
-document.querySelector(".close-modal").onclick=()=>modal.style.display="none";
+      // Scroll suave
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+          const targetId = this.getAttribute('href');
+          if (targetId === '#') return;
+          
+          e.preventDefault();
+          const targetElement = document.querySelector(targetId);
+          
+          if (targetElement) {
+            const headerHeight = document.querySelector('header').offsetHeight;
+            const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset;
+            
+            window.scrollTo({
+              top: targetPosition - headerHeight - 10,
+              behavior: 'smooth'
+            });
+            
+            if (menuOpen) toggleMenu();
+          }
+        });
+      });
 
-document.getElementById("btnEnviarWhatsApp").onclick=()=>{
-  const nome = nome.value.trim();
-  const email = email.value.trim();
-  const telefone = telefone.value.trim();
-  const curso = document.getElementById("curso").value;
+      // Sistema de pré-matrícula corrigido para mobile
+      const modal = document.getElementById('modalMatricula');
+      const closeModal = document.querySelector('.close-modal');
+      const btnsMatricula = document.querySelectorAll('.btn-matricula');
+      const form = document.getElementById('formMatricula');
+      const cursoSelect = document.getElementById('curso');
+      const btnEnviarWhatsApp = document.getElementById('btnEnviarWhatsApp');
+      const formStatus = document.getElementById('formStatus');
 
-  if(!nome||!email||!telefone||!curso){
-    statusBox.textContent="Preencha todos os campos.";
-    statusBox.className="form-status error";
-    statusBox.style.display="block";
-    return;
-  }
+      // Abrir modal
+      btnsMatricula.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const cursoSelecionado = btn.getAttribute('data-curso');
+          cursoSelect.value = cursoSelecionado;
+          modal.style.display = 'flex';
+          document.body.style.overflow = 'hidden';
+          
+          // Resetar status
+          formStatus.style.display = 'none';
+          formStatus.className = 'form-status';
+        });
+      });
 
-  const msg = encodeURIComponent(
-    `PRÉ-MATRÍCULA APROVAMAISPB\nNome: ${nome}\nEmail: ${email}\nTelefone: ${telefone}\nCurso: ${curso}`
-  );
+      // Fechar modal
+      const closeModalFunc = () => {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+        // Limpar formulário após fechar
+        setTimeout(() => {
+          form.reset();
+          formStatus.style.display = 'none';
+        }, 300);
+      };
 
-  const url = `https://wa.me/5583996627827?text=${msg}`;
-  const mobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+      closeModal.addEventListener('click', closeModalFunc);
 
-  mobile ? window.location.href=url : window.open(url,"_blank");
-  modal.style.display="none";
-};
-</script>
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          closeModalFunc();
+        }
+      });
+
+      // Formatação de telefone
+      const telefoneInput = document.getElementById('telefone');
+      telefoneInput.addEventListener('input', (e) => {
+        let value = e.target.value.replace(/\D/g, '');
+        
+        if (value.length > 0) {
+          if (value.length <= 2) {
+            value = '(' + value;
+          } else if (value.length <= 7) {
+            value = '(' + value.substring(0,2) + ') ' + value.substring(2);
+          } else if (value.length <= 11) {
+            value = '(' + value.substring(0,2) + ') ' + value.substring(2,7) + '-' + value.substring(7);
+          } else {
+            value = '(' + value.substring(0,2) + ') ' + value.substring(2,7) + '-' + value.substring(7,11);
+          }
+        }
+        
+        e.target.value = value;
+      });
+
+      // VALIDAÇÃO DO FORMULÁRIO
+      const validarFormulario = () => {
+        const nome = document.getElementById('nome').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const telefone = document.getElementById('telefone').value;
+        const curso = document.getElementById('curso').value;
+        
+        let erros = [];
+        
+        if (!nome) erros.push('Nome completo');
+        if (!email) erros.push('E-mail');
+        if (!telefone.replace(/\D/g, '')) erros.push('Telefone/WhatsApp');
+        if (!curso) erros.push('Curso escolhido');
+        
+        if (erros.length > 0) {
+          mostrarStatus('Por favor, preencha: ' + erros.join(', '), 'error');
+          return false;
+        }
+        
+        // Validar e-mail
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          mostrarStatus('Por favor, insira um e-mail válido!', 'error');
+          return false;
+        }
+        
+        // Validar telefone
+        const telefoneDigits = telefone.replace(/\D/g, '');
+        if (telefoneDigits.length < 10) {
+          mostrarStatus('Por favor, insira um número de telefone válido com DDD!', 'error');
+          return false;
+        }
+        
+        return true;
+      };
+
+      // Função para mostrar status
+      const mostrarStatus = (mensagem, tipo) => {
+        formStatus.textContent = mensagem;
+        formStatus.className = `form-status ${tipo}`;
+        formStatus.style.display = 'block';
+        
+        // Scroll para o status
+        formStatus.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        // Auto-esconder após 5 segundos para erros
+        if (tipo === 'error') {
+          setTimeout(() => {
+            formStatus.style.display = 'none';
+          }, 5000);
+        }
+      };
+
+      // FUNÇÃO CORRIGIDA PARA REDIRECIONAMENTO MOBILE
+      const abrirWhatsAppMobile = (mensagem) => {
+        const numeroWhatsApp = '5583996627827';
+        const urlWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${mensagem}`;
+        
+        // Para mobile, vamos usar diferentes estratégias
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        
+        if (isMobile) {
+          // Para iOS e Android, tentamos diferentes abordagens
+          
+          // Tentativa 1: Usar location.href (funciona na maioria dos casos)
+          try {
+            // Criar um link temporário e simular clique
+            const link = document.createElement('a');
+            link.href = urlWhatsApp;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            
+            // Disparar clique sincronamente
+            const clickEvent = new MouseEvent('click', {
+              view: window,
+              bubbles: true,
+              cancelable: true
+            });
+            link.dispatchEvent(clickEvent);
+            
+            // Remover o link após um tempo
+            setTimeout(() => {
+              document.body.removeChild(link);
+            }, 1000);
+            
+            return true;
+          } catch (error) {
+            console.log('Erro na tentativa 1:', error);
+          }
+          
+          // Tentativa 2: Usar window.open com fallback
+          try {
+            const newWindow = window.open(urlWhatsApp, '_blank');
+            if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+              // Se bloqueado, tentar location.href
+              window.location.href = urlWhatsApp;
+            }
+            return true;
+          } catch (error) {
+            console.log('Erro na tentativa 2:', error);
+          }
+          
+          // Tentativa 3: Para iOS específico
+          const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+          if (isIOS) {
+            try {
+              // iOS pode precisar de um iframe temporário
+              const iframe = document.createElement('iframe');
+              iframe.style.display = 'none';
+              iframe.src = urlWhatsApp;
+              document.body.appendChild(iframe);
+              
+              setTimeout(() => {
+                document.body.removeChild(iframe);
+              }, 1000);
+              
+              return true;
+            } catch (error) {
+              console.log('Erro na tentativa 3 (iOS):', error);
+            }
+          }
+          
+          // Última tentativa: Mostrar o link para o usuário clicar
+          mostrarStatus(
+            '✅ Formulário validado! ' +
+            '<br><br>Clique no botão WhatsApp abaixo para enviar:' +
+            `<br><br><a href="${urlWhatsApp}" target="_blank" style="color: #25D366; font-weight: bold;">👉 ABRIR WHATSAPP 👈</a>`,
+            'success'
+          );
+          
+          // Não fechar o modal para o usuário poder clicar
+          return false;
+        } else {
+          // Para desktop, usar window.open normalmente
+          window.open(urlWhatsApp, '_blank');
+          return true;
+        }
+      };
+
+      // ENVIAR PARA WHATSAPP - CORRIGIDO PARA MOBILE
+      btnEnviarWhatsApp.addEventListener('click', () => {
+        if (!validarFormulario()) return;
+        
+        // Coletar dados
+        const nome = document.getElementById('nome').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const telefone = document.getElementById('telefone').value;
+        const curso = document.getElementById('curso').value;
+        const observacoes = document.getElementById('observacoes').value.trim();
+        
+        // Formatar mensagem para WhatsApp
+        const mensagem = `*📋 PRÉ-MATRÍCULA - APROVA MAIS PB*%0A%0A` +
+                         `*👤 Nome:* ${nome}%0A` +
+                         `*📧 E-mail:* ${email}%0A` +
+                         `*📱 Telefone:* ${telefone}%0A` +
+                         `*🎓 Curso escolhido:* ${curso}%0A` +
+                         `*📝 Observações:* ${observacoes || 'Nenhuma'}%0A%0A` +
+                         `*📅 Data do cadastro:* ${new Date().toLocaleDateString('pt-BR')}%0A` +
+                         `*⏰ Hora:* ${new Date().toLocaleTimeString('pt-BR')}%0A%0A` +
+                         `_Esta mensagem foi enviada através do site oficial do AprovaMaisPB_`;
+        
+        // Mostrar status de sucesso
+        mostrarStatus('✅ Formulário validado! Redirecionando para o WhatsApp...', 'success');
+        
+        // Aguardar um momento para o usuário ver o status
+        setTimeout(() => {
+          // Tentar abrir WhatsApp
+          const abertoComSucesso = abrirWhatsAppMobile(mensagem);
+          
+          if (abertoComSucesso) {
+            // Se abriu com sucesso, fechar modal após 1 segundo
+            setTimeout(closeModalFunc, 1000);
+          } else {
+            // Se não abriu, manter modal aberto com link clicável
+            // O usuário verá o link no status
+          }
+        }, 1000);
+      });
+
+      // Permitir envio com Enter no último campo
+      document.getElementById('observacoes').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          btnEnviarWhatsApp.click();
+        }
+      });
+
+      // Suporte para fechar modal com gesto de swipe (mobile)
+      let startY = 0;
+      modal.addEventListener('touchstart', (e) => {
+        startY = e.touches[0].clientY;
+      }, { passive: true });
+
+      modal.addEventListener('touchmove', (e) => {
+        if (window.innerWidth < 1024) {
+          const currentY = e.touches[0].clientY;
+          const diff = currentY - startY;
+          
+          if (diff > 50) {
+            closeModalFunc();
+          }
+        }
+      }, { passive: true });
+
+      // Prevenir zoom em inputs em iOS
+      document.addEventListener('touchstart', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+          document.body.style.zoom = "100%";
+        }
+      }, { passive: true });
+
+      // Ajustar altura do viewport para mobile
+      const setVH = () => {
+        let vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+      };
+
+      setVH();
+      window.addEventListener('resize', setVH);
+      window.addEventListener('orientationchange', setVH);
+
+      // Detectar se é mobile para otimizações
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      if (isMobile) {
+        console.log('Dispositivo mobile detectado - otimizações aplicadas');
+        
+        // Feedback tátil para mobile
+        document.querySelectorAll('.btn, .benefit-card, .course-card').forEach(el => {
+          el.addEventListener('touchstart', () => {
+            el.style.transform = 'scale(0.98)';
+          }, { passive: true });
+
+          el.addEventListener('touchend', () => {
+            el.style.transform = '';
+          }, { passive: true });
+        });
+      }
+    });
+  </script>
 
 </body>
 </html>
