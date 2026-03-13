@@ -1,163 +1,20 @@
-:root{
-  --bg:#f4f7ff;
-  --card:#ffffff;
-  --accent:#6b46ff;
-  --accent-2:#2b82ff;
-  --green:#00c166;
-  --muted:#6b7280;
-  --shadow:0 20px 50px rgba(15,23,42,.12);
-  --radius:16px;
-  --wrap:1100px;
-}
-
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-}
 
 body{
-  font-family:Inter,Poppins,system-ui;
-  background:linear-gradient(180deg,#f7f9ff,#f4f7ff);
-  color:#071129;
+font-family:Arial, Helvetica, sans-serif;
 }
 
-.wrap{
-  max-width:var(--wrap);
-  margin:0 auto;
-  padding:0 20px;
+.login-body{
+background:linear-gradient(135deg,#1B4DFF,#0A2540);
+height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
 }
 
-.muted{color:var(--muted)}
-
-/* ===== NAVBAR ===== */
-.navbar{
-  position:sticky;
-  top:0;
-  z-index:100;
-  padding:14px 0;
+.login-card{
+width:380px;
+background:white;
+padding:30px;
+border-radius:12px;
+box-shadow:0 10px 25px rgba(0,0,0,0.2);
 }
-
-.nav-inner{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  background:rgba(255,255,255,.7);
-  backdrop-filter:blur(6px);
-  padding:12px 18px;
-  border-radius:14px;
-  box-shadow:var(--shadow);
-}
-
-.brand{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-
-.brand .title{font-weight:700}
-.brand .subtitle{font-size:12px;color:var(--muted)}
-
-.navlinks{
-  display:flex;
-  gap:20px;
-}
-
-.navlinks a{
-  text-decoration:none;
-  color:var(--muted);
-  font-weight:600;
-}
-
-.nav-actions{
-  display:flex;
-  gap:12px;
-  align-items:center;
-}
-
-/* ===== BUTTONS ===== */
-.btn{
-  padding:10px 16px;
-  border-radius:10px;
-  font-weight:700;
-  cursor:pointer;
-  border:none;
-  text-decoration:none;
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-}
-
-.btn.primary{
-  background:linear-gradient(90deg,var(--accent),var(--accent-2));
-  color:#fff;
-}
-
-.btn.ghost{
-  background:transparent;
-  border:2px solid #e5e7eb;
-  color:#111827;
-}
-
-.btn.whatsapp{
-  background:linear-gradient(90deg,var(--green),#069955);
-  color:#fff;
-}
-
-/* ===== HERO ===== */
-.hero{
-  padding:80px 0 50px;
-}
-
-.hero-inner{
-  display:grid;
-  grid-template-columns:1.1fr .9fr;
-  gap:40px;
-  align-items:center;
-}
-
-.hero h1{
-  font-size:44px;
-  line-height:1.1;
-  margin-bottom:12px;
-}
-
-.hero h1 span{color:var(--accent)}
-
-.lead{
-  color:var(--muted);
-  margin-bottom:22px;
-}
-
-.hero-ctas{
-  display:flex;
-  gap:12px;
-}
-
-/* floating cards */
-.floating-cards{
-  position:relative;
-  height:300px;
-}
-
-.fc{
-  position:absolute;
-  width:240px;
-  padding:16px;
-  border-radius:14px;
-  color:#fff;
-  box-shadow:var(--shadow);
-}
-
-.card-1{
-  background:linear-gradient(135deg,#6b46ff,#2b82ff);
-  top:20px;
-  left:20px;
-  transform:rotate(-6deg);
-}
-
-.card-2{
-  background:linear-gradient(135deg,#00c166,#06a058);
-  top:100px;
-  right:0;
-  transfor
