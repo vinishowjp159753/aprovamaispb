@@ -1,28 +1,34 @@
 
-import { storage, db } from "./firebase.js";
+import { auth, db, storage } from "./firebase.js"
+import { signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-import { addDoc, collection } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-window.uploadMaterial = async function(){
+document.getElementById("logoutBtn").addEventListener("click", async ()=>{
+await signOut(auth)
+window.location.href="login.html"
+})
 
-let file = document.getElementById("arquivo").files[0];
-let titulo = document.getElementById("titulo").value;
-let materia = document.getElementById("materia").value;
-let destaque = document.getElementById("destaque").checked;
+document.getElementById("btnUpload").addEventListener("click",async ()=>{
 
-const storageRef = ref(storage,"materiais/"+file.name);
+let titulo=document.getElementById("titulo").value
+let materia=document.getElementById("materia").value
+let arquivo=document.getElementById("arquivo").files[0]
 
-await uploadBytes(storageRef,file);
+if(!arquivo){alert("Selecione um arquivo");return}
 
-let url = await getDownloadURL(storageRef);
+let storageRef=ref(storage,"materiais/"+arquivo.name)
+
+await uploadBytes(storageRef,arquivo)
+
+let url=await getDownloadURL(storageRef)
 
 await addDoc(collection(db,"materiais"),{
-titulo,
-materia,
-url,
-destaque
-});
+titulo:titulo,
+materia:materia,
+url:url
+})
 
-alert("Material enviado");
+document.getElementById("statusUpload").innerText="Upload concluído!"
 
-}
+})
