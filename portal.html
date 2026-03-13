@@ -1,50 +1,27 @@
 
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Portal do Aluno</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
-
 <body>
-
-<nav class="navbar navbar-dark bg-dark">
+<div class="navbar">
+<h3>AprovaMaisPB</h3>
+<button id="logoutBtn">Sair</button>
+</div>
 <div class="container">
-<span class="navbar-brand">Aprova Mais PB</span>
-
-<div>
-<span id="nomeAluno" class="text-white me-3"></span>
-<button class="btn btn-danger btn-sm" onclick="logout()">Sair</button>
-</div>
-
-</div>
-</nav>
-
-<div class="container mt-4">
-
-<h3>Materiais de Estudo</h3>
-
-<div class="mb-3">
-
-<button class="btn btn-outline-primary" onclick="filtrar('all')">Todos</button>
-<button class="btn btn-outline-primary" onclick="filtrar('Matemática')">Matemática</button>
-<button class="btn btn-outline-primary" onclick="filtrar('Português')">Português</button>
-<button class="btn btn-outline-primary" onclick="filtrar('História')">História</button>
-
-</div>
-
+<h2>Materiais</h2>
+<select id="filtroMateria">
+<option value="todas">Todas matérias</option>
+<option value="portugues">Português</option>
+<option value="matematica">Matemática</option>
+<option value="direito">Direito</option>
+</select>
 <div id="materials-list"></div>
-
-<hr>
-
-<h4>Materiais em destaque</h4>
-
-<div id="featured"></div>
-
 </div>
-
 <script type="module" src="assets/js/portal.js"></script>
 </body>
 </html>
