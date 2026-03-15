@@ -13,18 +13,34 @@
 <style>
 
 body{
-background:#f4f6fa;
+background:#f1f5f9;
 font-family:Arial;
 }
 
-.header{
-background:#0f172a;
+.sidebar{
+width:220px;
+height:100vh;
+background:#1e293b;
+position:fixed;
 color:white;
 padding:20px;
 }
 
+.sidebar h4{
+margin-bottom:30px;
+}
+
+.sidebar button{
+width:100%;
+margin-bottom:10px;
+}
+
+.content{
+margin-left:240px;
+padding:30px;
+}
+
 .card{
-margin-top:20px;
 border-radius:10px;
 }
 
@@ -34,33 +50,64 @@ border-radius:10px;
 
 <body>
 
-<div class="header">
-<h3>Painel do Coordenador</h3>
+<div class="sidebar">
+
+<h4>🎓 AprovaMaisPB</h4>
+
+<button class="btn btn-light" onclick="mostrar('cadastro')">
+Cadastrar Aluno
+</button>
+
+<button class="btn btn-light" onclick="mostrar('materiais')">
+Materiais
+</button>
+
 </div>
 
-<div class="container">
+<div class="content">
+
+<div id="cadastro">
+
+<h3>Cadastrar Aluno</h3>
 
 <div class="card p-4">
 
-<h4>Upload de Material</h4>
+<input id="nomeAluno" class="form-control mb-3" placeholder="Nome do aluno">
+
+<button class="btn btn-primary" onclick="criarAluno()">
+Criar aluno
+</button>
+
+<div id="credencial" class="mt-4"></div>
+
+</div>
+
+</div>
+
+<div id="materiais" style="display:none">
+
+<h3>Enviar Material</h3>
+
+<div class="card p-4">
 
 <input id="titulo" class="form-control mb-2" placeholder="Título">
 
 <select id="materia" class="form-control mb-2">
 
-<option>matematica</option>
-<option>portugues</option>
-<option>historia</option>
-<option>geografia</option>
-<option>redacao</option>
+<option>Matemática</option>
+<option>Português</option>
+<option>História</option>
+<option>Geografia</option>
 
 </select>
 
 <input type="file" id="arquivo" class="form-control mb-3">
 
 <button class="btn btn-success" onclick="uploadMaterial()">
-Enviar Material
+Enviar
 </button>
+
+</div>
 
 </div>
 
@@ -96,28 +143,76 @@ measurementId: "G-PM06K116GT"
 };
 
 const app = initializeApp(firebaseConfig);
-
 const db = getFirestore(app);
 const storage = getStorage(app);
 
+window.mostrar=function(sec){
+
+document.getElementById("cadastro").style.display="none"
+document.getElementById("materiais").style.display="none"
+
+document.getElementById(sec).style.display="block"
+
+}
+
+function gerarSenha(){
+
+return Math.floor(100000 + Math.random()*900000)
+
+}
+
+window.criarAluno = async function(){
+
+const nome=document.getElementById("nomeAluno").value
+
+const usuario = nome.toLowerCase().replaceAll(" ","")
+
+const senha = gerarSenha()
+
+await addDoc(collection(db,"usuarios"),{
+
+nome:nome,
+usuario:usuario,
+senha:senha,
+tipo:"aluno"
+
+})
+
+document.getElementById("credencial").innerHTML=`
+
+<div class="alert alert-success">
+
+<b>Aluno criado!</b>
+
+<br><br>
+
+Usuário: ${usuario}
+
+<br>
+
+Senha: ${senha}
+
+</div>
+
+`
+
+}
+
 window.uploadMaterial = async function(){
 
-const titulo = document.getElementById("titulo").value
-const materia = document.getElementById("materia").value
-const file = document.getElementById("arquivo").files[0]
+const file=document.getElementById("arquivo").files[0]
 
-const storageRef = ref(storage,"materiais/"+file.name)
+const storageRef=ref(storage,"materiais/"+file.name)
 
 await uploadBytes(storageRef,file)
 
-const url = await getDownloadURL(storageRef)
+const url=await getDownloadURL(storageRef)
 
 await addDoc(collection(db,"materiais"),{
 
-titulo,
-materia,
-url,
-data:new Date()
+titulo:document.getElementById("titulo").value,
+materia:document.getElementById("materia").value,
+url:url
 
 })
 
