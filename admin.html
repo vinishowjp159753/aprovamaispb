@@ -1,25 +1,32 @@
 
 <!DOCTYPE html>
-<html lang="pt-br">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Painel Admin</title>
-<link rel="stylesheet" href="assets/css/style.css">
+<title>Admin</title>
+<link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
-<div class="navbar">
-<h3>Painel Admin</h3>
-<button id="logoutBtn">Sair</button>
-</div>
-<div class="container">
-<h2>Upload de Material</h2>
+
+<h1>Painel Administrativo</h1>
+
 <input id="titulo" placeholder="Título">
 <input id="materia" placeholder="Matéria">
-<input id="arquivo" type="file">
-<button id="btnUpload">Enviar Material</button>
-<p id="statusUpload"></p>
-</div>
-<script type="module" src="assets/js/admin.js"></script>
+<input id="professor" placeholder="Professor">
+
+<select id="curso">
+<option value="extensivo-semanal">Extensivo Semanal</option>
+<option value="extensivo-sabado">Extensivo Sábado</option>
+</select>
+
+<input type="file" id="arquivo">
+<button id="btnUpload">Enviar</button>
+
+<hr>
+
+<a href="cadastrar-aluno.html">Cadastrar aluno</a>
+
+<script type="module" src="../assets/js/admin.js"></script>
+
 </body>
 </html>

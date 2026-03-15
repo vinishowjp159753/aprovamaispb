@@ -1,0 +1,40 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Cadastrar Aluno</title>
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+<h1>Cadastrar Aluno</h1>
+
+<input id="nome" placeholder="Nome">
+<input id="email" placeholder="Email">
+<input id="telefone" placeholder="Telefone">
+
+<select id="curso">
+<option value="extensivo-semanal">Extensivo Semanal</option>
+<option value="extensivo-sabado">Extensivo Sábado</option>
+</select>
+
+<input type="date" id="dataMatricula">
+
+<select id="expiracao">
+<option value="30">30 dias</option>
+<option value="60">60 dias</option>
+<option value="360">360 dias</option>
+</select>
+
+<select id="pagamento">
+<option>PIX</option>
+<option>Cartão</option>
+<option>Dinheiro</option>
+</select>
+
+<button id="btnCadastrar">Cadastrar</button>
+
+<script type="module" src="../assets/js/cadastrar-aluno.js"></script>
+</body>
+</html>
