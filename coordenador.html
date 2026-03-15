@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Painel Coordenador</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+
+body{
+background:#f4f6fa;
+font-family:Arial;
+}
+
+.header{
+background:#0f172a;
+color:white;
+padding:20px;
+}
+
+.card{
+border-radius:10px;
+margin-top:20px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+<h3>Painel do Coordenador</h3>
+</div>
+
+<div class="container">
+
+<div class="card p-4">
+
+<h4>Enviar Material</h4>
+
+<input id="titulo" class="form-control mb-2" placeholder="Título">
+
+<select id="materia" class="form-control mb-2">
+
+<option>matematica</option>
+<option>portugues</option>
+<option>historia</option>
+<option>geografia</option>
+<option>redacao</option>
+
+</select>
+
+<input id="link" class="form-control mb-2" placeholder="Link PDF">
+
+<button class="btn btn-success" onclick="salvarMaterial()">
+Salvar Material
+</button>
+
+</div>
+
+<div class="card p-4">
+
+<h4>Cadastrar Aluno</h4>
+
+<input id="nomeAluno" class="form-control mb-2" placeholder="Nome">
+
+<input id="emailAluno" class="form-control mb-2" placeholder="Email">
+
+<input id="senhaAluno" class="form-control mb-2" placeholder="Senha">
+
+<button class="btn btn-primary" onclick="criarAluno()">
+Criar Aluno
+</button>
+
+</div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
+import {
+getFirestore,
+collection,
+addDoc
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+import {
+getAuth,
+createUserWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyBRm4yix2fC2PhAVjTtbWlR-azz0bAglpo",
+authDomain: "aprovamaispb2-3bc78.firebaseapp.com",
+projectId: "aprovamaispb2-3bc78",
+storageBucket: "aprovamaispb2-3bc78.firebasestorage.app",
+messagingSenderId: "830264910104",
+appId: "1:830264910104:web:0c0c6a9b1930c155c47e6d",
+measurementId: "G-PM06K116GT"
+
+};
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+const auth = getAuth(app);
+
+window.salvarMaterial = async function(){
+
+const titulo = document.getElementById("titulo").value
+const materia = document.getElementById("materia").value
+const link = document.getElementById("link").value
+
+await addDoc(collection(db,"materiais"),{
+
+titulo,
+materia,
+link,
+data:new Date()
+
+})
+
+alert("Material enviado")
+
+}
+
+window.criarAluno = async function(){
+
+const email = document.getElementById("emailAluno").value
+const senha = document.getElementById("senhaAluno").value
+
+await createUserWithEmailAndPassword(auth,email,senha)
+
+alert("Aluno criado")
+
+}
+
+</script>
+
+</body>
+</html>
