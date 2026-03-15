@@ -4,8 +4,9 @@
 <head>
 
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Painel Coordenador</title>
+<title>Painel do Coordenador</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -62,7 +63,11 @@ Lista de Alunos
 </button>
 
 <button class="btn btn-light" onclick="mostrar('materiais')">
-Materiais
+Enviar Materiais
+</button>
+
+<button onclick="logout()" class="btn btn-danger mt-3">
+Sair
 </button>
 
 </div>
@@ -75,9 +80,11 @@ Materiais
 
 <h3>Dashboard</h3>
 
-<div class="card p-3">
+<div class="card p-3 mb-3">
 
-Total de alunos: <b id="totalAlunos">0</b>
+Total de alunos cadastrados:
+
+<h2 id="totalAlunos">0</h2>
 
 </div>
 
@@ -91,7 +98,7 @@ Total de alunos: <b id="totalAlunos">0</b>
 
 <div class="card p-4">
 
-<input id="nomeAluno" class="form-control mb-2" placeholder="Nome">
+<input id="nomeAluno" class="form-control mb-2" placeholder="Nome do aluno">
 
 <input id="telefoneAluno" class="form-control mb-2" placeholder="Telefone">
 
@@ -125,7 +132,7 @@ Cadastrar aluno
 
 <div id="lista" style="display:none">
 
-<h3>Alunos</h3>
+<h3>Lista de Alunos</h3>
 
 <div id="tabelaAlunos"></div>
 
@@ -135,25 +142,26 @@ Cadastrar aluno
 
 <div id="materiais" style="display:none">
 
-<h3>Enviar Material</h3>
+<h3>Upload de Materiais</h3>
 
-<div class="card p-3">
+<div class="card p-4">
 
-<input id="titulo" class="form-control mb-2" placeholder="Título">
+<input id="tituloMaterial" class="form-control mb-2" placeholder="Título do material">
 
-<select id="materia" class="form-control mb-2">
+<select id="materiaMaterial" class="form-control mb-2">
 
 <option>Matemática</option>
 <option>Português</option>
 <option>História</option>
 <option>Geografia</option>
+<option>Direito</option>
 
 </select>
 
-<input type="file" id="arquivo" class="form-control mb-3">
+<input type="file" id="arquivoMaterial" class="form-control mb-3">
 
 <button class="btn btn-success" onclick="uploadMaterial()">
-Enviar
+Enviar Material
 </button>
 
 </div>
@@ -182,7 +190,7 @@ uploadBytes,
 getDownloadURL
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-const firebaseConfig={
+const firebaseConfig = {
 
 apiKey:"AIzaSyBRm4yix2fC2PhAVjTtbWlR-azz0bAglpo",
 authDomain:"aprovamaispb2-3bc78.firebaseapp.com",
@@ -192,17 +200,28 @@ messagingSenderId:"830264910104",
 appId:"1:830264910104:web:0c0c6a9b1930c155c47e6d",
 measurementId:"G-PM06K116GT"
 
+};
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+const storage = getStorage(app);
+
+window.logout = function(){
+
+localStorage.clear()
+
+window.location="index.html"
+
 }
 
-const app=initializeApp(firebaseConfig)
-
-const db=getFirestore(app)
-const storage=getStorage(app)
-
-window.mostrar=function(sec){
+window.mostrar = function(sec){
 
 ["dashboard","cadastro","lista","materiais"].forEach(id=>{
+
 document.getElementById(id).style.display="none"
+
 })
 
 document.getElementById(sec).style.display="block"
@@ -211,21 +230,22 @@ document.getElementById(sec).style.display="block"
 
 function gerarSenha(){
 
-return Math.floor(100000+Math.random()*900000)
+return Math.floor(100000 + Math.random()*900000)
 
 }
 
-window.criarAluno=async function(){
+window.criarAluno = async function(){
 
-const nome=document.getElementById("nomeAluno").value
-const telefone=document.getElementById("telefoneAluno").value
-const matricula=document.getElementById("matriculaAluno").value
-const inicio=document.getElementById("inicioAluno").value
-const fim=document.getElementById("fimAluno").value
-const pagamento=document.getElementById("pagamentoAluno").value
+const nome = document.getElementById("nomeAluno").value
+const telefone = document.getElementById("telefoneAluno").value
+const matricula = document.getElementById("matriculaAluno").value
+const inicio = document.getElementById("inicioAluno").value
+const fim = document.getElementById("fimAluno").value
+const pagamento = document.getElementById("pagamentoAluno").value
 
-const usuario=nome.toLowerCase().replaceAll(" ","")
-const senha=gerarSenha()
+const usuario = nome.toLowerCase().replaceAll(" ","")
+
+const senha = gerarSenha()
 
 await addDoc(collection(db,"usuarios"),{
 
@@ -245,8 +265,14 @@ document.getElementById("credencial").innerHTML=`
 
 <div class="alert alert-success">
 
+Aluno cadastrado com sucesso
+
+<br><br>
+
 Usuário: <b>${usuario}</b>
+
 <br>
+
 Senha: <b>${senha}</b>
 
 </div>
@@ -259,39 +285,48 @@ carregarAlunos()
 
 async function carregarAlunos(){
 
-const snap=await getDocs(collection(db,"usuarios"))
+const snap = await getDocs(collection(db,"usuarios"))
 
-let html=`<table class="table table-striped">
+let html = `
+
+<table class="table table-striped">
 
 <tr>
+
 <th>Nome</th>
 <th>Matrícula</th>
 <th>Telefone</th>
-<th>Ações</th>
-</tr>`
+<th>Ação</th>
 
-let total=0
+</tr>
+`
+
+let total = 0
 
 snap.forEach(docu=>{
 
-const a=docu.data()
+const a = docu.data()
 
 if(a.tipo==="aluno"){
 
 total++
 
-html+=`
+html += `
 
 <tr>
 
 <td>${a.nome}</td>
+
 <td>${a.matricula}</td>
+
 <td>${a.telefone}</td>
 
 <td>
 
-<button onclick="excluir('${docu.id}')" class="btn btn-danger btn-sm">
+<button class="btn btn-danger btn-sm" onclick="excluir('${docu.id}')">
+
 Excluir
+
 </button>
 
 </td>
@@ -304,39 +339,45 @@ Excluir
 
 })
 
-html+="</table>"
+html += "</table>"
 
-document.getElementById("tabelaAlunos").innerHTML=html
-document.getElementById("totalAlunos").innerText=total
+document.getElementById("tabelaAlunos").innerHTML = html
+
+document.getElementById("totalAlunos").innerText = total
 
 }
 
-window.excluir=async function(id){
+window.excluir = async function(id){
 
 await deleteDoc(doc(db,"usuarios",id))
+
 carregarAlunos()
 
 }
 
-window.uploadMaterial=async function(){
+window.uploadMaterial = async function(){
 
-const file=document.getElementById("arquivo").files[0]
+const file = document.getElementById("arquivoMaterial").files[0]
 
-const storageRef=ref(storage,"materiais/"+file.name)
+const titulo = document.getElementById("tituloMaterial").value
+
+const materia = document.getElementById("materiaMaterial").value
+
+const storageRef = ref(storage,"materiais/"+file.name)
 
 await uploadBytes(storageRef,file)
 
-const url=await getDownloadURL(storageRef)
+const url = await getDownloadURL(storageRef)
 
 await addDoc(collection(db,"materiais"),{
 
-titulo:document.getElementById("titulo").value,
-materia:document.getElementById("materia").value,
+titulo,
+materia,
 url
 
 })
 
-alert("Material enviado")
+alert("Material enviado com sucesso")
 
 }
 
