@@ -70,8 +70,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import {
 getFirestore,
 collection,
-query,
-where,
 getDocs
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -92,30 +90,43 @@ const db = getFirestore(app);
 
 window.login = async function(){
 
-const usuario = document.getElementById("usuario").value
-const senha = document.getElementById("senha").value
-const tipo = document.getElementById("tipo").value
+let usuario = document.getElementById("usuario").value
+let senha = document.getElementById("senha").value
+let tipo = document.getElementById("tipo").value
 
-const q = query(
-collection(db,"usuarios"),
-where("usuario","==",usuario),
-where("senha","==",senha),
-where("tipo","==",tipo)
-)
+usuario = usuario.toLowerCase().replaceAll(" ","")
 
-const snap = await getDocs(q)
+const snap = await getDocs(collection(db,"usuarios"))
 
-if(snap.empty){
+let encontrou=false
 
-alert("Usuário ou senha inválidos")
-return
+snap.forEach(docu=>{
 
-}
+const u = docu.data()
+
+if(
+u.usuario === usuario &&
+String(u.senha) === senha &&
+u.tipo === tipo
+){
+
+encontrou=true
 
 localStorage.setItem("usuario",usuario)
+localStorage.setItem("nome",u.nome)
 
 if(tipo==="aluno") window.location="aluno.html"
 if(tipo==="coordenador") window.location="coordenador.html"
+
+}
+
+})
+
+if(!encontrou){
+
+alert("Usuário ou senha inválidos")
+
+}
 
 }
 
