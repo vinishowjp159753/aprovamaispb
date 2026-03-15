@@ -4,6 +4,7 @@
 <head>
 
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Portal do Aluno</title>
 
@@ -23,6 +24,12 @@ padding:20px;
 text-align:center;
 }
 
+.menu{
+display:flex;
+gap:10px;
+margin-bottom:20px;
+}
+
 .material{
 background:white;
 padding:15px;
@@ -30,6 +37,10 @@ border-radius:10px;
 margin-bottom:10px;
 display:flex;
 justify-content:space-between;
+}
+
+.card{
+border-radius:10px;
 }
 
 </style>
@@ -46,7 +57,33 @@ justify-content:space-between;
 
 <div class="container mt-4">
 
-<div id="materiais"></div>
+<div class="menu">
+
+<button class="btn btn-primary" onclick="mostrar('materiais')">
+Materiais
+</button>
+
+<button class="btn btn-secondary" onclick="mostrar('matricula')">
+Matrícula
+</button>
+
+</div>
+
+<div id="materiais">
+
+<h4>Materiais disponíveis</h4>
+
+<div id="listaMateriais"></div>
+
+</div>
+
+<div id="matricula" style="display:none">
+
+<h4>Dados da Matrícula</h4>
+
+<div id="dadosMatricula"></div>
+
+</div>
 
 </div>
 
@@ -57,35 +94,46 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import {
 getFirestore,
 collection,
-getDocs
+getDocs,
+query,
+where
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
 
-apiKey: "AIzaSyBRm4yix2fC2PhAVjTtbWlR-azz0bAglpo",
-authDomain: "aprovamaispb2-3bc78.firebaseapp.com",
-projectId: "aprovamaispb2-3bc78",
-storageBucket: "aprovamaispb2-3bc78.firebasestorage.app",
-messagingSenderId: "830264910104",
-appId: "1:830264910104:web:0c0c6a9b1930c155c47e6d",
-measurementId: "G-PM06K116GT"
+apiKey:"AIzaSyBRm4yix2fC2PhAVjTtbWlR-azz0bAglpo",
+authDomain:"aprovamaispb2-3bc78.firebaseapp.com",
+projectId:"aprovamaispb2-3bc78",
+storageBucket:"aprovamaispb2-3bc78.firebasestorage.app",
+messagingSenderId:"830264910104",
+appId:"1:830264910104:web:0c0c6a9b1930c155c47e6d",
+measurementId:"G-PM06K116GT"
 
 };
 
-const app=initializeApp(firebaseConfig)
-const db=getFirestore(app)
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-async function carregar(){
+window.mostrar=function(sec){
 
-const snap=await getDocs(collection(db,"materiais"))
+document.getElementById("materiais").style.display="none"
+document.getElementById("matricula").style.display="none"
 
-const div=document.getElementById("materiais")
+document.getElementById(sec).style.display="block"
+
+}
+
+async function carregarMateriais(){
+
+const snap = await getDocs(collection(db,"materiais"))
+
+let html=""
 
 snap.forEach(doc=>{
 
-const m=doc.data()
+const m = doc.data()
 
-div.innerHTML+=`
+html += `
 
 <div class="material">
 
@@ -97,7 +145,7 @@ ${m.materia}
 
 </div>
 
-<a href="${m.url}" class="btn btn-success" target="_blank">
+<a href="${m.url}" target="_blank" class="btn btn-success">
 Baixar
 </a>
 
@@ -107,9 +155,69 @@ Baixar
 
 })
 
+document.getElementById("listaMateriais").innerHTML = html
+
 }
 
-carregar()
+async function carregarMatricula(){
+
+const usuario = localStorage.getItem("usuario")
+
+const q = query(
+collection(db,"usuarios"),
+where("usuario","==",usuario)
+)
+
+const snap = await getDocs(q)
+
+snap.forEach(doc=>{
+
+const a = doc.data()
+
+const hoje = new Date()
+const fim = new Date(a.fim)
+
+const diff = fim - hoje
+const dias = Math.ceil(diff / (1000*60*60*24))
+
+document.getElementById("dadosMatricula").innerHTML = `
+
+<div class="card p-4">
+
+<b>Nome:</b> ${a.nome}
+<br><br>
+
+<b>Telefone:</b> ${a.telefone}
+<br><br>
+
+<b>Matrícula:</b> ${a.matricula}
+<br><br>
+
+<b>Forma de pagamento:</b> ${a.pagamento}
+<br><br>
+
+<b>Início:</b> ${a.inicio}
+<br><br>
+
+<b>Expira em:</b> ${a.fim}
+<br><br>
+
+<h5 class="text-danger">
+
+⏳ Restam ${dias} dias para vencer
+
+</h5>
+
+</div>
+
+`
+
+})
+
+}
+
+carregarMateriais()
+carregarMatricula()
 
 </script>
 
