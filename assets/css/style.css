@@ -1,8 +1,10 @@
 
-body{font-family:Arial;margin:0;background:#f4f6f9;}
-.navbar{background:#0A2540;color:white;padding:15px;display:flex;justify-content:space-between;}
-.container{padding:30px;}
-button{background:#1B4DFF;color:white;border:none;padding:10px;border-radius:6px;cursor:pointer;}
-.material-item{background:white;padding:15px;margin-top:10px;border-radius:8px;}
-.login-body{height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1B4DFF,#0A2540);}
-.login-card{background:white;padding:30px;border-radius:10px;display:flex;flex-direction:column;gap:10px;width:300px;}
+body{font-family:Arial;margin:0;background:#0f172a;color:white}
+.login-body{display:flex;justify-content:center;align-items:center;height:100vh}
+.login-card{background:#1e293b;padding:40px;border-radius:10px;display:flex;flex-direction:column;gap:10px}
+.sidebar{width:220px;background:#020617;height:100vh;position:fixed;padding:20px}
+.main{margin-left:240px;padding:40px}
+.cards{display:flex;gap:20px}
+.card{background:#1e293b;padding:20px;border-radius:10px;width:200px}
+button{background:#3b82f6;border:none;padding:10px;border-radius:6px;color:white;cursor:pointer}
+input,select{padding:8px;margin:5px}
