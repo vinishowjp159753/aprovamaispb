@@ -4,7 +4,6 @@
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Painel Coordenador</title>
 
@@ -18,16 +17,12 @@ font-family:Arial;
 }
 
 .sidebar{
-width:220px;
+width:230px;
 height:100vh;
 background:#1e293b;
 position:fixed;
 color:white;
 padding:20px;
-}
-
-.sidebar h4{
-margin-bottom:30px;
 }
 
 .sidebar button{
@@ -36,7 +31,7 @@ margin-bottom:10px;
 }
 
 .content{
-margin-left:240px;
+margin-left:250px;
 padding:30px;
 }
 
@@ -54,8 +49,16 @@ border-radius:10px;
 
 <h4>🎓 AprovaMaisPB</h4>
 
+<button class="btn btn-light" onclick="mostrar('dashboard')">
+Dashboard
+</button>
+
 <button class="btn btn-light" onclick="mostrar('cadastro')">
 Cadastrar Aluno
+</button>
+
+<button class="btn btn-light" onclick="mostrar('lista')">
+Lista de Alunos
 </button>
 
 <button class="btn btn-light" onclick="mostrar('materiais')">
@@ -66,29 +69,75 @@ Materiais
 
 <div class="content">
 
-<div id="cadastro">
+<!-- DASHBOARD -->
+
+<div id="dashboard">
+
+<h3>Dashboard</h3>
+
+<div class="card p-3">
+
+Total de alunos: <b id="totalAlunos">0</b>
+
+</div>
+
+</div>
+
+<!-- CADASTRO -->
+
+<div id="cadastro" style="display:none">
 
 <h3>Cadastrar Aluno</h3>
 
 <div class="card p-4">
 
-<input id="nomeAluno" class="form-control mb-3" placeholder="Nome do aluno">
+<input id="nomeAluno" class="form-control mb-2" placeholder="Nome">
+
+<input id="telefoneAluno" class="form-control mb-2" placeholder="Telefone">
+
+<input id="matriculaAluno" class="form-control mb-2" placeholder="Número da matrícula">
+
+<label>Início da matrícula</label>
+<input type="date" id="inicioAluno" class="form-control mb-2">
+
+<label>Fim da matrícula</label>
+<input type="date" id="fimAluno" class="form-control mb-3">
+
+<select id="pagamentoAluno" class="form-control mb-3">
+
+<option value="pix">PIX</option>
+<option value="dinheiro">Dinheiro</option>
+<option value="cartao">Cartão</option>
+
+</select>
 
 <button class="btn btn-primary" onclick="criarAluno()">
-Criar aluno
+Cadastrar aluno
 </button>
 
-<div id="credencial" class="mt-4"></div>
+<div id="credencial" class="mt-3"></div>
 
 </div>
 
 </div>
+
+<!-- LISTA -->
+
+<div id="lista" style="display:none">
+
+<h3>Alunos</h3>
+
+<div id="tabelaAlunos"></div>
+
+</div>
+
+<!-- MATERIAIS -->
 
 <div id="materiais" style="display:none">
 
 <h3>Enviar Material</h3>
 
-<div class="card p-4">
+<div class="card p-3">
 
 <input id="titulo" class="form-control mb-2" placeholder="Título">
 
@@ -120,7 +169,10 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import {
 getFirestore,
 collection,
-addDoc
+addDoc,
+getDocs,
+deleteDoc,
+doc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 import {
@@ -130,26 +182,28 @@ uploadBytes,
 getDownloadURL
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-const firebaseConfig = {
+const firebaseConfig={
 
-apiKey: "AIzaSyBRm4yix2fC2PhAVjTtbWlR-azz0bAglpo",
-authDomain: "aprovamaispb2-3bc78.firebaseapp.com",
-projectId: "aprovamaispb2-3bc78",
-storageBucket: "aprovamaispb2-3bc78.firebasestorage.app",
-messagingSenderId: "830264910104",
-appId: "1:830264910104:web:0c0c6a9b1930c155c47e6d",
-measurementId: "G-PM06K116GT"
+apiKey:"AIzaSyBRm4yix2fC2PhAVjTtbWlR-azz0bAglpo",
+authDomain:"aprovamaispb2-3bc78.firebaseapp.com",
+projectId:"aprovamaispb2-3bc78",
+storageBucket:"aprovamaispb2-3bc78.firebasestorage.app",
+messagingSenderId:"830264910104",
+appId:"1:830264910104:web:0c0c6a9b1930c155c47e6d",
+measurementId:"G-PM06K116GT"
 
-};
+}
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const storage = getStorage(app);
+const app=initializeApp(firebaseConfig)
+
+const db=getFirestore(app)
+const storage=getStorage(app)
 
 window.mostrar=function(sec){
 
-document.getElementById("cadastro").style.display="none"
-document.getElementById("materiais").style.display="none"
+["dashboard","cadastro","lista","materiais"].forEach(id=>{
+document.getElementById(id).style.display="none"
+})
 
 document.getElementById(sec).style.display="block"
 
@@ -157,23 +211,32 @@ document.getElementById(sec).style.display="block"
 
 function gerarSenha(){
 
-return Math.floor(100000 + Math.random()*900000)
+return Math.floor(100000+Math.random()*900000)
 
 }
 
-window.criarAluno = async function(){
+window.criarAluno=async function(){
 
 const nome=document.getElementById("nomeAluno").value
+const telefone=document.getElementById("telefoneAluno").value
+const matricula=document.getElementById("matriculaAluno").value
+const inicio=document.getElementById("inicioAluno").value
+const fim=document.getElementById("fimAluno").value
+const pagamento=document.getElementById("pagamentoAluno").value
 
-const usuario = nome.toLowerCase().replaceAll(" ","")
-
-const senha = gerarSenha()
+const usuario=nome.toLowerCase().replaceAll(" ","")
+const senha=gerarSenha()
 
 await addDoc(collection(db,"usuarios"),{
 
-nome:nome,
-usuario:usuario,
-senha:senha,
+nome,
+usuario,
+senha,
+telefone,
+matricula,
+inicio,
+fim,
+pagamento,
 tipo:"aluno"
 
 })
@@ -182,23 +245,80 @@ document.getElementById("credencial").innerHTML=`
 
 <div class="alert alert-success">
 
-<b>Aluno criado!</b>
-
-<br><br>
-
-Usuário: ${usuario}
-
+Usuário: <b>${usuario}</b>
 <br>
-
-Senha: ${senha}
+Senha: <b>${senha}</b>
 
 </div>
 
 `
 
+carregarAlunos()
+
 }
 
-window.uploadMaterial = async function(){
+async function carregarAlunos(){
+
+const snap=await getDocs(collection(db,"usuarios"))
+
+let html=`<table class="table table-striped">
+
+<tr>
+<th>Nome</th>
+<th>Matrícula</th>
+<th>Telefone</th>
+<th>Ações</th>
+</tr>`
+
+let total=0
+
+snap.forEach(docu=>{
+
+const a=docu.data()
+
+if(a.tipo==="aluno"){
+
+total++
+
+html+=`
+
+<tr>
+
+<td>${a.nome}</td>
+<td>${a.matricula}</td>
+<td>${a.telefone}</td>
+
+<td>
+
+<button onclick="excluir('${docu.id}')" class="btn btn-danger btn-sm">
+Excluir
+</button>
+
+</td>
+
+</tr>
+
+`
+
+}
+
+})
+
+html+="</table>"
+
+document.getElementById("tabelaAlunos").innerHTML=html
+document.getElementById("totalAlunos").innerText=total
+
+}
+
+window.excluir=async function(id){
+
+await deleteDoc(doc(db,"usuarios",id))
+carregarAlunos()
+
+}
+
+window.uploadMaterial=async function(){
 
 const file=document.getElementById("arquivo").files[0]
 
@@ -212,13 +332,15 @@ await addDoc(collection(db,"materiais"),{
 
 titulo:document.getElementById("titulo").value,
 materia:document.getElementById("materia").value,
-url:url
+url
 
 })
 
 alert("Material enviado")
 
 }
+
+carregarAlunos()
 
 </script>
 
