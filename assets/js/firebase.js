@@ -1,24 +1,20 @@
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js"
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"
 import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js"
 
 const firebaseConfig = {
-
-apiKey: "AIzaSyBRm4yix2fC2PhAVjTtbWlR-azz0bAglpo",
-authDomain: "aprovamaispb2-3bc78.firebaseapp.com",
-projectId: "aprovamaispb2-3bc78",
-storageBucket: "aprovamaispb2-3bc78.firebasestorage.app",
-messagingSenderId: "830264910104",
-appId: "1:830264910104:web:0c0c6a9b1930c155c47e6d",
-measurementId: "G-PM06K116GT"
-
+apiKey:"YOUR_KEY",
+authDomain:"YOUR_DOMAIN",
+projectId:"YOUR_PROJECT",
+storageBucket:"YOUR_BUCKET",
+messagingSenderId:"ID",
+appId:"APPID"
 }
 
-const app = initializeApp(firebaseConfig)
+const app=initializeApp(firebaseConfig)
 
-export const analytics = getAnalytics(app)
-export const auth = getAuth(app)
-export const db = getFirestore(app)
-export const storage = getStorage(app)
+export const auth=getAuth(app)
+export const db=getFirestore(app)
+export const storage=getStorage(app)
