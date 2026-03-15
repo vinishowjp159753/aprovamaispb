@@ -4,7 +4,6 @@
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Portal do Aluno</title>
 
@@ -13,14 +12,14 @@
 <style>
 
 body{
-background:#f4f6fa;
+background:#f8fafc;
 font-family:Arial;
 }
 
 .header{
 background:#2563eb;
 color:white;
-padding:30px;
+padding:20px;
 text-align:center;
 }
 
@@ -40,14 +39,14 @@ justify-content:space-between;
 <body>
 
 <div class="header">
+
 <h2>Portal do Aluno</h2>
+
 </div>
 
 <div class="container mt-4">
 
-<h4>Materiais</h4>
-
-<div id="lista"></div>
+<div id="materiais"></div>
 
 </div>
 
@@ -73,32 +72,32 @@ measurementId: "G-PM06K116GT"
 
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const app=initializeApp(firebaseConfig)
+const db=getFirestore(app)
 
-async function carregarMateriais(){
+async function carregar(){
 
-const snapshot = await getDocs(collection(db,"materiais"))
+const snap=await getDocs(collection(db,"materiais"))
 
-const lista = document.getElementById("lista")
+const div=document.getElementById("materiais")
 
-snapshot.forEach(doc=>{
+snap.forEach(doc=>{
 
-const m = doc.data()
+const m=doc.data()
 
-lista.innerHTML += `
+div.innerHTML+=`
 
 <div class="material">
 
 <div>
 
-<strong>${m.titulo}</strong>
+<b>${m.titulo}</b>
 <br>
 ${m.materia}
 
 </div>
 
-<a href="${m.url}" target="_blank" class="btn btn-success">
+<a href="${m.url}" class="btn btn-success" target="_blank">
 Baixar
 </a>
 
@@ -110,7 +109,7 @@ Baixar
 
 }
 
-carregarMateriais()
+carregar()
 
 </script>
 
