@@ -45,9 +45,9 @@ justify-content:space-between;
 
 <div class="container mt-4">
 
-<h4>Materiais de Estudo</h4>
+<h4>Materiais</h4>
 
-<div id="listaMateriais"></div>
+<div id="lista"></div>
 
 </div>
 
@@ -74,16 +74,15 @@ measurementId: "G-PM06K116GT"
 };
 
 const app = initializeApp(firebaseConfig);
-
 const db = getFirestore(app);
 
 async function carregarMateriais(){
 
-const querySnapshot = await getDocs(collection(db,"materiais"))
+const snapshot = await getDocs(collection(db,"materiais"))
 
-const lista = document.getElementById("listaMateriais")
+const lista = document.getElementById("lista")
 
-querySnapshot.forEach(doc => {
+snapshot.forEach(doc=>{
 
 const m = doc.data()
 
@@ -99,7 +98,7 @@ ${m.materia}
 
 </div>
 
-<a href="${m.link}" target="_blank" class="btn btn-success">
+<a href="${m.url}" target="_blank" class="btn btn-success">
 Baixar
 </a>
 
