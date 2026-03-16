@@ -316,8 +316,10 @@ window.uploadMaterial = async function(){
 const file = document.getElementById("arquivoMaterial").files[0]
 
 if(!file){
+
 alert("Selecione um arquivo")
 return
+
 }
 
 const formData = new FormData()
@@ -325,7 +327,7 @@ const formData = new FormData()
 formData.append("file", file)
 formData.append("upload_preset","aprovamais_upload")
 
-const res = await fetch("https://api.cloudinary.com/v1_1/dq54qvrej/auto/upload",{
+const res = await fetch("https://api.cloudinary.com/v1_1/dq54qvrej/raw/upload",{
 
 method:"POST",
 body:formData
