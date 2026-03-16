@@ -50,25 +50,15 @@ border-radius:10px;
 
 <h4>🎓 AprovaMaisPB</h4>
 
-<button class="btn btn-light" onclick="mostrar('dashboard')">
-Dashboard
-</button>
+<button class="btn btn-light" onclick="mostrar('dashboard')">Dashboard</button>
 
-<button class="btn btn-light" onclick="mostrar('cadastro')">
-Cadastrar Aluno
-</button>
+<button class="btn btn-light" onclick="mostrar('cadastro')">Cadastrar Aluno</button>
 
-<button class="btn btn-light" onclick="mostrar('lista')">
-Lista de Alunos
-</button>
+<button class="btn btn-light" onclick="mostrar('lista')">Lista de Alunos</button>
 
-<button class="btn btn-light" onclick="mostrar('materiais')">
-Enviar Materiais
-</button>
+<button class="btn btn-light" onclick="mostrar('materiais')">Materiais</button>
 
-<button onclick="logout()" class="btn btn-danger mt-3">
-Sair
-</button>
+<button onclick="logout()" class="btn btn-danger mt-3">Sair</button>
 
 </div>
 
@@ -118,9 +108,7 @@ Total de alunos cadastrados:
 
 </select>
 
-<button class="btn btn-primary" onclick="criarAluno()">
-Cadastrar aluno
-</button>
+<button class="btn btn-primary" onclick="criarAluno()">Cadastrar aluno</button>
 
 <div id="credencial" class="mt-3"></div>
 
@@ -142,7 +130,7 @@ Cadastrar aluno
 
 <div id="materiais" style="display:none">
 
-<h3>Upload de Materiais</h3>
+<h3>Enviar Material</h3>
 
 <div class="card p-4">
 
@@ -154,15 +142,12 @@ Cadastrar aluno
 <option>Português</option>
 <option>História</option>
 <option>Geografia</option>
-<option>Direito</option>
 
 </select>
 
 <input type="file" id="arquivoMaterial" class="form-control mb-3">
 
-<button class="btn btn-success" onclick="uploadMaterial()">
-Enviar Material
-</button>
+<button class="btn btn-success" onclick="uploadMaterial()">Enviar material</button>
 
 </div>
 
@@ -183,13 +168,6 @@ deleteDoc,
 doc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-import {
-getStorage,
-ref,
-uploadBytes,
-getDownloadURL
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
-
 const firebaseConfig = {
 
 apiKey:"AIzaSyBRm4yix2fC2PhAVjTtbWlR-azz0bAglpo",
@@ -203,15 +181,11 @@ measurementId:"G-PM06K116GT"
 };
 
 const app = initializeApp(firebaseConfig);
-
 const db = getFirestore(app);
-
-const storage = getStorage(app);
 
 window.logout = function(){
 
 localStorage.clear()
-
 window.location="index.html"
 
 }
@@ -265,14 +239,7 @@ document.getElementById("credencial").innerHTML=`
 
 <div class="alert alert-success">
 
-Aluno cadastrado com sucesso
-
-<br><br>
-
-Usuário: <b>${usuario}</b>
-
-<br>
-
+Usuário: <b>${usuario}</b><br>
 Senha: <b>${senha}</b>
 
 </div>
@@ -287,46 +254,37 @@ async function carregarAlunos(){
 
 const snap = await getDocs(collection(db,"usuarios"))
 
-let html = `
-
-<table class="table table-striped">
+let html=`<table class="table table-striped">
 
 <tr>
-
 <th>Nome</th>
 <th>Matrícula</th>
 <th>Telefone</th>
 <th>Ação</th>
+</tr>`
 
-</tr>
-`
-
-let total = 0
+let total=0
 
 snap.forEach(docu=>{
 
-const a = docu.data()
+const a=docu.data()
 
 if(a.tipo==="aluno"){
 
 total++
 
-html += `
+html+=`
 
 <tr>
 
 <td>${a.nome}</td>
-
 <td>${a.matricula}</td>
-
 <td>${a.telefone}</td>
 
 <td>
 
 <button class="btn btn-danger btn-sm" onclick="excluir('${docu.id}')">
-
 Excluir
-
 </button>
 
 </td>
@@ -339,18 +297,16 @@ Excluir
 
 })
 
-html += "</table>"
+html+="</table>"
 
-document.getElementById("tabelaAlunos").innerHTML = html
-
-document.getElementById("totalAlunos").innerText = total
+document.getElementById("tabelaAlunos").innerHTML=html
+document.getElementById("totalAlunos").innerText=total
 
 }
 
 window.excluir = async function(id){
 
 await deleteDoc(doc(db,"usuarios",id))
-
 carregarAlunos()
 
 }
@@ -359,20 +315,31 @@ window.uploadMaterial = async function(){
 
 const file = document.getElementById("arquivoMaterial").files[0]
 
-const titulo = document.getElementById("tituloMaterial").value
+if(!file){
+alert("Selecione um arquivo")
+return
+}
 
-const materia = document.getElementById("materiaMaterial").value
+const formData = new FormData()
 
-const storageRef = ref(storage,"materiais/"+file.name)
+formData.append("file", file)
+formData.append("upload_preset","aprovamais_upload")
 
-await uploadBytes(storageRef,file)
+const res = await fetch("https://api.cloudinary.com/v1_1/dq54qvrej/auto/upload",{
 
-const url = await getDownloadURL(storageRef)
+method:"POST",
+body:formData
+
+})
+
+const data = await res.json()
+
+const url = data.secure_url
 
 await addDoc(collection(db,"materiais"),{
 
-titulo,
-materia,
+titulo:document.getElementById("tituloMaterial").value,
+materia:document.getElementById("materiaMaterial").value,
 url
 
 })
