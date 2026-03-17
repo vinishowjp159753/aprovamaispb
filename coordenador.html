@@ -134,15 +134,14 @@ document.getElementById(id).style.display="none"
 document.getElementById(sec).style.display="block"
 }
 
-/* GERAR MATRÍCULA */
+/* GERAR USUÁRIO */
 function gerarMatricula(){
-const agora = new Date()
-return "AP" + agora.getFullYear() +
-(agora.getMonth()+1).toString().padStart(2,"0") +
-agora.getDate().toString().padStart(2,"0") +
-agora.getHours().toString().padStart(2,"0") +
-agora.getMinutes().toString().padStart(2,"0") +
-agora.getSeconds().toString().padStart(2,"0")
+return "AP" + Math.floor(10000 + Math.random() * 90000)
+}
+
+/* GERAR SENHA */
+function gerarSenha(){
+return Math.random().toString(36).substring(2,8)
 }
 
 let turmaFiltro=""
@@ -164,23 +163,24 @@ alert("Preencha os campos")
 return
 }
 
-const matricula = gerarMatricula()
+const usuario = gerarMatricula()
+const senha = gerarSenha()
 
 await addDoc(collection(db,"usuarios"),{
 nome,
 telefone,
 turma,
-usuario: matricula,
-senha: matricula,
-matricula,
+usuario,
+senha,
+matricula: usuario,
 tipo:"aluno"
 })
 
 document.getElementById("credencial").innerHTML = `
 <div class="alert alert-success mt-2">
 <b>Aluno cadastrado!</b><br>
-Usuário: ${matricula}<br>
-Senha: ${matricula}
+Usuário: ${usuario}<br>
+Senha: ${senha}
 </div>`
 
 carregarAlunos()
@@ -206,13 +206,15 @@ html+=`
 <div class="card p-2 mb-2">
 <b>${a.nome}</b> (${a.turma})<br>
 
-<button class="btn btn-info btn-sm mt-2" onclick="ver('${a.usuario}')">Ver acesso</button>
+<button class="btn btn-info btn-sm mt-2" onclick="ver('${a.usuario}','${a.senha}')">
+Ver acesso
+</button>
 
-<button class="btn btn-success btn-sm mt-2" onclick="zap('${a.usuario}','${a.telefone}')">
+<button class="btn btn-success btn-sm mt-2" onclick="zap('${a.usuario}','${a.senha}','${a.telefone}')">
 WhatsApp
 </button>
 
-<button class="btn btn-warning btn-sm mt-2" onclick="editar('${d.id}','${a.nome}','${a.telefone}','${a.turma}')">
+<button class="btn btn-warning btn-sm mt-2" onclick="editar('${d.id}','${a.nome}','${a.telefone}','${a.turma}','${a.senha}')">
 Editar
 </button>
 
@@ -228,16 +230,16 @@ document.getElementById("tabela").innerHTML=html
 }
 
 /* VER */
-window.ver = (mat)=>{
-alert(`Usuário: ${mat}\nSenha: ${mat}`)
+window.ver = (usuario, senha)=>{
+alert(`Usuário: ${usuario}\nSenha: ${senha}`)
 }
 
 /* WHATS */
-window.zap = (mat, tel)=>{
+window.zap = (usuario, senha, tel)=>{
 const msg=`🎓 AprovaMaisPB
 
-Usuário: ${mat}
-Senha: ${mat}
+Usuário: ${usuario}
+Senha: ${senha}
 
 Acesse:
 https://aprovamaispb.com.br
@@ -246,16 +248,29 @@ Clique em Área do Aluno`
 window.open(`https://wa.me/55${tel}?text=${encodeURIComponent(msg)}`)
 }
 
-/* EDITAR */
-window.editar = async (id,n,t,tu)=>{
-const nome=prompt("Nome",n)
-const tel=prompt("Telefone",t)
-const turma=prompt("Turma",tu)
+/* EDITAR (AGORA COM SENHA) */
+window.editar = async (id,nomeAtual,telAtual,turmaAtual,senhaAtual)=>{
+
+const nome = prompt("Editar nome:", nomeAtual)
+if(nome === null) return
+
+const telefone = prompt("Editar telefone:", telAtual)
+if(telefone === null) return
+
+const turma = prompt("Editar turma (Semanal ou Sabado):", turmaAtual)
+if(turma === null) return
+
+const senha = prompt("Editar senha:", senhaAtual)
+if(senha === null) return
 
 await updateDoc(doc(db,"usuarios",id),{
-nome,telefone:tel,turma
+nome,
+telefone,
+turma,
+senha
 })
 
+alert("Aluno atualizado!")
 carregarAlunos()
 }
 
