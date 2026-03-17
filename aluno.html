@@ -5,38 +5,61 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Área do Aluno</title>
+<title>Área do Aluno - AprovaMaisPB</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
-body{
-  background:#f1f5f9;
+body{background:#f5f7fb;}
+
+.topbar{
+display:flex;
+justify-content:space-between;
+padding:12px;
+background:#0d6efd;
+color:white;
 }
+
 .card{
-  border-radius:12px;
+border-radius:12px;
+}
+
+.progresso{
+height:8px;
+background:#ddd;
+border-radius:10px;
+overflow:hidden;
+}
+
+.progresso-bar{
+height:8px;
+background:#0d6efd;
+}
+
+.badge-novo{
+background:red;
+color:white;
+font-size:10px;
+padding:3px 6px;
+border-radius:6px;
+margin-left:5px;
 }
 </style>
 
 </head>
 
-<body class="container mt-4">
+<body>
 
-<div id="login">
-
-<h3 class="mb-3">🎓 Área do Aluno</h3>
-
-<input id="user" class="form-control mb-2" placeholder="Usuário">
-<input id="pass" type="password" class="form-control mb-2" placeholder="Senha">
-
-<button class="btn btn-success w-100" onclick="login()">Entrar</button>
-
+<div class="topbar">
+<b id="nomeAluno"></b>
+<button onclick="logout()" class="btn btn-light btn-sm">Sair</button>
 </div>
 
-<div id="painel" style="display:none">
+<div class="container mt-3">
 
-<h4 id="nomeAluno"></h4>
-<p id="turmaAluno"></p>
+<h5>📚 Seus Materiais</h5>
+
+<div id="continuar" class="mb-3"></div>
 
 <div id="materiais"></div>
 
@@ -55,57 +78,111 @@ projectId:"aprovamaispb2-3bc78"
 
 const db = getFirestore(app);
 
-let aluno=null
-
-window.login = async ()=>{
-
-const u=user.value
-const p=pass.value
-
-const snap=await getDocs(collection(db,"usuarios"))
-
-snap.forEach(d=>{
-const a=d.data()
-if(a.usuario===u && a.senha==p){
-aluno=a
-}
-})
+/* 🔒 PEGAR SESSÃO */
+const aluno = JSON.parse(localStorage.getItem("aluno"))
 
 if(!aluno){
-alert("Login inválido")
-return
+alert("Faça login novamente")
+window.location.href="index.html"
 }
 
-login.style.display="none"
-painel.style.display="block"
+document.getElementById("nomeAluno").innerText = aluno.nome
 
-nomeAluno.innerText="Olá, "+aluno.nome
-turmaAluno.innerText="Turma: "+aluno.turma
+/* 📊 PROGRESSO LOCAL */
+let progresso = JSON.parse(localStorage.getItem("progresso_"+aluno.usuario)) || {}
 
-carregarMateriais()
-}
+/* 📚 CARREGAR MATERIAIS */
+async function carregar(){
 
-async function carregarMateriais(){
-
-const snap=await getDocs(collection(db,"materiais"))
+const snap = await getDocs(collection(db,"materiais"))
 
 let html=""
+let total=0
+let vistos=0
+let ultimo=null
 
-snap.forEach(d=>{
-const m=d.data()
+snap.forEach(doc=>{
 
-if(m.turma==="Ambas" || m.turma===aluno.turma){
+const m = doc.data()
+const id = doc.id
+
+if(m.turma === aluno.turma || m.turma === "Ambas"){
+
+total++
+
+const visto = progresso[id]
+
+if(visto){
+vistos++
+ultimo = m
+}
+
 html+=`
 <div class="card p-3 mb-2">
-<b>${m.titulo}</b><br>
-<button class="btn btn-primary mt-2" onclick="window.open('${m.url}')">
-Baixar material
+
+<b>${m.titulo}
+${!visto ? '<span class="badge-novo">NOVO</span>' : ''}
+</b><br>
+
+<small>${m.materia}</small><br>
+
+<button class="btn btn-primary btn-sm mt-2" onclick="abrir('${m.url}','${id}')">
+Abrir Material
 </button>
-</div>`
+
+</div>
+`
 }
+
 })
 
-materiais.innerHTML=html
+/* CONTINUAR */
+if(ultimo){
+document.getElementById("continuar").innerHTML=`
+<div class="card p-2">
+<b>▶️ Continuar de onde parou</b><br>
+${ultimo.titulo}
+<button class="btn btn-success btn-sm mt-2" onclick="window.open('${ultimo.url}')">
+Continuar
+</button>
+</div>
+`
+}
+
+/* PROGRESSO */
+const porcentagem = total ? Math.floor((vistos/total)*100) : 0
+
+html = `
+<div class="mb-3">
+<b>Seu progresso: ${porcentagem}%</b>
+<div class="progresso">
+<div class="progresso-bar" style="width:${porcentagem}%"></div>
+</div>
+</div>
+` + html
+
+document.getElementById("materiais").innerHTML = html
+
+}
+
+carregar()
+
+/* ABRIR MATERIAL */
+window.abrir = (url,id)=>{
+
+progresso[id]=true
+
+localStorage.setItem("progresso_"+aluno.usuario, JSON.stringify(progresso))
+
+window.open(url)
+
+carregar()
+}
+
+/* LOGOUT */
+window.logout = ()=>{
+localStorage.removeItem("aluno")
+window.location.href="index.html"
 }
 
 </script>
