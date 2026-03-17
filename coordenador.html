@@ -205,7 +205,7 @@ Enviar acesso via WhatsApp
 carregarAlunos()
 }
 
-// WHATSAPP AUTOMÁTICO
+// WHATSAPP
 window.enviar = (user,pass,telefone)=>{
 
 const numero = telefone.replace(/\D/g,"")
@@ -218,7 +218,7 @@ Seu acesso ao portal:
 🔒 Senha: ${pass}
 
 🌐 Acesse:
-https://aprovamaispb.com.br/login.html
+https://aprovamaispb.com.br/login
 
 📱 Tutorial:
 1. Entre no site
@@ -277,7 +277,7 @@ await deleteDoc(doc(db,"usuarios",id))
 carregarAlunos()
 }
 
-// UPLOAD MATERIAL (CORRIGIDO)
+// 🚀 UPLOAD CORRIGIDO (RAW)
 window.upload = async ()=>{
 
 const file = document.getElementById("arquivo").files[0]
@@ -291,8 +291,7 @@ const formData = new FormData()
 formData.append("file", file)
 formData.append("upload_preset","aprovamais_upload")
 
-// 🔥 AGORA CERTO
-const res = await fetch("https://api.cloudinary.com/v1_1/dq54qvrej/auto/upload",{
+const res = await fetch("https://api.cloudinary.com/v1_1/dq54qvrej/raw/upload",{
 method:"POST",
 body:formData
 })
@@ -329,7 +328,9 @@ html+=`
 <b>${m.titulo}</b> - ${m.materia} <br>
 ${m.data}
 <br>
-<a href="${m.url}" target="_blank" class="btn btn-primary btn-sm">Abrir</a>
+<a download href="${m.url}?fl_attachment=true" class="btn btn-success btn-sm">
+⬇ Baixar Material
+</a>
 <button class="btn btn-danger btn-sm" onclick="delMat('${d.id}')">Excluir</button>
 </div>
 `
