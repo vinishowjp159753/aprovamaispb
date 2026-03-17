@@ -38,21 +38,28 @@ const app = initializeApp({
 });
 const db = getFirestore(app);
 
-const aluno = JSON.parse(localStorage.getItem("aluno"))
-if(!aluno){ window.location.href="index.html"; }
+// ✅ Pegar dados do usuário logado
+const usuario = localStorage.getItem("usuario")
+const nome = localStorage.getItem("nome")
+const tipo = localStorage.getItem("tipo")
+const turma = localStorage.getItem("turma") || "Semanal"
 
-document.getElementById("nomeAluno").innerText = aluno.nome
+if(!usuario || tipo !== "aluno"){ window.location.href="index.html" }
 
-let progresso = JSON.parse(localStorage.getItem("progresso_"+aluno.usuario)) || {}
+document.getElementById("nomeAluno").innerText = nome
+
+// progresso localStorage
+let progresso = JSON.parse(localStorage.getItem("progresso_"+usuario)) || {}
 
 async function carregarMateriais(){
   const snap = await getDocs(collection(db,"materiais"))
-  let html=""; let total=0; let vistos=0; let ultimo=null
+  let html="", total=0, vistos=0, ultimo=null
 
   snap.forEach(doc=>{
-    const m = doc.data(); const id=doc.id
-    if(m.turma===aluno.turma || m.turma==="Ambas"){
-      total++; if(progresso[id]){ vistos++; ultimo=m }
+    const m = doc.data(); const id = doc.id
+    if(m.turma===turma || m.turma==="Ambas"){
+      total++; 
+      if(progresso[id]){ vistos++; ultimo=m }
       html+=`
       <div class="card p-3 mb-2">
         <b>${m.titulo} ${!progresso[id] ? '<span class="badge-novo">NOVO</span>' : ''}</b><br>
@@ -75,17 +82,24 @@ async function carregarMateriais(){
   html = `<div class="mb-3"><b>Seu progresso: ${porcentagem}%</b>
     <div class="progresso"><div class="progresso-bar" style="width:${porcentagem}%"></div></div></div>` + html
 
-  document.getElementById("materiais").innerHTML=html
+  document.getElementById("materiais").innerHTML = html
 }
 
 window.abrir = (url,id)=>{
   progresso[id]=true
-  localStorage.setItem("progresso_"+aluno.usuario, JSON.stringify(progresso))
+  localStorage.setItem("progresso_"+usuario, JSON.stringify(progresso))
   window.open(url)
   carregarMateriais()
 }
 
-window.logout = ()=>{ localStorage.removeItem("aluno"); window.location.href="index.html" }
+window.logout = ()=>{ 
+  // remove apenas dados do aluno
+  localStorage.removeItem("usuario")
+  localStorage.removeItem("nome")
+  localStorage.removeItem("tipo")
+  localStorage.removeItem("turma")
+  window.location.href="index.html" 
+}
 
 carregarMateriais()
 </script>
