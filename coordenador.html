@@ -1,28 +1,27 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Painel do Coordenador</title>
+<title>Painel PRO - AprovaMaisPB</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
 
 body{
-background:#f1f5f9;
+background:#0f172a;
+color:white;
 font-family:Arial;
 }
 
 .sidebar{
 width:230px;
 height:100vh;
-background:#1e293b;
+background:#020617;
 position:fixed;
-color:white;
 padding:20px;
 }
 
@@ -37,7 +36,10 @@ padding:30px;
 }
 
 .card{
-border-radius:10px;
+background:#1e293b;
+border:none;
+border-radius:12px;
+color:white;
 }
 
 </style>
@@ -48,14 +50,10 @@ border-radius:10px;
 
 <div class="sidebar">
 
-<h4>🎓 AprovaMaisPB</h4>
-
-<button class="btn btn-light" onclick="mostrar('dashboard')">Dashboard</button>
+<h4>🚀 AprovaMaisPB</h4>
 
 <button class="btn btn-light" onclick="mostrar('cadastro')">Cadastrar Aluno</button>
-
-<button class="btn btn-light" onclick="mostrar('lista')">Lista de Alunos</button>
-
+<button class="btn btn-light" onclick="mostrar('lista')">Alunos</button>
 <button class="btn btn-light" onclick="mostrar('materiais')">Materiais</button>
 
 <button onclick="logout()" class="btn btn-danger mt-3">Sair</button>
@@ -64,53 +62,33 @@ border-radius:10px;
 
 <div class="content">
 
-<!-- DASHBOARD -->
-
-<div id="dashboard">
-
-<h3>Dashboard</h3>
-
-<div class="card p-3 mb-3">
-
-Total de alunos cadastrados:
-
-<h2 id="totalAlunos">0</h2>
-
-</div>
-
-</div>
-
 <!-- CADASTRO -->
 
-<div id="cadastro" style="display:none">
+<div id="cadastro">
 
-<h3>Cadastrar Aluno</h3>
+<h3>👨‍🎓 Cadastro de Aluno</h3>
 
 <div class="card p-4">
 
-<input id="nomeAluno" class="form-control mb-2" placeholder="Nome do aluno">
+<input id="nome" class="form-control mb-2" placeholder="Nome">
 
-<input id="telefoneAluno" class="form-control mb-2" placeholder="Telefone">
+<input id="telefone" class="form-control mb-2" placeholder="Telefone">
 
-<input id="matriculaAluno" class="form-control mb-2" placeholder="Número da matrícula">
+<label>Início</label>
+<input type="date" id="inicio" class="form-control mb-2">
 
-<label>Início da matrícula</label>
-<input type="date" id="inicioAluno" class="form-control mb-2">
+<label>Fim</label>
+<input type="date" id="fim" class="form-control mb-2">
 
-<label>Fim da matrícula</label>
-<input type="date" id="fimAluno" class="form-control mb-3">
-
-<select id="pagamentoAluno" class="form-control mb-3">
-
-<option value="pix">PIX</option>
-<option value="dinheiro">Dinheiro</option>
-<option value="cartao">Cartão</option>
-
+<select id="pagamento" class="form-control mb-3">
+<option>pix</option>
+<option>dinheiro</option>
+<option>cartao</option>
 </select>
 
-<button class="btn btn-primary" onclick="criarAluno()">Cadastrar aluno</button>
+<button class="btn btn-success" onclick="criarAluno()">Cadastrar</button>
 
-<div id="credencial" class="mt-3"></div>
+<div id="credencial"></div>
 
 </div>
 
@@ -120,9 +98,9 @@ Total de alunos cadastrados:
 
 <div id="lista" style="display:none">
 
-<h3>Lista de Alunos</h3>
+<h3>📋 Alunos</h3>
 
-<div id="tabelaAlunos"></div>
+<div id="tabela"></div>
 
 </div>
 
@@ -130,26 +108,25 @@ Total de alunos cadastrados:
 
 <div id="materiais" style="display:none">
 
-<h3>Enviar Material</h3>
+<h3>📚 Materiais</h3>
 
-<div class="card p-4">
+<div class="card p-3 mb-3">
 
-<input id="tituloMaterial" class="form-control mb-2" placeholder="Título do material">
+<input id="titulo" class="form-control mb-2" placeholder="Título">
 
-<select id="materiaMaterial" class="form-control mb-2">
-
+<select id="materia" class="form-control mb-2">
 <option>Matemática</option>
 <option>Português</option>
 <option>História</option>
-<option>Geografia</option>
-
 </select>
 
-<input type="file" id="arquivoMaterial" class="form-control mb-3">
+<input type="file" id="arquivo" class="form-control mb-2">
 
-<button class="btn btn-success" onclick="uploadMaterial()">Enviar material</button>
+<button class="btn btn-primary" onclick="upload()">Enviar</button>
 
 </div>
+
+<div id="listaMateriais"></div>
 
 </div>
 
@@ -168,189 +145,205 @@ deleteDoc,
 doc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-const firebaseConfig = {
-
-apiKey:"AIzaSyBRm4yix2fC2PhAVjTtbWlR-azz0bAglpo",
+const app = initializeApp({
+apiKey:"AIzaSy...",
 authDomain:"aprovamaispb2-3bc78.firebaseapp.com",
-projectId:"aprovamaispb2-3bc78",
-storageBucket:"aprovamaispb2-3bc78.firebasestorage.app",
-messagingSenderId:"830264910104",
-appId:"1:830264910104:web:0c0c6a9b1930c155c47e6d",
-measurementId:"G-PM06K116GT"
+projectId:"aprovamaispb2-3bc78"
+});
 
-};
-
-const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-window.logout = function(){
-
+// LOGOUT
+window.logout = () => {
 localStorage.clear()
-window.location="index.html"
-
+location="index.html"
 }
 
-window.mostrar = function(sec){
-
-["dashboard","cadastro","lista","materiais"].forEach(id=>{
-
+// MENU
+window.mostrar = (sec)=>{
+["cadastro","lista","materiais"].forEach(id=>{
 document.getElementById(id).style.display="none"
-
 })
-
 document.getElementById(sec).style.display="block"
-
 }
 
+// GERAR SENHA
 function gerarSenha(){
-
 return Math.floor(100000 + Math.random()*900000)
-
 }
 
-window.criarAluno = async function(){
+// GERAR MATRÍCULA
+function gerarMatricula(){
+return "AP"+Date.now()
+}
 
-const nome = document.getElementById("nomeAluno").value
-const telefone = document.getElementById("telefoneAluno").value
-const matricula = document.getElementById("matriculaAluno").value
-const inicio = document.getElementById("inicioAluno").value
-const fim = document.getElementById("fimAluno").value
-const pagamento = document.getElementById("pagamentoAluno").value
+// CRIAR ALUNO
+window.criarAluno = async ()=>{
+
+const nome = document.getElementById("nome").value
+const telefone = document.getElementById("telefone").value
+const inicio = document.getElementById("inicio").value
+const fim = document.getElementById("fim").value
+const pagamento = document.getElementById("pagamento").value
 
 const usuario = nome.toLowerCase().replaceAll(" ","")
-
 const senha = gerarSenha()
+const matricula = gerarMatricula()
 
 await addDoc(collection(db,"usuarios"),{
-
-nome,
-usuario,
-senha,
-telefone,
-matricula,
-inicio,
-fim,
-pagamento,
-tipo:"aluno"
-
+nome, telefone, inicio, fim, pagamento,
+usuario, senha, matricula, tipo:"aluno"
 })
 
 document.getElementById("credencial").innerHTML=`
-
-<div class="alert alert-success">
-
-Usuário: <b>${usuario}</b><br>
-Senha: <b>${senha}</b>
-
+<div class="alert alert-success mt-3">
+Usuário: ${usuario}<br>
+Senha: ${senha}<br>
+Matrícula: ${matricula}
+<br><br>
+<button class="btn btn-info" onclick="enviar('${usuario}','${senha}')">
+Enviar acesso
+</button>
 </div>
-
 `
 
 carregarAlunos()
+}
+
+// ENVIAR ACESSO
+window.enviar = (user,pass)=>{
+
+const msg = `🎓 AprovaMaisPB
+
+Seu acesso:
+
+Usuário: ${user}
+Senha: ${pass}
+
+Acesse:
+https://SEUSITE.vercel.app
+
+Tutorial:
+1. Acesse o site
+2. Digite login e senha
+3. Clique em entrar
+`
+
+navigator.clipboard.writeText(msg)
+
+alert("Mensagem copiada! Envie no WhatsApp")
 
 }
 
+// LISTAR ALUNOS
 async function carregarAlunos(){
 
 const snap = await getDocs(collection(db,"usuarios"))
 
-let html=`<table class="table table-striped">
+let html = "<table class='table table-dark'><tr><th>Nome</th><th>Ação</th></tr>"
 
-<tr>
-<th>Nome</th>
-<th>Matrícula</th>
-<th>Telefone</th>
-<th>Ação</th>
-</tr>`
+snap.forEach(d=>{
 
-let total=0
-
-snap.forEach(docu=>{
-
-const a=docu.data()
+const a = d.data()
 
 if(a.tipo==="aluno"){
 
-total++
-
 html+=`
-
 <tr>
-
 <td>${a.nome}</td>
-<td>${a.matricula}</td>
-<td>${a.telefone}</td>
-
 <td>
-
-<button class="btn btn-danger btn-sm" onclick="excluir('${docu.id}')">
-Excluir
-</button>
-
+<button class="btn btn-info btn-sm" onclick="ver('${a.usuario}','${a.senha}')">Login</button>
+<button class="btn btn-danger btn-sm" onclick="del('${d.id}')">Excluir</button>
 </td>
-
 </tr>
-
 `
-
 }
 
 })
 
 html+="</table>"
 
-document.getElementById("tabelaAlunos").innerHTML=html
-document.getElementById("totalAlunos").innerText=total
+document.getElementById("tabela").innerHTML = html
 
 }
 
-window.excluir = async function(id){
+// VER LOGIN
+window.ver = (u,s)=>{
+alert("Usuário: "+u+" | Senha: "+s)
+}
 
+// EXCLUIR
+window.del = async(id)=>{
 await deleteDoc(doc(db,"usuarios",id))
 carregarAlunos()
-
 }
 
-window.uploadMaterial = async function(){
+// UPLOAD MATERIAL
+window.upload = async ()=>{
 
-const file = document.getElementById("arquivoMaterial").files[0]
-
-if(!file){
-
-alert("Selecione um arquivo")
-return
-
-}
+const file = document.getElementById("arquivo").files[0]
 
 const formData = new FormData()
-
 formData.append("file", file)
 formData.append("upload_preset","aprovamais_upload")
 
 const res = await fetch("https://api.cloudinary.com/v1_1/dq54qvrej/raw/upload",{
-
 method:"POST",
 body:formData
-
 })
 
 const data = await res.json()
 
 const url = data.secure_url
+.replace("/raw/upload/", "/image/upload/fl_attachment:false/")
 
 await addDoc(collection(db,"materiais"),{
-
-titulo:document.getElementById("tituloMaterial").value,
-materia:document.getElementById("materiaMaterial").value,
-url
-
+titulo:document.getElementById("titulo").value,
+materia:document.getElementById("materia").value,
+url,
+data:new Date().toLocaleDateString()
 })
 
-alert("Material enviado com sucesso")
+alert("Material enviado")
+
+carregarMateriais()
+}
+
+// LISTAR MATERIAIS
+async function carregarMateriais(){
+
+const snap = await getDocs(collection(db,"materiais"))
+
+let html=""
+
+snap.forEach(d=>{
+
+const m = d.data()
+
+html+=`
+<div class="card p-3 mb-2">
+<b>${m.titulo}</b> - ${m.materia} <br>
+${m.data}
+
+<br>
+<a href="${m.url}" target="_blank" class="btn btn-primary btn-sm">Abrir</a>
+<button class="btn btn-danger btn-sm" onclick="delMat('${d.id}')">Excluir</button>
+</div>
+`
+})
+
+document.getElementById("listaMateriais").innerHTML = html
 
 }
 
+// EXCLUIR MATERIAL
+window.delMat = async(id)=>{
+await deleteDoc(doc(db,"materiais",id))
+carregarMateriais()
+}
+
 carregarAlunos()
+carregarMateriais()
 
 </script>
 
