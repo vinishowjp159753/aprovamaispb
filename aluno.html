@@ -3,61 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Portal do Aluno - AprovaMaisPB</title>
+<title>Área do Aluno - AprovaMaisPB</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <style>
-body { background:#f1f5f9; font-family:Arial, sans-serif; margin:0; padding:0; }
+body { background:#f5f7fb; font-family:Arial, sans-serif; }
 .topbar { display:flex; justify-content:space-between; align-items:center; padding:12px; background:#0d6efd; color:white; }
-.container { padding:15px; }
-.card { border-radius:12px; margin-bottom:10px; }
-h3 { margin-bottom:15px; }
-select, input { margin-bottom:10px; }
-.btn { margin-right:5px; margin-top:5px; }
-@media(max-width:600px){
-  .topbar { flex-direction:column; text-align:center; gap:8px; }
-}
+.card { border-radius:12px; }
+.progresso { height:8px; background:#ddd; border-radius:10px; overflow:hidden; }
+.progresso-bar { height:8px; background:#0d6efd; }
+.badge-novo { background:red; color:white; font-size:10px; padding:3px 6px; border-radius:6px; margin-left:5px; }
 </style>
 </head>
 <body>
 
 <div class="topbar">
-  <b>🎓 AprovaMaisPB - Portal do Aluno</b>
-  <button class="btn btn-light btn-sm" onclick="logout()">Sair</button>
+  <b id="nomeAluno"></b>
+  <button onclick="logout()" class="btn btn-light btn-sm">Sair</button>
 </div>
 
-<div class="container">
-
-<h3>📚 Materiais Disponíveis</h3>
-
-<div class="mb-3">
-  <label>Filtrar por turma:</label>
-  <select id="filtroTurma" class="form-control" onchange="carregarMateriais()">
-    <option value="">Todas</option>
-    <option value="Semanal">Extensivo Semanal</option>
-    <option value="Sabado">Extensivo Sábado</option>
-  </select>
-</div>
-
-<div class="mb-3">
-  <label>Filtrar por disciplina:</label>
-  <select id="filtroMateria" class="form-control" onchange="carregarMateriais()">
-    <option value="">Todas</option>
-    <option>Redação</option>
-    <option>Matemática</option>
-    <option>Química</option>
-    <option>Física</option>
-    <option>Biologia</option>
-    <option>Sociologia</option>
-    <option>Filosofia</option>
-    <option>Literatura</option>
-    <option>Gramática</option>
-    <option>Inglês</option>
-    <option>Espanhol</option>
-  </select>
-</div>
-
-<div id="listaMateriais"></div>
-
+<div class="container mt-3">
+  <h5>📚 Seus Materiais</h5>
+  <div id="continuar" class="mb-3"></div>
+  <div id="materiais"></div>
 </div>
 
 <script type="module">
@@ -71,57 +38,70 @@ const app = initializeApp({
 });
 const db = getFirestore(app);
 
-// MOCK: informações do aluno logado (no login real, use localStorage ou sessão)
-const aluno = {
-  nome: localStorage.getItem("nome") || "Aluno",
-  turma: localStorage.getItem("turma") || ""
-};
+// ✅ Pegar dados do usuário logado
+const usuario = localStorage.getItem("usuario")
+const nome = localStorage.getItem("nome")
+const tipo = localStorage.getItem("tipo")
+const turma = localStorage.getItem("turma") || "Semanal"
 
-// LOGOUT
-window.logout = () => {
-  localStorage.clear();
-  location="index.html";
-}
+if(!usuario || tipo !== "aluno"){ window.location.href="index.html" }
 
-// BAIXAR MATERIAL
-window.baixar = (url, nome="material.pdf") => {
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = nome;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
+document.getElementById("nomeAluno").innerText = nome
 
-// CARREGAR MATERIAIS
+// progresso localStorage
+let progresso = JSON.parse(localStorage.getItem("progresso_"+usuario)) || {}
+
 async function carregarMateriais(){
-  const filtroTurma = document.getElementById("filtroTurma").value;
-  const filtroMateria = document.getElementById("filtroMateria").value;
+  const snap = await getDocs(collection(db,"materiais"))
+  let html="", total=0, vistos=0, ultimo=null
 
-  const snap = await getDocs(collection(db,"materiais"));
-  let html="";
+  snap.forEach(doc=>{
+    const m = doc.data(); const id = doc.id
+    if(m.turma===turma || m.turma==="Ambas"){
+      total++; 
+      if(progresso[id]){ vistos++; ultimo=m }
+      html+=`
+      <div class="card p-3 mb-2">
+        <b>${m.titulo} ${!progresso[id] ? '<span class="badge-novo">NOVO</span>' : ''}</b><br>
+        <small>${m.materia}</small><br>
+        <button class="btn btn-primary btn-sm mt-2" onclick="abrir('${m.url}','${id}')">Abrir Material</button>
+      </div>`
+    }
+  })
 
-  snap.forEach(d=>{
-    const m = d.data();
-    // filtrar por turma do aluno
-    if(aluno.turma !== "Semanal" && aluno.turma !== "Sabado") return;
-    if(m.turma !== "Ambas" && m.turma !== aluno.turma) return;
-    if(filtroTurma && m.turma !== filtroTurma) return;
-    if(filtroMateria && m.materia !== filtroMateria) return;
+  if(ultimo){
+    document.getElementById("continuar").innerHTML=`
+      <div class="card p-2">
+        <b>▶️ Continuar de onde parou</b><br>
+        ${ultimo.titulo}<br>
+        <button class="btn btn-success btn-sm mt-2" onclick="window.open('${ultimo.url}')">Continuar</button>
+      </div>`
+  }
 
-    html+=`
-    <div class="card p-3">
-      <b>${m.titulo}</b><br>
-      <small>${m.materia} - ${m.turma}</small><br><br>
-      <button class="btn btn-success btn-sm" onclick="baixar('${m.url}','${m.nomeArquivo}')">⬇ Baixar</button>
-    </div>`;
-  });
+  const porcentagem = total ? Math.floor((vistos/total)*100) : 0
+  html = `<div class="mb-3"><b>Seu progresso: ${porcentagem}%</b>
+    <div class="progresso"><div class="progresso-bar" style="width:${porcentagem}%"></div></div></div>` + html
 
-  document.getElementById("listaMateriais").innerHTML = html || "<p>Nenhum material encontrado.</p>";
+  document.getElementById("materiais").innerHTML = html
 }
 
-carregarMateriais();
-</script>
+window.abrir = (url,id)=>{
+  progresso[id]=true
+  localStorage.setItem("progresso_"+usuario, JSON.stringify(progresso))
+  window.open(url)
+  carregarMateriais()
+}
 
+window.logout = ()=>{ 
+  // remove apenas dados do aluno
+  localStorage.removeItem("usuario")
+  localStorage.removeItem("nome")
+  localStorage.removeItem("tipo")
+  localStorage.removeItem("turma")
+  window.location.href="index.html" 
+}
+
+carregarMateriais()
+</script>
 </body>
 </html>
