@@ -290,7 +290,8 @@ return
 const formData = new FormData()
 formData.append("file", file)
 formData.append("upload_preset","aprovamais_upload")
-formData.append("public_id", file.name)
+formData.append("resource_type","raw")
+formData.append("type","upload")
 
 const res = await fetch("https://api.cloudinary.com/v1_1/dq54qvrej/raw/upload",{
 method:"POST",
@@ -298,6 +299,12 @@ body:formData
 })
 
 const data = await res.json()
+
+if(!data.secure_url){
+alert("Erro no upload")
+console.log(data)
+return
+}
 
 await addDoc(collection(db,"materiais"),{
 titulo:document.getElementById("titulo").value,
