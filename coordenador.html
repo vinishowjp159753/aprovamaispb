@@ -57,17 +57,17 @@ body { background:#f1f5f9; font-family:Arial, sans-serif; }
   <div class="card p-3 mb-3">
     <input id="titulo" class="form-control mb-2" placeholder="Título">
     <select id="materia" class="form-control mb-2">
-<option>Redação</option>
-<option>Matemática</option>
-<option>Química</option>
-<option>Física</option>
-<option>Biologia</option>
-<option>Sociologia</option>
-<option>Filosofia</option>
-<option>Literatura</option>
-<option>Gramática</option>
-<option>Inglês</option>
-<option>Espanhol</option>
+      <option>Redação</option>
+      <option>Matemática</option>
+      <option>Química</option>
+      <option>Física</option>
+      <option>Biologia</option>
+      <option>Sociologia</option>
+      <option>Filosofia</option>
+      <option>Literatura</option>
+      <option>Gramática</option>
+      <option>Inglês</option>
+      <option>Espanhol</option>
     </select>
     <select id="turmaMaterial" class="form-control mb-2">
       <option value="Semanal">Semanal</option>
@@ -77,6 +77,8 @@ body { background:#f1f5f9; font-family:Arial, sans-serif; }
     <input id="linkDrive" class="form-control mb-2" placeholder="Link do Drive">
     <button class="btn btn-primary w-100" onclick="salvarLink()">Salvar Material</button>
   </div>
+
+  <h5>📄 Materiais cadastrados</h5>
   <div id="listaMateriais"></div>
 </div>
 
@@ -173,6 +175,7 @@ window.editar = async btn=>{
 
 window.del = async id => { await deleteDoc(doc(db,"usuarios",id)); carregarAlunos() }
 
+/* SALVAR MATERIAL */
 window.salvarLink = async ()=>{
   const titulo=document.getElementById("titulo").value
   const materia=document.getElementById("materia").value
@@ -183,9 +186,28 @@ window.salvarLink = async ()=>{
   await addDoc(collection(db,"materiais"),{titulo,materia,turma,url,nomeArquivo:titulo+".pdf",data:new Date().toLocaleDateString()})
   alert("Material salvo!")
   document.getElementById("titulo").value=""; document.getElementById("linkDrive").value=""
+  carregarMateriais()
 }
 
+/* LISTAR MATERIAIS */
+async function carregarMateriais(){
+  const snap = await getDocs(collection(db,"materiais"))
+  let html=""
+  snap.forEach(d=>{
+    const m=d.data()
+    html+=`
+    <div class="card p-2 mb-2">
+      <b>${m.titulo}</b> (${m.materia} - ${m.turma})<br>
+      <button class="btn btn-danger btn-sm mt-2" onclick="delMat('${d.id}')">Excluir</button>
+    </div>`
+  })
+  document.getElementById("listaMateriais").innerHTML=html
+}
+
+window.delMat = async id=>{ await deleteDoc(doc(db,"materiais",id)); carregarMateriais() }
+
 carregarAlunos()
+carregarMateriais()
 </script>
 </body>
 </html>
