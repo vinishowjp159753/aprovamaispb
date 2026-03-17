@@ -10,9 +10,8 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
-
 body{
-background:#0f172a;
+background:#020617;
 color:white;
 font-family:Arial;
 }
@@ -20,7 +19,7 @@ font-family:Arial;
 .sidebar{
 width:230px;
 height:100vh;
-background:#020617;
+background:#0f172a;
 position:fixed;
 padding:20px;
 }
@@ -41,7 +40,6 @@ border:none;
 border-radius:12px;
 color:white;
 }
-
 </style>
 
 </head>
@@ -63,7 +61,6 @@ color:white;
 <div class="content">
 
 <!-- CADASTRO -->
-
 <div id="cadastro">
 
 <h3>👨‍🎓 Cadastro de Aluno</h3>
@@ -72,7 +69,7 @@ color:white;
 
 <input id="nome" class="form-control mb-2" placeholder="Nome">
 
-<input id="telefone" class="form-control mb-2" placeholder="Telefone">
+<input id="telefone" class="form-control mb-2" placeholder="Telefone (com DDD)">
 
 <label>Início</label>
 <input type="date" id="inicio" class="form-control mb-2">
@@ -95,7 +92,6 @@ color:white;
 </div>
 
 <!-- LISTA -->
-
 <div id="lista" style="display:none">
 
 <h3>📋 Alunos</h3>
@@ -105,7 +101,6 @@ color:white;
 </div>
 
 <!-- MATERIAIS -->
-
 <div id="materiais" style="display:none">
 
 <h3>📚 Materiais</h3>
@@ -146,7 +141,7 @@ doc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const app = initializeApp({
-apiKey:"AIzaSy...",
+apiKey:"AIzaSyBRm4yix2fC2PhAVjTtbWlR-azz0bAglpo",
 authDomain:"aprovamaispb2-3bc78.firebaseapp.com",
 projectId:"aprovamaispb2-3bc78"
 });
@@ -201,8 +196,8 @@ Usuário: ${usuario}<br>
 Senha: ${senha}<br>
 Matrícula: ${matricula}
 <br><br>
-<button class="btn btn-info" onclick="enviar('${usuario}','${senha}')">
-Enviar acesso
+<button class="btn btn-info" onclick="enviar('${usuario}','${senha}','${telefone}')">
+Enviar acesso via WhatsApp
 </button>
 </div>
 `
@@ -210,28 +205,32 @@ Enviar acesso
 carregarAlunos()
 }
 
-// ENVIAR ACESSO
-window.enviar = (user,pass)=>{
+// WHATSAPP AUTOMÁTICO
+window.enviar = (user,pass,telefone)=>{
 
-const msg = `🎓 AprovaMaisPB
+const numero = telefone.replace(/\D/g,"")
 
-Seu acesso:
+const msg = `🎓 *AprovaMaisPB*
 
-Usuário: ${user}
-Senha: ${pass}
+Seu acesso ao portal:
 
-Acesse:
-https://SEUSITE.vercel.app
+👤 Usuário: ${user}
+🔒 Senha: ${pass}
 
-Tutorial:
-1. Acesse o site
+🌐 Acesse:
+https://aprovamaispb.com.br/login.html
+
+📱 Tutorial:
+1. Entre no site
 2. Digite login e senha
 3. Clique em entrar
-`
+4. Acesse seus materiais
 
-navigator.clipboard.writeText(msg)
+Bons estudos! 🚀`
 
-alert("Mensagem copiada! Envie no WhatsApp")
+const url = `https://wa.me/55${numero}?text=${encodeURIComponent(msg)}`
+
+window.open(url, "_blank")
 
 }
 
@@ -272,22 +271,28 @@ window.ver = (u,s)=>{
 alert("Usuário: "+u+" | Senha: "+s)
 }
 
-// EXCLUIR
+// EXCLUIR ALUNO
 window.del = async(id)=>{
 await deleteDoc(doc(db,"usuarios",id))
 carregarAlunos()
 }
 
-// UPLOAD MATERIAL
+// UPLOAD MATERIAL (CORRIGIDO)
 window.upload = async ()=>{
 
 const file = document.getElementById("arquivo").files[0]
+
+if(!file){
+alert("Selecione um arquivo")
+return
+}
 
 const formData = new FormData()
 formData.append("file", file)
 formData.append("upload_preset","aprovamais_upload")
 
-const res = await fetch("https://api.cloudinary.com/v1_1/dq54qvrej/raw/upload",{
+// 🔥 AGORA CERTO
+const res = await fetch("https://api.cloudinary.com/v1_1/dq54qvrej/auto/upload",{
 method:"POST",
 body:formData
 })
@@ -295,7 +300,6 @@ body:formData
 const data = await res.json()
 
 const url = data.secure_url
-.replace("/raw/upload/", "/image/upload/fl_attachment:false/")
 
 await addDoc(collection(db,"materiais"),{
 titulo:document.getElementById("titulo").value,
@@ -304,7 +308,7 @@ url,
 data:new Date().toLocaleDateString()
 })
 
-alert("Material enviado")
+alert("Material enviado com sucesso")
 
 carregarMateriais()
 }
@@ -324,7 +328,6 @@ html+=`
 <div class="card p-3 mb-2">
 <b>${m.titulo}</b> - ${m.materia} <br>
 ${m.data}
-
 <br>
 <a href="${m.url}" target="_blank" class="btn btn-primary btn-sm">Abrir</a>
 <button class="btn btn-danger btn-sm" onclick="delMat('${d.id}')">Excluir</button>
