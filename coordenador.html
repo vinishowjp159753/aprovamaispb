@@ -10,36 +10,25 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
-body{
-  background:#f1f5f9;
-}
+body{background:#f1f5f9;}
 
 .topbar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:12px;
-  background:#0d6efd;
-  color:white;
+display:flex;
+justify-content:space-between;
+padding:12px;
+background:#0d6efd;
+color:white;
 }
 
 .menu{
-  display:flex;
-  gap:10px;
-  padding:10px;
-  overflow:auto;
-  background:white;
+display:flex;
+gap:10px;
+padding:10px;
+overflow:auto;
+background:white;
 }
 
-.card{
-  border-radius:12px;
-}
-
-@media(min-width:900px){
-  .container{
-    max-width:900px;
-  }
-}
+.card{border-radius:12px;}
 </style>
 
 </head>
@@ -47,14 +36,14 @@ body{
 <body>
 
 <div class="topbar">
-  <b>🎓 AprovaMaisPB</b>
-  <button onclick="logout()" class="btn btn-light btn-sm">Sair</button>
+<b>🎓 AprovaMaisPB</b>
+<button onclick="logout()" class="btn btn-light btn-sm">Sair</button>
 </div>
 
 <div class="menu">
-  <button class="btn btn-outline-primary" onclick="mostrar('cadastro')">Cadastro</button>
-  <button class="btn btn-outline-primary" onclick="mostrar('lista')">Alunos</button>
-  <button class="btn btn-outline-primary" onclick="mostrar('materiais')">Materiais</button>
+<button class="btn btn-outline-primary" onclick="mostrar('cadastro')">Cadastro</button>
+<button class="btn btn-outline-primary" onclick="mostrar('lista')">Alunos</button>
+<button class="btn btn-outline-primary" onclick="mostrar('materiais')">Materiais</button>
 </div>
 
 <div class="container mt-3">
@@ -90,6 +79,7 @@ body{
 </div>
 
 <div id="tabela"></div>
+
 </div>
 
 <!-- MATERIAIS -->
@@ -144,6 +134,17 @@ document.getElementById(id).style.display="none"
 document.getElementById(sec).style.display="block"
 }
 
+/* GERAR MATRÍCULA */
+function gerarMatricula(){
+const agora = new Date()
+return "AP" + agora.getFullYear() +
+(agora.getMonth()+1).toString().padStart(2,"0") +
+agora.getDate().toString().padStart(2,"0") +
+agora.getHours().toString().padStart(2,"0") +
+agora.getMinutes().toString().padStart(2,"0") +
+agora.getSeconds().toString().padStart(2,"0")
+}
+
 let turmaFiltro=""
 
 window.filtroTurma = (t)=>{
@@ -151,28 +152,45 @@ turmaFiltro=t
 carregarAlunos()
 }
 
+/* CRIAR ALUNO */
 window.criarAluno = async ()=>{
-const nome=nome.value
-const telefone=telefone.value
-const turma=turma.value
 
-const usuario=nome.toLowerCase().replaceAll(" ","")
-const senha=Math.floor(100000+Math.random()*900000)
+const nome = document.getElementById("nome").value
+const telefone = document.getElementById("telefone").value
+const turma = document.getElementById("turma").value
+
+if(!nome || !telefone){
+alert("Preencha os campos")
+return
+}
+
+const matricula = gerarMatricula()
 
 await addDoc(collection(db,"usuarios"),{
-nome,telefone,turma,usuario,senha,tipo:"aluno"
+nome,
+telefone,
+turma,
+usuario: matricula,
+senha: matricula,
+matricula,
+tipo:"aluno"
 })
 
-credencial.innerHTML=`<div class="alert alert-success mt-2">
-Usuário: ${usuario}<br>Senha: ${senha}
+document.getElementById("credencial").innerHTML = `
+<div class="alert alert-success mt-2">
+<b>Aluno cadastrado!</b><br>
+Usuário: ${matricula}<br>
+Senha: ${matricula}
 </div>`
 
 carregarAlunos()
 }
 
+/* LISTAR */
 async function carregarAlunos(){
-const busca=busca.value.toLowerCase()
-const snap=await getDocs(collection(db,"usuarios"))
+
+const busca = document.getElementById("busca").value.toLowerCase()
+const snap = await getDocs(collection(db,"usuarios"))
 
 let html=""
 
@@ -180,6 +198,7 @@ snap.forEach(d=>{
 const a=d.data()
 
 if(a.tipo==="aluno"){
+
 if(turmaFiltro && a.turma!==turmaFiltro) return
 if(!a.nome.toLowerCase().includes(busca)) return
 
@@ -187,41 +206,68 @@ html+=`
 <div class="card p-2 mb-2">
 <b>${a.nome}</b> (${a.turma})<br>
 
-<button class="btn btn-info btn-sm mt-2" onclick="ver('${a.usuario}','${a.senha}')">Ver</button>
-<button class="btn btn-success btn-sm mt-2" onclick="zap('${a.usuario}','${a.senha}','${a.telefone}')">WhatsApp</button>
-<button class="btn btn-warning btn-sm mt-2" onclick="editar('${d.id}','${a.nome}','${a.telefone}','${a.turma}')">Editar</button>
-<button class="btn btn-danger btn-sm mt-2" onclick="del('${d.id}')">Excluir</button>
+<button class="btn btn-info btn-sm mt-2" onclick="ver('${a.usuario}')">Ver acesso</button>
+
+<button class="btn btn-success btn-sm mt-2" onclick="zap('${a.usuario}','${a.telefone}')">
+WhatsApp
+</button>
+
+<button class="btn btn-warning btn-sm mt-2" onclick="editar('${d.id}','${a.nome}','${a.telefone}','${a.turma}')">
+Editar
+</button>
+
+<button class="btn btn-danger btn-sm mt-2" onclick="del('${d.id}')">
+Excluir
+</button>
 
 </div>`
 }
 })
 
-tabela.innerHTML=html
+document.getElementById("tabela").innerHTML=html
 }
 
-window.ver=(u,s)=>alert(`Usuário: ${u}\nSenha: ${s}`)
-
-window.zap=(u,s,t)=>{
-const msg=`Acesso AprovaMaisPB\nUsuário:${u}\nSenha:${s}\n\nAcesse:\naprovamaispb.com.br\nClique em Área do Aluno`
-window.open(`https://wa.me/55${t}?text=${encodeURIComponent(msg)}`)
+/* VER */
+window.ver = (mat)=>{
+alert(`Usuário: ${mat}\nSenha: ${mat}`)
 }
 
-window.editar=async(id,n,t,tu)=>{
+/* WHATS */
+window.zap = (mat, tel)=>{
+const msg=`🎓 AprovaMaisPB
+
+Usuário: ${mat}
+Senha: ${mat}
+
+Acesse:
+https://aprovamaispb.com.br
+
+Clique em Área do Aluno`
+window.open(`https://wa.me/55${tel}?text=${encodeURIComponent(msg)}`)
+}
+
+/* EDITAR */
+window.editar = async (id,n,t,tu)=>{
 const nome=prompt("Nome",n)
 const tel=prompt("Telefone",t)
 const turma=prompt("Turma",tu)
 
-await updateDoc(doc(db,"usuarios",id),{nome,telefone:tel,turma})
+await updateDoc(doc(db,"usuarios",id),{
+nome,telefone:tel,turma
+})
+
 carregarAlunos()
 }
 
-window.del=async(id)=>{
+/* EXCLUIR */
+window.del = async (id)=>{
 await deleteDoc(doc(db,"usuarios",id))
 carregarAlunos()
 }
 
-window.salvarLink=async()=>{
-let url=linkDrive.value
+/* MATERIAL */
+window.salvarLink = async ()=>{
+let url=document.getElementById("linkDrive").value
 
 if(url.includes("drive")){
 const id=url.split("/d/")[1]?.split("/")[0]
