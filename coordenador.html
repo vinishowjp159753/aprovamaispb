@@ -271,9 +271,17 @@ alert("Selecione um arquivo")
 return
 }
 
+const nomeSeguro = file.name.replaceAll(" ", "_")
+
 const formData = new FormData()
 formData.append("file", file)
 formData.append("upload_preset","aprovamais_upload")
+
+// 🔥 ESSA LINHA RESOLVE O PROBLEMA
+formData.append("public_id", nomeSeguro)
+
+// 🔥 FORÇA EXTENSÃO CORRETA
+formData.append("format", "pdf")
 
 const res = await fetch("https://api.cloudinary.com/v1_1/dq54qvrej/raw/upload",{
 method:"POST",
@@ -297,6 +305,7 @@ data:new Date().toLocaleDateString()
 })
 
 alert("Material enviado com sucesso")
+
 carregarMateriais()
 }
 
