@@ -68,7 +68,6 @@ color:white;
 <div class="card p-4">
 
 <input id="nome" class="form-control mb-2" placeholder="Nome">
-
 <input id="telefone" class="form-control mb-2" placeholder="Telefone (com DDD)">
 
 <label>Início</label>
@@ -95,7 +94,6 @@ color:white;
 <div id="lista" style="display:none">
 
 <h3>📋 Alunos</h3>
-
 <div id="tabela"></div>
 
 </div>
@@ -207,25 +205,17 @@ carregarAlunos()
 
 // WHATSAPP
 window.enviar = (user,pass,telefone)=>{
-
 const numero = telefone.replace(/\D/g,"")
 
-const msg = `🎓 *AprovaMaisPB*
+const msg = `🎓 AprovaMaisPB
 
-Seu acesso ao portal:
+Usuário: ${user}
+Senha: ${pass}
 
-👤 Usuário: ${user}
-🔒 Senha: ${pass}
-
-🌐 Acesse:
-https://aprovamaispb.com.br/login
-
-Bons estudos! 🚀`
+https://aprovamaispb.com.br/login`
 
 const url = `https://wa.me/55${numero}?text=${encodeURIComponent(msg)}`
-
 window.open(url, "_blank")
-
 }
 
 // LISTAR ALUNOS
@@ -236,28 +226,23 @@ const snap = await getDocs(collection(db,"usuarios"))
 let html = "<table class='table table-dark'><tr><th>Nome</th><th>Ação</th></tr>"
 
 snap.forEach(d=>{
-
 const a = d.data()
 
 if(a.tipo==="aluno"){
-
 html+=`
 <tr>
 <td>${a.nome}</td>
 <td>
-<button class="btn btn-info btn-sm" onclick="ver('${a.usuario}','${a.senha}')">Login</button>
 <button class="btn btn-danger btn-sm" onclick="del('${d.id}')">Excluir</button>
 </td>
 </tr>
 `
 }
-
 })
 
 html+="</table>"
 
 document.getElementById("tabela").innerHTML = html
-
 }
 
 // EXCLUIR ALUNO
@@ -266,15 +251,14 @@ await deleteDoc(doc(db,"usuarios",id))
 carregarAlunos()
 }
 
-// DOWNLOAD FORÇADO
-window.baixar = async (url, nome="material") => {
-  const res = await fetch(url)
-  const blob = await res.blob()
-
-  const link = document.createElement("a")
-  link.href = window.URL.createObjectURL(blob)
-  link.download = nome
-  link.click()
+// DOWNLOAD DIRETO
+window.baixar = (url, nome="arquivo.pdf") => {
+const link = document.createElement("a")
+link.href = url
+link.download = nome
+document.body.appendChild(link)
+link.click()
+document.body.removeChild(link)
 }
 
 // UPLOAD CORRETO
@@ -290,8 +274,6 @@ return
 const formData = new FormData()
 formData.append("file", file)
 formData.append("upload_preset","aprovamais_upload")
-formData.append("resource_type","raw")
-formData.append("type","upload")
 
 const res = await fetch("https://api.cloudinary.com/v1_1/dq54qvrej/raw/upload",{
 method:"POST",
@@ -310,11 +292,11 @@ await addDoc(collection(db,"materiais"),{
 titulo:document.getElementById("titulo").value,
 materia:document.getElementById("materia").value,
 url: data.secure_url,
+nomeArquivo: file.name,
 data:new Date().toLocaleDateString()
 })
 
 alert("Material enviado com sucesso")
-
 carregarMateriais()
 }
 
@@ -326,24 +308,27 @@ const snap = await getDocs(collection(db,"materiais"))
 let html=""
 
 snap.forEach(d=>{
-
 const m = d.data()
 
 html+=`
 <div class="card p-3 mb-2">
-<b>${m.titulo}</b> - ${m.materia} <br>
-${m.data}
-<br>
-<button class="btn btn-success btn-sm" onclick="baixar('${m.url}','${m.titulo}')">
-⬇ Baixar Material
+<b>${m.titulo}</b> - ${m.materia}<br>
+${m.data}<br>
+
+<button class="btn btn-success btn-sm"
+onclick="baixar('${m.url}','${m.nomeArquivo || 'material.pdf'}')">
+⬇ Baixar
 </button>
-<button class="btn btn-danger btn-sm" onclick="delMat('${d.id}')">Excluir</button>
+
+<button class="btn btn-danger btn-sm"
+onclick="delMat('${d.id}')">
+Excluir
+</button>
 </div>
 `
 })
 
 document.getElementById("listaMateriais").innerHTML = html
-
 }
 
 // EXCLUIR MATERIAL
