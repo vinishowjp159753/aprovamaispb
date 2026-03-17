@@ -10,8 +10,18 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
-body{background:#020617;color:white;}
-.card{background:#1e293b;border:none;border-radius:12px;color:white;}
+body{
+background:#020617;
+color:white;
+font-family:Arial;
+}
+
+.card{
+background:#1e293b;
+border:none;
+border-radius:12px;
+color:white;
+}
 </style>
 
 </head>
@@ -36,32 +46,40 @@ projectId:"aprovamaispb2-3bc78"
 
 const db = getFirestore(app);
 
-async function carregar(){
+async function carregarMateriais(){
 
 const snap = await getDocs(collection(db,"materiais"))
 
 let html=""
 
-snap.forEach(d=>{
-const m = d.data()
+snap.forEach(doc => {
 
-html+=`
+const m = doc.data()
+
+html += `
 <div class="card p-3 mb-2">
 <b>${m.titulo}</b> - ${m.materia}<br>
 ${m.data}<br>
 
-<a href="${m.url}" target="_blank" class="btn btn-success btn-sm">
-⬇ Baixar Material
-</a>
+<button class="btn btn-success btn-sm" onclick="baixar('${m.url}')">
+⬇ Baixar
+</button>
 </div>
 `
 })
 
 document.getElementById("materiais").innerHTML = html
-
 }
 
-carregar()
+// 🔥 FUNÇÃO DOWNLOAD (ESSA É A MAIS SEGURA)
+window.baixar = (url) => {
+const link = document.createElement("a")
+link.href = url
+link.target = "_blank"
+link.click()
+}
+
+carregarMateriais()
 
 </script>
 
