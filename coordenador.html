@@ -1,202 +1,96 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Painel ULTRA - AprovaMaisPB</title>
+<title>Painel PRO</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
+*{color:white!important;}
+body{background:#020617;font-family:Arial;}
 
-body{
-  background:#020617;
-  color:white;
-  font-family:Arial;
-}
+.topbar{display:flex;justify-content:space-between;padding:10px;background:#0f172a;}
+.menu-mobile{display:flex;gap:5px;padding:10px;overflow:auto;}
+.card{background:#1e293b;border-radius:12px;}
 
-/* TOP */
-.topbar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:12px;
-  background:#0f172a;
-  position:sticky;
-  top:0;
-}
-
-.menu-mobile{
-  display:flex;
-  gap:8px;
-  overflow-x:auto;
-  padding:10px;
-}
-
-.menu-mobile button{
-  min-width:120px;
-}
-
-/* DESKTOP */
-.sidebar{
-  width:230px;
-  height:100vh;
-  background:#0f172a;
-  position:fixed;
-  padding:20px;
-  display:none;
-}
-
-@media(min-width:900px){
-  .sidebar{display:block;}
-  .topbar,.menu-mobile{display:none;}
-  .content{margin-left:250px;padding:30px;}
-}
-
-.content{padding:15px;}
-
-.card{
-  background:#1e293b;
-  border-radius:16px;
-}
-
-input,select{
-  background:#020617 !important;
-  color:white !important;
-  border:1px solid #334155 !important;
-  height:45px;
-}
-
-button{
-  border-radius:10px !important;
-  height:45px;
-}
-
-.kpi{
-  text-align:center;
-  padding:20px;
-}
-
-.kpi h2{
-  font-size:28px;
-}
+input,select{background:#020617!important;border:1px solid #334155!important;}
 
 </style>
-
 </head>
 
 <body>
 
-<!-- MOBILE -->
 <div class="topbar">
-  <b>🚀 AprovaMaisPB</b>
-  <button onclick="logout()" class="btn btn-danger btn-sm">Sair</button>
+<b>AprovaMaisPB</b>
+<button onclick="logout()" class="btn btn-danger btn-sm">Sair</button>
 </div>
 
 <div class="menu-mobile">
-  <button class="btn btn-light" onclick="mostrar('dashboard')">Dashboard</button>
-  <button class="btn btn-light" onclick="mostrar('cadastro')">Cadastro</button>
-  <button class="btn btn-light" onclick="mostrar('lista')">Alunos</button>
-  <button class="btn btn-light" onclick="mostrar('materiais')">Materiais</button>
+<button class="btn btn-light" onclick="mostrar('cadastro')">Cadastro</button>
+<button class="btn btn-light" onclick="mostrar('lista')">Alunos</button>
+<button class="btn btn-light" onclick="mostrar('materiais')">Materiais</button>
 </div>
 
-<!-- DESKTOP -->
-<div class="sidebar">
-<h4>🚀 AprovaMaisPB</h4>
-
-<button class="btn btn-light mb-2" onclick="mostrar('dashboard')">Dashboard</button>
-<button class="btn btn-light mb-2" onclick="mostrar('cadastro')">Cadastro</button>
-<button class="btn btn-light mb-2" onclick="mostrar('lista')">Alunos</button>
-<button class="btn btn-light mb-2" onclick="mostrar('materiais')">Materiais</button>
-
-<button onclick="logout()" class="btn btn-danger mt-3">Sair</button>
-</div>
-
-<div class="content">
-
-<!-- DASHBOARD -->
-<div id="dashboard">
-<h3>📊 Dashboard</h3>
-
-<div class="row">
-  <div class="col-6">
-    <div class="card kpi">
-      <h2 id="totalAlunos">0</h2>
-      <span>Alunos</span>
-    </div>
-  </div>
-
-  <div class="col-6">
-    <div class="card kpi">
-      <h2 id="totalMateriais">0</h2>
-      <span>Materiais</span>
-    </div>
-  </div>
-</div>
-</div>
+<div class="container mt-3">
 
 <!-- CADASTRO -->
-<div id="cadastro" style="display:none">
-<h3>Cadastro</h3>
-
+<div id="cadastro">
 <div class="card p-3">
 
 <input id="nome" class="form-control mb-2" placeholder="Nome">
 <input id="telefone" class="form-control mb-2" placeholder="Telefone">
 
-<input type="date" id="inicio" class="form-control mb-2">
-<input type="date" id="fim" class="form-control mb-2">
-
-<select id="pagamento" class="form-control mb-2">
-<option>pix</option>
-<option>dinheiro</option>
-<option>cartao</option>
+<select id="turma" class="form-control mb-2">
+<option value="Semanal">Extensivo Semanal</option>
+<option value="Sabado">Extensivo Sábado</option>
 </select>
 
 <button class="btn btn-success" onclick="criarAluno()">Cadastrar</button>
 
 <div id="credencial"></div>
-
 </div>
 </div>
 
-<!-- LISTA -->
+<!-- ALUNOS -->
 <div id="lista" style="display:none">
-<h3>Alunos</h3>
 
-<input id="busca" class="form-control mb-3" placeholder="Buscar aluno..." onkeyup="carregarAlunos()">
+<input id="busca" class="form-control mb-2" placeholder="Buscar..." onkeyup="carregarAlunos()">
+
+<button class="btn btn-light btn-sm" onclick="filtroTurma('')">Todos</button>
+<button class="btn btn-light btn-sm" onclick="filtroTurma('Semanal')">Semanal</button>
+<button class="btn btn-light btn-sm" onclick="filtroTurma('Sabado')">Sábado</button>
 
 <div id="tabela"></div>
 </div>
 
 <!-- MATERIAIS -->
 <div id="materiais" style="display:none">
-<h3>Materiais</h3>
 
 <div class="card p-3 mb-3">
+
 <input id="titulo" class="form-control mb-2" placeholder="Título">
 
 <select id="materia" class="form-control mb-2">
 <option>Matemática</option>
 <option>Português</option>
-<option>História</option>
 </select>
 
-<input id="linkDrive" class="form-control mb-2" placeholder="Link do Drive">
+<select id="turmaMaterial" class="form-control mb-2">
+<option value="Semanal">Semanal</option>
+<option value="Sabado">Sábado</option>
+<option value="Ambas">Ambas</option>
+</select>
+
+<input id="linkDrive" class="form-control mb-2" placeholder="Link Drive">
 
 <button class="btn btn-primary" onclick="salvarLink()">Salvar</button>
+
 </div>
 
-<select id="filtroMateria" class="form-control mb-3" onchange="carregarMateriais()">
-<option value="">Todas</option>
-<option>Matemática</option>
-<option>Português</option>
-<option>História</option>
-</select>
-
 <div id="listaMateriais"></div>
+
 </div>
 
 </div>
@@ -204,129 +98,109 @@ button{
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const app = initializeApp({
-apiKey:"AIzaSyBRm4yix2fC2PhAVjTtbWlR-azz0bAglpo",
-authDomain:"aprovamaispb2-3bc78.firebaseapp.com",
-projectId:"aprovamaispb2-3bc78"
+apiKey:"SUA KEY",
+authDomain:"SEU DOMINIO",
+projectId:"SEU ID"
 });
 
 const db = getFirestore(app);
 
-window.logout = ()=>{localStorage.clear();location="index.html"}
-
-window.mostrar = (sec)=>{
-["dashboard","cadastro","lista","materiais"].forEach(id=>{
-document.getElementById(id).style.display="none"
-})
+window.mostrar = sec=>{
+["cadastro","lista","materiais"].forEach(id=>document.getElementById(id).style.display="none")
 document.getElementById(sec).style.display="block"
 }
 
-function gerarSenha(){return Math.floor(100000 + Math.random()*900000)}
-function gerarMatricula(){return "AP"+Date.now()}
+let turmaFiltro=""
+
+window.filtroTurma = t=>{
+turmaFiltro=t
+carregarAlunos()
+}
 
 window.criarAluno = async ()=>{
-const nome = nomeInput.value
-const telefone = telefoneInput.value
+const nome=nome.value
+const telefone=telefone.value
+const turma=turma.value
 
-const usuario = nome.toLowerCase().replaceAll(" ","")
-const senha = gerarSenha()
-const matricula = gerarMatricula()
+const usuario=nome.toLowerCase().replaceAll(" ","")
+const senha=Math.floor(100000+Math.random()*900000)
 
 await addDoc(collection(db,"usuarios"),{
-nome, telefone, usuario, senha, matricula, tipo:"aluno"
+nome,telefone,turma,usuario,senha,tipo:"aluno"
 })
 
-credencial.innerHTML=`<div class="alert alert-success mt-2">
-${usuario} | ${senha}
-</div>`
-
+alert("Criado!")
 carregarAlunos()
-atualizarDashboard()
 }
 
 async function carregarAlunos(){
-const busca = document.getElementById("busca").value.toLowerCase()
+const busca=busca.value.toLowerCase()
+const snap=await getDocs(collection(db,"usuarios"))
 
-const snap = await getDocs(collection(db,"usuarios"))
-
-let html = "<div class='table-responsive'><table class='table table-dark'>"
+let html=""
 
 snap.forEach(d=>{
-const a = d.data()
+const a=d.data()
 
-if(a.tipo==="aluno" && a.nome.toLowerCase().includes(busca)){
-html+=`<tr>
-<td>${a.nome}</td>
-<td><button class="btn btn-danger btn-sm" onclick="del('${d.id}')">Excluir</button></td>
-</tr>`
+if(a.tipo==="aluno"){
+if(turmaFiltro && a.turma!==turmaFiltro) return
+if(!a.nome.toLowerCase().includes(busca)) return
+
+html+=`
+<div class="card p-2 mb-2">
+<b>${a.nome}</b> (${a.turma})<br>
+
+<button onclick="ver('${a.usuario}','${a.senha}')">Ver</button>
+<button onclick="zap('${a.usuario}','${a.senha}','${a.telefone}')">Whats</button>
+<button onclick="editar('${d.id}','${a.nome}','${a.telefone}','${a.turma}')">Editar</button>
+<button onclick="del('${d.id}')">Excluir</button>
+</div>`
 }
 })
 
-html+="</table></div>"
-
-tabela.innerHTML = html
+tabela.innerHTML=html
 }
 
-window.del = async(id)=>{
+window.ver=(u,s)=>alert(`Usuário:${u}\nSenha:${s}`)
+
+window.zap=(u,s,t)=>{
+window.open(`https://wa.me/55${t}?text=Login:${u} Senha:${s}`)
+}
+
+window.editar=async(id,n,t,tu)=>{
+const nome=prompt("Nome",n)
+const tel=prompt("Tel",t)
+const turma=prompt("Turma",tu)
+
+await updateDoc(doc(db,"usuarios",id),{nome,telefone:tel,turma})
+carregarAlunos()
+}
+
+window.del=async(id)=>{
 await deleteDoc(doc(db,"usuarios",id))
 carregarAlunos()
-atualizarDashboard()
 }
 
-window.salvarLink = async ()=>{
-let url = linkDrive.value
+window.salvarLink=async()=>{
+let url=linkDrive.value
 
 if(url.includes("drive")){
-const id = url.split("/d/")[1]?.split("/")[0]
-url = `https://drive.google.com/uc?export=download&id=${id}`
+const id=url.split("/d/")[1]?.split("/")[0]
+url=`https://drive.google.com/uc?export=download&id=${id}`
 }
 
 await addDoc(collection(db,"materiais"),{
 titulo:titulo.value,
 materia:materia.value,
+turma:turmaMaterial.value,
 url
 })
 
-carregarMateriais()
-atualizarDashboard()
+alert("Salvo")
 }
-
-async function carregarMateriais(){
-const filtro = filtroMateria.value
-
-const snap = await getDocs(collection(db,"materiais"))
-
-let html=""
-
-snap.forEach(d=>{
-const m = d.data()
-
-if(filtro && m.materia !== filtro) return
-
-html+=`<div class="card p-2 mb-2">
-<b>${m.titulo}</b><br>
-<button class="btn btn-success btn-sm mt-2" onclick="baixar('${m.url}')">Baixar</button>
-</div>`
-})
-
-listaMateriais.innerHTML = html
-}
-
-window.baixar = (url)=>window.open(url,"_blank")
-
-async function atualizarDashboard(){
-const alunos = await getDocs(collection(db,"usuarios"))
-const materiais = await getDocs(collection(db,"materiais"))
-
-totalAlunos.innerText = alunos.size
-totalMateriais.innerText = materiais.size
-}
-
-carregarAlunos()
-carregarMateriais()
-atualizarDashboard()
 
 </script>
 
