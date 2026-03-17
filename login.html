@@ -50,12 +50,12 @@ color:#1e3a8a;
 
 <input id="usuario" class="form-control mb-3" placeholder="Usuário">
 
-<input id="senha" type="password" class="form-control mb-3" placeholder="Senha">
+<input id="senha" type="password" class="form-control mb-2" placeholder="Senha">
 
-<select id="tipo" class="form-control mb-3">
-<option value="aluno">Aluno</option>
-<option value="coordenador">Coordenador</option>
-</select>
+<div class="form-check mb-3">
+<input class="form-check-input" type="checkbox" id="lembrar">
+<label class="form-check-label">Lembrar usuário</label>
+</div>
 
 <button class="btn btn-primary w-100" onclick="login()">
 Entrar
@@ -74,58 +74,77 @@ getDocs
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
-
 apiKey:"AIzaSyBRm4yix2fC2PhAVjTtbWlR-azz0bAglpo",
 authDomain:"aprovamaispb2-3bc78.firebaseapp.com",
-projectId:"aprovamaispb2-3bc78",
-storageBucket:"aprovamaispb2-3bc78.firebasestorage.app",
-messagingSenderId:"830264910104",
-appId:"1:830264910104:web:0c0c6a9b1930c155c47e6d",
-measurementId:"G-PM06K116GT"
-
+projectId:"aprovamaispb2-3bc78"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+/* 🔥 LEMBRAR USUÁRIO */
+window.onload = ()=>{
+const salvo = localStorage.getItem("lembrarUsuario")
+if(salvo){
+document.getElementById("usuario").value = salvo
+document.getElementById("lembrar").checked = true
+}
+}
+
+/* 🔐 LOGIN AUTOMÁTICO */
 window.login = async function(){
 
-let usuario = document.getElementById("usuario").value
-let senha = document.getElementById("senha").value
-let tipo = document.getElementById("tipo").value
+let usuario = document.getElementById("usuario").value.trim()
+let senha = document.getElementById("senha").value.trim()
+let lembrar = document.getElementById("lembrar").checked
 
-usuario = usuario.toLowerCase().replaceAll(" ","")
+if(!usuario || !senha){
+alert("Preencha usuário e senha")
+return
+}
 
 const snap = await getDocs(collection(db,"usuarios"))
 
-let encontrou=false
+let encontrou = false
 
-snap.forEach(docu=>{
+for (const docu of snap.docs){
 
 const u = docu.data()
 
 if(
 u.usuario === usuario &&
-String(u.senha) === senha &&
-u.tipo === tipo
+String(u.senha) === senha
 ){
 
-encontrou=true
+encontrou = true
 
-localStorage.setItem("usuario",usuario)
-localStorage.setItem("nome",u.nome)
+// salvar sessão
+localStorage.setItem("usuario", usuario)
+localStorage.setItem("nome", u.nome)
+localStorage.setItem("tipo", u.tipo)
 
-if(tipo==="aluno") window.location="aluno.html"
-if(tipo==="coordenador") window.location="coordenador.html"
-
+// lembrar usuário
+if(lembrar){
+localStorage.setItem("lembrarUsuario", usuario)
+}else{
+localStorage.removeItem("lembrarUsuario")
 }
 
-})
+// redirecionamento automático
+if(u.tipo === "aluno"){
+window.location = "aluno.html"
+}
+
+if(u.tipo === "coordenador"){
+window.location = "coordenador.html"
+}
+
+break
+}
+}
 
 if(!encontrou){
-
 alert("Usuário ou senha inválidos")
-
 }
 
 }
