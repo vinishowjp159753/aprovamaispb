@@ -91,7 +91,7 @@ document.getElementById("lembrar").checked = true
 }
 }
 
-/* 🔐 LOGIN AUTOMÁTICO */
+/* 🔐 LOGIN */
 window.login = async function(){
 
 let usuario = document.getElementById("usuario").value.trim()
@@ -118,10 +118,13 @@ String(u.senha) === senha
 
 encontrou = true
 
-// salvar sessão
-localStorage.setItem("usuario", usuario)
+// ✅ SALVAR SESSÃO COMPLETA
+localStorage.setItem("usuario", u.usuario)
 localStorage.setItem("nome", u.nome)
 localStorage.setItem("tipo", u.tipo)
+
+// 🔥 CORREÇÃO PRINCIPAL
+localStorage.setItem("turma", (u.turma || "Semanal").trim())
 
 // lembrar usuário
 if(lembrar){
@@ -130,7 +133,7 @@ localStorage.setItem("lembrarUsuario", usuario)
 localStorage.removeItem("lembrarUsuario")
 }
 
-// redirecionamento automático
+// redirecionamento
 if(u.tipo === "aluno"){
 window.location = "aluno.html"
 }
