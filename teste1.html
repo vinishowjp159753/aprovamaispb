@@ -31,7 +31,6 @@ body { background:#f5f7fb; font-family:Arial, sans-serif; }
 
   <h5>📚 Seus Materiais</h5>
 
-  <!-- FILTRO -->
   <select id="filtroMateria" class="form-select mb-3">
     <option value="todas">Todas as matérias</option>
     <option>Redação</option>
@@ -45,6 +44,7 @@ body { background:#f5f7fb; font-family:Arial, sans-serif; }
     <option>Gramática</option>
     <option>Inglês</option>
     <option>Espanhol</option>
+    <option>Geografia</option>
   </select>
 
   <div id="continuar" class="mb-3"></div>
@@ -64,13 +64,15 @@ const app = initializeApp({
 
 const db = getFirestore(app)
 
-// 🔐 USUÁRIO
+// USUÁRIO
 const usuario = localStorage.getItem("usuario")
 const nome = localStorage.getItem("nome")
 const tipo = localStorage.getItem("tipo")
 
-// 🔥 NORMALIZA TURMA (ANTI-BUG)
-const turma = (localStorage.getItem("turma") || "Semanal").toLowerCase()
+const turma = (localStorage.getItem("turma") || "Semanal")
+  .toString()
+  .trim()
+  .toLowerCase()
 
 if(!usuario || tipo !== "aluno"){
   window.location.href="index.html"
@@ -78,14 +80,12 @@ if(!usuario || tipo !== "aluno"){
 
 document.getElementById("nomeAluno").innerText = nome
 
-// 👇 EXIBE TURMA BONITO
 document.getElementById("tipoTurma").innerText =
   turma === "sabado" ? "Extensivo Sábado" : "Extensivo Semanal"
 
-// 📊 PROGRESSO
+// PROGRESSO
 let progresso = JSON.parse(localStorage.getItem("progresso_"+usuario)) || {}
 
-// 🔎 FILTRO
 const filtroSelect = document.getElementById("filtroMateria")
 filtroSelect.addEventListener("change", carregarMateriais)
 
@@ -104,13 +104,20 @@ async function carregarMateriais(){
     const m = doc.data()
     const id = doc.id
 
-    // 🔥 NORMALIZA TURMA DO FIREBASE
-    const turmaMaterial = (m.turma || "").toLowerCase()
+    const turmaMaterial = (m.turma || "")
+      .toString()
+      .trim()
+      .toLowerCase()
 
-    // 🎯 FILTRO DE TURMA (CORRIGIDO)
-    if(turmaMaterial !== turma && turmaMaterial !== "ambas") return
+    // 🔥 FILTRO CORRIGIDO 100%
+    if(turma === "sabado"){
+      if(turmaMaterial !== "sabado" && turmaMaterial !== "ambas") return
+    }
 
-    // 🎯 FILTRO DE MATÉRIA
+    if(turma === "semanal"){
+      if(turmaMaterial !== "semanal" && turmaMaterial !== "ambas") return
+    }
+
     if(filtroMateria !== "todas" && m.materia !== filtroMateria) return
 
     total++
@@ -131,7 +138,6 @@ async function carregarMateriais(){
     `
   })
 
-  // ▶️ CONTINUAR
   if(ultimo){
     document.getElementById("continuar").innerHTML = `
       <div class="card p-2">
@@ -146,7 +152,6 @@ async function carregarMateriais(){
     document.getElementById("continuar").innerHTML = ""
   }
 
-  // 📊 PROGRESSO
   const porcentagem = total ? Math.floor((vistos/total)*100) : 0
 
   html = `
@@ -161,7 +166,6 @@ async function carregarMateriais(){
   document.getElementById("materiais").innerHTML = html
 }
 
-// ▶️ ABRIR
 window.abrir = (url,id)=>{
   progresso[id] = true
   localStorage.setItem("progresso_"+usuario, JSON.stringify(progresso))
@@ -169,7 +173,6 @@ window.abrir = (url,id)=>{
   carregarMateriais()
 }
 
-// 🚪 LOGOUT
 window.logout = ()=>{
   localStorage.removeItem("usuario")
   localStorage.removeItem("nome")
@@ -178,7 +181,6 @@ window.logout = ()=>{
   window.location.href="index.html"
 }
 
-// 🚀 INICIAR
 carregarMateriais()
 
 </script>
