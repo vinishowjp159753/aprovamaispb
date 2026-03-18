@@ -132,6 +132,7 @@ body{ background:#f1f5f9; font-family:Segoe UI; }
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+// FIREBASE
 const app = initializeApp({
   apiKey:"SUA_API_KEY",
   authDomain:"SEU_DOMINIO",
@@ -140,6 +141,7 @@ const app = initializeApp({
 
 const db = getFirestore(app)
 
+// UI
 window.logout = ()=> location="index.html"
 
 window.mostrar = sec=>{
@@ -293,7 +295,8 @@ window.renovar = async (id, telefone)=>{
   })
 
   const numero = telefone.replace(/\D/g,'')
-  const msg = `Olá, sua matrícula foi renovada com sucesso por mais 30 dias!`
+
+  const msg = `Olá, sua matrícula foi renovada por mais 30 dias!`
 
   window.open(`https://wa.me/55${numero}?text=${encodeURIComponent(msg)}`,"_blank")
 
@@ -318,10 +321,10 @@ window.editarAluno = async btn=>{
   const pagamento = prompt("Pagamento:", btn.dataset.pagamento)
   if(pagamento===null) return
 
-  const inicio = prompt("Data início:", btn.dataset.inicio?.substring(0,10))
+  const inicio = prompt("Data início (YYYY-MM-DD):", btn.dataset.inicio?.substring(0,10))
   if(inicio===null) return
 
-  const fim = prompt("Data fim:", btn.dataset.fim?.substring(0,10))
+  const fim = prompt("Data fim (YYYY-MM-DD):", btn.dataset.fim?.substring(0,10))
   if(fim===null) return
 
   let senha = ""
@@ -330,7 +333,7 @@ window.editarAluno = async btn=>{
     alert("Nova senha: " + senha)
   }
 
-  const dados = {
+  const updateData = {
     nome,
     telefone,
     turma,
@@ -339,15 +342,17 @@ window.editarAluno = async btn=>{
     dataFim: new Date(fim).toISOString()
   }
 
-  if(senha) dados.senha = senha
+  if(senha) updateData.senha = senha
 
-  await updateDoc(doc(db,"usuarios",id), dados)
+  await updateDoc(doc(db,"usuarios",id), updateData)
+
+  alert("Atualizado!")
 
   carregarAlunos()
   carregarDashboard()
 }
 
-// EXCLUIR ALUNO
+// EXCLUIR
 window.del = async id=>{
   await deleteDoc(doc(db,"usuarios",id))
   carregarAlunos()
