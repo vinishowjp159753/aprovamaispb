@@ -142,7 +142,7 @@ body{ background:#f1f5f9; font-family:Segoe UI; }
 
 </div>
 
-<!-- MODAL EDITAR -->
+<!-- MODAL -->
 <div class="modal fade" id="modalEditar">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -167,7 +167,7 @@ body{ background:#f1f5f9; font-family:Segoe UI; }
           <option value="inativo">Inativo</option>
         </select>
 
-        <input id="editDias" type="number" class="form-control mb-2" placeholder="Dias">
+        <input id="editDias" type="number" class="form-control mb-2">
 
         <button class="btn btn-warning w-100" onclick="salvarEdicao()">Salvar</button>
 
@@ -202,113 +202,84 @@ document.getElementById(sec).style.display="block"
 
 // DASHBOARD
 async function carregarDashboard(){
-
 const snap = await getDocs(collection(db,"usuarios"))
-
-let total=0, ativos=0, semanal=0, sabado=0
-let vencidosHTML=""
-const hoje=new Date()
+let total=0, ativos=0
 
 snap.forEach(d=>{
 const a=d.data()
 if(a.tipo!=="aluno") return
-
 total++
-
-let turma=(a.turma||"").toLowerCase()
-
-if(turma.includes("sem")) semanal++
-if(turma.includes("sab")) sabado++
-
-let ativo=false
-
-if(a.dataFim){
-let fim=new Date(a.dataFim)
-if(fim>=hoje) ativo=true
-else vencidosHTML+=`<div><b>${a.nome}</b> - ${fim.toLocaleDateString()}</div>`
-}else ativo=true
-
-if(a.status==="ativo") ativo=true
-if(ativo) ativos++
+if(a.status==="ativo") ativos++
 })
 
-document.getElementById("totalAlunos").innerText=total
-document.getElementById("ativos").innerText=ativos
-document.getElementById("semanal").innerText=semanal
-document.getElementById("sabado").innerText=sabado
-
-document.getElementById("listaVencidos").innerHTML=vencidosHTML||"Nenhuma matrícula vencida 🎉"
+totalAlunos.innerText=total
+ativos.innerText=ativos
 }
 
-// ALUNOS (🔥 CORRIGIDO)
-async function carregarAlunos(){
-
+// ALUNOS
+window.carregarAlunos = async ()=>{
 const busca = document.getElementById("busca").value.toLowerCase()
 const snap = await getDocs(collection(db,"usuarios"))
 
-let alunos = []
+let alunos=[]
 
 snap.forEach(d=>{
-  const a = d.data()
-  if(a.tipo !== "aluno") return
-
-  alunos.push({
-    id: d.id,
-    ...a
-  })
+const a=d.data()
+if(a.tipo==="aluno"){
+alunos.push({id:d.id,...a})
+}
 })
 
-// ORDEM ALFABÉTICA
-alunos.sort((a,b)=> (a.nome || "").localeCompare(b.nome || ""))
+alunos.sort((a,b)=> (a.nome||"").localeCompare(b.nome||""))
 
-let html = ""
+let html=""
 
 alunos.forEach(a=>{
+if(!(a.nome||"").toLowerCase().includes(busca)) return
 
-  if(!(a.nome || "").toLowerCase().includes(busca)) return
+html+=`
+<div class="card p-2 mb-2">
+<b>${a.nome}</b> (${a.turma})<br>
 
-  html += `
-  <div class="card p-2 mb-2">
-    <b>${a.nome}</b> (${a.turma})<br>
-
-    <button onclick="zap('${a.usuario}','${a.senha}','${a.telefone}')" class="btn btn-success btn-sm">WhatsApp</button>
-
-    <button onclick="abrirEditar(this)" class="btn btn-warning btn-sm"
-      data-id="${a.id}"
-      data-nome="${a.nome||''}"
-      data-telefone="${a.telefone||''}"
-      data-turma="${a.turma||''}"
-      data-pagamento="${a.pagamento||''}"
-      data-status="${a.status||'ativo'}">
-      Editar
-    </button>
-
-    <button onclick="renovar('${a.id}','${a.telefone}')" class="btn btn-primary btn-sm">+30d</button>
-
-    <button onclick="excluirAluno('${a.id}')" class="btn btn-danger btn-sm">Excluir</button>
-  </div>`
+<button onclick="excluirAluno('${a.id}')" class="btn btn-danger btn-sm">Excluir</button>
+</div>`
 })
 
-document.getElementById("tabela").innerHTML = html || "Nenhum aluno encontrado"
+document.getElementById("tabela").innerHTML=html
 }
 
-// EXCLUIR (🔥 NOVO)
+// EXCLUIR
 window.excluirAluno = async(id)=>{
-
-if(!confirm("Tem certeza que deseja excluir este aluno?")) return
-
-try{
-  await deleteDoc(doc(db,"usuarios",id))
-  alert("Aluno excluído com sucesso!")
-  carregarAlunos()
-  carregarDashboard()
-}catch(e){
-  alert("Erro ao excluir: " + e.message)
-}
+await deleteDoc(doc(db,"usuarios",id))
+carregarAlunos()
+carregarDashboard()
 }
 
-// RESTO DO SEU CÓDIGO CONTINUA IGUAL (editar, materiais, presença, etc)
+// PRESENÇA (🔥 CORRIGIDO)
+window.gerarListaPresenca = async ()=>{
 
+const snap = await getDocs(collection(db,"usuarios"))
+
+let html="<h5>Lista de Presença</h5><ul>"
+
+snap.forEach(d=>{
+const a=d.data()
+if(a.tipo==="aluno"){
+html+=`<li>${a.nome}</li>`
+}
+})
+
+html+="</ul>"
+
+document.getElementById("listaPresenca").innerHTML=html
+}
+
+// PDF
+window.baixarPDF=()=>{
+html2pdf().from(document.getElementById("listaPresenca")).save()
+}
+
+// INIT
 carregarDashboard()
 carregarAlunos()
 
