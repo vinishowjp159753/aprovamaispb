@@ -194,8 +194,7 @@ async function carregarDashboard(){
 
     total++
 
-    // 🔥 NORMALIZAÇÃO FORTE DA TURMA
-    let turma = (a.turma || "")
+    const turma = (a.turma || "")
       .toString()
       .trim()
       .toLowerCase()
@@ -203,26 +202,22 @@ async function carregarDashboard(){
     if(turma.includes("sem")) semanal++
     if(turma.includes("sab")) sabado++
 
-    // 🔥 ATIVO INTELIGENTE (MISTO)
     let ativo = false
 
-    if(a.status){
-      ativo = a.status.toLowerCase() === "ativo"
-    }
-
+    // prioridade: dataFim
     if(a.dataFim){
       const fim = new Date(a.dataFim)
-
-      if(!isNaN(fim)){
-        if(fim >= hoje){
-          ativo = true
-        }else{
-          ativo = false
-        }
+      if(!isNaN(fim) && fim >= hoje){
+        ativo = true
       }
     }
 
-    // 🔥 ALUNO ANTIGO (SEM STATUS E SEM DATA)
+    // fallback: status
+    if(a.status && a.status.toLowerCase() === "ativo"){
+      ativo = true
+    }
+
+    // aluno antigo
     if(!a.status && !a.dataFim){
       ativo = true
     }
@@ -230,12 +225,11 @@ async function carregarDashboard(){
     if(ativo) ativos++
   })
 
+  // 🔥 SEM CONFLITO DE VARIÁVEL
   document.getElementById("totalAlunos").innerText = total
   document.getElementById("ativos").innerText = ativos
   document.getElementById("semanal").innerText = semanal
   document.getElementById("sabado").innerText = sabado
-
-  console.log("DASHBOARD:", { total, ativos, semanal, sabado })
 }
 
 // LISTA
