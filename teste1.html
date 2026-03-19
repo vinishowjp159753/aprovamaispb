@@ -31,10 +31,6 @@ body{ background:#f1f5f9; font-family:Segoe UI; }
   border-radius:12px;
   box-shadow:0 3px 10px rgba(0,0,0,0.05);
 }
-
-.badge{
-  font-size:12px;
-}
 </style>
 </head>
 
@@ -57,7 +53,6 @@ body{ background:#f1f5f9; font-family:Segoe UI; }
 
 <!-- DASHBOARD -->
 <div id="dashboard">
-
 <div class="row">
 <div class="col-6"><div class="card p-3 text-center"><h6>Total</h6><h3 id="totalAlunos">0</h3></div></div>
 <div class="col-6"><div class="card p-3 text-center"><h6>Ativos</h6><h3 id="ativos">0</h3></div></div>
@@ -69,7 +64,6 @@ body{ background:#f1f5f9; font-family:Segoe UI; }
 <h5 class="text-danger">⚠️ Matrículas Vencidas</h5>
 <div id="listaVencidos"></div>
 </div>
-
 </div>
 
 <!-- CADASTRO -->
@@ -113,11 +107,13 @@ body{ background:#f1f5f9; font-family:Segoe UI; }
 <div class="card p-3 mb-3">
 <input id="titulo" class="form-control mb-2" placeholder="Título">
 <input id="linkDrive" class="form-control mb-2" placeholder="Link do Drive">
+
 <select id="turmaMaterial" class="form-control mb-2">
 <option value="Semanal">Semanal</option>
 <option value="Sabado">Sabado</option>
 <option value="Ambas">Ambas</option>
 </select>
+
 <button class="btn btn-primary" onclick="salvarLink()">Salvar</button>
 </div>
 
@@ -153,12 +149,22 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const app = initializeApp({
-  apiKey:"AIzaSyBRm4yix2fC2PhAVjTtbWlR-azz0bAglpo",
-  authDomain:"aprovamaispb2-3bc78.firebaseapp.com",
-  projectId:"aprovamaispb2-3bc78"
+apiKey:"SUA_API_KEY",
+authDomain:"SEU_DOMINIO",
+projectId:"SEU_PROJETO"
 });
 
 const db = getFirestore(app)
+
+
+// 🔥 FUNÇÃO QUE ESTAVA FALTANDO (CORREÇÃO DO BUG)
+window.mostrar = (sec)=>{
+  ["dashboard","cadastro","lista","materiais","presenca"].forEach(id=>{
+    document.getElementById(id).style.display="none"
+  })
+  document.getElementById(sec).style.display="block"
+}
+
 
 // DASHBOARD
 async function carregarDashboard(){
@@ -184,6 +190,7 @@ let ativo=false
 
 if(a.dataFim){
 let fim=new Date(a.dataFim)
+
 if(fim>=hoje) ativo=true
 else{
 vencidosHTML+=`<div><b>${a.nome}</b> - ${fim.toLocaleDateString()}</div>`
@@ -202,6 +209,7 @@ document.getElementById("sabado").innerText=sabado
 
 document.getElementById("listaVencidos").innerHTML=vencidosHTML||"Nenhuma matrícula vencida 🎉"
 }
+
 
 // ALUNOS
 async function carregarAlunos(){
@@ -229,11 +237,21 @@ html+=`
 tabela.innerHTML=html
 }
 
+
 // WHATSAPP
 window.zap=(u,s,t)=>{
-let msg=`Acesse AprovaMaisPB\nUsuario:${u}\nSenha:${s}\naprovamaispb.com.br`
+let msg=`🎓 AprovaMaisPB
+
+Usuário: ${u}
+Senha: ${s}
+
+Acesse:
+https://aprovamaispb.com.br
+
+➡ Área do aluno`
 window.open(`https://wa.me/55${t}?text=${encodeURIComponent(msg)}`)
 }
+
 
 // RENOVAR
 window.renovar=async(id,t)=>{
@@ -246,6 +264,7 @@ window.open(`https://wa.me/55${t}?text=Renovado+30+dias`)
 carregarDashboard()
 }
 
+
 // MATERIAIS
 window.salvarLink=async()=>{
 await addDoc(collection(db,"materiais"),{
@@ -257,13 +276,15 @@ carregarMateriais()
 }
 
 async function carregarMateriais(){
-const filtro=filtroMaterial.value
+
+const filtro=document.getElementById("filtroMaterial").value
 const snap=await getDocs(collection(db,"materiais"))
 
 let html=""
 
 snap.forEach(d=>{
 const m=d.data()
+
 if(filtro && m.turma!==filtro) return
 
 html+=`
@@ -272,6 +293,7 @@ html+=`
 <b>${m.titulo}</b><br>
 <span class="badge bg-primary">${m.turma}</span>
 </div>
+
 <div>
 <a href="${m.url}" target="_blank" class="btn btn-success btn-sm">Baixar</a>
 <button onclick="delMat('${d.id}')" class="btn btn-danger btn-sm">Excluir</button>
@@ -279,13 +301,14 @@ html+=`
 </div>`
 })
 
-listaMateriais.innerHTML=html
+listaMateriais.innerHTML=html||"Nenhum material encontrado"
 }
 
 window.delMat=async id=>{
 await deleteDoc(doc(db,"materiais",id))
 carregarMateriais()
 }
+
 
 // PRESENÇA
 window.gerarListaPresenca=async()=>{
@@ -320,6 +343,7 @@ html+="</table>"
 
 listaPresenca.innerHTML=html
 }
+
 
 // INIT
 carregarDashboard()
