@@ -134,6 +134,7 @@ body{ background:#f1f5f9; font-family:Segoe UI; }
 
 <button class="btn btn-primary mb-2" onclick="gerarListaPresenca()">Gerar</button>
 <button class="btn btn-success mb-2" onclick="window.print()">Imprimir</button>
+<button class="btn btn-dark mb-2" onclick="baixarPDF()">Baixar PDF</button>
 
 <div id="listaPresenca"></div>
 
@@ -141,7 +142,42 @@ body{ background:#f1f5f9; font-family:Segoe UI; }
 
 </div>
 
+<!-- MODAL EDITAR -->
+<div class="modal fade" id="modalEditar">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body">
+
+        <input id="editNome" class="form-control mb-2">
+        <input id="editTelefone" class="form-control mb-2">
+
+        <select id="editTurma" class="form-control mb-2">
+          <option value="Semanal">Semanal</option>
+          <option value="Sabado">Sábado</option>
+        </select>
+
+        <select id="editPagamento" class="form-control mb-2">
+          <option>Pix</option>
+          <option>Dinheiro</option>
+          <option>Cartão</option>
+        </select>
+
+        <select id="editStatus" class="form-control mb-2">
+          <option value="ativo">Ativo</option>
+          <option value="inativo">Inativo</option>
+        </select>
+
+        <input id="editDias" type="number" class="form-control mb-2" placeholder="Dias">
+
+        <button class="btn btn-warning w-100" onclick="salvarEdicao()">Salvar</button>
+
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <script type="module">
 
@@ -149,22 +185,20 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const app = initializeApp({
-  apiKey:"AIzaSyBRm4yix2fC2PhAVjTtbWlR-azz0bAglpo",
-  authDomain:"aprovamaispb2-3bc78.firebaseapp.com",
-  projectId:"aprovamaispb2-3bc78"
+apiKey:"SUA_API_KEY",
+authDomain:"SEU_DOMINIO",
+projectId:"SEU_PROJETO"
 });
 
 const db = getFirestore(app)
 
-
-// 🔥 FUNÇÃO QUE ESTAVA FALTANDO (CORREÇÃO DO BUG)
+// ABAS
 window.mostrar = (sec)=>{
-  ["dashboard","cadastro","lista","materiais","presenca"].forEach(id=>{
-    document.getElementById(id).style.display="none"
-  })
-  document.getElementById(sec).style.display="block"
+["dashboard","cadastro","lista","materiais","presenca"].forEach(id=>{
+document.getElementById(id).style.display="none"
+})
+document.getElementById(sec).style.display="block"
 }
-
 
 // DASHBOARD
 async function carregarDashboard(){
@@ -192,9 +226,7 @@ if(a.dataFim){
 let fim=new Date(a.dataFim)
 
 if(fim>=hoje) ativo=true
-else{
-vencidosHTML+=`<div><b>${a.nome}</b> - ${fim.toLocaleDateString()}</div>`
-}
+else vencidosHTML+=`<div><b>${a.nome}</b> - ${fim.toLocaleDateString()}</div>`
 }else ativo=true
 
 if(a.status==="ativo") ativo=true
@@ -209,7 +241,6 @@ document.getElementById("sabado").innerText=sabado
 
 document.getElementById("listaVencidos").innerHTML=vencidosHTML||"Nenhuma matrícula vencida 🎉"
 }
-
 
 // ALUNOS
 async function carregarAlunos(){
@@ -229,6 +260,16 @@ html+=`
 <b>${a.nome}</b> (${a.turma})<br>
 
 <button onclick="zap('${a.usuario}','${a.senha}','${a.telefone}')" class="btn btn-success btn-sm">WhatsApp</button>
+
+<button onclick="abrirEditar(this)" class="btn btn-warning btn-sm"
+data-id="${d.id}"
+data-nome="${a.nome||''}"
+data-telefone="${a.telefone||''}"
+data-turma="${a.turma||''}"
+data-pagamento="${a.pagamento||''}"
+data-status="${a.status||'ativo'}">
+Editar</button>
+
 <button onclick="renovar('${d.id}','${a.telefone}')" class="btn btn-primary btn-sm">+30d</button>
 <button onclick="del('${d.id}')" class="btn btn-danger btn-sm">Excluir</button>
 </div>`
@@ -237,6 +278,40 @@ html+=`
 tabela.innerHTML=html
 }
 
+// EDITAR
+let alunoEditandoId=null
+
+window.abrirEditar=(btn)=>{
+alunoEditandoId=btn.dataset.id
+editNome.value=btn.dataset.nome
+editTelefone.value=btn.dataset.telefone
+editTurma.value=btn.dataset.turma
+editPagamento.value=btn.dataset.pagamento
+editStatus.value=btn.dataset.status
+new bootstrap.Modal(document.getElementById('modalEditar')).show()
+}
+
+window.salvarEdicao=async()=>{
+const dias=parseInt(editDias.value)||30
+const inicio=new Date()
+const fim=new Date()
+fim.setDate(inicio.getDate()+dias)
+
+await updateDoc(doc(db,"usuarios",alunoEditandoId),{
+nome:editNome.value,
+telefone:editTelefone.value,
+turma:editTurma.value,
+pagamento:editPagamento.value,
+status:editStatus.value,
+dataInicio:inicio.toISOString(),
+dataFim:fim.toISOString()
+})
+
+alert("Atualizado!")
+carregarAlunos()
+carregarDashboard()
+bootstrap.Modal.getInstance(document.getElementById('modalEditar')).hide()
+}
 
 // WHATSAPP
 window.zap=(u,s,t)=>{
@@ -246,12 +321,9 @@ Usuário: ${u}
 Senha: ${s}
 
 Acesse:
-https://aprovamaispb.com.br
-
-➡ Área do aluno`
+https://aprovamaispb.com.br`
 window.open(`https://wa.me/55${t}?text=${encodeURIComponent(msg)}`)
 }
-
 
 // RENOVAR
 window.renovar=async(id,t)=>{
@@ -263,7 +335,6 @@ await updateDoc(ref,{dataFim:fim.toISOString()})
 window.open(`https://wa.me/55${t}?text=Renovado+30+dias`)
 carregarDashboard()
 }
-
 
 // MATERIAIS
 window.salvarLink=async()=>{
@@ -277,14 +348,13 @@ carregarMateriais()
 
 async function carregarMateriais(){
 
-const filtro=document.getElementById("filtroMaterial").value
+const filtro=filtroMaterial.value
 const snap=await getDocs(collection(db,"materiais"))
 
 let html=""
 
 snap.forEach(d=>{
 const m=d.data()
-
 if(filtro && m.turma!==filtro) return
 
 html+=`
@@ -293,7 +363,6 @@ html+=`
 <b>${m.titulo}</b><br>
 <span class="badge bg-primary">${m.turma}</span>
 </div>
-
 <div>
 <a href="${m.url}" target="_blank" class="btn btn-success btn-sm">Baixar</a>
 <button onclick="delMat('${d.id}')" class="btn btn-danger btn-sm">Excluir</button>
@@ -301,14 +370,13 @@ html+=`
 </div>`
 })
 
-listaMateriais.innerHTML=html||"Nenhum material encontrado"
+listaMateriais.innerHTML=html||"Nenhum material"
 }
 
 window.delMat=async id=>{
 await deleteDoc(doc(db,"materiais",id))
 carregarMateriais()
 }
-
 
 // PRESENÇA
 window.gerarListaPresenca=async()=>{
@@ -335,7 +403,15 @@ snap.forEach(d=>{
 const a=d.data()
 if(a.tipo==="aluno"){
 if(turma && a.turma!==turma) return
-html+=`<tr><td>${i++}</td><td>${a.nome}</td><td></td></tr>`
+
+html+=`
+<tr>
+<td>${i++}</td>
+<td>${a.nome}</td>
+<td style="height:40px;">
+<div style="border-bottom:1px solid black; width:100%; height:20px;"></div>
+</td>
+</tr>`
 }
 })
 
@@ -344,6 +420,11 @@ html+="</table>"
 listaPresenca.innerHTML=html
 }
 
+// PDF
+window.baixarPDF=()=>{
+const element=document.getElementById("listaPresenca")
+html2pdf().from(element).save("lista_presenca.pdf")
+}
 
 // INIT
 carregarDashboard()
