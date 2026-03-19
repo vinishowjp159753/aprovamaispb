@@ -177,28 +177,65 @@ window.mostrar = sec=>{
 
 // DASHBOARD
 async function carregarDashboard(){
+
   const snap = await getDocs(collection(db,"usuarios"))
 
-  let total=0, ativos=0, semanal=0, sabado=0
+  let total = 0
+  let ativos = 0
+  let semanal = 0
+  let sabado = 0
 
-  snap.forEach(d=>{
-    const a=d.data()
-    if(a.tipo!=="aluno") return
+  const hoje = new Date()
+
+  snap.forEach(docSnap=>{
+    const a = docSnap.data()
+
+    if(a.tipo !== "aluno") return
 
     total++
 
-    const turma = (a.turma||"").toLowerCase()
+    // 🔥 NORMALIZAÇÃO FORTE DA TURMA
+    let turma = (a.turma || "")
+      .toString()
+      .trim()
+      .toLowerCase()
 
     if(turma.includes("sem")) semanal++
     if(turma.includes("sab")) sabado++
 
-    if(a.status==="ativo" || !a.status) ativos++
+    // 🔥 ATIVO INTELIGENTE (MISTO)
+    let ativo = false
+
+    if(a.status){
+      ativo = a.status.toLowerCase() === "ativo"
+    }
+
+    if(a.dataFim){
+      const fim = new Date(a.dataFim)
+
+      if(!isNaN(fim)){
+        if(fim >= hoje){
+          ativo = true
+        }else{
+          ativo = false
+        }
+      }
+    }
+
+    // 🔥 ALUNO ANTIGO (SEM STATUS E SEM DATA)
+    if(!a.status && !a.dataFim){
+      ativo = true
+    }
+
+    if(ativo) ativos++
   })
 
-  totalAlunos.innerText=total
-  ativos.innerText=ativos
-  semanal.innerText=semanal
-  sabado.innerText=sabado
+  document.getElementById("totalAlunos").innerText = total
+  document.getElementById("ativos").innerText = ativos
+  document.getElementById("semanal").innerText = semanal
+  document.getElementById("sabado").innerText = sabado
+
+  console.log("DASHBOARD:", { total, ativos, semanal, sabado })
 }
 
 // LISTA
