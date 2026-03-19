@@ -32,10 +32,8 @@ body{ background:#f1f5f9; font-family:Segoe UI; }
   box-shadow:0 3px 10px rgba(0,0,0,0.05);
 }
 
-@media print{
-  body *{ visibility:hidden }
-  #listaPresenca, #listaPresenca *{ visibility:visible }
-  #listaPresenca{ position:absolute; top:0; left:0; width:100% }
+.badge{
+  font-size:12px;
 }
 </style>
 </head>
@@ -59,96 +57,92 @@ body{ background:#f1f5f9; font-family:Segoe UI; }
 
 <!-- DASHBOARD -->
 <div id="dashboard">
-  <div class="row">
-    <div class="col-6"><div class="card p-3 text-center"><h6>Total</h6><h3 id="totalAlunos">0</h3></div></div>
-    <div class="col-6"><div class="card p-3 text-center"><h6>Ativos</h6><h3 id="ativos">0</h3></div></div>
-    <div class="col-6 mt-2"><div class="card p-3 text-center"><h6>Semanal</h6><h3 id="semanal">0</h3></div></div>
-    <div class="col-6 mt-2"><div class="card p-3 text-center"><h6>Sábado</h6><h3 id="sabado">0</h3></div></div>
-  </div>
+
+<div class="row">
+<div class="col-6"><div class="card p-3 text-center"><h6>Total</h6><h3 id="totalAlunos">0</h3></div></div>
+<div class="col-6"><div class="card p-3 text-center"><h6>Ativos</h6><h3 id="ativos">0</h3></div></div>
+<div class="col-6 mt-2"><div class="card p-3 text-center"><h6>Semanal</h6><h3 id="semanal">0</h3></div></div>
+<div class="col-6 mt-2"><div class="card p-3 text-center"><h6>Sábado</h6><h3 id="sabado">0</h3></div></div>
+</div>
+
+<div class="card p-3 mt-3">
+<h5 class="text-danger">⚠️ Matrículas Vencidas</h5>
+<div id="listaVencidos"></div>
+</div>
+
 </div>
 
 <!-- CADASTRO -->
 <div id="cadastro" style="display:none">
-  <div class="card p-3">
-    <input id="nome" class="form-control mb-2" placeholder="Nome">
-    <input id="telefone" class="form-control mb-2" placeholder="Telefone">
+<div class="card p-3">
+<input id="nome" class="form-control mb-2" placeholder="Nome">
+<input id="telefone" class="form-control mb-2" placeholder="Telefone">
 
-    <select id="turma" class="form-control mb-2">
-      <option value="Semanal">Semanal</option>
-      <option value="Sabado">Sabado</option>
-    </select>
+<select id="turma" class="form-control mb-2">
+<option value="Semanal">Semanal</option>
+<option value="Sabado">Sabado</option>
+</select>
 
-    <select id="pagamento" class="form-control mb-2">
-      <option>Pix</option>
-      <option>Dinheiro</option>
-      <option>Cartão</option>
-    </select>
+<select id="pagamento" class="form-control mb-2">
+<option>Pix</option>
+<option>Dinheiro</option>
+<option>Cartão</option>
+</select>
 
-    <input id="dias" type="number" class="form-control mb-2" placeholder="Dias (ex: 30)">
+<input id="dias" type="number" class="form-control mb-2" placeholder="Dias">
 
-    <button class="btn btn-success w-100" onclick="criarAluno()">Cadastrar</button>
-  </div>
+<button class="btn btn-success w-100" onclick="criarAluno()">Cadastrar</button>
+</div>
 </div>
 
 <!-- ALUNOS -->
 <div id="lista" style="display:none">
-  <input id="busca" class="form-control mb-2" placeholder="Buscar..." onkeyup="carregarAlunos()">
-  <div id="tabela"></div>
+<input id="busca" class="form-control mb-2" placeholder="Buscar..." onkeyup="carregarAlunos()">
+<div id="tabela"></div>
 </div>
 
 <!-- MATERIAIS -->
 <div id="materiais" style="display:none">
-  <div class="card p-3 mb-3">
-    <input id="titulo" class="form-control mb-2" placeholder="Título">
-    <input id="linkDrive" class="form-control mb-2" placeholder="Link do Drive">
-    <button class="btn btn-primary" onclick="salvarLink()">Salvar</button>
-  </div>
-  <div id="listaMateriais"></div>
+
+<select id="filtroMaterial" class="form-control mb-2" onchange="carregarMateriais()">
+<option value="">Todas</option>
+<option value="Semanal">Semanal</option>
+<option value="Sabado">Sábado</option>
+</select>
+
+<div class="card p-3 mb-3">
+<input id="titulo" class="form-control mb-2" placeholder="Título">
+<input id="linkDrive" class="form-control mb-2" placeholder="Link do Drive">
+<select id="turmaMaterial" class="form-control mb-2">
+<option value="Semanal">Semanal</option>
+<option value="Sabado">Sabado</option>
+<option value="Ambas">Ambas</option>
+</select>
+<button class="btn btn-primary" onclick="salvarLink()">Salvar</button>
+</div>
+
+<div id="listaMateriais"></div>
+
 </div>
 
 <!-- PRESENÇA -->
 <div id="presenca" style="display:none">
-  <div class="card p-3">
-    <button class="btn btn-primary mb-2" onclick="gerarListaPresenca()">Gerar</button>
-    <button class="btn btn-success mb-2" onclick="window.print()">Imprimir</button>
-    <div id="listaPresenca"></div>
-  </div>
-</div>
+
+<select id="turmaPresenca" class="form-control mb-2">
+<option value="">Todas</option>
+<option value="Semanal">Semanal</option>
+<option value="Sabado">Sábado</option>
+</select>
+
+<input type="date" id="dataPresenca" class="form-control mb-2">
+
+<button class="btn btn-primary mb-2" onclick="gerarListaPresenca()">Gerar</button>
+<button class="btn btn-success mb-2" onclick="window.print()">Imprimir</button>
+
+<div id="listaPresenca"></div>
 
 </div>
 
-<!-- MODAL EDITAR -->
-<div class="modal fade" id="modalEditar">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-body">
-
-        <input id="editNome" class="form-control mb-2">
-        <input id="editTelefone" class="form-control mb-2">
-
-        <select id="editTurma" class="form-control mb-2">
-          <option value="Semanal">Semanal</option>
-          <option value="Sabado">Sábado</option>
-        </select>
-
-        <select id="editPagamento" class="form-control mb-2">
-          <option>Pix</option>
-          <option>Dinheiro</option>
-          <option>Cartão</option>
-        </select>
-
-        <select id="editStatus" class="form-control mb-2">
-          <option value="ativo">Ativo</option>
-          <option value="inativo">Inativo</option>
-        </select>
-
-        <input id="editDias" type="number" class="form-control mb-2" placeholder="Dias">
-
-        <button class="btn btn-warning w-100" onclick="salvarEdicao()">Salvar</button>
-
-      </div>
-    </div>
-  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -159,246 +153,177 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const app = initializeApp({
-  apiKey:"AIzaSyBRm4yix2fC2PhAVjTtbWlR-azz0bAglpo",
-  authDomain:"aprovamaispb2-3bc78.firebaseapp.com",
-  projectId:"aprovamaispb2-3bc78"
+apiKey:"SUA_API_KEY",
+authDomain:"SEU_DOMINIO",
+projectId:"SEU_PROJETO"
 });
 
 const db = getFirestore(app)
 
-let alunoEditandoId=null
-
-window.mostrar = sec=>{
-  ["dashboard","cadastro","lista","materiais","presenca"].forEach(id=>{
-    document.getElementById(id).style.display="none"
-  })
-  document.getElementById(sec).style.display="block"
-}
-
 // DASHBOARD
 async function carregarDashboard(){
 
-  const snap = await getDocs(collection(db,"usuarios"))
+const snap = await getDocs(collection(db,"usuarios"))
 
-  let total = 0
-  let ativos = 0
-  let semanal = 0
-  let sabado = 0
+let total=0, ativos=0, semanal=0, sabado=0
+let vencidosHTML=""
+const hoje=new Date()
 
-  const hoje = new Date()
+snap.forEach(d=>{
+const a=d.data()
+if(a.tipo!=="aluno") return
 
-  snap.forEach(docSnap=>{
-    const a = docSnap.data()
+total++
 
-    if(a.tipo !== "aluno") return
+let turma=(a.turma||"").toLowerCase()
 
-    total++
+if(turma.includes("sem")) semanal++
+if(turma.includes("sab")) sabado++
 
-    const turma = (a.turma || "")
-      .toString()
-      .trim()
-      .toLowerCase()
+let ativo=false
 
-    if(turma.includes("sem")) semanal++
-    if(turma.includes("sab")) sabado++
+if(a.dataFim){
+let fim=new Date(a.dataFim)
+if(fim>=hoje) ativo=true
+else{
+vencidosHTML+=`<div><b>${a.nome}</b> - ${fim.toLocaleDateString()}</div>`
+}
+}else ativo=true
 
-    let ativo = false
+if(a.status==="ativo") ativo=true
 
-    // prioridade: dataFim
-    if(a.dataFim){
-      const fim = new Date(a.dataFim)
-      if(!isNaN(fim) && fim >= hoje){
-        ativo = true
-      }
-    }
+if(ativo) ativos++
+})
 
-    // fallback: status
-    if(a.status && a.status.toLowerCase() === "ativo"){
-      ativo = true
-    }
+document.getElementById("totalAlunos").innerText=total
+document.getElementById("ativos").innerText=ativos
+document.getElementById("semanal").innerText=semanal
+document.getElementById("sabado").innerText=sabado
 
-    // aluno antigo
-    if(!a.status && !a.dataFim){
-      ativo = true
-    }
-
-    if(ativo) ativos++
-  })
-
-  // 🔥 SEM CONFLITO DE VARIÁVEL
-  document.getElementById("totalAlunos").innerText = total
-  document.getElementById("ativos").innerText = ativos
-  document.getElementById("semanal").innerText = semanal
-  document.getElementById("sabado").innerText = sabado
+document.getElementById("listaVencidos").innerHTML=vencidosHTML||"Nenhuma matrícula vencida 🎉"
 }
 
-// LISTA
+// ALUNOS
 async function carregarAlunos(){
 
-  const busca = document.getElementById("busca").value.toLowerCase()
-  const snap = await getDocs(collection(db,"usuarios"))
+const busca=document.getElementById("busca").value.toLowerCase()
+const snap=await getDocs(collection(db,"usuarios"))
 
-  let html=""
+let html=""
 
-  snap.forEach(d=>{
-    const a=d.data()
-    if(a.tipo!=="aluno") return
+snap.forEach(d=>{
+const a=d.data()
+if(a.tipo!=="aluno") return
+if(!(a.nome||"").toLowerCase().includes(busca)) return
 
-    if(!(a.nome||"").toLowerCase().includes(busca)) return
+html+=`
+<div class="card p-2 mb-2">
+<b>${a.nome}</b> (${a.turma})<br>
 
-    html+=`
-    <div class="card p-2 mb-2">
-      <b>${a.nome}</b> (${a.turma})<br>
-      💳 ${a.pagamento||"Não informado"}<br>
-      📊 ${a.status||"ativo"}<br>
+<button onclick="zap('${a.usuario}','${a.senha}','${a.telefone}')" class="btn btn-success btn-sm">WhatsApp</button>
+<button onclick="renovar('${d.id}','${a.telefone}')" class="btn btn-primary btn-sm">+30d</button>
+<button onclick="del('${d.id}')" class="btn btn-danger btn-sm">Excluir</button>
+</div>`
+})
 
-      <button onclick="ver('${a.usuario}','${a.senha}')" class="btn btn-info btn-sm">Ver acesso</button>
-
-      <button onclick="zap('${a.usuario}','${a.senha}','${a.telefone}')" class="btn btn-success btn-sm">
-        WhatsApp
-      </button>
-
-      <button onclick="abrirEditar(this)" class="btn btn-warning btn-sm"
-        data-id="${d.id}"
-        data-nome="${a.nome||''}"
-        data-telefone="${a.telefone||''}"
-        data-turma="${a.turma||''}"
-        data-pagamento="${a.pagamento||''}"
-        data-status="${a.status||'ativo'}">
-        Editar
-      </button>
-
-      <button onclick="renovar('${d.id}','${a.telefone||""}')" class="btn btn-primary btn-sm">
-        Renovar +30d
-      </button>
-
-      <button onclick="del('${d.id}')" class="btn btn-danger btn-sm">Excluir</button>
-    </div>`
-  })
-
-  tabela.innerHTML=html
+tabela.innerHTML=html
 }
 
 // WHATSAPP
-window.ver=(u,s)=>alert(`Usuário: ${u}\nSenha: ${s}`)
-
-window.zap=(u,s,tel)=>{
-  const msg=`🎓 AprovaMaisPB
-
-Usuário: ${u}
-Senha: ${s}
-
-Acesse:
-https://aprovamaispb.com.br
-Área do aluno`
-  window.open(`https://wa.me/55${tel}?text=${encodeURIComponent(msg)}`)
-}
-
-// EDITAR
-window.abrirEditar=(btn)=>{
-  alunoEditandoId=btn.dataset.id
-  editNome.value=btn.dataset.nome
-  editTelefone.value=btn.dataset.telefone
-  editTurma.value=btn.dataset.turma
-  editPagamento.value=btn.dataset.pagamento
-  editStatus.value=btn.dataset.status
-  new bootstrap.Modal(modalEditar).show()
-}
-
-window.salvarEdicao=async()=>{
-
-  const dias=parseInt(editDias.value)||30
-
-  const inicio=new Date()
-  const fim=new Date()
-  fim.setDate(inicio.getDate()+dias)
-
-  await updateDoc(doc(db,"usuarios",alunoEditandoId),{
-    nome:editNome.value,
-    telefone:editTelefone.value,
-    turma:editTurma.value,
-    pagamento:editPagamento.value,
-    status:editStatus.value,
-    dataInicio:inicio.toISOString(),
-    dataFim:fim.toISOString()
-  })
-
-  carregarAlunos()
-  carregarDashboard()
-
-  bootstrap.Modal.getInstance(modalEditar).hide()
+window.zap=(u,s,t)=>{
+let msg=`Acesse AprovaMaisPB\nUsuario:${u}\nSenha:${s}\naprovamaispb.com.br`
+window.open(`https://wa.me/55${t}?text=${encodeURIComponent(msg)}`)
 }
 
 // RENOVAR
-window.renovar=async(id,tel)=>{
-  const ref=doc(db,"usuarios",id)
-  const snap=await getDoc(ref)
-  const a=snap.data()
-
-  let fim=new Date(a.dataFim||new Date())
-  fim.setDate(fim.getDate()+30)
-
-  await updateDoc(ref,{dataFim:fim.toISOString()})
-
-  window.open(`https://wa.me/55${tel}?text=Renovado+30+dias`)
-
-  carregarAlunos()
-  carregarDashboard()
-}
-
-// DELETE
-window.del=async id=>{
-  await deleteDoc(doc(db,"usuarios",id))
-  carregarAlunos()
-  carregarDashboard()
-}
-
-// PRESENÇA
-window.gerarListaPresenca=async()=>{
-  const snap=await getDocs(collection(db,"usuarios"))
-
-  let html="<table border='1' width='100%'><tr><th>#</th><th>Nome</th><th>Assinatura</th></tr>"
-  let i=1
-
-  snap.forEach(d=>{
-    const a=d.data()
-    if(a.tipo==="aluno"){
-      html+=`<tr><td>${i++}</td><td>${a.nome}</td><td></td></tr>`
-    }
-  })
-
-  html+="</table>"
-  listaPresenca.innerHTML=html
+window.renovar=async(id,t)=>{
+const ref=doc(db,"usuarios",id)
+const snap=await getDoc(ref)
+let fim=new Date(snap.data().dataFim||new Date())
+fim.setDate(fim.getDate()+30)
+await updateDoc(ref,{dataFim:fim.toISOString()})
+window.open(`https://wa.me/55${t}?text=Renovado+30+dias`)
+carregarDashboard()
 }
 
 // MATERIAIS
 window.salvarLink=async()=>{
-  await addDoc(collection(db,"materiais"),{
-    titulo:titulo.value,
-    url:linkDrive.value
-  })
-  carregarMateriais()
+await addDoc(collection(db,"materiais"),{
+titulo:titulo.value,
+url:linkDrive.value,
+turma:turmaMaterial.value
+})
+carregarMateriais()
 }
 
 async function carregarMateriais(){
-  const snap=await getDocs(collection(db,"materiais"))
-  let html=""
-  snap.forEach(d=>{
-    const m=d.data()
-    html+=`<div>${m.titulo}
-    <button onclick="delMat('${d.id}')">Excluir</button></div>`
-  })
-  listaMateriais.innerHTML=html
+const filtro=filtroMaterial.value
+const snap=await getDocs(collection(db,"materiais"))
+
+let html=""
+
+snap.forEach(d=>{
+const m=d.data()
+if(filtro && m.turma!==filtro) return
+
+html+=`
+<div class="card p-3 mb-2 d-flex justify-content-between">
+<div>
+<b>${m.titulo}</b><br>
+<span class="badge bg-primary">${m.turma}</span>
+</div>
+<div>
+<a href="${m.url}" target="_blank" class="btn btn-success btn-sm">Baixar</a>
+<button onclick="delMat('${d.id}')" class="btn btn-danger btn-sm">Excluir</button>
+</div>
+</div>`
+})
+
+listaMateriais.innerHTML=html
 }
 
 window.delMat=async id=>{
-  await deleteDoc(doc(db,"materiais",id))
-  carregarMateriais()
+await deleteDoc(doc(db,"materiais",id))
+carregarMateriais()
+}
+
+// PRESENÇA
+window.gerarListaPresenca=async()=>{
+
+const turma=turmaPresenca.value
+const data=dataPresenca.value
+
+const snap=await getDocs(collection(db,"usuarios"))
+
+let html=`
+<div style="text-align:center">
+<img src="assets/img/logo_aprovamaispb.png" width="120">
+<h4>Lista de Presença</h4>
+<p>${data?new Date(data).toLocaleDateString():""}</p>
+</div>
+
+<table border="1" width="100%">
+<tr><th>#</th><th>Nome</th><th>Assinatura</th></tr>
+`
+
+let i=1
+
+snap.forEach(d=>{
+const a=d.data()
+if(a.tipo==="aluno"){
+if(turma && a.turma!==turma) return
+html+=`<tr><td>${i++}</td><td>${a.nome}</td><td></td></tr>`
+}
+})
+
+html+="</table>"
+
+listaPresenca.innerHTML=html
 }
 
 // INIT
-carregarAlunos()
 carregarDashboard()
+carregarAlunos()
 carregarMateriais()
 
 </script>
