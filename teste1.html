@@ -277,14 +277,14 @@ async function carregarAlunos(){
 
       <button onclick="renovar('${d.id}','${a.telefone||""}')" class="btn btn-success btn-sm">Renovar +30d</button>
 
-      <button onclick="editarAluno(this)" class="btn btn-warning btn-sm"
-        data-id="${d.id}"
-        data-nome="${a.nome||""}"
-        data-telefone="${a.telefone||""}"
-        data-turma="${a.turma||""}"
-        data-pagamento="${a.pagamento||""}">
-        Editar
-      </button>
+<button onclick="editarAluno(this)" 
+  data-id="${d.id}"
+  data-nome="${a.nome || ''}"
+  data-telefone="${a.telefone || ''}"
+  data-turma="${a.turma || ''}"
+  data-pagamento="${a.pagamento || ''}">
+  Editar
+</button>
 
       <button onclick="del('${d.id}')" class="btn btn-danger btn-sm">Excluir</button>
     </div>`
@@ -316,45 +316,59 @@ window.renovar = async (id,telefone)=>{
 }
 
 // EDITAR (COMPLETA DADOS)
-window.editarAluno = async btn=>{
+window.editarAluno = async (btn)=>{
 
-  const id = btn.dataset.id
+  try{
 
-  const nome = prompt("Nome:", btn.dataset.nome)
-  if(nome===null) return
+    const id = btn.dataset.id
 
-  const telefone = prompt("Telefone:", btn.dataset.telefone)
-  if(telefone===null) return
+    const nome = prompt("Nome:", btn.dataset.nome || "")
+    if(nome === null) return
 
-  const turma = prompt("Turma:", btn.dataset.turma)
-  if(turma===null) return
+    const telefone = prompt("Telefone:", btn.dataset.telefone || "")
+    if(telefone === null) return
 
-  const pagamento = prompt("Pagamento:", btn.dataset.pagamento)
-  if(pagamento===null) return
+    const turma = prompt("Turma (Semanal/Sabado):", btn.dataset.turma || "")
+    if(turma === null) return
 
-  const dias = prompt("Dias da matrícula:", "30")
-  if(dias===null) return
+    const pagamento = prompt("Pagamento (Pix/Dinheiro/Cartão):", btn.dataset.pagamento || "")
+    if(pagamento === null) return
 
-  const inicio = new Date()
-  const fim = new Date()
-  fim.setDate(inicio.getDate()+parseInt(dias))
+    const diasStr = prompt("Dias da matrícula:", "30")
+    if(diasStr === null) return
 
-  let data={
-    nome,telefone,turma,pagamento,
-    dataInicio:inicio.toISOString(),
-    dataFim:fim.toISOString()
+    const dias = parseInt(diasStr) || 30
+
+    const inicio = new Date()
+    const fim = new Date()
+    fim.setDate(inicio.getDate() + dias)
+
+    let updateData = {
+      nome: nome || "",
+      telefone: telefone || "",
+      turma: turma || "",
+      pagamento: pagamento || "",
+      dataInicio: inicio.toISOString(),
+      dataFim: fim.toISOString()
+    }
+
+    if(confirm("Deseja resetar a senha?")){
+      const nova = Math.random().toString(36).substring(2,8)
+      updateData.senha = nova
+      alert("Nova senha: " + nova)
+    }
+
+    await updateDoc(doc(db,"usuarios",id), updateData)
+
+    alert("Atualizado com sucesso!")
+
+    carregarAlunos()
+    carregarDashboard()
+
+  }catch(e){
+    console.error("Erro ao editar:", e)
+    alert("Erro ao editar. Veja o console (F12).")
   }
-
-  if(confirm("Resetar senha?")){
-    const nova=Math.random().toString(36).substring(2,8)
-    data.senha=nova
-    alert("Nova senha: "+nova)
-  }
-
-  await updateDoc(doc(db,"usuarios",id),data)
-
-  carregarAlunos()
-  carregarDashboard()
 }
 
 // EXCLUIR
