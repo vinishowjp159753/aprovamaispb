@@ -32,10 +32,6 @@ body{ background:#f1f5f9; font-family:Segoe UI; }
   box-shadow:0 3px 10px rgba(0,0,0,0.05);
 }
 
-.vencido{
-  border-left:5px solid red;
-}
-
 @media print{
   body *{ visibility:hidden }
   #listaPresenca, #listaPresenca *{ visibility:visible }
@@ -48,7 +44,7 @@ body{ background:#f1f5f9; font-family:Segoe UI; }
 
 <div class="topbar">
   <b>🎓 AprovaMaisPB</b>
-  <button onclick="logout()" class="btn btn-light btn-sm">Sair</button>
+  <button onclick="location='index.html'" class="btn btn-light btn-sm">Sair</button>
 </div>
 
 <div class="menu">
@@ -69,11 +65,6 @@ body{ background:#f1f5f9; font-family:Segoe UI; }
     <div class="col-6 mt-2"><div class="card p-3 text-center"><h6>Semanal</h6><h3 id="semanal">0</h3></div></div>
     <div class="col-6 mt-2"><div class="card p-3 text-center"><h6>Sábado</h6><h3 id="sabado">0</h3></div></div>
   </div>
-
-  <div class="card p-3 mt-3">
-    <h5 class="text-danger">⚠️ Matrículas Vencidas</h5>
-    <div id="vencidos"></div>
-  </div>
 </div>
 
 <!-- CADASTRO -->
@@ -93,7 +84,7 @@ body{ background:#f1f5f9; font-family:Segoe UI; }
       <option>Cartão</option>
     </select>
 
-    <input id="dias" type="number" class="form-control mb-2" placeholder="Dias da matrícula">
+    <input id="dias" type="number" class="form-control mb-2" placeholder="Dias (ex: 30)">
 
     <button class="btn btn-success w-100" onclick="criarAluno()">Cadastrar</button>
   </div>
@@ -109,42 +100,17 @@ body{ background:#f1f5f9; font-family:Segoe UI; }
 <div id="materiais" style="display:none">
   <div class="card p-3 mb-3">
     <input id="titulo" class="form-control mb-2" placeholder="Título">
-
-    <select id="materia" class="form-control mb-2">
-      <option>Matemática</option>
-      <option>Português</option>
-      <option>Biologia</option>
-      <option>Física</option>
-    </select>
-
-    <select id="turmaMaterial" class="form-control mb-2">
-      <option value="Semanal">Semanal</option>
-      <option value="Sabado">Sabado</option>
-      <option value="Ambas">Ambas</option>
-    </select>
-
     <input id="linkDrive" class="form-control mb-2" placeholder="Link do Drive">
-
-    <button class="btn btn-primary w-100" onclick="salvarLink()">Salvar</button>
+    <button class="btn btn-primary" onclick="salvarLink()">Salvar</button>
   </div>
-
   <div id="listaMateriais"></div>
 </div>
 
 <!-- PRESENÇA -->
 <div id="presenca" style="display:none">
   <div class="card p-3">
-    <h5>📋 Lista de Presença</h5>
-
-    <select id="filtroTurmaPresenca" class="form-control mb-2">
-      <option value="">Todas</option>
-      <option value="Semanal">Semanal</option>
-      <option value="Sabado">Sábado</option>
-    </select>
-
     <button class="btn btn-primary mb-2" onclick="gerarListaPresenca()">Gerar</button>
     <button class="btn btn-success mb-2" onclick="window.print()">Imprimir</button>
-
     <div id="listaPresenca"></div>
   </div>
 </div>
@@ -155,13 +121,8 @@ body{ background:#f1f5f9; font-family:Segoe UI; }
 <div class="modal fade" id="modalEditar">
   <div class="modal-dialog">
     <div class="modal-content">
-
-      <div class="modal-header">
-        <h5 class="modal-title">Editar Aluno</h5>
-        <button class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-
       <div class="modal-body">
+
         <input id="editNome" class="form-control mb-2">
         <input id="editTelefone" class="form-control mb-2">
 
@@ -171,7 +132,6 @@ body{ background:#f1f5f9; font-family:Segoe UI; }
         </select>
 
         <select id="editPagamento" class="form-control mb-2">
-          <option value="">Pagamento</option>
           <option>Pix</option>
           <option>Dinheiro</option>
           <option>Cartão</option>
@@ -183,13 +143,10 @@ body{ background:#f1f5f9; font-family:Segoe UI; }
         </select>
 
         <input id="editDias" type="number" class="form-control mb-2" placeholder="Dias">
-      </div>
 
-      <div class="modal-footer">
-        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-        <button class="btn btn-warning" onclick="salvarEdicao()">Salvar</button>
-      </div>
+        <button class="btn btn-warning w-100" onclick="salvarEdicao()">Salvar</button>
 
+      </div>
     </div>
   </div>
 </div>
@@ -202,9 +159,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const app = initializeApp({
-  apiKey:"AIzaSyBRm4yix2fC2PhAVjTtbWlR-azz0bAglpo",
-  authDomain:"aprovamaispb2-3bc78.firebaseapp.com",
-  projectId:"aprovamaispb2-3bc78"
+  apiKey:"SUA_API_KEY",
+  authDomain:"SEU_DOMINIO",
+  projectId:"SEU_PROJETO"
 });
 
 const db = getFirestore(app)
@@ -218,9 +175,8 @@ window.mostrar = sec=>{
   document.getElementById(sec).style.display="block"
 }
 
-// DASHBOARD CORRIGIDO
+// DASHBOARD
 async function carregarDashboard(){
-
   const snap = await getDocs(collection(db,"usuarios"))
 
   let total=0, ativos=0, semanal=0, sabado=0
@@ -231,10 +187,12 @@ async function carregarDashboard(){
 
     total++
 
-    if((a.turma||"").toLowerCase().includes("sem")) semanal++
-    if((a.turma||"").toLowerCase().includes("sab")) sabado++
+    const turma = (a.turma||"").toLowerCase()
 
-    if(a.status==="ativo") ativos++
+    if(turma.includes("sem")) semanal++
+    if(turma.includes("sab")) sabado++
+
+    if(a.status==="ativo" || !a.status) ativos++
   })
 
   totalAlunos.innerText=total
@@ -246,18 +204,28 @@ async function carregarDashboard(){
 // LISTA
 async function carregarAlunos(){
 
-  const snap=await getDocs(collection(db,"usuarios"))
+  const busca = document.getElementById("busca").value.toLowerCase()
+  const snap = await getDocs(collection(db,"usuarios"))
+
   let html=""
 
   snap.forEach(d=>{
     const a=d.data()
     if(a.tipo!=="aluno") return
 
+    if(!(a.nome||"").toLowerCase().includes(busca)) return
+
     html+=`
     <div class="card p-2 mb-2">
       <b>${a.nome}</b> (${a.turma})<br>
       💳 ${a.pagamento||"Não informado"}<br>
       📊 ${a.status||"ativo"}<br>
+
+      <button onclick="ver('${a.usuario}','${a.senha}')" class="btn btn-info btn-sm">Ver acesso</button>
+
+      <button onclick="zap('${a.usuario}','${a.senha}','${a.telefone}')" class="btn btn-success btn-sm">
+        WhatsApp
+      </button>
 
       <button onclick="abrirEditar(this)" class="btn btn-warning btn-sm"
         data-id="${d.id}"
@@ -269,7 +237,9 @@ async function carregarAlunos(){
         Editar
       </button>
 
-      <button onclick="renovar('${d.id}','${a.telefone||""}')" class="btn btn-success btn-sm">Renovar</button>
+      <button onclick="renovar('${d.id}','${a.telefone||""}')" class="btn btn-primary btn-sm">
+        Renovar +30d
+      </button>
 
       <button onclick="del('${d.id}')" class="btn btn-danger btn-sm">Excluir</button>
     </div>`
@@ -278,20 +248,32 @@ async function carregarAlunos(){
   tabela.innerHTML=html
 }
 
-// ABRIR MODAL
+// WHATSAPP
+window.ver=(u,s)=>alert(`Usuário: ${u}\nSenha: ${s}`)
+
+window.zap=(u,s,tel)=>{
+  const msg=`🎓 AprovaMaisPB
+
+Usuário: ${u}
+Senha: ${s}
+
+Acesse:
+https://aprovamaispb.com.br
+Área do aluno`
+  window.open(`https://wa.me/55${tel}?text=${encodeURIComponent(msg)}`)
+}
+
+// EDITAR
 window.abrirEditar=(btn)=>{
   alunoEditandoId=btn.dataset.id
-
   editNome.value=btn.dataset.nome
   editTelefone.value=btn.dataset.telefone
   editTurma.value=btn.dataset.turma
   editPagamento.value=btn.dataset.pagamento
   editStatus.value=btn.dataset.status
-
-  new bootstrap.Modal(document.getElementById('modalEditar')).show()
+  new bootstrap.Modal(modalEditar).show()
 }
 
-// SALVAR
 window.salvarEdicao=async()=>{
 
   const dias=parseInt(editDias.value)||30
@@ -300,7 +282,7 @@ window.salvarEdicao=async()=>{
   const fim=new Date()
   fim.setDate(inicio.getDate()+dias)
 
-  let data={
+  await updateDoc(doc(db,"usuarios",alunoEditandoId),{
     nome:editNome.value,
     telefone:editTelefone.value,
     turma:editTurma.value,
@@ -308,19 +290,16 @@ window.salvarEdicao=async()=>{
     status:editStatus.value,
     dataInicio:inicio.toISOString(),
     dataFim:fim.toISOString()
-  }
-
-  await updateDoc(doc(db,"usuarios",alunoEditandoId),data)
+  })
 
   carregarAlunos()
   carregarDashboard()
 
-  bootstrap.Modal.getInstance(document.getElementById('modalEditar')).hide()
+  bootstrap.Modal.getInstance(modalEditar).hide()
 }
 
 // RENOVAR
-window.renovar=async(id,telefone)=>{
-
+window.renovar=async(id,tel)=>{
   const ref=doc(db,"usuarios",id)
   const snap=await getDoc(ref)
   const a=snap.data()
@@ -330,9 +309,7 @@ window.renovar=async(id,telefone)=>{
 
   await updateDoc(ref,{dataFim:fim.toISOString()})
 
-  if(telefone){
-    window.open(`https://wa.me/55${telefone}?text=Renovado+30+dias`)
-  }
+  window.open(`https://wa.me/55${tel}?text=Renovado+30+dias`)
 
   carregarAlunos()
   carregarDashboard()
@@ -347,7 +324,6 @@ window.del=async id=>{
 
 // PRESENÇA
 window.gerarListaPresenca=async()=>{
-  const turma=filtroTurmaPresenca.value
   const snap=await getDocs(collection(db,"usuarios"))
 
   let html="<table border='1' width='100%'><tr><th>#</th><th>Nome</th><th>Assinatura</th></tr>"
@@ -356,7 +332,6 @@ window.gerarListaPresenca=async()=>{
   snap.forEach(d=>{
     const a=d.data()
     if(a.tipo==="aluno"){
-      if(turma && a.turma!==turma) return
       html+=`<tr><td>${i++}</td><td>${a.nome}</td><td></td></tr>`
     }
   })
@@ -365,9 +340,35 @@ window.gerarListaPresenca=async()=>{
   listaPresenca.innerHTML=html
 }
 
+// MATERIAIS
+window.salvarLink=async()=>{
+  await addDoc(collection(db,"materiais"),{
+    titulo:titulo.value,
+    url:linkDrive.value
+  })
+  carregarMateriais()
+}
+
+async function carregarMateriais(){
+  const snap=await getDocs(collection(db,"materiais"))
+  let html=""
+  snap.forEach(d=>{
+    const m=d.data()
+    html+=`<div>${m.titulo}
+    <button onclick="delMat('${d.id}')">Excluir</button></div>`
+  })
+  listaMateriais.innerHTML=html
+}
+
+window.delMat=async id=>{
+  await deleteDoc(doc(db,"materiais",id))
+  carregarMateriais()
+}
+
 // INIT
 carregarAlunos()
 carregarDashboard()
+carregarMateriais()
 
 </script>
 </body>
