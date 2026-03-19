@@ -4,33 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<link rel="icon" type="image/png" href="assets/img/logo_aprovamaispb.png">
+
 <title>Painel Coordenador</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
-body{ background:#f1f5f9; font-family:Segoe UI; }
-
-.topbar{
-  display:flex;
-  justify-content:space-between;
-  padding:15px;
-  background:#0d6efd;
-  color:white;
-}
-
-.menu{
-  display:flex;
-  gap:10px;
-  padding:10px;
-  background:white;
-}
-
-.card{
-  border:none;
-  border-radius:12px;
-  box-shadow:0 3px 10px rgba(0,0,0,0.05);
-}
+body { background:#f1f5f9; font-family:Arial, sans-serif; }
+.topbar { display:flex; justify-content:space-between; padding:12px; background:#0d6efd; color:white; }
+.menu { display:flex; gap:10px; padding:10px; overflow:auto; background:white; }
+.card { border-radius:12px; }
 </style>
 </head>
 
@@ -38,151 +22,87 @@ body{ background:#f1f5f9; font-family:Segoe UI; }
 
 <div class="topbar">
   <b>🎓 AprovaMaisPB</b>
-  <button onclick="location='index.html'" class="btn btn-light btn-sm">Sair</button>
+  <button onclick="logout()" class="btn btn-light btn-sm">Sair</button>
 </div>
 
 <div class="menu">
-  <button class="btn btn-outline-primary" onclick="mostrar('dashboard')">Dashboard</button>
   <button class="btn btn-outline-primary" onclick="mostrar('cadastro')">Cadastro</button>
   <button class="btn btn-outline-primary" onclick="mostrar('lista')">Alunos</button>
   <button class="btn btn-outline-primary" onclick="mostrar('materiais')">Materiais</button>
-  <button class="btn btn-outline-primary" onclick="mostrar('presenca')">Presença</button>
 </div>
 
 <div class="container mt-3">
 
-<!-- DASHBOARD -->
-<div id="dashboard">
-<div class="row">
-<div class="col-6"><div class="card p-3 text-center"><h6>Total</h6><h3 id="totalAlunos">0</h3></div></div>
-<div class="col-6"><div class="card p-3 text-center"><h6>Ativos</h6><h3 id="ativos">0</h3></div></div>
-<div class="col-6 mt-2"><div class="card p-3 text-center"><h6>Semanal</h6><h3 id="semanal">0</h3></div></div>
-<div class="col-6 mt-2"><div class="card p-3 text-center"><h6>Sábado</h6><h3 id="sabado">0</h3></div></div>
-</div>
-
-<div class="card p-3 mt-3">
-<h5 class="text-danger">⚠️ Matrículas Vencidas</h5>
-<div id="listaVencidos"></div>
-</div>
-</div>
-
 <!-- CADASTRO -->
-<div id="cadastro" style="display:none">
-<div class="card p-3">
-<input id="nome" class="form-control mb-2" placeholder="Nome">
-<input id="telefone" class="form-control mb-2" placeholder="Telefone">
+<div id="cadastro">
+  <div class="card p-3">
+    <input id="nome" class="form-control mb-2" placeholder="Nome">
+    <input id="telefone" class="form-control mb-2" placeholder="Telefone">
 
-<select id="turma" class="form-control mb-2">
-<option value="Semanal">Semanal</option>
-<option value="Sabado">Sabado</option>
-</select>
+    <select id="turma" class="form-control mb-2">
+      <option value="Semanal">Extensivo Semanal</option>
+      <option value="Sabado">Extensivo Sábado</option>
+    </select>
 
-<select id="pagamento" class="form-control mb-2">
-<option>Pix</option>
-<option>Dinheiro</option>
-<option>Cartão</option>
-</select>
-
-<input id="dias" type="number" class="form-control mb-2" placeholder="Dias">
-
-<button class="btn btn-success w-100" onclick="criarAluno()">Cadastrar</button>
-</div>
+    <button class="btn btn-success w-100" onclick="criarAluno()">Cadastrar</button>
+    <div id="credencial"></div>
+  </div>
 </div>
 
 <!-- ALUNOS -->
 <div id="lista" style="display:none">
-<input id="busca" class="form-control mb-2" placeholder="Buscar..." onkeyup="carregarAlunos()">
-<div id="tabela"></div>
+  <input id="busca" class="form-control mb-2" placeholder="Buscar..." onkeyup="carregarAlunos()">
+
+  <div class="mb-2">
+    <button class="btn btn-secondary btn-sm" onclick="filtroTurma('')">Todos</button>
+    <button class="btn btn-secondary btn-sm" onclick="filtroTurma('Semanal')">Semanal</button>
+    <button class="btn btn-secondary btn-sm" onclick="filtroTurma('Sabado')">Sábado</button>
+  </div>
+
+  <div id="tabela"></div>
 </div>
 
 <!-- MATERIAIS -->
 <div id="materiais" style="display:none">
+  <div class="card p-3 mb-3">
 
-<select id="filtroMaterial" class="form-control mb-2" onchange="carregarMateriais()">
-<option value="">Todas</option>
-<option value="Semanal">Semanal</option>
-<option value="Sabado">Sábado</option>
-</select>
+    <input id="titulo" class="form-control mb-2" placeholder="Título">
 
-<div class="card p-3 mb-3">
-<input id="titulo" class="form-control mb-2" placeholder="Título">
-<input id="linkDrive" class="form-control mb-2" placeholder="Link do Drive">
+    <select id="materia" class="form-control mb-2">
+      <option>Redação</option>
+      <option>Matemática</option>
+      <option>Química</option>
+      <option>Física</option>
+      <option>Biologia</option>
+      <option>Sociologia</option>
+      <option>Filosofia</option>
+      <option>Literatura</option>
+      <option>Gramática</option>
+      <option>Inglês</option>
+      <option>Espanhol</option>
+      <option>Geografia</option>
+    </select>
 
-<select id="turmaMaterial" class="form-control mb-2">
-<option value="Semanal">Semanal</option>
-<option value="Sabado">Sabado</option>
-<option value="Ambas">Ambas</option>
-</select>
+    <select id="turmaMaterial" class="form-control mb-2">
+      <option value="Semanal">Semanal</option>
+      <option value="Sabado">Sábado</option>
+      <option value="Ambas">Ambas</option>
+    </select>
 
-<button class="btn btn-primary" onclick="salvarLink()">Salvar</button>
-</div>
+    <input id="linkDrive" class="form-control mb-2" placeholder="Link do Drive">
 
-<div id="listaMateriais"></div>
-
-</div>
-
-<!-- PRESENÇA -->
-<div id="presenca" style="display:none">
-
-<select id="turmaPresenca" class="form-control mb-2">
-<option value="">Todas</option>
-<option value="Semanal">Semanal</option>
-<option value="Sabado">Sábado</option>
-</select>
-
-<input type="date" id="dataPresenca" class="form-control mb-2">
-
-<button class="btn btn-primary mb-2" onclick="gerarListaPresenca()">Gerar</button>
-<button class="btn btn-success mb-2" onclick="window.print()">Imprimir</button>
-<button class="btn btn-dark mb-2" onclick="baixarPDF()">Baixar PDF</button>
-
-<div id="listaPresenca"></div>
-
-</div>
-
-</div>
-
-<!-- MODAL -->
-<div class="modal fade" id="modalEditar">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-body">
-
-        <input id="editNome" class="form-control mb-2">
-        <input id="editTelefone" class="form-control mb-2">
-
-        <select id="editTurma" class="form-control mb-2">
-          <option value="Semanal">Semanal</option>
-          <option value="Sabado">Sábado</option>
-        </select>
-
-        <select id="editPagamento" class="form-control mb-2">
-          <option>Pix</option>
-          <option>Dinheiro</option>
-          <option>Cartão</option>
-        </select>
-
-        <select id="editStatus" class="form-control mb-2">
-          <option value="ativo">Ativo</option>
-          <option value="inativo">Inativo</option>
-        </select>
-
-        <input id="editDias" type="number" class="form-control mb-2">
-
-        <button class="btn btn-warning w-100" onclick="salvarEdicao()">Salvar</button>
-
-      </div>
-    </div>
+    <button class="btn btn-primary w-100" onclick="salvarLink()">Salvar Material</button>
   </div>
+
+  <h5>📄 Materiais cadastrados</h5>
+  <div id="listaMateriais"></div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</div>
 
 <script type="module">
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const app = initializeApp({
   apiKey:"AIzaSyBRm4yix2fC2PhAVjTtbWlR-azz0bAglpo",
@@ -192,96 +112,210 @@ const app = initializeApp({
 
 const db = getFirestore(app)
 
-// ABAS
-window.mostrar = (sec)=>{
-["dashboard","cadastro","lista","materiais","presenca"].forEach(id=>{
-document.getElementById(id).style.display="none"
-})
-document.getElementById(sec).style.display="block"
+window.logout = ()=> location="index.html"
+
+window.mostrar = sec => {
+  ["cadastro","lista","materiais"].forEach(id=>{
+    document.getElementById(id).style.display="none"
+  })
+  document.getElementById(sec).style.display="block"
 }
 
-// DASHBOARD
-async function carregarDashboard(){
-const snap = await getDocs(collection(db,"usuarios"))
-let total=0, ativos=0
-
-snap.forEach(d=>{
-const a=d.data()
-if(a.tipo!=="aluno") return
-total++
-if(a.status==="ativo") ativos++
-})
-
-totalAlunos.innerText=total
-ativos.innerText=ativos
+// 🔥 PADRONIZAÇÃO GLOBAL
+function normalizar(texto){
+  return texto.toString().trim()
 }
 
-// ALUNOS
-window.carregarAlunos = async ()=>{
-const busca = document.getElementById("busca").value.toLowerCase()
-const snap = await getDocs(collection(db,"usuarios"))
+// GERADORES
+function gerarMatricula(){ return "AP"+Math.floor(10000 + Math.random()*90000) }
+function gerarSenha(){ return Math.random().toString(36).substring(2,8) }
 
-let alunos=[]
+let turmaFiltro=""
 
-snap.forEach(d=>{
-const a=d.data()
-if(a.tipo==="aluno"){
-alunos.push({id:d.id,...a})
-}
-})
-
-alunos.sort((a,b)=> (a.nome||"").localeCompare(b.nome||""))
-
-let html=""
-
-alunos.forEach(a=>{
-if(!(a.nome||"").toLowerCase().includes(busca)) return
-
-html+=`
-<div class="card p-2 mb-2">
-<b>${a.nome}</b> (${a.turma})<br>
-
-<button onclick="excluirAluno('${a.id}')" class="btn btn-danger btn-sm">Excluir</button>
-</div>`
-})
-
-document.getElementById("tabela").innerHTML=html
+window.filtroTurma = t=>{
+  turmaFiltro = normalizar(t)
+  carregarAlunos()
 }
 
-// EXCLUIR
-window.excluirAluno = async(id)=>{
-await deleteDoc(doc(db,"usuarios",id))
+// ✅ CADASTRAR ALUNO (PADRONIZADO)
+window.criarAluno = async ()=>{
+
+  const nome = document.getElementById("nome").value
+  const telefone = document.getElementById("telefone").value
+  const turma = normalizar(document.getElementById("turma").value)
+
+  if(!nome || !telefone){
+    alert("Preencha os campos")
+    return
+  }
+
+  const usuario = gerarMatricula()
+  const senha = gerarSenha()
+
+  await addDoc(collection(db,"usuarios"),{
+    nome,
+    telefone,
+    turma,
+    usuario,
+    senha,
+    matricula: usuario,
+    tipo:"aluno"
+  })
+
+  document.getElementById("credencial").innerHTML = `
+  <div class="alert alert-success mt-2">
+    <b>Aluno cadastrado!</b><br>
+    Usuário: ${usuario}<br>
+    Senha: ${senha}
+  </div>`
+
+  carregarAlunos()
+}
+
+// ✅ LISTAR ALUNOS
+async function carregarAlunos(){
+
+  const busca = document.getElementById("busca").value.toLowerCase()
+  const snap = await getDocs(collection(db,"usuarios"))
+
+  let html=""
+
+  snap.forEach(d=>{
+    const a = d.data()
+
+    if(a.tipo==="aluno"){
+
+      if(turmaFiltro && normalizar(a.turma) !== turmaFiltro) return
+      if(!a.nome.toLowerCase().includes(busca)) return
+
+      html += `
+      <div class="card p-2 mb-2">
+        <b>${a.nome}</b> (${a.turma})<br>
+
+        <button class="btn btn-info btn-sm mt-2" onclick="ver('${a.usuario}','${a.senha}')">Ver acesso</button>
+        <button class="btn btn-success btn-sm mt-2" onclick="zap('${a.usuario}','${a.senha}','${a.telefone}')">WhatsApp</button>
+
+        <button class="btn btn-warning btn-sm mt-2" onclick="editar(this)"
+          data-id="${d.id}"
+          data-nome="${a.nome}"
+          data-telefone="${a.telefone}"
+          data-turma="${a.turma}"
+          data-senha="${a.senha}">
+          Editar
+        </button>
+
+        <button class="btn btn-danger btn-sm mt-2" onclick="del('${d.id}')">Excluir</button>
+      </div>`
+    }
+  })
+
+  document.getElementById("tabela").innerHTML = html
+}
+
+window.ver = (usuario, senha)=> alert(`Usuário: ${usuario}\nSenha: ${senha}`)
+
+window.zap = (usuario, senha, tel)=>{
+  const msg=`🎓 AprovaMaisPB\nUsuário: ${usuario}\nSenha: ${senha}\nAcesse: https://aprovamaispb.com.br`
+  window.open(`https://wa.me/55${tel}?text=${encodeURIComponent(msg)}`)
+}
+
+// ✅ EDITAR
+window.editar = async btn=>{
+
+  const id = btn.dataset.id
+
+  const nome = prompt("Nome:", btn.dataset.nome)
+  if(nome===null) return
+
+  const telefone = prompt("Telefone:", btn.dataset.telefone)
+  if(telefone===null) return
+
+  const turma = normalizar(prompt("Turma (Semanal ou Sabado):", btn.dataset.turma))
+  if(turma===null) return
+
+  const senha = prompt("Senha:", btn.dataset.senha)
+  if(senha===null) return
+
+  await updateDoc(doc(db,"usuarios",id),{
+    nome,
+    telefone,
+    turma,
+    senha
+  })
+
+  alert("Atualizado!")
+  carregarAlunos()
+}
+
+window.del = async id=>{
+  await deleteDoc(doc(db,"usuarios",id))
+  carregarAlunos()
+}
+
+// ✅ SALVAR MATERIAL (PADRONIZADO)
+window.salvarLink = async ()=>{
+
+  const titulo = document.getElementById("titulo").value
+  const materia = document.getElementById("materia").value
+
+  let turma = normalizar(document.getElementById("turmaMaterial").value)
+
+  let url = document.getElementById("linkDrive").value
+
+  if(!url){
+    alert("Cole o link do Drive")
+    return
+  }
+
+  if(url.includes("drive")){
+    const id = url.split("/d/")[1]?.split("/")[0]
+    url = `https://drive.google.com/uc?export=download&id=${id}`
+  }
+
+  await addDoc(collection(db,"materiais"),{
+    titulo,
+    materia,
+    turma,
+    url,
+    nomeArquivo: titulo+".pdf",
+    data: new Date().toLocaleDateString()
+  })
+
+  alert("Material salvo!")
+
+  document.getElementById("titulo").value=""
+  document.getElementById("linkDrive").value=""
+
+  carregarMateriais()
+}
+
+// ✅ LISTAR MATERIAIS
+async function carregarMateriais(){
+
+  const snap = await getDocs(collection(db,"materiais"))
+
+  let html=""
+
+  snap.forEach(d=>{
+    const m = d.data()
+
+    html += `
+    <div class="card p-2 mb-2">
+      <b>${m.titulo}</b> (${m.materia} - ${m.turma})<br>
+      <button class="btn btn-danger btn-sm mt-2" onclick="delMat('${d.id}')">Excluir</button>
+    </div>`
+  })
+
+  document.getElementById("listaMateriais").innerHTML = html
+}
+
+window.delMat = async id=>{
+  await deleteDoc(doc(db,"materiais",id))
+  carregarMateriais()
+}
+
 carregarAlunos()
-carregarDashboard()
-}
-
-// PRESENÇA (🔥 CORRIGIDO)
-window.gerarListaPresenca = async ()=>{
-
-const snap = await getDocs(collection(db,"usuarios"))
-
-let html="<h5>Lista de Presença</h5><ul>"
-
-snap.forEach(d=>{
-const a=d.data()
-if(a.tipo==="aluno"){
-html+=`<li>${a.nome}</li>`
-}
-})
-
-html+="</ul>"
-
-document.getElementById("listaPresenca").innerHTML=html
-}
-
-// PDF
-window.baixarPDF=()=>{
-html2pdf().from(document.getElementById("listaPresenca")).save()
-}
-
-// INIT
-carregarDashboard()
-carregarAlunos()
+carregarMateriais()
 
 </script>
 </body>
