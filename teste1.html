@@ -35,6 +35,13 @@ body{ background:#f1f5f9; font-family:Segoe UI; }
 .vencido{
   border-left:5px solid red;
 }
+
+/* impressão lista */
+@media print{
+  body *{ visibility:hidden }
+  #listaPresenca, #listaPresenca *{ visibility:visible }
+  #listaPresenca{ position:absolute; top:0; left:0; width:100% }
+}
 </style>
 </head>
 
@@ -50,6 +57,7 @@ body{ background:#f1f5f9; font-family:Segoe UI; }
   <button class="btn btn-outline-primary" onclick="mostrar('cadastro')">Cadastro</button>
   <button class="btn btn-outline-primary" onclick="mostrar('lista')">Alunos</button>
   <button class="btn btn-outline-primary" onclick="mostrar('materiais')">Materiais</button>
+  <button class="btn btn-outline-primary" onclick="mostrar('presenca')">Presença</button>
 </div>
 
 <div class="container mt-3">
@@ -125,6 +133,24 @@ body{ background:#f1f5f9; font-family:Segoe UI; }
   <div id="listaMateriais"></div>
 </div>
 
+<!-- PRESENÇA -->
+<div id="presenca" style="display:none">
+  <div class="card p-3">
+    <h5>📋 Lista de Presença</h5>
+
+    <select id="filtroTurmaPresenca" class="form-control mb-2">
+      <option value="">Todas</option>
+      <option value="Semanal">Semanal</option>
+      <option value="Sabado">Sábado</option>
+    </select>
+
+    <button class="btn btn-primary mb-2" onclick="gerarListaPresenca()">Gerar Lista</button>
+    <button class="btn btn-success mb-2" onclick="window.print()">🖨️ Imprimir / PDF</button>
+
+    <div id="listaPresenca"></div>
+  </div>
+</div>
+
 </div>
 
 <script type="module">
@@ -132,7 +158,7 @@ body{ background:#f1f5f9; font-family:Segoe UI; }
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// FIREBASE
+// 🔥 COLE SEU FIREBASE AQUI
 const app = initializeApp({
   apiKey:"SUA_API_KEY",
   authDomain:"SEU_DOMINIO",
@@ -141,29 +167,29 @@ const app = initializeApp({
 
 const db = getFirestore(app)
 
-// UI
 window.logout = ()=> location="index.html"
 
 window.mostrar = sec=>{
-  ["dashboard","cadastro","lista","materiais"].forEach(id=>{
+  ["dashboard","cadastro","lista","materiais","presenca"].forEach(id=>{
     document.getElementById(id).style.display="none"
   })
   document.getElementById(sec).style.display="block"
 }
 
+function formatarData(data){
+  if(!data) return "Sem data"
+  const d = new Date(data)
+  if(isNaN(d)) return "Sem data"
+  return d.toLocaleDateString()
+}
+
 // CADASTRO
 window.criarAluno = async ()=>{
-
-  const nome = document.getElementById("nome").value
+  const nome = nome.value
   const telefone = document.getElementById("telefone").value
   const turma = document.getElementById("turma").value
   const pagamento = document.getElementById("pagamento").value
   const dias = parseInt(document.getElementById("dias").value) || 30
-
-  if(!nome || !telefone){
-    alert("Preencha nome e telefone")
-    return
-  }
 
   const usuario = "AP"+Math.floor(10000 + Math.random()*90000)
   const senha = Math.random().toString(36).substring(2,8)
@@ -184,7 +210,7 @@ window.criarAluno = async ()=>{
     dataFim: fim.toISOString()
   })
 
-  alert(`Aluno criado!\nUsuário: ${usuario}\nSenha: ${senha}`)
+  alert("Aluno criado!")
 
   carregarAlunos()
   carregarDashboard()
@@ -202,31 +228,27 @@ async function carregarDashboard(){
 
   snap.forEach(d=>{
     const a = d.data()
+    if(a.tipo!=="aluno") return
 
-    if(a.tipo==="aluno"){
+    total++
 
-      total++
+    if(a.turma==="Semanal") semanal++
+    if(a.turma==="Sabado") sabado++
 
-      if(a.turma==="Semanal") semanal++
-      if(a.turma==="Sabado") sabado++
-
-      if(a.dataFim){
-        const fim = new Date(a.dataFim)
-
-        if(fim >= hoje){
-          ativos++
-        }else{
-          html += `<div class="alert alert-danger">${a.nome} vencido</div>`
-        }
+    if(a.dataFim){
+      const fim = new Date(a.dataFim)
+      if(!isNaN(fim)){
+        if(fim>=hoje) ativos++
+        else html += `<div class="alert alert-danger">${a.nome} vencido</div>`
       }
     }
   })
 
-  document.getElementById("totalAlunos").innerText = total
-  document.getElementById("ativos").innerText = ativos
-  document.getElementById("semanal").innerText = semanal
-  document.getElementById("sabado").innerText = sabado
-  document.getElementById("vencidos").innerHTML = html
+  totalAlunos.innerText = total
+  ativos.innerText = ativos
+  semanal.innerText = semanal
+  sabado.innerText = sabado
+  vencidos.innerHTML = html
 }
 
 // LISTA
@@ -240,71 +262,60 @@ async function carregarAlunos(){
 
   snap.forEach(d=>{
     const a = d.data()
+    if(a.tipo!=="aluno") return
 
-    if(a.tipo==="aluno" && a.nome?.toLowerCase().includes(busca)){
+    if(!(a.nome||"").toLowerCase().includes(busca)) return
 
-      const fim = a.dataFim ? new Date(a.dataFim) : null
-      const dataFormatada = fim ? fim.toLocaleDateString() : "Sem data"
+    const fim = a.dataFim ? new Date(a.dataFim) : null
+    const vencido = fim && fim<hoje
 
-      const vencido = fim && fim < hoje
+    html += `
+    <div class="card p-2 mb-2 ${vencido?'vencido':''}">
+      <b>${a.nome}</b> (${a.turma})<br>
+      📅 ${formatarData(a.dataFim)}<br>
+      💳 ${a.pagamento||"Não informado"}<br>
 
-      html += `
-      <div class="card p-2 mb-2 ${vencido ? 'vencido' : ''}">
-        <b>${a.nome}</b> (${a.turma || "-"})<br>
-        📅 ${dataFormatada} <br>
-        💳 ${a.pagamento || "Não informado"}<br>
+      <button onclick="renovar('${d.id}','${a.telefone||""}')" class="btn btn-success btn-sm">Renovar +30d</button>
 
-        <button onclick="renovar('${d.id}','${a.telefone}')" class="btn btn-success btn-sm">
-          Renovar +30d
-        </button>
+      <button onclick="editarAluno(this)" class="btn btn-warning btn-sm"
+        data-id="${d.id}"
+        data-nome="${a.nome||""}"
+        data-telefone="${a.telefone||""}"
+        data-turma="${a.turma||""}"
+        data-pagamento="${a.pagamento||""}">
+        Editar
+      </button>
 
-        <button onclick="editarAluno(this)" class="btn btn-warning btn-sm"
-          data-id="${d.id}"
-          data-nome="${a.nome}"
-          data-telefone="${a.telefone}"
-          data-turma="${a.turma}"
-          data-pagamento="${a.pagamento}"
-          data-inicio="${a.dataInicio}"
-          data-fim="${a.dataFim}">
-          Editar
-        </button>
-
-        <button onclick="del('${d.id}')" class="btn btn-danger btn-sm">Excluir</button>
-      </div>`
-    }
+      <button onclick="del('${d.id}')" class="btn btn-danger btn-sm">Excluir</button>
+    </div>`
   })
 
   tabela.innerHTML = html
 }
 
-// RENOVAR + WHATSAPP
-window.renovar = async (id, telefone)=>{
+// RENOVAR
+window.renovar = async (id,telefone)=>{
 
   const ref = doc(db,"usuarios",id)
-  const docSnap = await getDoc(ref)
+  const snap = await getDoc(ref)
 
-  const aluno = docSnap.data()
+  const a = snap.data()
 
-  const atualFim = aluno.dataFim ? new Date(aluno.dataFim) : new Date()
+  let fim = a.dataFim ? new Date(a.dataFim) : new Date()
+  fim.setDate(fim.getDate()+30)
 
-  const novoFim = new Date(atualFim)
-  novoFim.setDate(novoFim.getDate() + 30)
+  await updateDoc(ref,{ dataFim:fim.toISOString() })
 
-  await updateDoc(ref,{
-    dataFim: novoFim.toISOString()
-  })
-
-  const numero = telefone.replace(/\D/g,'')
-
-  const msg = `Olá, sua matrícula foi renovada por mais 30 dias!`
-
-  window.open(`https://wa.me/55${numero}?text=${encodeURIComponent(msg)}`,"_blank")
+  if(telefone){
+    const msg="Sua matrícula foi renovada por mais 30 dias!"
+    window.open(`https://wa.me/55${telefone}?text=${encodeURIComponent(msg)}`)
+  }
 
   carregarAlunos()
   carregarDashboard()
 }
 
-// EDITAR
+// EDITAR (COMPLETA DADOS)
 window.editarAluno = async btn=>{
 
   const id = btn.dataset.id
@@ -321,32 +332,26 @@ window.editarAluno = async btn=>{
   const pagamento = prompt("Pagamento:", btn.dataset.pagamento)
   if(pagamento===null) return
 
-  const inicio = prompt("Data início (YYYY-MM-DD):", btn.dataset.inicio?.substring(0,10))
-  if(inicio===null) return
+  const dias = prompt("Dias da matrícula:", "30")
+  if(dias===null) return
 
-  const fim = prompt("Data fim (YYYY-MM-DD):", btn.dataset.fim?.substring(0,10))
-  if(fim===null) return
+  const inicio = new Date()
+  const fim = new Date()
+  fim.setDate(inicio.getDate()+parseInt(dias))
 
-  let senha = ""
+  let data={
+    nome,telefone,turma,pagamento,
+    dataInicio:inicio.toISOString(),
+    dataFim:fim.toISOString()
+  }
+
   if(confirm("Resetar senha?")){
-    senha = Math.random().toString(36).substring(2,8)
-    alert("Nova senha: " + senha)
+    const nova=Math.random().toString(36).substring(2,8)
+    data.senha=nova
+    alert("Nova senha: "+nova)
   }
 
-  const updateData = {
-    nome,
-    telefone,
-    turma,
-    pagamento,
-    dataInicio: new Date(inicio).toISOString(),
-    dataFim: new Date(fim).toISOString()
-  }
-
-  if(senha) updateData.senha = senha
-
-  await updateDoc(doc(db,"usuarios",id), updateData)
-
-  alert("Atualizado!")
+  await updateDoc(doc(db,"usuarios",id),data)
 
   carregarAlunos()
   carregarDashboard()
@@ -366,35 +371,52 @@ window.salvarLink = async ()=>{
   const turma = document.getElementById("turmaMaterial").value
   const url = document.getElementById("linkDrive").value
 
-  await addDoc(collection(db,"materiais"),{ titulo, materia, turma, url })
-
+  await addDoc(collection(db,"materiais"),{ titulo,materia,turma,url })
   carregarMateriais()
 }
 
 async function carregarMateriais(){
-
   const snap = await getDocs(collection(db,"materiais"))
-
   let html=""
-
   snap.forEach(d=>{
-    const m = d.data()
-
-    html += `
-    <div class="card p-2 mb-2">
-      <b>${m.titulo}</b><br>
-      ${m.materia} - ${m.turma}<br>
-
+    const m=d.data()
+    html+=`<div class="card p-2 mb-2">
+      <b>${m.titulo}</b><br>${m.materia} - ${m.turma}<br>
       <button onclick="delMat('${d.id}')" class="btn btn-danger btn-sm">Excluir</button>
     </div>`
   })
-
-  listaMateriais.innerHTML = html
+  listaMateriais.innerHTML=html
 }
 
 window.delMat = async id=>{
   await deleteDoc(doc(db,"materiais",id))
   carregarMateriais()
+}
+
+// PRESENÇA
+window.gerarListaPresenca = async ()=>{
+  const turma = document.getElementById("filtroTurmaPresenca").value
+  const snap = await getDocs(collection(db,"usuarios"))
+
+  let html=`<div style="padding:20px">
+  <h2 style="text-align:center">AprovaMaisPB</h2>
+  <h4 style="text-align:center">Lista de Presença</h4>
+  <table border="1" width="100%" style="border-collapse:collapse">
+  <tr><th>#</th><th>Nome</th><th>Turma</th><th>Assinatura</th></tr>`
+
+  let i=1
+
+  snap.forEach(d=>{
+    const a=d.data()
+    if(a.tipo==="aluno"){
+      if(turma && a.turma!==turma) return
+      html+=`<tr><td>${i++}</td><td>${a.nome}</td><td>${a.turma}</td><td></td></tr>`
+    }
+  })
+
+  html+=`</table></div>`
+
+  listaPresenca.innerHTML=html
 }
 
 // START
