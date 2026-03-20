@@ -193,6 +193,7 @@ body {
 .stat-icon.green { background: rgba(76, 201, 240, 0.1); color: var(--success); }
 .stat-icon.orange { background: rgba(248, 150, 30, 0.1); color: var(--warning); }
 .stat-icon.pink { background: rgba(247, 37, 133, 0.1); color: var(--danger); }
+.stat-icon.purple { background: rgba(63, 57, 201, 0.1); color: var(--secondary); }
 
 /* Cards de conteúdo */
 .content-card {
@@ -291,6 +292,11 @@ body {
 
 .btn-danger-modern {
   background: var(--danger);
+  color: white;
+}
+
+.btn-info-modern {
+  background: #17a2b8;
   color: white;
 }
 
@@ -491,6 +497,16 @@ body {
   bottom: 0;
 }
 
+/* Estilos para impressão financeira */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  .pagina-financeiro {
+    padding: 20px;
+  }
+}
+
 /* Responsividade */
 @media (max-width: 768px) {
   .sidebar {
@@ -555,6 +571,9 @@ body {
     </a>
     <a href="#" onclick="mostrar('presenca'); return false" data-page="presenca">
       <i class="fas fa-calendar-check"></i> Presença
+    </a>
+    <a href="#" onclick="mostrar('financeiro'); return false" data-page="financeiro">
+      <i class="fas fa-chart-pie"></i> Financeiro
     </a>
   </div>
 </aside>
@@ -763,6 +782,142 @@ body {
         <div id="listaPresenca"></div>
       </div>
     </div>
+
+    <!-- FINANCEIRO -->
+    <div id="financeiro" style="display:none">
+      <!-- Cards de resumo financeiro -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-info">
+            <h6>Total de Alunos</h6>
+            <h3 id="totalAlunosFinanceiro">0</h3>
+          </div>
+          <div class="stat-icon blue">
+            <i class="fas fa-users"></i>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-info">
+            <h6>Pagamentos Pix</h6>
+            <h3 id="totalPix">0</h3>
+          </div>
+          <div class="stat-icon green">
+            <i class="fas fa-qrcode"></i>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-info">
+            <h6>Pagamentos Cartão</h6>
+            <h3 id="totalCartao">0</h3>
+          </div>
+          <div class="stat-icon orange">
+            <i class="fas fa-credit-card"></i>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-info">
+            <h6>Pagamentos Dinheiro</h6>
+            <h3 id="totalDinheiro">0</h3>
+          </div>
+          <div class="stat-icon pink">
+            <i class="fas fa-money-bill-wave"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Receita Total -->
+      <div class="content-card">
+        <div class="card-title">
+          <i class="fas fa-dollar-sign"></i> Receita Total
+        </div>
+        <h2 id="receitaTotal" style="color: var(--success);">R$ 0,00</h2>
+      </div>
+
+      <!-- Adicionar Despesa -->
+      <div class="content-card">
+        <div class="card-title">
+          <i class="fas fa-plus-circle"></i> Adicionar Despesa
+        </div>
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <input type="text" id="despesaDescricao" class="form-modern" placeholder="Descrição da despesa">
+          </div>
+          <div class="col-md-3 mb-3">
+            <input type="number" id="despesaValor" class="form-modern" placeholder="Valor (R$)">
+          </div>
+          <div class="col-md-3 mb-3">
+            <input type="date" id="despesaData" class="form-modern">
+          </div>
+          <div class="col-md-2 mb-3">
+            <button class="btn-modern btn-primary-modern w-100" onclick="adicionarDespesa()">
+              <i class="fas fa-save"></i> Adicionar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filtros de Despesas -->
+      <div class="content-card">
+        <div class="card-title">
+          <i class="fas fa-filter"></i> Filtros de Despesas
+        </div>
+        <div class="d-flex gap-3 flex-wrap">
+          <select id="filtroDespesaPeriodo" class="form-modern" style="width: auto;" onchange="carregarDespesas()">
+            <option value="hoje">Hoje</option>
+            <option value="semana">Esta Semana</option>
+            <option value="mes" selected>Este Mês</option>
+            <option value="todos">Todos</option>
+          </select>
+          <input type="date" id="filtroDespesaInicio" class="form-modern" style="width: auto;" placeholder="Data Início">
+          <input type="date" id="filtroDespesaFim" class="form-modern" style="width: auto;" placeholder="Data Fim">
+          <button class="btn-modern btn-info-modern" onclick="filtrarDespesasPorPeriodo()">
+            <i class="fas fa-search"></i> Filtrar
+          </button>
+          <button class="btn-modern btn-success-modern" onclick="imprimirDespesas()">
+            <i class="fas fa-print"></i> Imprimir
+          </button>
+        </div>
+      </div>
+
+      <!-- Lista de Despesas -->
+      <div class="content-card">
+        <div class="card-title">
+          <i class="fas fa-list"></i> Lista de Despesas
+          <span class="ms-auto" id="totalDespesasMes">Total: R$ 0,00</span>
+        </div>
+        <div class="table-responsive">
+          <table class="table-modern">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Descrição</th>
+                <th>Valor</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaDespesas"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Saldo Final -->
+      <div class="content-card">
+        <div class="card-title">
+          <i class="fas fa-chart-line"></i> Saldo do Mês
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <h5>Receita Total: <span id="saldoReceita" style="color: var(--success);">R$ 0,00</span></h5>
+          </div>
+          <div class="col-md-6">
+            <h5>Despesas: <span id="saldoDespesas" style="color: var(--danger);">R$ 0,00</span></h5>
+          </div>
+          <div class="col-md-12 mt-3">
+            <h3>Saldo Líquido: <span id="saldoLiquido" style="color: var(--primary);">R$ 0,00</span></h3>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -810,7 +965,7 @@ body {
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, getDoc, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBRm4yix2fC2PhAVjTtbWlR-azz0bAglpo",
@@ -857,7 +1012,7 @@ window.toggleSidebar = function() {
 
 // ABAS
 window.mostrar = function(sec) {
-  const sections = ['dashboard', 'cadastro', 'lista', 'materiais', 'presenca'];
+  const sections = ['dashboard', 'cadastro', 'lista', 'materiais', 'presenca', 'financeiro'];
   sections.forEach(id => {
     const element = document.getElementById(id);
     if (element) element.style.display = 'none';
@@ -866,7 +1021,6 @@ window.mostrar = function(sec) {
   const targetSection = document.getElementById(sec);
   if (targetSection) targetSection.style.display = 'block';
   
-  // Atualizar classe ativa nos links da sidebar
   document.querySelectorAll('.sidebar-nav a').forEach(link => {
     link.classList.remove('active');
     if(link.getAttribute('data-page') === sec) {
@@ -874,13 +1028,15 @@ window.mostrar = function(sec) {
     }
   });
   
-  // Fechar sidebar em dispositivos móveis após clicar
   if (window.innerWidth <= 768) {
     document.getElementById('sidebar').classList.remove('active');
   }
   
   if(sec === 'dashboard') {
     atualizarGrafico();
+  }
+  if(sec === 'financeiro') {
+    carregarFinanceiro();
   }
 };
 
@@ -1199,7 +1355,7 @@ window.delMat = async (id) => {
   }
 };
 
-// PRESENÇA - Distribuição inteligente para folha A4
+// PRESENÇA
 function formatarDataBR(dataString) {
   if (!dataString) return "__/__/____";
   const partes = dataString.split('-');
@@ -1331,6 +1487,259 @@ window.baixarPDF = () => {
   showToast('PDF gerado com sucesso!', 'success');
 };
 
+// FINANCEIRO
+let despesasAtuais = [];
+
+async function carregarFinanceiro() {
+  await carregarResumoPagamentos();
+  await carregarDespesas();
+}
+
+async function carregarResumoPagamentos() {
+  const snap = await getDocs(collection(db, "usuarios"));
+  let totalAlunos = 0;
+  let pix = 0;
+  let cartao = 0;
+  let dinheiro = 0;
+  
+  snap.forEach(doc => {
+    const aluno = doc.data();
+    if (aluno.tipo === "aluno") {
+      totalAlunos++;
+      const pagamento = aluno.pagamento || "";
+      if (pagamento.toLowerCase() === "pix") pix++;
+      else if (pagamento.toLowerCase() === "cartão") cartao++;
+      else if (pagamento.toLowerCase() === "dinheiro") dinheiro++;
+    }
+  });
+  
+  document.getElementById("totalAlunosFinanceiro").innerText = totalAlunos;
+  document.getElementById("totalPix").innerText = pix;
+  document.getElementById("totalCartao").innerText = cartao;
+  document.getElementById("totalDinheiro").innerText = dinheiro;
+  
+  const valorMensalidade = 150; // Valor da mensalidade
+  const receitaTotal = (pix + cartao + dinheiro) * valorMensalidade;
+  document.getElementById("receitaTotal").innerHTML = `R$ ${receitaTotal.toFixed(2)}`;
+  document.getElementById("saldoReceita").innerHTML = `R$ ${receitaTotal.toFixed(2)}`;
+}
+
+async function carregarDespesas() {
+  const snap = await getDocs(collection(db, "despesas"));
+  despesasAtuais = [];
+  snap.forEach(doc => {
+    despesasAtuais.push({
+      id: doc.id,
+      ...doc.data()
+    });
+  });
+  
+  despesasAtuais.sort((a, b) => new Date(b.data) - new Date(a.data));
+  filtrarDespesas();
+}
+
+function filtrarDespesas() {
+  const periodo = document.getElementById("filtroDespesaPeriodo").value;
+  const inicio = document.getElementById("filtroDespesaInicio").value;
+  const fim = document.getElementById("filtroDespesaFim").value;
+  
+  let despesasFiltradas = [...despesasAtuais];
+  const hoje = new Date();
+  
+  if (inicio && fim) {
+    const dataInicio = new Date(inicio);
+    const dataFim = new Date(fim);
+    dataFim.setHours(23, 59, 59);
+    despesasFiltradas = despesasFiltradas.filter(d => {
+      const dataDespesa = new Date(d.data);
+      return dataDespesa >= dataInicio && dataDespesa <= dataFim;
+    });
+  } else if (periodo === "hoje") {
+    const hojeStr = hoje.toISOString().split('T')[0];
+    despesasFiltradas = despesasFiltradas.filter(d => d.data === hojeStr);
+  } else if (periodo === "semana") {
+    const inicioSemana = new Date(hoje);
+    inicioSemana.setDate(hoje.getDate() - hoje.getDay());
+    despesasFiltradas = despesasFiltradas.filter(d => new Date(d.data) >= inicioSemana);
+  } else if (periodo === "mes") {
+    const inicioMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+    despesasFiltradas = despesasFiltradas.filter(d => new Date(d.data) >= inicioMes);
+  }
+  
+  exibirDespesas(despesasFiltradas);
+}
+
+function exibirDespesas(despesas) {
+  const tbody = document.getElementById("tabelaDespesas");
+  if (!tbody) return;
+  
+  let total = 0;
+  let html = '';
+  
+  despesas.forEach(despesa => {
+    total += despesa.valor;
+    const dataFormatada = formatarDataBR(despesa.data);
+    html += `
+      <tr>
+        <td>${dataFormatada}</td>
+        <td>${despesa.descricao}</td>
+        <td>R$ ${despesa.valor.toFixed(2)}</td>
+        <td>
+          <button onclick="excluirDespesa('${despesa.id}')" class="btn-modern btn-danger-modern" style="padding: 5px 10px; font-size: 12px;">
+            <i class="fas fa-trash"></i>
+          </button>
+        </td>
+      </tr>
+    `;
+  });
+  
+  if (despesas.length === 0) {
+    html = '<tr><td colspan="4" class="text-center text-muted">Nenhuma despesa encontrada</td></tr>';
+  }
+  
+  tbody.innerHTML = html;
+  document.getElementById("totalDespesasMes").innerHTML = `Total: R$ ${total.toFixed(2)}`;
+  document.getElementById("saldoDespesas").innerHTML = `R$ ${total.toFixed(2)}`;
+  
+  const receitaTexto = document.getElementById("saldoReceita").innerText;
+  const receita = parseFloat(receitaTexto.replace("R$ ", "").replace(",", ".")) || 0;
+  const saldoLiquido = receita - total;
+  document.getElementById("saldoLiquido").innerHTML = `R$ ${saldoLiquido.toFixed(2)}`;
+  document.getElementById("saldoLiquido").style.color = saldoLiquido >= 0 ? "var(--success)" : "var(--danger)";
+}
+
+window.adicionarDespesa = async () => {
+  const descricao = document.getElementById("despesaDescricao").value;
+  const valor = parseFloat(document.getElementById("despesaValor").value);
+  const data = document.getElementById("despesaData").value || new Date().toISOString().split('T')[0];
+  
+  if (!descricao || !valor || valor <= 0) {
+    showToast("Preencha todos os campos corretamente!", "error");
+    return;
+  }
+  
+  showLoading();
+  try {
+    await addDoc(collection(db, "despesas"), {
+      descricao,
+      valor,
+      data
+    });
+    showToast("Despesa adicionada com sucesso!", "success");
+    document.getElementById("despesaDescricao").value = "";
+    document.getElementById("despesaValor").value = "";
+    await carregarDespesas();
+  } catch (error) {
+    showToast("Erro ao adicionar despesa!", "error");
+  } finally {
+    hideLoading();
+  }
+};
+
+window.excluirDespesa = async (id) => {
+  if (confirm("Tem certeza que deseja excluir esta despesa?")) {
+    showLoading();
+    try {
+      await deleteDoc(doc(db, "despesas", id));
+      showToast("Despesa excluída com sucesso!", "success");
+      await carregarDespesas();
+    } catch (error) {
+      showToast("Erro ao excluir despesa!", "error");
+    } finally {
+      hideLoading();
+    }
+  }
+};
+
+window.filtrarDespesasPorPeriodo = () => {
+  filtrarDespesas();
+};
+
+window.imprimirDespesas = () => {
+  const periodo = document.getElementById("filtroDespesaPeriodo").value;
+  const inicio = document.getElementById("filtroDespesaInicio").value;
+  const fim = document.getElementById("filtroDespesaFim").value;
+  
+  let titulo = "";
+  if (inicio && fim) {
+    titulo = `Período: ${formatarDataBR(inicio)} até ${formatarDataBR(fim)}`;
+  } else if (periodo === "hoje") {
+    titulo = `Despesas de Hoje - ${new Date().toLocaleDateString()}`;
+  } else if (periodo === "semana") {
+    titulo = `Despesas da Semana`;
+  } else if (periodo === "mes") {
+    titulo = `Despesas do Mês de ${new Date().toLocaleString('pt-BR', { month: 'long', year: 'numeric' })}`;
+  } else {
+    titulo = `Todas as Despesas`;
+  }
+  
+  let html = `
+    <div style="padding: 40px; font-family: Arial, sans-serif;">
+      <div style="text-align: center; margin-bottom: 30px;">
+        <h2>AprovaMaisPB</h2>
+        <h3>Relatório de Despesas</h3>
+        <p>${titulo}</p>
+        <p>Data de emissão: ${new Date().toLocaleString()}</p>
+      </div>
+      <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr style="background: #4361ee; color: white;">
+            <th style="padding: 10px; border: 1px solid #ddd;">Data</th>
+            <th style="padding: 10px; border: 1px solid #ddd;">Descrição</th>
+            <th style="padding: 10px; border: 1px solid #ddd;">Valor</th>
+          </tr>
+        </thead>
+        <tbody>
+  `;
+  
+  let total = 0;
+  const tbody = document.getElementById("tabelaDespesas");
+  if (tbody) {
+    const rows = tbody.querySelectorAll("tr");
+    rows.forEach(row => {
+      if (row.cells && row.cells.length >= 3) {
+        const data = row.cells[0].innerText;
+        const descricao = row.cells[1].innerText;
+        const valor = row.cells[2].innerText;
+        if (descricao !== "Nenhuma despesa encontrada") {
+          html += `
+            <tr>
+              <td style="padding: 8px; border: 1px solid #ddd;">${data}</td>
+              <td style="padding: 8px; border: 1px solid #ddd;">${descricao}</td>
+              <td style="padding: 8px; border: 1px solid #ddd;">${valor}</td>
+            </tr>
+          `;
+          const valorNum = parseFloat(valor.replace("R$ ", "").replace(",", "."));
+          if (!isNaN(valorNum)) total += valorNum;
+        }
+      }
+    });
+  }
+  
+  const receitaTexto = document.getElementById("saldoReceita").innerText;
+  const receita = parseFloat(receitaTexto.replace("R$ ", "").replace(",", ".")) || 0;
+  const saldoLiquido = receita - total;
+  
+  html += `
+        </tbody>
+      </table>
+      <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+        <p><strong>Total de Despesas:</strong> R$ ${total.toFixed(2)}</p>
+        <p><strong>Receita Total:</strong> ${receitaTexto}</p>
+        <p><strong>Saldo Líquido:</strong> R$ ${saldoLiquido.toFixed(2)}</p>
+      </div>
+      <div style="text-align: center; margin-top: 30px; color: #666;">
+        <p>Relatório gerado automaticamente por AprovaMaisPB</p>
+      </div>
+    </div>
+  `;
+  
+  const win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+  win.print();
+};
+
 // INIT
 carregarDashboard();
 carregarAlunos();
@@ -1359,6 +1768,10 @@ window.salvarLink = salvarLink;
 window.delMat = delMat;
 window.gerarListaPresenca = gerarListaPresenca;
 window.baixarPDF = baixarPDF;
+window.adicionarDespesa = adicionarDespesa;
+window.excluirDespesa = excluirDespesa;
+window.filtrarDespesasPorPeriodo = filtrarDespesasPorPeriodo;
+window.imprimirDespesas = imprimirDespesas;
 </script>
 </body>
 </html>
