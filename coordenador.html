@@ -83,6 +83,7 @@ body {
   transition: all 0.3s;
   font-weight: 500;
   margin: 5px 0;
+  cursor: pointer;
 }
 
 .sidebar-nav a i {
@@ -106,6 +107,7 @@ body {
 .main-content {
   margin-left: var(--sidebar-width);
   transition: all 0.3s ease;
+  min-height: 100vh;
 }
 
 .topbar {
@@ -264,6 +266,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  cursor: pointer;
 }
 
 .btn-modern:hover {
@@ -809,12 +812,13 @@ body {
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-const app = initializeApp({
-  apiKey:"AIzaSyBRm4yix2fC2PhAVjTtbWlR-azz0bAglpo",
-  authDomain:"aprovamaispb2-3bc78.firebaseapp.com",
-  projectId:"aprovamaispb2-3bc78"
-});
+const firebaseConfig = {
+  apiKey: "AIzaSyBRm4yix2fC2PhAVjTtbWlR-azz0bAglpo",
+  authDomain: "aprovamaispb2-3bc78.firebaseapp.com",
+  projectId: "aprovamaispb2-3bc78"
+};
 
+const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 let grafico;
 
@@ -846,23 +850,34 @@ function hideLoading() {
 }
 
 // Sidebar Toggle
-window.toggleSidebar = () => {
-  document.getElementById('sidebar').classList.toggle('active');
+window.toggleSidebar = function() {
+  const sidebar = document.getElementById('sidebar');
+  sidebar.classList.toggle('active');
 };
 
 // ABAS
-window.mostrar = (sec) => {
-  ['dashboard','cadastro','lista','materiais','presenca'].forEach(id => {
-    document.getElementById(id).style.display = 'none';
+window.mostrar = function(sec) {
+  const sections = ['dashboard', 'cadastro', 'lista', 'materiais', 'presenca'];
+  sections.forEach(id => {
+    const element = document.getElementById(id);
+    if (element) element.style.display = 'none';
   });
-  document.getElementById(sec).style.display = 'block';
   
+  const targetSection = document.getElementById(sec);
+  if (targetSection) targetSection.style.display = 'block';
+  
+  // Atualizar classe ativa nos links da sidebar
   document.querySelectorAll('.sidebar-nav a').forEach(link => {
     link.classList.remove('active');
     if(link.getAttribute('data-page') === sec) {
       link.classList.add('active');
     }
   });
+  
+  // Fechar sidebar em dispositivos móveis após clicar
+  if (window.innerWidth <= 768) {
+    document.getElementById('sidebar').classList.remove('active');
+  }
   
   if(sec === 'dashboard') {
     atualizarGrafico();
@@ -876,6 +891,7 @@ async function carregarDashboard() {
   let total=0, ativos=0, semanal=0, sabado=0;
   let vencidosHTML = '<div class="list-group">';
   const hoje = new Date();
+  let temVencidos = false;
   
   snap.forEach(d => {
     const a = d.data();
@@ -890,7 +906,10 @@ async function carregarDashboard() {
     if(a.dataFim) {
       let fim = new Date(a.dataFim);
       if(fim >= hoje) ativo = true;
-      else vencidosHTML += `<div class="list-group-item"><i class="fas fa-user text-danger me-2"></i><b>${a.nome}</b> - Venceu em ${fim.toLocaleDateString()}</div>`;
+      else {
+        vencidosHTML += `<div class="list-group-item"><i class="fas fa-user text-danger me-2"></i><b>${a.nome}</b> - Venceu em ${fim.toLocaleDateString()}</div>`;
+        temVencidos = true;
+      }
     } else ativo = true;
     
     if(a.status === "ativo") ativo = true;
@@ -903,7 +922,12 @@ async function carregarDashboard() {
   document.getElementById("ativos").innerText = ativos;
   document.getElementById("semanal").innerText = semanal;
   document.getElementById("sabado").innerText = sabado;
-  document.getElementById("listaVencidos").innerHTML = vencidosHTML || "<p class='text-success'><i class='fas fa-check-circle'></i> Nenhuma matrícula vencida 🎉</p>";
+  
+  if(!temVencidos) {
+    document.getElementById("listaVencidos").innerHTML = "<p class='text-success'><i class='fas fa-check-circle'></i> Nenhuma matrícula vencida 🎉</p>";
+  } else {
+    document.getElementById("listaVencidos").innerHTML = vencidosHTML;
+  }
   
   atualizarGrafico(semanal, sabado);
 }
@@ -939,9 +963,9 @@ function atualizarGrafico(semanal = null, sabado = null) {
 
 // ALUNOS
 async function carregarAlunos() {
-  const busca = document.getElementById("busca").value.toLowerCase();
-  const filtroStatus = document.getElementById("filtroStatus").value;
-  const filtroTurma = document.getElementById("filtroTurma").value;
+  const busca = document.getElementById("busca")?.value.toLowerCase() || "";
+  const filtroStatus = document.getElementById("filtroStatus")?.value || "";
+  const filtroTurma = document.getElementById("filtroTurma")?.value || "";
   
   const snap = await getDocs(collection(db,"usuarios"));
   let alunos = [];
@@ -949,7 +973,7 @@ async function carregarAlunos() {
   snap.forEach(d => {
     const a = d.data();
     if(a.tipo !== "aluno") return;
-    if(!(a.nome || "").toLowerCase().includes(busca)) return;
+    if(busca && !(a.nome || "").toLowerCase().includes(busca)) return;
     if(filtroStatus && a.status !== filtroStatus) return;
     if(filtroTurma && a.turma !== filtroTurma) return;
     
@@ -965,19 +989,19 @@ async function carregarAlunos() {
     });
   });
   
-  alunos.sort((a, b) => a.nome.localeCompare(b.nome));
+  alunos.sort((a, b) => (a.nome || "").localeCompare(b.nome || ""));
   
   let html = '<div class="table-responsive"><table class="table-modern">';
-  html += '<thead><tr><th>Nome</th><th>Turma</th><th>Status</th><th>Ações</th> </thead><tbody>';
+  html += '<thead><tr><th>Nome</th><th>Turma</th><th>Status</th><th>Ações</th></tr></thead><tbody>';
   
   alunos.forEach(a => {
     html += `
       <tr>
-        <td><strong>${a.nome}</strong><br><small class="text-muted">${a.telefone}</small></td>
-        <td>${a.turma}<br><small>${a.pagamento}</small></td>
+        <td><strong>${a.nome || ""}</strong><br><small class="text-muted">${a.telefone || ""}</small></td>
+        <td>${a.turma || ""}<br><small>${a.pagamento || ""}</small></td>
         <td><span class="badge-status ${a.status === 'ativo' ? 'badge-ativo' : 'badge-inativo'}">${a.status === 'ativo' ? 'Ativo' : 'Inativo'}</span></td>
         <td>
-          <button onclick="zap('${a.usuario}','${a.senha}','${a.telefone}')" class="btn-modern btn-success-modern" style="padding: 5px 10px; font-size: 12px;">
+          <button onclick="zap('${a.usuario || ""}','${a.senha || ""}','${a.telefone || ""}')" class="btn-modern btn-success-modern" style="padding: 5px 10px; font-size: 12px;">
             <i class="fab fa-whatsapp"></i>
           </button>
           <button onclick="abrirEditar(this)" class="btn-modern btn-warning-modern" style="padding: 5px 10px; font-size: 12px; margin-left: 5px;"
@@ -1001,7 +1025,8 @@ async function carregarAlunos() {
   });
   
   html += '</tbody></table></div>';
-  document.getElementById("tabela").innerHTML = html || '<p class="text-center text-muted">Nenhum aluno encontrado</p>';
+  const tabelaElement = document.getElementById("tabela");
+  if(tabelaElement) tabelaElement.innerHTML = html || '<p class="text-center text-muted">Nenhum aluno encontrado</p>';
 }
 
 window.confirmarExcluir = async (id) => {
@@ -1063,7 +1088,8 @@ window.abrirEditar = (btn) => {
   document.getElementById("editTurma").value = btn.dataset.turma;
   document.getElementById("editPagamento").value = btn.dataset.pagamento;
   document.getElementById("editStatus").value = btn.dataset.status;
-  new bootstrap.Modal(document.getElementById('modalEditar')).show();
+  const modal = new bootstrap.Modal(document.getElementById('modalEditar'));
+  modal.show();
 };
 
 window.salvarEdicao = async () => {
@@ -1087,7 +1113,8 @@ window.salvarEdicao = async () => {
   showToast('Aluno atualizado com sucesso!', 'success');
   await carregarAlunos();
   await carregarDashboard();
-  bootstrap.Modal.getInstance(document.getElementById('modalEditar')).hide();
+  const modal = bootstrap.Modal.getInstance(document.getElementById('modalEditar'));
+  if(modal) modal.hide();
 };
 
 window.zap = (u, s, t) => {
@@ -1127,7 +1154,7 @@ window.salvarLink = async () => {
 };
 
 async function carregarMateriais() {
-  const filtro = document.getElementById("filtroMaterial").value;
+  const filtro = document.getElementById("filtroMaterial")?.value || "";
   const snap = await getDocs(collection(db,"materiais"));
   
   let html = '<div class="row">';
@@ -1158,7 +1185,8 @@ async function carregarMateriais() {
   });
   html += '</div>';
   
-  document.getElementById("listaMateriais").innerHTML = html || '<p class="text-center text-muted">Nenhum material disponível</p>';
+  const listaMateriais = document.getElementById("listaMateriais");
+  if(listaMateriais) listaMateriais.innerHTML = html || '<p class="text-center text-muted">Nenhum material disponível</p>';
 }
 
 window.delMat = async (id) => {
@@ -1181,20 +1209,7 @@ function formatarDataBR(dataString) {
   return dataString;
 }
 
-// Calcula o número ideal de alunos por página baseado na altura disponível
 function calcularAlunosPorPagina() {
-  // Altura total A4 em mm: 297mm
-  // Margens: superior 12mm + inferior 10mm = 22mm
-  // Altura útil: 275mm
-  
-  // Cabeçalho: ~40mm
-  // Rodapé: ~15mm
-  // Altura por linha: ~10mm (incluindo padding e border)
-  
-  // Espaço disponível para linhas: 275 - 40 - 15 = 220mm
-  // Com 10mm por linha, cabem 22 linhas
-  // Mas para garantir que tudo caiba perfeitamente, usamos 21 alunos por página
-  // Isso dá margem de segurança e evita cortes
   return 21;
 }
 
@@ -1214,9 +1229,8 @@ window.gerarListaPresenca = async () => {
     }
   });
   
-  alunos.sort((a, b) => a.nome.localeCompare(b.nome));
+  alunos.sort((a, b) => (a.nome || "").localeCompare(b.nome || ""));
   
-  // Calcular número ideal de alunos por página
   const alunosPorPagina = calcularAlunosPorPagina();
   const totalPaginas = Math.ceil(alunos.length / alunosPorPagina);
   
@@ -1269,8 +1283,6 @@ window.gerarListaPresenca = async () => {
       `;
     });
     
-    // Preencher espaços vazios para manter consistência visual
-    // Isso evita que a última página tenha menos linhas e pareça "cortada"
     const espacosVazios = alunosPorPagina - alunosPagina.length;
     if(espacosVazios > 0 && espacosVazios < alunosPorPagina) {
       for(let v = 0; v < espacosVazios; v++) {
@@ -1297,12 +1309,17 @@ window.gerarListaPresenca = async () => {
     `;
   }
   
-  document.getElementById("listaPresenca").innerHTML = html;
+  const listaPresenca = document.getElementById("listaPresenca");
+  if(listaPresenca) listaPresenca.innerHTML = html;
   showToast(`Lista gerada com ${alunos.length} alunos distribuídos em ${totalPaginas} página(s) (${alunosPorPagina} alunos por página)!`, 'success');
 };
 
 window.baixarPDF = () => {
   const element = document.getElementById("listaPresenca");
+  if(!element || !element.innerHTML.trim()) {
+    showToast('Gere uma lista de presença primeiro!', 'warning');
+    return;
+  }
   const opt = {
     margin: [0, 0, 0, 0],
     filename: `lista_presenca_${new Date().toLocaleDateString()}.pdf`,
@@ -1327,6 +1344,21 @@ document.addEventListener('click', function(e) {
     sidebar.classList.remove('active');
   }
 });
+
+// Expor funções globalmente
+window.mostrar = mostrar;
+window.toggleSidebar = toggleSidebar;
+window.criarAluno = criarAluno;
+window.carregarAlunos = carregarAlunos;
+window.abrirEditar = abrirEditar;
+window.salvarEdicao = salvarEdicao;
+window.confirmarExcluir = confirmarExcluir;
+window.zap = zap;
+window.renovar = renovar;
+window.salvarLink = salvarLink;
+window.delMat = delMat;
+window.gerarListaPresenca = gerarListaPresenca;
+window.baixarPDF = baixarPDF;
 </script>
 </body>
 </html>
