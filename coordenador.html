@@ -4,264 +4,692 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Painel Coordenador</title>
+<title>AprovaMaisPB - Sistema de Gestão</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-body{ background:#f1f5f9; font-family:Segoe UI; }
-
-.topbar{
-  display:flex;
-  justify-content:space-between;
-  padding:15px;
-  background:#0d6efd;
-  color:white;
+:root {
+  --primary: #4361ee;
+  --primary-dark: #3a56d4;
+  --secondary: #3f37c9;
+  --success: #4cc9f0;
+  --danger: #f72585;
+  --warning: #f8961e;
+  --dark: #2b2d42;
+  --light: #f8f9fa;
+  --gray: #6c757d;
+  --gradient: linear-gradient(135deg, #4361ee, #3f37c9);
+  --sidebar-width: 280px;
 }
 
-.menu{
-  display:flex;
-  gap:10px;
-  padding:10px;
-  background:white;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.card{
-  border:none;
-  border-radius:12px;
-  box-shadow:0 3px 10px rgba(0,0,0,0.05);
+body {
+  font-family: 'Segoe UI', 'Poppins', sans-serif;
+  background: #f1f5f9;
+  overflow-x: hidden;
 }
 
-/* Estilos para o PDF */
-.pdf-container {
-  font-family: 'Segoe UI', Arial, sans-serif;
-  width: 100%;
-  max-width: 210mm;
-  margin: 0 auto;
+/* Sidebar */
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: var(--sidebar-width);
+  height: 100%;
   background: white;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  overflow-y: auto;
 }
 
-.pdf-header {
+.sidebar-header {
+  padding: 25px 20px;
+  text-align: center;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.sidebar-header img {
+  width: 70px;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+.sidebar-header h3 {
+  font-size: 1.3rem;
+  color: var(--primary);
+  margin: 0;
+}
+
+.sidebar-nav {
+  padding: 20px 0;
+}
+
+.sidebar-nav a {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  border-bottom: 2px solid #0d6efd;
-  padding-bottom: 10px;
-  margin-bottom: 15px;
-  page-break-inside: avoid;
+  gap: 12px;
+  padding: 12px 25px;
+  color: var(--dark);
+  text-decoration: none;
+  transition: all 0.3s;
+  font-weight: 500;
+  margin: 5px 0;
 }
 
-.pdf-header-left {
+.sidebar-nav a i {
+  width: 24px;
+  font-size: 1.2rem;
+}
+
+.sidebar-nav a:hover {
+  background: rgba(67, 97, 238, 0.1);
+  color: var(--primary);
+  padding-left: 30px;
+}
+
+.sidebar-nav a.active {
+  background: var(--gradient);
+  color: white;
+  border-radius: 0 20px 20px 0;
+}
+
+/* Main Content */
+.main-content {
+  margin-left: var(--sidebar-width);
+  transition: all 0.3s ease;
+}
+
+.topbar {
+  background: white;
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  position: sticky;
+  top: 0;
+  z-index: 99;
+}
+
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--primary);
+  cursor: pointer;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.user-info span {
+  color: var(--dark);
+  font-weight: 500;
+}
+
+/* Cards */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.stat-info h6 {
+  color: var(--gray);
+  font-size: 0.85rem;
+  margin-bottom: 8px;
+}
+
+.stat-info h3 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--dark);
+  margin: 0;
+}
+
+.stat-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+}
+
+.stat-icon.blue { background: rgba(67, 97, 238, 0.1); color: var(--primary); }
+.stat-icon.green { background: rgba(76, 201, 240, 0.1); color: var(--success); }
+.stat-icon.orange { background: rgba(248, 150, 30, 0.1); color: var(--warning); }
+.stat-icon.pink { background: rgba(247, 37, 133, 0.1); color: var(--danger); }
+
+/* Cards de conteúdo */
+.content-card {
+  background: white;
+  border-radius: 20px;
+  padding: 25px;
+  margin: 0 20px 20px 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.card-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--dark);
+  margin-bottom: 20px;
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.pdf-header-right {
-  text-align: right;
+/* Formulários */
+.form-modern {
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  padding: 12px 16px;
+  transition: all 0.3s;
+  width: 100%;
 }
 
-.logo-pdf {
-  width: 60px;
-  height: auto;
-  object-fit: contain;
+.form-modern:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.1);
+  outline: none;
 }
 
-.pdf-table {
+/* Tabela moderna */
+.table-modern {
   width: 100%;
   border-collapse: collapse;
-  font-size: 11px;
-  page-break-inside: auto;
 }
 
-.pdf-table tr {
-  page-break-inside: avoid;
-  page-break-after: auto;
+.table-modern thead {
+  background: var(--light);
 }
 
-.pdf-table th {
-  background: #0d6efd;
-  color: white;
-  padding: 8px;
+.table-modern th {
+  padding: 15px;
+  text-align: left;
   font-weight: 600;
-  font-size: 12px;
+  color: var(--dark);
+  border-bottom: 2px solid #e9ecef;
 }
 
-.pdf-table td {
-  padding: 8px 6px;
-  border-bottom: 1px solid #ddd;
+.table-modern td {
+  padding: 15px;
+  border-bottom: 1px solid #e9ecef;
   vertical-align: middle;
 }
 
-.assinatura-linha {
-  border-bottom: 1.5px solid #000;
-  height: 25px;
-  width: 100%;
-  max-width: 140px;
-  margin: 0 auto;
+.table-modern tr:hover {
+  background: rgba(67, 97, 238, 0.02);
 }
 
-.pdf-footer {
-  margin-top: 20px;
-  text-align: center;
-  color: #777;
-  font-size: 9px;
-  page-break-inside: avoid;
-  border-top: 1px solid #eee;
-  padding-top: 10px;
+/* Botões */
+.btn-modern {
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  border: none;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.page-break {
-  page-break-before: always;
-  margin-top: 20px;
+.btn-modern:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }
 
-/* Ajuste para o conteúdo do PDF */
-#listaPresenca {
+.btn-primary-modern {
+  background: var(--gradient);
+  color: white;
+}
+
+.btn-success-modern {
+  background: var(--success);
+  color: white;
+}
+
+.btn-warning-modern {
+  background: var(--warning);
+  color: white;
+}
+
+.btn-danger-modern {
+  background: var(--danger);
+  color: white;
+}
+
+/* Toast Notification */
+.toast-notification {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 12px 24px;
+  border-radius: 12px;
   background: white;
-  padding: 15px;
-  border-radius: 8px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+  transform: translateX(400px);
+  transition: transform 0.3s ease;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 500;
+}
+
+.toast-notification.show {
+  transform: translateX(0);
+}
+
+.toast-notification.success {
+  border-left: 4px solid var(--success);
+  color: var(--success);
+}
+
+.toast-notification.error {
+  border-left: 4px solid var(--danger);
+  color: var(--danger);
+}
+
+.toast-notification.warning {
+  border-left: 4px solid var(--warning);
+  color: var(--warning);
+}
+
+/* Loading */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255,255,255,0.9);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid var(--light);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Status Badges */
+.badge-status {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge-ativo {
+  background: rgba(76, 201, 240, 0.1);
+  color: var(--success);
+}
+
+.badge-inativo {
+  background: rgba(247, 37, 133, 0.1);
+  color: var(--danger);
+}
+
+/* Filtros */
+.filtros-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar.active {
+    transform: translateX(0);
+  }
+  .main-content {
+    margin-left: 0;
+  }
+  .menu-toggle {
+    display: block;
+  }
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  .content-card {
+    margin: 0 15px 15px 15px;
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--light);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 4px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="topbar">
-  <b>🎓 AprovaMaisPB</b>
-  <button onclick="location='index.html'" class="btn btn-light btn-sm">Sair</button>
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
 </div>
 
-<div class="menu">
-  <button class="btn btn-outline-primary" onclick="mostrar('dashboard')">Dashboard</button>
-  <button class="btn btn-outline-primary" onclick="mostrar('cadastro')">Cadastro</button>
-  <button class="btn btn-outline-primary" onclick="mostrar('lista')">Alunos</button>
-  <button class="btn btn-outline-primary" onclick="mostrar('materiais')">Materiais</button>
-  <button class="btn btn-outline-primary" onclick="mostrar('presenca')">Presença</button>
-</div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <img src="assets/img/logo_aprovamaispb.png" alt="Logo" onerror="this.style.display='none'">
+    <h3>AprovaMaisPB</h3>
+  </div>
+  <div class="sidebar-nav">
+    <a href="#" onclick="mostrar('dashboard'); return false" class="active" data-page="dashboard">
+      <i class="fas fa-chart-line"></i> Dashboard
+    </a>
+    <a href="#" onclick="mostrar('cadastro'); return false" data-page="cadastro">
+      <i class="fas fa-user-plus"></i> Cadastro
+    </a>
+    <a href="#" onclick="mostrar('lista'); return false" data-page="lista">
+      <i class="fas fa-users"></i> Alunos
+    </a>
+    <a href="#" onclick="mostrar('materiais'); return false" data-page="materiais">
+      <i class="fas fa-folder-open"></i> Materiais
+    </a>
+    <a href="#" onclick="mostrar('presenca'); return false" data-page="presenca">
+      <i class="fas fa-calendar-check"></i> Presença
+    </a>
+  </div>
+</aside>
 
-<div class="container mt-3">
+<div class="main-content">
+  <div class="topbar">
+    <button class="menu-toggle" id="menuToggle" onclick="toggleSidebar()">
+      <i class="fas fa-bars"></i>
+    </button>
+    <div class="user-info">
+      <span><i class="fas fa-user-circle"></i> Coordenador</span>
+      <button onclick="location='index.html'" class="btn-modern btn-danger-modern" style="padding: 8px 16px;">
+        <i class="fas fa-sign-out-alt"></i> Sair
+      </button>
+    </div>
+  </div>
 
-<!-- DASHBOARD -->
-<div id="dashboard">
-<div class="row">
-<div class="col-6"><div class="card p-3 text-center"><h6>Total</h6><h3 id="totalAlunos">0</h3></div></div>
-<div class="col-6"><div class="card p-3 text-center"><h6>Ativos</h6><h3 id="ativos">0</h3></div></div>
-<div class="col-6 mt-2"><div class="card p-3 text-center"><h6>Semanal</h6><h3 id="semanal">0</h3></div></div>
-<div class="col-6 mt-2"><div class="card p-3 text-center"><h6>Sábado</h6><h3 id="sabado">0</h3></div></div>
-</div>
+  <div class="container-fluid p-0">
+    <!-- DASHBOARD -->
+    <div id="dashboard">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-info">
+            <h6>Total de Alunos</h6>
+            <h3 id="totalAlunos">0</h3>
+          </div>
+          <div class="stat-icon blue">
+            <i class="fas fa-users"></i>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-info">
+            <h6>Alunos Ativos</h6>
+            <h3 id="ativos">0</h3>
+          </div>
+          <div class="stat-icon green">
+            <i class="fas fa-user-check"></i>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-info">
+            <h6>Turma Semanal</h6>
+            <h3 id="semanal">0</h3>
+          </div>
+          <div class="stat-icon orange">
+            <i class="fas fa-calendar-week"></i>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-info">
+            <h6>Turma Sábado</h6>
+            <h3 id="sabado">0</h3>
+          </div>
+          <div class="stat-icon pink">
+            <i class="fas fa-calendar-weekend"></i>
+          </div>
+        </div>
+      </div>
 
-<div class="card p-3 mt-3">
-<h5 class="text-danger">⚠️ Matrículas Vencidas</h5>
-<div id="listaVencidos"></div>
-</div>
-</div>
+      <div class="content-card">
+        <div class="card-title">
+          <i class="fas fa-chart-pie"></i> Distribuição por Turma
+        </div>
+        <canvas id="graficoTurmas" style="max-height: 300px;"></canvas>
+      </div>
 
-<!-- CADASTRO -->
-<div id="cadastro" style="display:none">
-<div class="card p-3">
-<input id="nome" class="form-control mb-2" placeholder="Nome">
-<input id="telefone" class="form-control mb-2" placeholder="Telefone">
+      <div class="content-card">
+        <div class="card-title">
+          <i class="fas fa-exclamation-triangle text-danger"></i> Matrículas Vencidas
+        </div>
+        <div id="listaVencidos"></div>
+      </div>
+    </div>
 
-<select id="turma" class="form-control mb-2">
-<option value="Semanal">Semanal</option>
-<option value="Sabado">Sabado</option>
-</select>
-
-<select id="pagamento" class="form-control mb-2">
-<option>Pix</option>
-<option>Dinheiro</option>
-<option>Cartão</option>
-</select>
-
-<input id="dias" type="number" class="form-control mb-2" placeholder="Dias">
-
-<button class="btn btn-success w-100" onclick="criarAluno()">Cadastrar</button>
-</div>
-</div>
-
-<!-- ALUNOS -->
-<div id="lista" style="display:none">
-<input id="busca" class="form-control mb-2" placeholder="Buscar..." onkeyup="carregarAlunos()">
-<div id="tabela"></div>
-</div>
-
-<!-- MATERIAIS -->
-<div id="materiais" style="display:none">
-
-<select id="filtroMaterial" class="form-control mb-2" onchange="carregarMateriais()">
-<option value="">Todas</option>
-<option value="Semanal">Semanal</option>
-<option value="Sabado">Sábado</option>
-</select>
-
-<div class="card p-3 mb-3">
-<input id="titulo" class="form-control mb-2" placeholder="Título">
-<input id="linkDrive" class="form-control mb-2" placeholder="Link do Drive">
-
-<select id="turmaMaterial" class="form-control mb-2">
-<option value="Semanal">Semanal</option>
-<option value="Sabado">Sabado</option>
-<option value="Ambas">Ambas</option>
-</select>
-
-<button class="btn btn-primary" onclick="salvarLink()">Salvar</button>
-</div>
-
-<div id="listaMateriais"></div>
-
-</div>
-
-<!-- PRESENÇA -->
-<div id="presenca" style="display:none">
-
-<select id="turmaPresenca" class="form-control mb-2">
-<option value="">Todas</option>
-<option value="Semanal">Semanal</option>
-<option value="Sabado">Sábado</option>
-</select>
-
-<input type="date" id="dataPresenca" class="form-control mb-2">
-
-<button class="btn btn-primary mb-2" onclick="gerarListaPresenca()">Gerar</button>
-<button class="btn btn-success mb-2" onclick="window.print()">Imprimir</button>
-<button class="btn btn-dark mb-2" onclick="baixarPDF()">Baixar PDF</button>
-
-<div id="listaPresenca"></div>
-
-</div>
-
-</div>
-
-<!-- MODAL EDITAR -->
-<div class="modal fade" id="modalEditar">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-body">
-
-        <input id="editNome" class="form-control mb-2">
-        <input id="editTelefone" class="form-control mb-2">
-
-        <select id="editTurma" class="form-control mb-2">
+    <!-- CADASTRO -->
+    <div id="cadastro" style="display:none">
+      <div class="content-card">
+        <div class="card-title">
+          <i class="fas fa-user-plus"></i> Novo Aluno
+        </div>
+        <input id="nome" class="form-modern mb-3" placeholder="Nome completo">
+        <input id="telefone" class="form-modern mb-3" placeholder="Telefone (com DDD)">
+        
+        <select id="turma" class="form-modern mb-3">
           <option value="Semanal">Semanal</option>
           <option value="Sabado">Sábado</option>
         </select>
-
-        <select id="editPagamento" class="form-control mb-2">
+        
+        <select id="pagamento" class="form-modern mb-3">
           <option>Pix</option>
           <option>Dinheiro</option>
           <option>Cartão</option>
         </select>
+        
+        <input id="dias" type="number" class="form-modern mb-3" placeholder="Dias de matrícula (30 padrão)">
+        
+        <button class="btn-modern btn-primary-modern w-100" onclick="criarAluno()">
+          <i class="fas fa-save"></i> Cadastrar Aluno
+        </button>
+      </div>
+    </div>
 
-        <select id="editStatus" class="form-control mb-2">
+    <!-- ALUNOS -->
+    <div id="lista" style="display:none">
+      <div class="content-card">
+        <div class="card-title">
+          <i class="fas fa-search"></i> Buscar Aluno
+        </div>
+        <input id="busca" class="form-modern" placeholder="Buscar por nome..." onkeyup="carregarAlunos()">
+      </div>
+
+      <div class="content-card">
+        <div class="card-title">
+          <i class="fas fa-filter"></i> Filtros
+        </div>
+        <div class="filtros-container">
+          <select id="filtroStatus" class="form-modern" style="width: auto;" onchange="carregarAlunos()">
+            <option value="">Todos os status</option>
+            <option value="ativo">Ativos</option>
+            <option value="inativo">Inativos</option>
+          </select>
+          <select id="filtroTurma" class="form-modern" style="width: auto;" onchange="carregarAlunos()">
+            <option value="">Todas as turmas</option>
+            <option value="Semanal">Semanal</option>
+            <option value="Sabado">Sábado</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="content-card">
+        <div class="card-title">
+          <i class="fas fa-list"></i> Lista de Alunos
+        </div>
+        <div id="tabela"></div>
+      </div>
+    </div>
+
+    <!-- MATERIAIS -->
+    <div id="materiais" style="display:none">
+      <div class="content-card">
+        <div class="card-title">
+          <i class="fas fa-plus-circle"></i> Adicionar Material
+        </div>
+        <input id="titulo" class="form-modern mb-3" placeholder="Título do material">
+        <input id="linkDrive" class="form-modern mb-3" placeholder="Link do Drive">
+        
+        <select id="turmaMaterial" class="form-modern mb-3">
+          <option value="Semanal">Semanal</option>
+          <option value="Sabado">Sábado</option>
+          <option value="Ambas">Ambas</option>
+        </select>
+        
+        <button class="btn-modern btn-primary-modern w-100" onclick="salvarLink()">
+          <i class="fas fa-upload"></i> Salvar Material
+        </button>
+      </div>
+
+      <div class="content-card">
+        <div class="card-title">
+          <i class="fas fa-filter"></i> Filtrar Materiais
+        </div>
+        <select id="filtroMaterial" class="form-modern" onchange="carregarMateriais()">
+          <option value="">Todas as turmas</option>
+          <option value="Semanal">Semanal</option>
+          <option value="Sabado">Sábado</option>
+        </select>
+      </div>
+
+      <div class="content-card">
+        <div class="card-title">
+          <i class="fas fa-folder-open"></i> Materiais Disponíveis
+        </div>
+        <div id="listaMateriais"></div>
+      </div>
+    </div>
+
+    <!-- PRESENÇA -->
+    <div id="presenca" style="display:none">
+      <div class="content-card">
+        <div class="card-title">
+          <i class="fas fa-calendar-alt"></i> Gerar Lista de Presença
+        </div>
+        
+        <select id="turmaPresenca" class="form-modern mb-3">
+          <option value="">Todas as turmas</option>
+          <option value="Semanal">Semanal</option>
+          <option value="Sabado">Sábado</option>
+        </select>
+        
+        <input type="date" id="dataPresenca" class="form-modern mb-3">
+        
+        <div class="d-flex gap-2">
+          <button class="btn-modern btn-primary-modern" onclick="gerarListaPresenca()">
+            <i class="fas fa-sync-alt"></i> Gerar
+          </button>
+          <button class="btn-modern btn-success-modern" onclick="window.print()">
+            <i class="fas fa-print"></i> Imprimir
+          </button>
+          <button class="btn-modern btn-warning-modern" onclick="baixarPDF()">
+            <i class="fas fa-file-pdf"></i> Baixar PDF
+          </button>
+        </div>
+      </div>
+
+      <div class="content-card">
+        <div id="listaPresenca"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDITAR -->
+<div class="modal fade" id="modalEditar" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fas fa-edit"></i> Editar Aluno</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input id="editNome" class="form-modern mb-2" placeholder="Nome">
+        <input id="editTelefone" class="form-modern mb-2" placeholder="Telefone">
+        
+        <select id="editTurma" class="form-modern mb-2">
+          <option value="Semanal">Semanal</option>
+          <option value="Sabado">Sábado</option>
+        </select>
+        
+        <select id="editPagamento" class="form-modern mb-2">
+          <option>Pix</option>
+          <option>Dinheiro</option>
+          <option>Cartão</option>
+        </select>
+        
+        <select id="editStatus" class="form-modern mb-2">
           <option value="ativo">Ativo</option>
           <option value="inativo">Inativo</option>
         </select>
-
-        <input id="editDias" type="number" class="form-control mb-2" placeholder="Dias">
-
-        <button class="btn btn-warning w-100" onclick="salvarEdicao()">Salvar</button>
-
+        
+        <input id="editDias" type="number" class="form-modern mb-2" placeholder="Dias para renovar">
+      </div>
+      <div class="modal-footer">
+        <button class="btn-modern btn-primary-modern" onclick="salvarEdicao()">
+          <i class="fas fa-save"></i> Salvar
+        </button>
       </div>
     </div>
   </div>
@@ -271,7 +699,6 @@ body{ background:#f1f5f9; font-family:Segoe UI; }
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <script type="module">
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -281,370 +708,496 @@ const app = initializeApp({
   projectId:"aprovamaispb2-3bc78"
 });
 
-const db = getFirestore(app)
+const db = getFirestore(app);
+let grafico;
 
-// ABAS
-window.mostrar = (sec)=>{
-["dashboard","cadastro","lista","materiais","presenca"].forEach(id=>{
-document.getElementById(id).style.display="none"
-})
-document.getElementById(sec).style.display="block"
+// Toast Notification
+function showToast(message, type = 'success') {
+  const toast = document.createElement('div');
+  toast.className = `toast-notification ${type}`;
+  toast.innerHTML = `
+    <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
+    <span>${message}</span>
+  `;
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.classList.add('show');
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 300);
+    }, 3000);
+  }, 100);
 }
 
+// Loading
+function showLoading() {
+  document.getElementById('loadingOverlay').style.display = 'flex';
+}
+function hideLoading() {
+  document.getElementById('loadingOverlay').style.display = 'none';
+}
+
+// Sidebar Toggle
+window.toggleSidebar = () => {
+  document.getElementById('sidebar').classList.toggle('active');
+};
+
+// ABAS
+window.mostrar = (sec) => {
+  ['dashboard','cadastro','lista','materiais','presenca'].forEach(id => {
+    document.getElementById(id).style.display = 'none';
+  });
+  document.getElementById(sec).style.display = 'block';
+  
+  // Ativar link na sidebar
+  document.querySelectorAll('.sidebar-nav a').forEach(link => {
+    link.classList.remove('active');
+    if(link.getAttribute('data-page') === sec) {
+      link.classList.add('active');
+    }
+  });
+  
+  if(sec === 'dashboard') {
+    atualizarGrafico();
+  }
+};
+
 // DASHBOARD
-async function carregarDashboard(){
+async function carregarDashboard() {
+  const snap = await getDocs(collection(db,"usuarios"));
+  
+  let total=0, ativos=0, semanal=0, sabado=0;
+  let vencidosHTML = '<div class="list-group">';
+  const hoje = new Date();
+  
+  snap.forEach(d => {
+    const a = d.data();
+    if(a.tipo !== "aluno") return;
+    
+    total++;
+    let turma = (a.turma || "").toLowerCase();
+    if(turma.includes("sem")) semanal++;
+    if(turma.includes("sab")) sabado++;
+    
+    let ativo = false;
+    if(a.dataFim) {
+      let fim = new Date(a.dataFim);
+      if(fim >= hoje) ativo = true;
+      else vencidosHTML += `<div class="list-group-item"><i class="fas fa-user text-danger me-2"></i><b>${a.nome}</b> - Venceu em ${fim.toLocaleDateString()}</div>`;
+    } else ativo = true;
+    
+    if(a.status === "ativo") ativo = true;
+    if(ativo) ativos++;
+  });
+  
+  vencidosHTML += '</div>';
+  
+  document.getElementById("totalAlunos").innerText = total;
+  document.getElementById("ativos").innerText = ativos;
+  document.getElementById("semanal").innerText = semanal;
+  document.getElementById("sabado").innerText = sabado;
+  document.getElementById("listaVencidos").innerHTML = vencidosHTML || "<p class='text-success'><i class='fas fa-check-circle'></i> Nenhuma matrícula vencida 🎉</p>";
+  
+  atualizarGrafico(semanal, sabado);
+}
 
-const snap = await getDocs(collection(db,"usuarios"))
-
-let total=0, ativos=0, semanal=0, sabado=0
-let vencidosHTML=""
-const hoje=new Date()
-
-snap.forEach(d=>{
-const a=d.data()
-if(a.tipo!=="aluno") return
-
-total++
-
-let turma=(a.turma||"").toLowerCase()
-
-if(turma.includes("sem")) semanal++
-if(turma.includes("sab")) sabado++
-
-let ativo=false
-
-if(a.dataFim){
-let fim=new Date(a.dataFim)
-
-if(fim>=hoje) ativo=true
-else vencidosHTML+=`<div><b>${a.nome}</b> - ${fim.toLocaleDateString()}</div>`
-}else ativo=true
-
-if(a.status==="ativo") ativo=true
-
-if(ativo) ativos++
-})
-
-document.getElementById("totalAlunos").innerText=total
-document.getElementById("ativos").innerText=ativos
-document.getElementById("semanal").innerText=semanal
-document.getElementById("sabado").innerText=sabado
-
-document.getElementById("listaVencidos").innerHTML=vencidosHTML||"Nenhuma matrícula vencida 🎉"
+function atualizarGrafico(semanal = null, sabado = null) {
+  const ctx = document.getElementById('graficoTurmas');
+  if(!ctx) return;
+  
+  if(grafico) grafico.destroy();
+  
+  grafico = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Turma Semanal', 'Turma Sábado'],
+      datasets: [{
+        data: [semanal || parseInt(document.getElementById('semanal').innerText) || 0, 
+               sabado || parseInt(document.getElementById('sabado').innerText) || 0],
+        backgroundColor: ['#4cc9f0', '#f8961e'],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: {
+          position: 'bottom'
+        }
+      }
+    }
+  });
 }
 
 // ALUNOS
-async function carregarAlunos(){
-
-const busca=document.getElementById("busca").value.toLowerCase()
-const snap=await getDocs(collection(db,"usuarios"))
-
-// Criar array para armazenar alunos
-let alunos = []
-
-snap.forEach(d=>{
-const a=d.data()
-if(a.tipo!=="aluno") return
-if(!(a.nome||"").toLowerCase().includes(busca)) return
-
-// Adicionar aluno ao array com seus dados
-alunos.push({
-  id: d.id,
-  nome: a.nome,
-  telefone: a.telefone,
-  turma: a.turma,
-  pagamento: a.pagamento,
-  status: a.status,
-  usuario: a.usuario,
-  senha: a.senha
-})
-})
-
-// Ordenar alunos por nome em ordem alfabética
-alunos.sort((a, b) => {
-  if (a.nome < b.nome) return -1
-  if (a.nome > b.nome) return 1
-  return 0
-})
-
-// Gerar HTML com alunos ordenados
-let html = ""
-alunos.forEach(a => {
-html+=`
-<div class="card p-2 mb-2">
-<b>${a.nome}</b> (${a.turma})<br>
-
-<button onclick="zap('${a.usuario}','${a.senha}','${a.telefone}')" class="btn btn-success btn-sm">WhatsApp</button>
-
-<button onclick="abrirEditar(this)" class="btn btn-warning btn-sm"
-data-id="${a.id}"
-data-nome="${a.nome||''}"
-data-telefone="${a.telefone||''}"
-data-turma="${a.turma||''}"
-data-pagamento="${a.pagamento||''}"
-data-status="${a.status||'ativo'}">
-Editar</button>
-
-<button onclick="renovar('${a.id}','${a.telefone}')" class="btn btn-primary btn-sm">+30d</button>
-<button onclick="del('${a.id}')" class="btn btn-danger btn-sm">Excluir</button>
-</div>`
-})
-
-document.getElementById("tabela").innerHTML = html
+async function carregarAlunos() {
+  const busca = document.getElementById("busca").value.toLowerCase();
+  const filtroStatus = document.getElementById("filtroStatus").value;
+  const filtroTurma = document.getElementById("filtroTurma").value;
+  
+  const snap = await getDocs(collection(db,"usuarios"));
+  let alunos = [];
+  
+  snap.forEach(d => {
+    const a = d.data();
+    if(a.tipo !== "aluno") return;
+    if(!(a.nome || "").toLowerCase().includes(busca)) return;
+    if(filtroStatus && a.status !== filtroStatus) return;
+    if(filtroTurma && a.turma !== filtroTurma) return;
+    
+    alunos.push({
+      id: d.id,
+      nome: a.nome,
+      telefone: a.telefone,
+      turma: a.turma,
+      pagamento: a.pagamento,
+      status: a.status,
+      usuario: a.usuario,
+      senha: a.senha
+    });
+  });
+  
+  alunos.sort((a, b) => a.nome.localeCompare(b.nome));
+  
+  let html = '<div class="table-responsive"><table class="table-modern">';
+  html += '<thead><tr><th>Nome</th><th>Turma</th><th>Status</th><th>Ações</th></tr></thead><tbody>';
+  
+  alunos.forEach(a => {
+    html += `
+      <tr>
+        <td><strong>${a.nome}</strong><br><small class="text-muted">${a.telefone}</small></td>
+        <td>${a.turma}<br><small>${a.pagamento}</small></td>
+        <td><span class="badge-status ${a.status === 'ativo' ? 'badge-ativo' : 'badge-inativo'}">${a.status === 'ativo' ? 'Ativo' : 'Inativo'}</span></td>
+        <td>
+          <button onclick="zap('${a.usuario}','${a.senha}','${a.telefone}')" class="btn-modern btn-success-modern" style="padding: 5px 10px; font-size: 12px;">
+            <i class="fab fa-whatsapp"></i>
+          </button>
+          <button onclick="abrirEditar(this)" class="btn-modern btn-warning-modern" style="padding: 5px 10px; font-size: 12px; margin-left: 5px;"
+            data-id="${a.id}"
+            data-nome="${a.nome || ''}"
+            data-telefone="${a.telefone || ''}"
+            data-turma="${a.turma || ''}"
+            data-pagamento="${a.pagamento || ''}"
+            data-status="${a.status || 'ativo'}">
+            <i class="fas fa-edit"></i>
+          </button>
+          <button onclick="renovar('${a.id}','${a.telefone}')" class="btn-modern btn-primary-modern" style="padding: 5px 10px; font-size: 12px; margin-left: 5px;">
+            <i class="fas fa-plus-circle"></i> +30d
+          </button>
+          <button onclick="confirmarExcluir('${a.id}')" class="btn-modern btn-danger-modern" style="padding: 5px 10px; font-size: 12px; margin-left: 5px;">
+            <i class="fas fa-trash"></i>
+          </button>
+        </td>
+      </tr>
+    `;
+  });
+  
+  html += '</tbody></table></div>';
+  document.getElementById("tabela").innerHTML = html || '<p class="text-center text-muted">Nenhum aluno encontrado</p>';
 }
 
-// EDITAR
-let alunoEditandoId=null
+window.confirmarExcluir = async (id) => {
+  if(confirm('Tem certeza que deseja excluir este aluno? Esta ação não pode ser desfeita.')) {
+    showLoading();
+    await deleteDoc(doc(db,"usuarios",id));
+    await carregarAlunos();
+    await carregarDashboard();
+    hideLoading();
+    showToast('Aluno excluído com sucesso!', 'success');
+  }
+};
 
-window.abrirEditar=(btn)=>{
-alunoEditandoId=btn.dataset.id
-editNome.value=btn.dataset.nome
-editTelefone.value=btn.dataset.telefone
-editTurma.value=btn.dataset.turma
-editPagamento.value=btn.dataset.pagamento
-editStatus.value=btn.dataset.status
-new bootstrap.Modal(document.getElementById('modalEditar')).show()
-}
+window.criarAluno = async () => {
+  const nome = document.getElementById("nome").value;
+  const telefone = document.getElementById("telefone").value;
+  const turma = document.getElementById("turma").value;
+  const pagamento = document.getElementById("pagamento").value;
+  const dias = parseInt(document.getElementById("dias").value) || 30;
+  
+  if(!nome || !telefone) {
+    showToast('Preencha nome e telefone!', 'error');
+    return;
+  }
+  
+  showLoading();
+  const inicio = new Date();
+  const fim = new Date();
+  fim.setDate(inicio.getDate() + dias);
+  
+  const usuario = nome.toLowerCase().replace(/\s/g, '') + Math.floor(Math.random() * 1000);
+  const senha = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+  
+  await addDoc(collection(db,"usuarios"), {
+    tipo: "aluno",
+    nome, telefone, turma, pagamento,
+    dataInicio: inicio.toISOString(),
+    dataFim: fim.toISOString(),
+    status: "ativo",
+    usuario, senha
+  });
+  
+  hideLoading();
+  showToast('Aluno cadastrado com sucesso!', 'success');
+  
+  document.getElementById("nome").value = "";
+  document.getElementById("telefone").value = "";
+  document.getElementById("dias").value = "";
+  
+  await carregarAlunos();
+  await carregarDashboard();
+};
 
-window.salvarEdicao=async()=>{
-const dias=parseInt(editDias.value)||30
-const inicio=new Date()
-const fim=new Date()
-fim.setDate(inicio.getDate()+dias)
+let alunoEditandoId = null;
+window.abrirEditar = (btn) => {
+  alunoEditandoId = btn.dataset.id;
+  document.getElementById("editNome").value = btn.dataset.nome;
+  document.getElementById("editTelefone").value = btn.dataset.telefone;
+  document.getElementById("editTurma").value = btn.dataset.turma;
+  document.getElementById("editPagamento").value = btn.dataset.pagamento;
+  document.getElementById("editStatus").value = btn.dataset.status;
+  new bootstrap.Modal(document.getElementById('modalEditar')).show();
+};
 
-await updateDoc(doc(db,"usuarios",alunoEditandoId),{
-nome:editNome.value,
-telefone:editTelefone.value,
-turma:editTurma.value,
-pagamento:editPagamento.value,
-status:editStatus.value,
-dataInicio:inicio.toISOString(),
-dataFim:fim.toISOString()
-})
+window.salvarEdicao = async () => {
+  const dias = parseInt(document.getElementById("editDias").value) || 30;
+  const inicio = new Date();
+  const fim = new Date();
+  fim.setDate(inicio.getDate() + dias);
+  
+  showLoading();
+  await updateDoc(doc(db,"usuarios",alunoEditandoId), {
+    nome: document.getElementById("editNome").value,
+    telefone: document.getElementById("editTelefone").value,
+    turma: document.getElementById("editTurma").value,
+    pagamento: document.getElementById("editPagamento").value,
+    status: document.getElementById("editStatus").value,
+    dataInicio: inicio.toISOString(),
+    dataFim: fim.toISOString()
+  });
+  
+  hideLoading();
+  showToast('Aluno atualizado com sucesso!', 'success');
+  await carregarAlunos();
+  await carregarDashboard();
+  bootstrap.Modal.getInstance(document.getElementById('modalEditar')).hide();
+};
 
-alert("Atualizado!")
-carregarAlunos()
-carregarDashboard()
-bootstrap.Modal.getInstance(document.getElementById('modalEditar')).hide()
-}
+window.zap = (u, s, t) => {
+  let msg = `🎓 AprovaMaisPB\n\nUsuário: ${u}\nSenha: ${s}\n\nAcesse: https://aprovamaispb.com.br`;
+  window.open(`https://wa.me/55${t}?text=${encodeURIComponent(msg)}`);
+};
 
-// WHATSAPP
-window.zap=(u,s,t)=>{
-let msg=`🎓 AprovaMaisPB
-
-Usuário: ${u}
-Senha: ${s}
-
-Acesse:
-https://aprovamaispb.com.br`
-window.open(`https://wa.me/55${t}?text=${encodeURIComponent(msg)}`)
-}
-
-// RENOVAR
-window.renovar=async(id,t)=>{
-const ref=doc(db,"usuarios",id)
-const snap=await getDoc(ref)
-let fim=new Date(snap.data().dataFim||new Date())
-fim.setDate(fim.getDate()+30)
-await updateDoc(ref,{dataFim:fim.toISOString()})
-window.open(`https://wa.me/55${t}?text=Renovado+30+dias`)
-carregarDashboard()
-}
+window.renovar = async (id, t) => {
+  const ref = doc(db,"usuarios",id);
+  const snap = await getDoc(ref);
+  let fim = new Date(snap.data().dataFim || new Date());
+  fim.setDate(fim.getDate() + 30);
+  await updateDoc(ref, {dataFim: fim.toISOString()});
+  window.open(`https://wa.me/55${t}?text=Renovado+30+dias`);
+  showToast('Matrícula renovada por +30 dias!', 'success');
+  await carregarDashboard();
+};
 
 // MATERIAIS
-window.salvarLink=async()=>{
-await addDoc(collection(db,"materiais"),{
-titulo:titulo.value,
-url:linkDrive.value,
-turma:turmaMaterial.value
-})
-carregarMateriais()
-}
-
-async function carregarMateriais(){
-
-const filtro=filtroMaterial.value
-const snap=await getDocs(collection(db,"materiais"))
-
-let html=""
-
-snap.forEach(d=>{
-const m=d.data()
-if(filtro && m.turma!==filtro) return
-
-html+=`
-<div class="card p-3 mb-2 d-flex justify-content-between">
-<div>
-<b>${m.titulo}</b><br>
-<span class="badge bg-primary">${m.turma}</span>
-</div>
-<div>
-<a href="${m.url}" target="_blank" class="btn btn-success btn-sm">Baixar</a>
-<button onclick="delMat('${d.id}')" class="btn btn-danger btn-sm">Excluir</button>
-</div>
-</div>`
-})
-
-listaMateriais.innerHTML=html||"Nenhum material"
-}
-
-window.delMat=async id=>{
-await deleteDoc(doc(db,"materiais",id))
-carregarMateriais()
-}
-
-// Função para formatar data corretamente
-function formatarDataBR(dataString) {
-  if (!dataString) return "__/__/____"
+window.salvarLink = async () => {
+  const titulo = document.getElementById("titulo").value;
+  const url = document.getElementById("linkDrive").value;
+  const turma = document.getElementById("turmaMaterial").value;
   
-  // Divide a string da data (formato YYYY-MM-DD)
-  const partes = dataString.split('-')
-  if (partes.length === 3) {
-    const ano = partes[0]
-    const mes = partes[1]
-    const dia = partes[2]
-    return `${dia}/${mes}/${ano}`
+  if(!titulo || !url) {
+    showToast('Preencha título e link!', 'error');
+    return;
   }
-  return dataString
-}
-
-// PRESENÇA
-window.gerarListaPresenca = async ()=>{
-
-  const turma = turmaPresenca.value
-  const data = dataPresenca.value
   
-  // Formatar a data corretamente
-  const dataFormatada = formatarDataBR(data)
+  showLoading();
+  await addDoc(collection(db,"materiais"), { titulo, url, turma });
+  hideLoading();
+  showToast('Material adicionado com sucesso!', 'success');
+  document.getElementById("titulo").value = "";
+  document.getElementById("linkDrive").value = "";
+  await carregarMateriais();
+};
 
-  const snap = await getDocs(collection(db,"usuarios"))
-
-  // Criar array para ordenar alunos
-  let alunos = []
-
-  snap.forEach(d=>{
-    const a = d.data()
-    if(a.tipo === "aluno"){
-      if(turma && a.turma !== turma) return
-      alunos.push(a)
-    }
-  })
-
-  // Ordenar alunos por nome em ordem alfabética
-  alunos.sort((a, b) => {
-    if (a.nome < b.nome) return -1
-    if (a.nome > b.nome) return 1
-    return 0
-  })
-
-  // Configuração: 15 alunos por página
-  const alunosPorPagina = 15
-  const totalPaginas = Math.ceil(alunos.length / alunosPorPagina)
-
-  // Criar container principal
-  let html = `<div class="pdf-container">`
-
-  for(let pagina = 0; pagina < totalPaginas; pagina++) {
-    const inicio = pagina * alunosPorPagina
-    const fim = Math.min(inicio + alunosPorPagina, alunos.length)
-    const alunosPagina = alunos.slice(inicio, fim)
-
-    // Cabeçalho da página com a logo
+async function carregarMateriais() {
+  const filtro = document.getElementById("filtroMaterial").value;
+  const snap = await getDocs(collection(db,"materiais"));
+  
+  let html = '<div class="row">';
+  snap.forEach(d => {
+    const m = d.data();
+    if(filtro && m.turma !== filtro) return;
+    
     html += `
-    <div class="pdf-header">
-      <div class="pdf-header-left">
-        <img src="assets/img/logo_aprovamaispb.png" class="logo-pdf" alt="Logo AprovaMaisPB" onerror="this.style.display='none'">
-        <div>
-          <h4 style="margin:0; color:#0d6efd; font-size: 18px;">AprovaMaisPB</h4>
-          <small style="color:#555; font-size: 10px;">Lista de Presença</small>
+      <div class="col-md-6 mb-3">
+        <div class="card p-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="mb-1"><i class="fas fa-file-alt"></i> ${m.titulo}</h6>
+              <span class="badge-status badge-ativo">${m.turma}</span>
+            </div>
+            <div>
+              <a href="${m.url}" target="_blank" class="btn-modern btn-success-modern" style="padding: 5px 10px;">
+                <i class="fas fa-download"></i>
+              </a>
+              <button onclick="delMat('${d.id}')" class="btn-modern btn-danger-modern" style="padding: 5px 10px; margin-left: 5px;">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="pdf-header-right">
-        <div style="font-size: 11px;"><b>Turma:</b> ${turma || "Todas"}</div>
-        <div style="font-size: 11px;"><b>Data:</b> ${dataFormatada}</div>
-        <div style="font-size: 11px;"><b>Página:</b> ${pagina + 1} de ${totalPaginas}</div>
-      </div>
-    </div>
+    `;
+  });
+  html += '</div>';
+  
+  document.getElementById("listaMateriais").innerHTML = html || '<p class="text-center text-muted">Nenhum material disponível</p>';
+}
 
-    <table class="pdf-table">
-      <thead>
-        <tr>
-          <th style="width: 12%; text-align: center;">Nº</th>
-          <th style="width: 55%; text-align: left;">Nome do Aluno</th>
-          <th style="width: 33%; text-align: center;">Assinatura</th>
-        </tr>
-      </thead>
-      <tbody>
-    `
+window.delMat = async (id) => {
+  if(confirm('Excluir este material?')) {
+    showLoading();
+    await deleteDoc(doc(db,"materiais",id));
+    hideLoading();
+    showToast('Material excluído!', 'success');
+    await carregarMateriais();
+  }
+};
 
-    let i = inicio + 1
+// PRESENÇA
+function formatarDataBR(dataString) {
+  if (!dataString) return "__/__/____";
+  const partes = dataString.split('-');
+  if (partes.length === 3) {
+    return `${partes[2]}/${partes[1]}/${partes[0]}`;
+  }
+  return dataString;
+}
+
+window.gerarListaPresenca = async () => {
+  const turma = document.getElementById("turmaPresenca").value;
+  const data = document.getElementById("dataPresenca").value;
+  const dataFormatada = formatarDataBR(data);
+  
+  const snap = await getDocs(collection(db,"usuarios"));
+  let alunos = [];
+  
+  snap.forEach(d => {
+    const a = d.data();
+    if(a.tipo === "aluno") {
+      if(turma && a.turma !== turma) return;
+      alunos.push(a);
+    }
+  });
+  
+  alunos.sort((a, b) => a.nome.localeCompare(b.nome));
+  
+  const alunosPorPagina = 15;
+  const totalPaginas = Math.ceil(alunos.length / alunosPorPagina);
+  
+  let html = `<div class="pdf-container">`;
+  
+  for(let pagina = 0; pagina < totalPaginas; pagina++) {
+    const inicio = pagina * alunosPorPagina;
+    const fim = Math.min(inicio + alunosPorPagina, alunos.length);
+    const alunosPagina = alunos.slice(inicio, fim);
+    
+    html += `
+      <div style="margin-bottom: 30px; page-break-after: ${pagina < totalPaginas - 1 ? 'always' : 'avoid'}">
+        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #4361ee; padding-bottom: 15px; margin-bottom: 20px;">
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <img src="assets/img/logo_aprovamaispb.png" style="width: 60px;" onerror="this.style.display='none'">
+            <div>
+              <h3 style="margin: 0; color: #4361ee;">AprovaMaisPB</h3>
+              <small>Lista de Presença</small>
+            </div>
+          </div>
+          <div style="text-align: right;">
+            <div><strong>Turma:</strong> ${turma || "Todas"}</div>
+            <div><strong>Data:</strong> ${dataFormatada}</div>
+            <div><strong>Página:</strong> ${pagina + 1} de ${totalPaginas}</div>
+          </div>
+        </div>
+        
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="background: #4361ee; color: white;">
+              <th style="padding: 10px; text-align: center;">Nº</th>
+              <th style="padding: 10px; text-align: left;">Aluno</th>
+              <th style="padding: 10px; text-align: center;">Assinatura</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+    
+    let i = inicio + 1;
     alunosPagina.forEach(a => {
       html += `
-        <tr>
-          <td style="text-align: center; vertical-align: middle; font-size: 11px;">${i++}</td>
-          <td style="vertical-align: middle; font-size: 11px;">${a.nome}</td>
-          <td style="text-align: center; vertical-align: middle;">
-            <div class="assinatura-linha"></div>
+        <tr style="border-bottom: 1px solid #ddd;">
+          <td style="padding: 10px; text-align: center;">${i++}</td>
+          <td style="padding: 10px;">${a.nome}</td>
+          <td style="padding: 10px; text-align: center;">
+            <div style="border-bottom: 1.5px solid #000; width: 120px; margin: 0 auto; height: 30px;"></div>
           </td>
-        </tr>`
-    })
-
-    // Preencher espaços vazios se necessário
-    const espacosVazios = alunosPorPagina - alunosPagina.length
+        </tr>
+      `;
+    });
+    
+    const espacosVazios = alunosPorPagina - alunosPagina.length;
     for(let v = 0; v < espacosVazios; v++) {
       html += `
-        <tr>
-          <td style="text-align: center; vertical-align: middle; font-size: 11px;">${i + v}</td>
-          <td style="vertical-align: middle; font-size: 11px;">&nbsp;</td>
-          <td style="text-align: center; vertical-align: middle;">
-            <div class="assinatura-linha"></div>
+        <tr style="border-bottom: 1px solid #ddd;">
+          <td style="padding: 10px; text-align: center;">${i + v}</td>
+          <td style="padding: 10px;">&nbsp;</td>
+          <td style="padding: 10px; text-align: center;">
+            <div style="border-bottom: 1.5px solid #000; width: 120px; margin: 0 auto; height: 30px;"></div>
           </td>
-        </tr>`
+        </tr>
+      `;
     }
-
+    
     html += `
-      </tbody>
-    </table>
-
-    <div class="pdf-footer">
-      Sistema AprovaMaisPB • Controle de Presença • Gerado em ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString()}
-    </div>
-    `
-
-    // Adicionar quebra de página (exceto na última)
-    if(pagina < totalPaginas - 1) {
-      html += `<div class="page-break"></div>`
-    }
+          </tbody>
+        </table>
+        <div style="margin-top: 30px; text-align: center; color: #777; font-size: 11px; padding-top: 10px;">
+          Sistema AprovaMaisPB • Gerado em ${new Date().toLocaleDateString('pt-BR')}
+        </div>
+      </div>
+    `;
   }
-
-  html += `</div>`
-
-  document.getElementById("listaPresenca").innerHTML = html
-}
-
-// PDF - Configurações otimizadas
-window.baixarPDF=()=>{
-  const element = document.getElementById("listaPresenca")
   
-  // Configurações para melhor formatação do PDF
+  html += `</div>`;
+  document.getElementById("listaPresenca").innerHTML = html;
+  showToast('Lista gerada com sucesso!', 'success');
+};
+
+window.baixarPDF = () => {
+  const element = document.getElementById("listaPresenca");
   const opt = {
-    margin:        [0.4, 0.4, 0.4, 0.4],
-    filename:     `lista_presenca_${new Date().toLocaleDateString()}.pdf`,
-    image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2, letterRendering: true, useCORS: true, logging: false },
-    jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
-    pagebreak:    { mode: ['css', 'legacy'] }
-  }
-  
-  // Gerar PDF
-  html2pdf().from(element).set(opt).save()
-}
+    margin: [0.5, 0.5, 0.5, 0.5],
+    filename: `lista_presenca_${new Date().toLocaleDateString()}.pdf`,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+  };
+  html2pdf().from(element).set(opt).save();
+  showToast('PDF sendo gerado...', 'success');
+};
 
 // INIT
-carregarDashboard()
-carregarAlunos()
-carregarMateriais()
+carregarDashboard();
+carregarAlunos();
+carregarMateriais();
 
+// Fechar sidebar ao clicar fora no mobile
+document.addEventListener('click', function(e) {
+  const sidebar = document.getElementById('sidebar');
+  const toggle = document.getElementById('menuToggle');
+  if(window.innerWidth <= 768 && sidebar.classList.contains('active') && !sidebar.contains(e.target) && e.target !== toggle) {
+    sidebar.classList.remove('active');
+  }
+});
 </script>
 </body>
 </html>
