@@ -381,6 +381,113 @@ body {
   flex-wrap: wrap;
 }
 
+/* Estilos para o PDF da lista de presença - Layout A4 otimizado */
+@page {
+  size: A4;
+  margin: 0;
+}
+
+.pagina-presenca {
+  width: 210mm;
+  min-height: 297mm;
+  padding: 12mm 10mm 10mm 10mm;
+  margin: 0;
+  background: white;
+  position: relative;
+  box-sizing: border-box;
+  page-break-after: always;
+  page-break-inside: avoid;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+.pagina-presenca:last-child {
+  page-break-after: auto;
+}
+
+.header-presenca {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 3px solid #4361ee;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+  page-break-inside: avoid;
+}
+
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-presenca {
+  width: 50px;
+  height: auto;
+  object-fit: contain;
+}
+
+.logo-area h4 {
+  margin: 0;
+  font-size: 18px;
+  color: #4361ee;
+  font-weight: 700;
+}
+
+.logo-area small {
+  font-size: 10px;
+  color: #666;
+}
+
+.info-area {
+  text-align: right;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.info-area div {
+  margin-bottom: 3px;
+}
+
+.tabela-presenca {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 10.5px;
+  margin-top: 5px;
+}
+
+.tabela-presenca th {
+  background: #4361ee;
+  color: white;
+  padding: 8px 6px;
+  font-weight: 600;
+  font-size: 11px;
+  border: none;
+}
+
+.tabela-presenca td {
+  padding: 6px 6px;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: middle;
+}
+
+.linha-assinatura {
+  border-bottom: 1.5px solid #000;
+  width: 100px;
+  margin: 0 auto;
+  height: 22px;
+}
+
+.footer-presenca {
+  margin-top: 20px;
+  text-align: center;
+  color: #9ca3af;
+  font-size: 9px;
+  padding-top: 8px;
+  border-top: 1px solid #e5e7eb;
+  position: relative;
+  bottom: 0;
+}
+
 /* Responsividade */
 @media (max-width: 768px) {
   .sidebar {
@@ -750,7 +857,6 @@ window.mostrar = (sec) => {
   });
   document.getElementById(sec).style.display = 'block';
   
-  // Ativar link na sidebar
   document.querySelectorAll('.sidebar-nav a').forEach(link => {
     link.classList.remove('active');
     if(link.getAttribute('data-page') === sec) {
@@ -862,7 +968,7 @@ async function carregarAlunos() {
   alunos.sort((a, b) => a.nome.localeCompare(b.nome));
   
   let html = '<div class="table-responsive"><table class="table-modern">';
-  html += '<thead><tr><th>Nome</th><th>Turma</th><th>Status</th><th>Ações</th></tr></thead><tbody>';
+  html += '<thead><tr><th>Nome</th><th>Turma</th><th>Status</th><th>Ações</th> </thead><tbody>';
   
   alunos.forEach(a => {
     html += `
@@ -1065,7 +1171,7 @@ window.delMat = async (id) => {
   }
 };
 
-// PRESENÇA
+// PRESENÇA - Distribuição inteligente para folha A4
 function formatarDataBR(dataString) {
   if (!dataString) return "__/__/____";
   const partes = dataString.split('-');
@@ -1073,6 +1179,23 @@ function formatarDataBR(dataString) {
     return `${partes[2]}/${partes[1]}/${partes[0]}`;
   }
   return dataString;
+}
+
+// Calcula o número ideal de alunos por página baseado na altura disponível
+function calcularAlunosPorPagina() {
+  // Altura total A4 em mm: 297mm
+  // Margens: superior 12mm + inferior 10mm = 22mm
+  // Altura útil: 275mm
+  
+  // Cabeçalho: ~40mm
+  // Rodapé: ~15mm
+  // Altura por linha: ~10mm (incluindo padding e border)
+  
+  // Espaço disponível para linhas: 275 - 40 - 15 = 220mm
+  // Com 10mm por linha, cabem 22 linhas
+  // Mas para garantir que tudo caiba perfeitamente, usamos 21 alunos por página
+  // Isso dá margem de segurança e evita cortes
+  return 21;
 }
 
 window.gerarListaPresenca = async () => {
@@ -1093,10 +1216,11 @@ window.gerarListaPresenca = async () => {
   
   alunos.sort((a, b) => a.nome.localeCompare(b.nome));
   
-  const alunosPorPagina = 15;
+  // Calcular número ideal de alunos por página
+  const alunosPorPagina = calcularAlunosPorPagina();
   const totalPaginas = Math.ceil(alunos.length / alunosPorPagina);
   
-  let html = `<div class="pdf-container">`;
+  let html = '';
   
   for(let pagina = 0; pagina < totalPaginas; pagina++) {
     const inicio = pagina * alunosPorPagina;
@@ -1104,28 +1228,29 @@ window.gerarListaPresenca = async () => {
     const alunosPagina = alunos.slice(inicio, fim);
     
     html += `
-      <div style="margin-bottom: 30px; page-break-after: ${pagina < totalPaginas - 1 ? 'always' : 'avoid'}">
-        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #4361ee; padding-bottom: 15px; margin-bottom: 20px;">
-          <div style="display: flex; align-items: center; gap: 15px;">
-            <img src="assets/img/logo_aprovamaispb.png" style="width: 60px;" onerror="this.style.display='none'">
+      <div class="pagina-presenca">
+        <div class="header-presenca">
+          <div class="logo-area">
+            <img src="assets/img/logo_aprovamaispb.png" class="logo-presenca" alt="Logo" onerror="this.style.display='none'">
             <div>
-              <h3 style="margin: 0; color: #4361ee;">AprovaMaisPB</h3>
+              <h4>AprovaMaisPB</h4>
               <small>Lista de Presença</small>
             </div>
           </div>
-          <div style="text-align: right;">
+          <div class="info-area">
             <div><strong>Turma:</strong> ${turma || "Todas"}</div>
             <div><strong>Data:</strong> ${dataFormatada}</div>
             <div><strong>Página:</strong> ${pagina + 1} de ${totalPaginas}</div>
+            <div><strong>Total Alunos:</strong> ${alunos.length}</div>
           </div>
         </div>
         
-        <table style="width: 100%; border-collapse: collapse;">
+        <table class="tabela-presenca">
           <thead>
-            <tr style="background: #4361ee; color: white;">
-              <th style="padding: 10px; text-align: center;">Nº</th>
-              <th style="padding: 10px; text-align: left;">Aluno</th>
-              <th style="padding: 10px; text-align: center;">Assinatura</th>
+            <tr>
+              <th style="width: 10%; text-align: center;">Nº</th>
+              <th style="width: 55%; text-align: left;">Nome do Aluno</th>
+              <th style="width: 35%; text-align: center;">Assinatura</th>
             </tr>
           </thead>
           <tbody>
@@ -1134,55 +1259,59 @@ window.gerarListaPresenca = async () => {
     let i = inicio + 1;
     alunosPagina.forEach(a => {
       html += `
-        <tr style="border-bottom: 1px solid #ddd;">
-          <td style="padding: 10px; text-align: center;">${i++}</td>
-          <td style="padding: 10px;">${a.nome}</td>
-          <td style="padding: 10px; text-align: center;">
-            <div style="border-bottom: 1.5px solid #000; width: 120px; margin: 0 auto; height: 30px;"></div>
+        <tr>
+          <td style="text-align: center; vertical-align: middle;">${i++}</td>
+          <td style="vertical-align: middle;">${a.nome}</td>
+          <td style="text-align: center; vertical-align: middle;">
+            <div class="linha-assinatura"></div>
           </td>
         </tr>
       `;
     });
     
+    // Preencher espaços vazios para manter consistência visual
+    // Isso evita que a última página tenha menos linhas e pareça "cortada"
     const espacosVazios = alunosPorPagina - alunosPagina.length;
-    for(let v = 0; v < espacosVazios; v++) {
-      html += `
-        <tr style="border-bottom: 1px solid #ddd;">
-          <td style="padding: 10px; text-align: center;">${i + v}</td>
-          <td style="padding: 10px;">&nbsp;</td>
-          <td style="padding: 10px; text-align: center;">
-            <div style="border-bottom: 1.5px solid #000; width: 120px; margin: 0 auto; height: 30px;"></div>
-          </td>
-        </tr>
-      `;
+    if(espacosVazios > 0 && espacosVazios < alunosPorPagina) {
+      for(let v = 0; v < espacosVazios; v++) {
+        html += `
+          <tr style="opacity: 0.5;">
+            <td style="text-align: center; vertical-align: middle;">${i + v}</td>
+            <td style="vertical-align: middle;"><em style="color: #999;">(vaga disponível)</em></td>
+            <td style="text-align: center; vertical-align: middle;">
+              <div class="linha-assinatura" style="border-bottom-color: #ccc;"></div>
+            </td>
+          </tr>
+        `;
+      }
     }
     
     html += `
           </tbody>
         </table>
-        <div style="margin-top: 30px; text-align: center; color: #777; font-size: 11px; padding-top: 10px;">
-          Sistema AprovaMaisPB • Gerado em ${new Date().toLocaleDateString('pt-BR')}
+        
+        <div class="footer-presenca">
+          <i class="fas fa-check-circle"></i> Assinatura do responsável • ${new Date().toLocaleDateString('pt-BR')}
         </div>
       </div>
     `;
   }
   
-  html += `</div>`;
   document.getElementById("listaPresenca").innerHTML = html;
-  showToast('Lista gerada com sucesso!', 'success');
+  showToast(`Lista gerada com ${alunos.length} alunos distribuídos em ${totalPaginas} página(s) (${alunosPorPagina} alunos por página)!`, 'success');
 };
 
 window.baixarPDF = () => {
   const element = document.getElementById("listaPresenca");
   const opt = {
-    margin: [0.5, 0.5, 0.5, 0.5],
+    margin: [0, 0, 0, 0],
     filename: `lista_presenca_${new Date().toLocaleDateString()}.pdf`,
     image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2 },
-    jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+    html2canvas: { scale: 2, letterRendering: true, useCORS: true },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
   };
   html2pdf().from(element).set(opt).save();
-  showToast('PDF sendo gerado...', 'success');
+  showToast('PDF gerado com sucesso!', 'success');
 };
 
 // INIT
