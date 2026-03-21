@@ -1518,7 +1518,7 @@ async function carregarResumoPagamentos() {
   document.getElementById("totalCartao").innerText = cartao;
   document.getElementById("totalDinheiro").innerText = dinheiro;
   
-  const valorMensalidade = 150; // Valor da mensalidade
+  const valorMensalidade = 0; // Valor da mensalidade
   const receitaTotal = (pix + cartao + dinheiro) * valorMensalidade;
   document.getElementById("receitaTotal").innerHTML = `R$ ${receitaTotal.toFixed(2)}`;
   document.getElementById("saldoReceita").innerHTML = `R$ ${receitaTotal.toFixed(2)}`;
