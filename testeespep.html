@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Mapa Comparativo de Preços</title>
+
+<style>
+body{
+    font-family: Arial;
+    background:#f5f7fa;
+    padding:20px;
+}
+
+h1{
+    text-align:center;
+    color:#0d3b66;
+}
+
+.container{
+    max-width:1200px;
+    margin:auto;
+}
+
+input, select, button{
+    padding:8px;
+    margin:5px;
+}
+
+button{
+    background:#0d3b66;
+    color:#fff;
+    border:none;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#094a86;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+    background:#fff;
+}
+
+th, td{
+    border:1px solid #ccc;
+    padding:8px;
+    text-align:center;
+}
+
+th{
+    background:#0d3b66;
+    color:#fff;
+}
+
+.print{
+    margin-top:20px;
+}
+
+@media print{
+    button, .form{
+        display:none;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>MAPA COMPARATIVO DE PREÇOS</h1>
+
+<div class="form">
+
+<h3>Cadastro do Item</h3>
+<input id="descricao" placeholder="Descrição do item">
+<input id="qtd" type="number" placeholder="Quantidade">
+<input id="und" placeholder="Unidade (KG, UND...)">
+<button onclick="criarItem()">Adicionar Item</button>
+
+<hr>
+
+<h3>Adicionar Cotação</h3>
+<select id="itemSelect"></select>
+<input id="empresa" placeholder="Empresa">
+<input id="valor" type="number" placeholder="Valor Unitário">
+<button onclick="addCotacao()">Adicionar Cotação</button>
+
+</div>
+
+<table id="tabela">
+<thead>
+<tr>
+<th>Item</th>
+<th>Descrição</th>
+<th>Qtd</th>
+<th>Empresa</th>
+<th>Valor Unit</th>
+<th>Valor Total</th>
+<th>Média</th>
+<th>Mediana</th>
+<th>Média Saneada</th>
+<th>Variância</th>
+<th>Desvio Padrão</th>
+<th>Mín</th>
+<th>Máx</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+
+<button class="print" onclick="window.print()">🖨️ Imprimir</button>
+
+</div>
+
+<script>
+
+let itens = [];
+
+function criarItem(){
+    let descricao = document.getElementById("descricao").value;
+    let qtd = parseFloat(document.getElementById("qtd").value);
+    let und = document.getElementById("und").value;
+
+    let item = {
+        descricao,
+        qtd,
+        und,
+        cotacoes:[]
+    };
+
+    itens.push(item);
+    atualizarSelect();
+}
+
+function atualizarSelect(){
+    let select = document.getElementById("itemSelect");
+    select.innerHTML = "";
+
+    itens.forEach((item, i)=>{
+        select.innerHTML += `<option value="${i}">Item ${i+1}</option>`;
+    });
+}
+
+function addCotacao(){
+    let index = document.getElementById("itemSelect").value;
+    let empresa = document.getElementById("empresa").value;
+    let valor = parseFloat(document.getElementById("valor").value);
+
+    let item = itens[index];
+
+    item.cotacoes.push({
+        empresa,
+        valor,
+        total: valor * item.qtd
+    });
+
+    render();
+}
+
+function calcularEstatisticas(valores){
+
+    let n = valores.length;
+    let media = valores.reduce((a,b)=>a+b,0)/n;
+
+    let ordenado = [...valores].sort((a,b)=>a-b);
+
+    let mediana = n%2 === 0 ?
+        (ordenado[n/2-1] + ordenado[n/2])/2 :
+        ordenado[Math.floor(n/2)];
+
+    let saneado = ordenado.slice(1, -1);
+    let mediaSaneada = saneado.length ?
+        saneado.reduce((a,b)=>a+b,0)/saneado.length : media;
+
+    let variancia = valores.reduce((a,b)=>a + Math.pow(b - media,2),0)/n;
+
+    let desvio = Math.sqrt(variancia);
+
+    return {
+        media, mediana, mediaSaneada, variancia, desvio,
+        min: Math.min(...valores),
+        max: Math.max(...valores)
+    };
+}
+
+function render(){
+
+    let tbody = document.querySelector("#tabela tbody");
+    tbody.innerHTML = "";
+
+    itens.forEach((item, i)=>{
+
+        if(item.cotacoes.length === 0) return;
+
+        let valores = item.cotacoes.map(c=>c.total);
+        let stats = calcularEstatisticas(valores);
+
+        item.cotacoes.forEach((c, index)=>{
+
+            tbody.innerHTML += `
+            <tr>
+                <td>${i+1}</td>
+                <td>${item.descricao}</td>
+                <td>${item.qtd} ${item.und}</td>
+                <td>${c.empresa}</td>
+                <td>R$ ${c.valor.toFixed(2)}</td>
+                <td>R$ ${c.total.toFixed(2)}</td>
+
+                ${index===0 ? `
+                <td rowspan="${item.cotacoes.length}">R$ ${stats.media.toFixed(2)}</td>
+                <td rowspan="${item.cotacoes.length}">R$ ${stats.mediana.toFixed(2)}</td>
+                <td rowspan="${item.cotacoes.length}">R$ ${stats.mediaSaneada.toFixed(2)}</td>
+                <td rowspan="${item.cotacoes.length}">${stats.variancia.toFixed(2)}</td>
+                <td rowspan="${item.cotacoes.length}">${stats.desvio.toFixed(2)}</td>
+                <td rowspan="${item.cotacoes.length}">R$ ${stats.min.toFixed(2)}</td>
+                <td rowspan="${item.cotacoes.length}">R$ ${stats.max.toFixed(2)}</td>
+                ` : ``}
+
+            </tr>
+            `;
+        });
+
+    });
+
+}
+
+</script>
+
+</body>
+</html>
