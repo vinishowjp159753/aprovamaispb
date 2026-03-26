@@ -2,12 +2,12 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Mapa Comparativo de Preços</title>
+<title>Mapa Comparativo - ESPEP</title>
 
 <style>
 body{
     font-family: Arial;
-    background:#f5f7fa;
+    background:#eef2f7;
     padding:20px;
 }
 
@@ -17,8 +17,16 @@ h1{
 }
 
 .container{
-    max-width:1200px;
+    max-width:1300px;
     margin:auto;
+}
+
+.card{
+    background:#fff;
+    padding:15px;
+    border-radius:8px;
+    margin-bottom:15px;
+    box-shadow:0 2px 6px rgba(0,0,0,0.1);
 }
 
 input, select, button{
@@ -46,7 +54,8 @@ table{
 
 th, td{
     border:1px solid #ccc;
-    padding:8px;
+    padding:6px;
+    font-size:13px;
     text-align:center;
 }
 
@@ -55,12 +64,12 @@ th{
     color:#fff;
 }
 
-.print{
-    margin-top:20px;
+.actions button{
+    background:#c0392b;
 }
 
 @media print{
-    button, .form{
+    .no-print{
         display:none;
     }
 }
@@ -73,115 +82,118 @@ th{
 
 <h1>MAPA COMPARATIVO DE PREÇOS</h1>
 
-<div class="form">
-
+<div class="card no-print">
 <h3>Cadastro do Item</h3>
-<input id="descricao" placeholder="Descrição do item">
+<input id="descricao" placeholder="Descrição">
 <input id="qtd" type="number" placeholder="Quantidade">
-<input id="und" placeholder="Unidade (KG, UND...)">
-<button onclick="criarItem()">Adicionar Item</button>
+<input id="und" placeholder="Unidade">
+<button onclick="addItem()">Adicionar</button>
+</div>
 
-<hr>
-
+<div class="card no-print">
 <h3>Adicionar Cotação</h3>
 <select id="itemSelect"></select>
 <input id="empresa" placeholder="Empresa">
+<input id="cnpj" placeholder="CNPJ">
 <input id="valor" type="number" placeholder="Valor Unitário">
 <button onclick="addCotacao()">Adicionar Cotação</button>
-
 </div>
 
-<table id="tabela">
+<table>
 <thead>
 <tr>
 <th>Item</th>
 <th>Descrição</th>
 <th>Qtd</th>
 <th>Empresa</th>
-<th>Valor Unit</th>
-<th>Valor Total</th>
+<th>CNPJ</th>
+<th>V.Unit</th>
+<th>Total</th>
 <th>Média</th>
 <th>Mediana</th>
-<th>Média Saneada</th>
+<th>Saneada</th>
 <th>Variância</th>
-<th>Desvio Padrão</th>
+<th>Desvio</th>
 <th>Mín</th>
 <th>Máx</th>
+<th class="no-print">Ações</th>
 </tr>
 </thead>
-<tbody></tbody>
+<tbody id="tbody"></tbody>
 </table>
 
-<button class="print" onclick="window.print()">🖨️ Imprimir</button>
+<button class="no-print" onclick="window.print()">🖨️ Imprimir</button>
 
 </div>
 
 <script>
 
-let itens = [];
+let itens = JSON.parse(localStorage.getItem("itens")) || [];
 
-function criarItem(){
-    let descricao = document.getElementById("descricao").value;
-    let qtd = parseFloat(document.getElementById("qtd").value);
-    let und = document.getElementById("und").value;
+function salvar(){
+    localStorage.setItem("itens", JSON.stringify(itens));
+}
 
+function addItem(){
     let item = {
-        descricao,
-        qtd,
-        und,
+        descricao:descricao.value,
+        qtd:parseFloat(qtd.value),
+        und:und.value,
         cotacoes:[]
     };
 
     itens.push(item);
+    salvar();
     atualizarSelect();
+    render();
 }
 
 function atualizarSelect(){
-    let select = document.getElementById("itemSelect");
-    select.innerHTML = "";
-
-    itens.forEach((item, i)=>{
-        select.innerHTML += `<option value="${i}">Item ${i+1}</option>`;
+    itemSelect.innerHTML = "";
+    itens.forEach((i, index)=>{
+        itemSelect.innerHTML += `<option value="${index}">Item ${index+1}</option>`;
     });
 }
 
 function addCotacao(){
-    let index = document.getElementById("itemSelect").value;
-    let empresa = document.getElementById("empresa").value;
-    let valor = parseFloat(document.getElementById("valor").value);
+    let i = itemSelect.value;
 
-    let item = itens[index];
-
-    item.cotacoes.push({
-        empresa,
-        valor,
-        total: valor * item.qtd
+    itens[i].cotacoes.push({
+        empresa:empresa.value,
+        cnpj:cnpj.value,
+        valor:parseFloat(valor.value)
     });
 
+    salvar();
     render();
 }
 
-function calcularEstatisticas(valores){
+function removerCotacao(itemIndex, cotIndex){
+    itens[itemIndex].cotacoes.splice(cotIndex,1);
+    salvar();
+    render();
+}
+
+function stats(valores){
 
     let n = valores.length;
     let media = valores.reduce((a,b)=>a+b,0)/n;
 
-    let ordenado = [...valores].sort((a,b)=>a-b);
+    let ord = [...valores].sort((a,b)=>a-b);
 
-    let mediana = n%2 === 0 ?
-        (ordenado[n/2-1] + ordenado[n/2])/2 :
-        ordenado[Math.floor(n/2)];
+    let mediana = n%2 ? ord[Math.floor(n/2)] : (ord[n/2-1]+ord[n/2])/2;
 
-    let saneado = ordenado.slice(1, -1);
-    let mediaSaneada = saneado.length ?
-        saneado.reduce((a,b)=>a+b,0)/saneado.length : media;
+    let saneado = ord.slice(1,-1);
+    let mediaSaneada = saneado.length ? saneado.reduce((a,b)=>a+b,0)/saneado.length : media;
 
-    let variancia = valores.reduce((a,b)=>a + Math.pow(b - media,2),0)/n;
-
-    let desvio = Math.sqrt(variancia);
+    let variancia = valores.reduce((a,b)=>a + (b-media)**2,0)/n;
 
     return {
-        media, mediana, mediaSaneada, variancia, desvio,
+        media,
+        mediana,
+        mediaSaneada,
+        variancia,
+        desvio: Math.sqrt(variancia),
         min: Math.min(...valores),
         max: Math.max(...valores)
     };
@@ -189,17 +201,19 @@ function calcularEstatisticas(valores){
 
 function render(){
 
-    let tbody = document.querySelector("#tabela tbody");
+    let tbody = document.getElementById("tbody");
     tbody.innerHTML = "";
 
     itens.forEach((item, i)=>{
 
         if(item.cotacoes.length === 0) return;
 
-        let valores = item.cotacoes.map(c=>c.total);
-        let stats = calcularEstatisticas(valores);
+        let totais = item.cotacoes.map(c=>c.valor * item.qtd);
+        let s = stats(totais);
 
-        item.cotacoes.forEach((c, index)=>{
+        item.cotacoes.forEach((c, j)=>{
+
+            let total = c.valor * item.qtd;
 
             tbody.innerHTML += `
             <tr>
@@ -207,26 +221,31 @@ function render(){
                 <td>${item.descricao}</td>
                 <td>${item.qtd} ${item.und}</td>
                 <td>${c.empresa}</td>
+                <td>${c.cnpj}</td>
                 <td>R$ ${c.valor.toFixed(2)}</td>
-                <td>R$ ${c.total.toFixed(2)}</td>
+                <td>R$ ${total.toFixed(2)}</td>
 
-                ${index===0 ? `
-                <td rowspan="${item.cotacoes.length}">R$ ${stats.media.toFixed(2)}</td>
-                <td rowspan="${item.cotacoes.length}">R$ ${stats.mediana.toFixed(2)}</td>
-                <td rowspan="${item.cotacoes.length}">R$ ${stats.mediaSaneada.toFixed(2)}</td>
-                <td rowspan="${item.cotacoes.length}">${stats.variancia.toFixed(2)}</td>
-                <td rowspan="${item.cotacoes.length}">${stats.desvio.toFixed(2)}</td>
-                <td rowspan="${item.cotacoes.length}">R$ ${stats.min.toFixed(2)}</td>
-                <td rowspan="${item.cotacoes.length}">R$ ${stats.max.toFixed(2)}</td>
-                ` : ``}
+                ${j===0 ? `
+                <td rowspan="${item.cotacoes.length}">${s.media.toFixed(2)}</td>
+                <td rowspan="${item.cotacoes.length}">${s.mediana.toFixed(2)}</td>
+                <td rowspan="${item.cotacoes.length}">${s.mediaSaneada.toFixed(2)}</td>
+                <td rowspan="${item.cotacoes.length}">${s.variancia.toFixed(2)}</td>
+                <td rowspan="${item.cotacoes.length}">${s.desvio.toFixed(2)}</td>
+                <td rowspan="${item.cotacoes.length}">${s.min.toFixed(2)}</td>
+                <td rowspan="${item.cotacoes.length}">${s.max.toFixed(2)}</td>
+                ` : ""}
 
+                <td class="no-print actions">
+                    <button onclick="removerCotacao(${i},${j})">X</button>
+                </td>
             </tr>
             `;
         });
-
     });
-
 }
+
+atualizarSelect();
+render();
 
 </script>
 
