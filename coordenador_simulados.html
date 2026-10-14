@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AprovaMaisPB - Gestão de Simulados</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+:root {
+  --primary: #4361ee;
+  --primary-dark: #3a56d4;
+  --secondary: #3f37c9;
+  --success: #4cc9f0;
+  --danger: #f72585;
+  --warning: #f8961e;
+  --dark: #2b2d42;
+  --light: #f8f9fa;
+  --gray: #6c757d;
+  --gradient: linear-gradient(135deg, #4361ee, #3f37c9);
+  --sidebar-width: 280px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Segoe UI', 'Poppins', sans-serif;
+  background: #f1f5f9;
+  overflow-x: hidden;
+}
+
+.sidebar {
+  position: fixed; left: 0; top: 0;
+  width: var(--sidebar-width); height: 100%;
+  background: white;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+  z-index: 1000; overflow-y: auto;
+}
+
+.sidebar-header {
+  padding: 25px 20px; text-align: center;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.sidebar-header h3 { font-size: 1.3rem; color: var(--primary); margin: 0; }
+
+.sidebar-nav { padding: 20px 0; }
+
+.sidebar-nav a {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 25px; color: var(--dark);
+  text-decoration: none; transition: all 0.3s;
+  font-weight: 500; margin: 5px 0; cursor: pointer;
+}
+
+.sidebar-nav a i { width: 24px; font-size: 1.2rem; }
+
+.sidebar-nav a:hover {
+  background: rgba(67, 97, 238, 0.1);
+  color: var(--primary); padding-left: 30px;
+}
+
+.sidebar-nav a.active {
+  background: var(--gradient); color: white;
+  border-radius: 0 20px 20px 0;
+}
+
+.main-content {
+  margin-left: var(--sidebar-width);
+  transition: all 0.3s ease; min-height: 100vh;
+}
+
+.topbar {
+  background: white; padding: 15px 30px;
+  display: flex; justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  position: sticky; top: 0; z-index: 99;
+}
+
+.menu-toggle {
+  display: none; background: none; border: none;
+  font-size: 1.5rem; color: var(--primary); cursor: pointer;
+}
+
+.user-info { display: flex; align-items: center; gap: 15px; }
+
+.content-card {
+  background: white; border-radius: 20px;
+  padding: 25px; margin: 0 20px 20px 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.card-title {
+  font-size: 1.2rem; font-weight: 600; color: var(--dark);
+  margin-bottom: 20px; display: flex; align-items: center; gap: 10px;
+}
+
+.form-modern {
+  border: 2px solid #e9ecef; border-radius: 12px;
+  padding: 12px 16px; transition: all 0.3s; width: 100%;
+}
+
+.form-modern:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.1);
+  outline: none;
+}
+
+.btn-modern {
+  padding: 10px 20px; border-radius: 10px;
+  font-weight: 600; border: none; transition: all 0.3s;
+  display: inline-flex; align-items: center; gap: 8px;
+  cursor: pointer;
+}
+
+.btn-modern:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+.btn-primary-modern { background: var(--gradient); color: white; }
+.btn-success-modern { background: var(--success); color: white; }
+.btn-warning-modern { background: var(--warning); color: white; }
+.btn-danger-modern { background: var(--danger); color: white; }
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px; padding: 20px;
+}
+
+.stat-card {
+  background: white; border-radius: 20px; padding: 20px;
+  display: flex; justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.stat-info h6 { color: var(--gray); font-size: 0.85rem; margin-bottom: 8px; }
+.stat-info h3 { font-size: 1.8rem; font-weight: 700; color: var(--dark); margin: 0; }
+
+.stat-icon {
+  width: 55px; height: 55px; border-radius: 15px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem;
+}
+
+.stat-icon.blue { background: rgba(67, 97, 238, 0.1); color: var(--primary); }
+.stat-icon.green { background: rgba(76, 201, 240, 0.1); color: var(--success); }
+.stat-icon.orange { background: rgba(248, 150, 30, 0.1); color: var(--warning); }
+.stat-icon.pink { background: rgba(247, 37, 133, 0.1); color: var(--danger); }
+
+.toast-notification {
+  position: fixed; bottom: 20px; right: 20px;
+  padding: 12px 24px; border-radius: 12px;
+  background: white; box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+  transform: translateX(400px); transition: transform 0.3s ease;
+  z-index: 1100; display: flex; align-items: center;
+  gap: 12px; font-weight: 500;
+}
+
+.toast-notification.show { transform: translateX(0); }
+.toast-notification.success { border-left: 4px solid var(--success); color: var(--success); }
+.toast-notification.error { border-left: 4px solid var(--danger); color: var(--danger); }
+.toast-notification.warning { border-left: 4px solid var(--warning); color: var(--warning); }
+
+.loading-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(255,255,255,0.9);
+  display: none; justify-content: center;
+  align-items: center; z-index: 2000;
+}
+
+.loading-spinner {
+  width: 50px; height: 50px;
+  border: 4px solid var(--light);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Estilos de questão */
+.questao-card {
+  background: #f8fafc; border: 1px solid #e2e8f0;
+  border-radius: 15px; padding: 20px;
+  margin-bottom: 15px; transition: all 0.3s;
+}
+
+.questao-card:hover { border-color: var(--primary); box-shadow: 0 5px 20px rgba(67,97,238,0.1); }
+
+.questao-card .badge-materia {
+  background: rgba(67, 97, 238, 0.1);
+  color: var(--primary);
+  padding: 4px 12px; border-radius: 12px;
+  font-size: 0.75rem; font-weight: 600;
+}
+
+.questao-card .badge-resposta {
+  background: rgba(76, 201, 240, 0.15);
+  color: #0369a1;
+  padding: 4px 12px; border-radius: 12px;
+  font-size: 0.75rem; font-weight: 600;
+}
+
+.alternativa-item {
+  display: flex; align-items: flex-start;
+  gap: 10px; padding: 10px 15px;
+  background: white; border-radius: 10px;
+  margin-bottom: 8px; border: 1px solid #e2e8f0;
+}
+
+.alternativa-letra {
+  font-weight: 700; color: var(--primary);
+  min-width: 25px;
+}
+
+.alternativa-correta {
+  background: rgba(76, 201, 240, 0.15) !important;
+  border-color: var(--success) !important;
+}
+
+/* Simulado preview */
+.simulado-card {
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 15px;
+  transition: all 0.3s;
+}
+
+.simulado-card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 5px 20px rgba(67,97,238,0.15);
+}
+
+@media (max-width: 768px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.active { transform: translateX(0); }
+  .main-content { margin-left: 0; }
+  .menu-toggle { display: block; }
+  .stats-grid { grid-template-columns: 1fr; }
+  .content-card { margin: 0 15px 15px 15px; }
+}
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--light); }
+::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
+</style>
+</head>
+
+<body>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+</div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <h3>AprovaMaisPB</h3>
+    <small style="color: var(--gray);">Gestão de Simulados</small>
+  </div>
+  <div class="sidebar-nav">
+    <a href="#" onclick="mostrar('dashboard'); return false" class="active" data-page="dashboard">
+      <i class="fas fa-chart-line"></i> Dashboard
+    </a>
+    <a href="#" onclick="mostrar('questoes'); return false" data-page="questoes">
+      <i class="fas fa-question-circle"></i> Banco de Questões
+    </a>
+    <a href="#" onclick="mostrar('gerar'); return false" data-page="gerar">
+      <i class="fas fa-magic"></i> Gerar Simulado
+    </a>
+    <a href="#" onclick="mostrar('simulados'); return false" data-page="simulados">
+      <i class="fas fa-file-alt"></i> Simulados Criados
+    </a>
+    <a href="#" onclick="mostrar('resultados'); return false" data-page="resultados">
+      <i class="fas fa-chart-bar"></i> Resultados dos Alunos
+    </a>
+    <a href="coordenador (1).html" style="color: var(--gray);">
+      <i class="fas fa-arrow-left"></i> Painel Principal
+    </a>
+  </div>
+</aside>
+
+<div class="main-content">
+  <div class="topbar">
+    <button class="menu-toggle" onclick="toggleSidebar()">
+      <i class="fas fa-bars"></i>
+    </button>
+    <div class="user-info">
+      <span><i class="fas fa-user-circle"></i> Coordenador</span>
+      <button onclick="location='index.html'" class="btn-modern btn-danger-modern" style="padding: 8px 16px;">
+        <i class="fas fa-sign-out-alt"></i> Sair
+      </button>
+    </div>
+  </div>
+
+  <div class="container-fluid p-0">
+    <!-- DASHBOARD -->
+    <div id="dashboard">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-info">
+            <h6>Total de Questões</h6>
+            <h3 id="totalQuestoes">0</h3>
+          </div>
+          <div class="stat-icon blue"><i class="fas fa-question-circle"></i></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-info">
+            <h6>Simulados Criados</h6>
+            <h3 id="totalSimulados">0</h3>
+          </div>
+          <div class="stat-icon green"><i class="fas fa-file-alt"></i></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-info">
+            <h6>Matérias Cadastradas</h6>
+            <h3 id="totalMaterias">0</h3>
+          </div>
+          <div class="stat-icon orange"><i class="fas fa-book"></i></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-info">
+            <h6>Respostas Recebidas</h6>
+            <h3 id="totalRespostas">0</h3>
+          </div>
+          <div class="stat-icon pink"><i class="fas fa-check-double"></i></div>
+        </div>
+      </div>
+
+      <div class="content-card">
+        <div class="card-title"><i class="fas fa-chart-pie"></i> Questões por Matéria</div>
+        <div id="questoesPorMateria"></div>
+      </div>
+    </div>
+
+    <!-- BANCO DE QUESTÕES -->
+    <div id="questoes" style="display:none">
+      <div class="content-card">
+        <div class="card-title"><i class="fas fa-plus-circle"></i> Adicionar Nova Questão</div>
+        
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Matéria</label>
+            <select id="qMateria" class="form-modern">
+              <option value="Redação">Redação</option>
+              <option value="Matemática">Matemática</option>
+              <option value="Química">Química</option>
+              <option value="Física">Física</option>
+              <option value="Biologia">Biologia</option>
+              <option value="Sociologia">Sociologia</option>
+              <option value="Filosofia">Filosofia</option>
+              <option value="Literatura">Literatura</option>
+              <option value="Gramática">Gramática</option>
+              <option value="Inglês">Inglês</option>
+              <option value="Espanhol">Espanhol</option>
+              <option value="Geografia">Geografia</option>
+              <option value="História">História</option>
+            </select>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Dificuldade</label>
+            <select id="qDificuldade" class="form-modern">
+              <option value="Facil">Fácil</option>
+              <option value="Medio" selected>Médio</option>
+              <option value="Dificil">Difícil</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-bold">Enunciado da Questão</label>
+          <textarea id="qEnunciado" class="form-modern" rows="4" placeholder="Digite o enunciado completo da questão..."></textarea>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-bold">Alternativas</label>
+          
+          <div class="input-group mb-2">
+            <span class="input-group-text" style="font-weight:700; min-width: 45px; justify-content:center;">A</span>
+            <input type="text" id="qAltA" class="form-modern" placeholder="Alternativa A">
+          </div>
+          <div class="input-group mb-2">
+            <span class="input-group-text" style="font-weight:700; min-width: 45px; justify-content:center;">B</span>
+            <input type="text" id="qAltB" class="form-modern" placeholder="Alternativa B">
+          </div>
+          <div class="input-group mb-2">
+            <span class="input-group-text" style="font-weight:700; min-width: 45px; justify-content:center;">C</span>
+            <input type="text" id="qAltC" class="form-modern" placeholder="Alternativa C">
+          </div>
+          <div class="input-group mb-2">
+            <span class="input-group-text" style="font-weight:700; min-width: 45px; justify-content:center;">D</span>
+            <input type="text" id="qAltD" class="form-modern" placeholder="Alternativa D">
+          </div>
+          <div class="input-group mb-2">
+            <span class="input-group-text" style="font-weight:700; min-width: 45px; justify-content:center;">E</span>
+            <input type="text" id="qAltE" class="form-modern" placeholder="Alternativa E (opcional)">
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-bold">Alternativa Correta</label>
+          <select id="qCorreta" class="form-modern">
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+            <option value="E">E</option>
+          </select>
+        </div>
+
+        <button class="btn-modern btn-primary-modern w-100" onclick="salvarQuestao()">
+          <i class="fas fa-save"></i> Salvar Questão no Banco
+        </button>
+      </div>
+
+      <div class="content-card">
+        <div class="card-title">
+          <i class="fas fa-list"></i> Questões Cadastradas
+          <select id="filtroQuestaoMateria" class="form-modern ms-auto" style="width:auto;" onchange="carregarQuestoes()">
+            <option value="">Todas as matérias</option>
+            <option value="Redação">Redação</option>
+            <option value="Matemática">Matemática</option>
+            <option value="Química">Química</option>
+            <option value="Física">Física</option>
+            <option value="Biologia">Biologia</option>
+            <option value="Sociologia">Sociologia</option>
+            <option value="Filosofia">Filosofia</option>
+            <option value="Literatura">Literatura</option>
+            <option value="Gramática">Gramática</option>
+            <option value="Inglês">Inglês</option>
+            <option value="Espanhol">Espanhol</option>
+            <option value="Geografia">Geografia</option>
+            <option value="História">História</option>
+          </select>
+        </div>
+        <div id="listaQuestoes"></div>
+      </div>
+    </div>
+
+    <!-- GERAR SIMULADO -->
+    <div id="gerar" style="display:none">
+      <div class="content-card">
+        <div class="card-title"><i class="fas fa-magic"></i> Configurar Novo Simulado</div>
+        
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Nome do Simulado</label>
+            <input type="text" id="simNome" class="form-modern" placeholder="Ex: Simulado Semanal 01">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Turma Destino</label>
+            <select id="simTurma" class="form-modern">
+              <option value="Ambas">Ambas as turmas</option>
+              <option value="Semanal">Turma Semanal</option>
+              <option value="Sabado">Turma Sábado</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-bold">Modo de Criação</label>
+          <div class="d-flex gap-3 flex-wrap">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="modoSim" id="modoManual" value="manual" checked>
+              <label class="form-check-label" for="modoManual">
+                <i class="fas fa-hand-pointer text-primary"></i> Seleção Manual
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="modoSim" id="modoAuto" value="automatico">
+              <label class="form-check-label" for="modoAuto">
+                <i class="fas fa-random text-warning"></i> Geração Automática (Aleatória)
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div id="configManual">
+          <div class="mb-3">
+            <label class="form-label fw-bold">Selecione as Questões</label>
+            <div id="selecaoQuestoes" style="max-height: 450px; overflow-y:auto; padding: 10px; border: 1px solid #e2e8f0; border-radius: 12px;">
+              <!-- Preenchido via JS -->
+            </div>
+            <small class="text-muted">Questões selecionadas: <strong id="qtdSelecionadas">0</strong></small>
+          </div>
+        </div>
+
+        <div id="configAuto" style="display:none">
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> A geração automática irá respeitar a distribuição por matéria. 
+            Escolha quantas questões deseja de cada matéria:
+          </div>
+          <div class="row" id="configAutoMaterias">
+            <!-- Preenchido via JS -->
+          </div>
+        </div>
+
+        <button class="btn-modern btn-success-modern w-100 mt-3" onclick="gerarSimulado()">
+          <i class="fas fa-check-circle"></i> Gerar e Publicar Simulado
+        </button>
+      </div>
+    </div>
+
+    <!-- SIMULADOS CRIADOS -->
+    <div id="simulados" style="display:none">
+      <div class="content-card">
+        <div class="card-title"><i class="fas fa-file-alt"></i> Simulados Publicados</div>
+        <div id="listaSimulados"></div>
+      </div>
+    </div>
+
+    <!-- RESULTADOS -->
+    <div id="resultados" style="display:none">
+      <div class="content-card">
+        <div class="card-title">
+          <i class="fas fa-filter"></i> Filtros
+        </div>
+        <div class="d-flex gap-3 flex-wrap">
+          <select id="filtroResSimulado" class="form-modern" style="width:auto;" onchange="carregarResultados()">
+            <option value="">Todos os simulados</option>
+          </select>
+          <input type="text" id="filtroResAluno" class="form-modern" placeholder="Buscar aluno..." style="width:auto;" onkeyup="carregarResultados()">
+        </div>
+      </div>
+
+      <div class="content-card">
+        <div class="card-title"><i class="fas fa-chart-bar"></i> Desempenho dos Alunos</div>
+        <div id="listaResultados"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBRm4yix2fC2PhAVjTtbWlR-azz0bAglpo",
+  authDomain: "aprovamaispb2-3bc78.firebaseapp.com",
+  projectId: "aprovamaispb2-3bc78"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const MATERIAS = ['Redação','Matemática','Química','Física','Biologia','Sociologia','Filosofia','Literatura','Gramática','Inglês','Espanhol','Geografia','História'];
+
+let todasQuestoes = [];
+let todasSimulados = [];
+let selecionadasManual = new Set();
+
+// ============ UTILITÁRIOS ============
+function showToast(message, type = 'success') {
+  const toast = document.createElement('div');
+  toast.className = `toast-notification ${type}`;
+  toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i><span>${message}</span>`;
+  document.body.appendChild(toast);
+  setTimeout(() => {
+    toast.classList.add('show');
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 300);
+    }, 3000);
+  }, 100);
+}
+
+function showLoading() { document.getElementById('loadingOverlay').style.display = 'flex'; }
+function hideLoading() { document.getElementById('loadingOverlay').style.display = 'none'; }
+
+window.toggleSidebar = () => document.getElementById('sidebar').classList.toggle('active');
+
+window.mostrar = function(sec) {
+  const sections = ['dashboard', 'questoes', 'gerar', 'simulados', 'resultados'];
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  const target = document.getElementById(sec);
+  if (target) target.style.display = 'block';
+  document.querySelectorAll('.sidebar-nav a[data-page]').forEach(link => {
+    link.classList.remove('active');
+    if (link.getAttribute('data-page') === sec) link.classList.add('active');
+  });
+  if (window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('active');
+
+  if (sec === 'dashboard') carregarDashboard();
+  if (sec === 'questoes') carregarQuestoes();
+  if (sec === 'gerar') prepararGerador();
+  if (sec === 'simulados') carregarSimulados();
+  if (sec === 'resultados') carregarResultados();
+};
+
+// ============ BANCO DE QUESTÕES ============
+window.salvarQuestao = async () => {
+  const materia = document.getElementById('qMateria').value;
+  const dificuldade = document.getElementById('qDificuldade').value;
+  const enunciado = document.getElementById('qEnunciado').value.trim();
+  const altA = document.getElementById('qAltA').value.trim();
+  const altB = document.getElementById('qAltB').value.trim();
+  const altC = document.getElementById('qAltC').value.trim();
+  const altD = document.getElementById('qAltD').value.trim();
+  const altE = document.getElementById('qAltE').value.trim();
+  const correta = document.getElementById('qCorreta').value;
+
+  if (!enunciado || !altA || !altB || !altC || !altD) {
+    showToast('Preencha enunciado e pelo menos as alternativas A, B, C e D!', 'error');
+    return;
+  }
+
+  // Validar se a alternativa correta foi preenchida
+  const mapa = {A: altA, B: altB, C: altC, D: altD, E: altE};
+  if (!mapa[correta]) {
+    showToast(`A alternativa correta (${correta}) está vazia!`, 'error');
+    return;
+  }
+
+  showLoading();
+  try {
+    await addDoc(collection(db, 'questoes'), {
+      materia, dificuldade, enunciado,
+      alternativas: { A: altA, B: altB, C: altC, D: altD, E: altE },
+      correta,
+      criadoEm: new Date().toISOString()
+    });
+    showToast('Questão salva no banco!', 'success');
+    
+    document.getElementById('qEnunciado').value = '';
+    document.getElementById('qAltA').value = '';
+    document.getElementById('qAltB').value = '';
+    document.getElementById('qAltC').value = '';
+    document.getElementById('qAltD').value = '';
+    document.getElementById('qAltE').value = '';
+    document.getElementById('qCorreta').value = 'A';
+    
+    await carregarQuestoes();
+  } catch (err) {
+    showToast('Erro ao salvar questão!', 'error');
+  } finally {
+    hideLoading();
+  }
+};
+
+async function carregarQuestoes() {
+  showLoading();
+  const filtro = document.getElementById('filtroQuestaoMateria')?.value || '';
+  const snap = await getDocs(collection(db, 'questoes'));
+  todasQuestoes = [];
+  snap.forEach(d => {
+    const q = d.data();
+    if (filtro && q.materia !== filtro) return;
+    todasQuestoes.push({ id: d.id, ...q });
+  });
+  todasQuestoes.sort((a, b) => (a.materia || '').localeCompare(b.materia || ''));
+
+  renderizarListaQuestoes(todasQuestoes);
+  hideLoading();
+}
+
+function renderizarListaQuestoes(questoes) {
+  const container = document.getElementById('listaQuestoes');
+  if (questoes.length === 0) {
+    container.innerHTML = '<p class="text-center text-muted">Nenhuma questão cadastrada ainda.</p>';
+    return;
+  }
+
+  let html = '';
+  questoes.forEach(q => {
+    html += `
+      <div class="questao-card">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <div>
+            <span class="badge-materia">${q.materia}</span>
+            <span class="badge-resposta ms-2">${q.dificuldade || 'Médio'}</span>
+          </div>
+          <button class="btn-modern btn-danger-modern" style="padding: 5px 10px; font-size:12px;" onclick="excluirQuestao('${q.id}')">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+        <p style="font-weight:500; margin-bottom: 12px;">${q.enunciado}</p>
+        ${['A','B','C','D','E'].map(letra => {
+          const texto = q.alternativas?.[letra];
+          if (!texto) return '';
+          const correta = q.correta === letra;
+          return `
+            <div class="alternativa-item ${correta ? 'alternativa-correta' : ''}">
+              <span class="alternativa-letra">${letra})</span>
+              <span>${texto} ${correta ? '<i class="fas fa-check-circle text-success ms-2"></i>' : ''}</span>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  });
+  container.innerHTML = html;
+}
+
+window.excluirQuestao = async (id) => {
+  if (!confirm('Excluir esta questão?')) return;
+  showLoading();
+  await deleteDoc(doc(db, 'questoes', id));
+  hideLoading();
+  showToast('Questão excluída!', 'success');
+  await carregarQuestoes();
+};
+
+// ============ GERAR SIMULADO ============
+async function prepararGerador() {
+  showLoading();
+  
+  // Carregar todas as questões
+  const snap = await getDocs(collection(db, 'questoes'));
+  todasQuestoes = [];
+  snap.forEach(d => todasQuestoes.push({ id: d.id, ...d.data() }));
+  
+  renderizarSelecaoManual();
+  renderizarConfigAuto();
+  hideLoading();
+}
+
+function renderizarSelecaoManual() {
+  const container = document.getElementById('selecaoQuestoes');
+  if (todasQuestoes.length === 0) {
+    container.innerHTML = '<p class="text-muted text-center">Nenhuma questão cadastrada. Cadastre questões primeiro.</p>';
+    return;
+  }
+  
+  // Agrupar por matéria
+  const porMateria = {};
+  todasQuestoes.forEach(q => {
+    if (!porMateria[q.materia]) porMateria[q.materia] = [];
+    porMateria[q.materia].push(q);
+  });
+  
+  let html = '';
+  Object.keys(porMateria).sort().forEach(materia => {
+    html += `<h6 class="mt-3 mb-2" style="color: var(--primary); font-weight:700;"><i class="fas fa-book"></i> ${materia} <span class="badge bg-secondary">${porMateria[materia].length}</span></h6>`;
+    porMateria[materia].forEach(q => {
+      const checked = selecionadasManual.has(q.id) ? 'checked' : '';
+      html += `
+        <div class="form-check mb-2" style="padding: 8px 12px; background:white; border-radius:8px; border:1px solid #e2e8f0;">
+          <input class="form-check-input" type="checkbox" id="chk_${q.id}" ${checked} onchange="toggleSelecao('${q.id}', this.checked)">
+          <label class="form-check-label" for="chk_${q.id}" style="cursor:pointer; font-size:0.9rem;">
+            <strong>${q.enunciado.substring(0, 100)}${q.enunciado.length > 100 ? '...' : ''}</strong>
+            <br><small class="text-muted">Resposta: ${q.correta}</small>
+          </label>
+        </div>
+      `;
+    });
+  });
+  
+  container.innerHTML = html;
+  atualizarQtdSelecionadas();
+}
+
+window.toggleSelecao = (id, checked) => {
+  if (checked) selecionadasManual.add(id);
+  else selecionadasManual.delete(id);
+  atualizarQtdSelecionadas();
+};
+
+function atualizarQtdSelecionadas() {
+  const el = document.getElementById('qtdSelecionadas');
+  if (el) el.textContent = selecionadasManual.size;
+}
+
+function renderizarConfigAuto() {
+  const container = document.getElementById('configAutoMaterias');
+  let html = '';
+  MATERIAS.forEach(m => {
+    const qtd = todasQuestoes.filter(q => q.materia === m).length;
+    html += `
+      <div class="col-md-4 mb-3">
+        <label class="form-label fw-bold">${m} <small class="text-muted">(${qtd} disp.)</small></label>
+        <input type="number" id="auto_${m.replace(/\s/g,'_')}" class="form-modern" value="0" min="0" max="${qtd}">
+      </div>
+    `;
+  });
+  container.innerHTML = html;
+}
+
+// Alternar entre manual e automático
+document.addEventListener('change', (e) => {
+  if (e.target.name === 'modoSim') {
+    document.getElementById('configManual').style.display = e.target.value === 'manual' ? 'block' : 'none';
+    document.getElementById('configAuto').style.display = e.target.value === 'automatico' ? 'block' : 'none';
+  }
+});
+
+window.gerarSimulado = async () => {
+  const nome = document.getElementById('simNome').value.trim();
+  const turma = document.getElementById('simTurma').value;
+  const modo = document.querySelector('input[name="modoSim"]:checked').value;
+  
+  if (!nome) {
+    showToast('Digite um nome para o simulado!', 'error');
+    return;
+  }
+  
+  let questoesSimulado = [];
+  
+  if (modo === 'manual') {
+    if (selecionadasManual.size === 0) {
+      showToast('Selecione pelo menos uma questão!', 'error');
+      return;
+    }
+    questoesSimulado = todasQuestoes.filter(q => selecionadasManual.has(q.id));
+  } else {
+    // Modo automático - respeitar distribuição por matéria
+    MATERIAS.forEach(m => {
+      const input = document.getElementById(`auto_${m.replace(/\s/g,'_')}`);
+      if (!input) return;
+      const qtd = parseInt(input.value) || 0;
+      if (qtd <= 0) return;
+      
+      const pool = todasQuestoes.filter(q => q.materia === m);
+      // Embaralhar
+      const embaralhado = [...pool].sort(() => Math.random() - 0.5);
+      questoesSimulado.push(...embaralhado.slice(0, qtd));
+    });
+    
+    if (questoesSimulado.length === 0) {
+      showToast('Defina a quantidade de questões para pelo menos uma matéria!', 'error');
+      return;
+    }
+  }
+  
+  showLoading();
+  try {
+    // Embaralhar a ordem final
+    questoesSimulado = questoesSimulado.sort(() => Math.random() - 0.5);
+    
+    // Salvar simulado no Firestore
+    const ref = await addDoc(collection(db, 'simulados'), {
+      nome,
+      turma,
+      modo,
+      totalQuestoes: questoesSimulado.length,
+      questoes: questoesSimulado.map(q => q.id),
+      questoesDetalhes: questoesSimulado.map(q => ({
+        id: q.id,
+        materia: q.materia,
+        enunciado: q.enunciado,
+        alternativas: q.alternativas,
+        correta: q.correta
+      })),
+      criadoEm: new Date().toISOString(),
+      ativo: true
+    });
+    
+    showToast(`Simulado "${nome}" publicado com ${questoesSimulado.length} questões!`, 'success');
+    
+    // Reset
+    document.getElementById('simNome').value = '';
+    selecionadasManual.clear();
+    atualizarQtdSelecionadas();
+    document.querySelectorAll('#configAutoMaterias input').forEach(i => i.value = '0');
+    renderizarSelecaoManual();
+    
+    await carregarSimulados();
+    mostrar('simulados');
+  } catch (err) {
+    console.error(err);
+    showToast('Erro ao gerar simulado!', 'error');
+  } finally {
+    hideLoading();
+  }
+};
+
+// ============ SIMULADOS CRIADOS ============
+async function carregarSimulados() {
+  showLoading();
+  const snap = await getDocs(collection(db, 'simulados'));
+  todasSimulados = [];
+  snap.forEach(d => todasSimulados.push({ id: d.id, ...d.data() }));
+  todasSimulados.sort((a, b) => new Date(b.criadoEm) - new Date(a.criadoEm));
+  
+  const container = document.getElementById('listaSimulados');
+  if (todasSimulados.length === 0) {
+    container.innerHTML = '<p class="text-center text-muted">Nenhum simulado criado ainda.</p>';
+    hideLoading();
+    return;
+  }
+  
+  let html = '';
+  todasSimulados.forEach(s => {
+    html += `
+      <div class="simulado-card">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+          <div>
+            <h5 style="color: var(--primary); margin-bottom: 8px;">
+              <i class="fas fa-file-alt"></i> ${s.nome}
+            </h5>
+            <div>
+              <span class="badge-materia me-2">${s.turma}</span>
+              <span class="badge-resposta me-2">${s.totalQuestoes} questões</span>
+              <span class="badge bg-secondary">${new Date(s.criadoEm).toLocaleDateString('pt-BR')}</span>
+              ${s.ativo ? '<span class="badge bg-success ms-2">Ativo</span>' : '<span class="badge bg-danger ms-2">Inativo</span>'}
+            </div>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn-modern btn-warning-modern" style="padding: 8px 14px;" onclick="toggleAtivo('${s.id}', ${!s.ativo})">
+              <i class="fas fa-${s.ativo ? 'eye-slash' : 'eye'}"></i> ${s.ativo ? 'Desativar' : 'Ativar'}
+            </button>
+            <button class="btn-modern btn-danger-modern" style="padding: 8px 14px;" onclick="excluirSimulado('${s.id}')">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+  container.innerHTML = html;
+  hideLoading();
+}
+
+window.toggleAtivo = async (id, ativo) => {
+  await updateDoc(doc(db, 'simulados', id), { ativo });
+  showToast(ativo ? 'Simulado ativado!' : 'Simulado desativado!', 'success');
+  await carregarSimulados();
+};
+
+window.excluirSimulado = async (id) => {
+  if (!confirm('Excluir este simulado?')) return;
+  showLoading();
+  await deleteDoc(doc(db, 'simulados', id));
+  hideLoading();
+  showToast('Simulado excluído!', 'success');
+  await carregarSimulados();
+};
+
+// ============ RESULTADOS ============
+async function carregarResultados() {
+  showLoading();
+  
+  // Carregar simulados para o filtro
+  if (todasSimulados.length === 0) {
+    const snapS = await getDocs(collection(db, 'simulados'));
+    todasSimulados = [];
+    snapS.forEach(d => todasSimulados.push({ id: d.id, ...d.data() }));
+  }
+  const filtroSimEl = document.getElementById('filtroResSimulado');
+  const valorAtual = filtroSimEl.value;
+  filtroSimEl.innerHTML = '<option value="">Todos os simulados</option>' + 
+    todasSimulados.map(s => `<option value="${s.id}">${s.nome}</option>`).join('');
+  filtroSimEl.value = valorAtual;
+  
+  // Carregar resultados
+  const snap = await getDocs(collection(db, 'resultados_simulados'));
+  let resultados = [];
+  snap.forEach(d => resultados.push({ id: d.id, ...d.data() }));
+  
+  const filtroSim = filtroSimEl.value;
+  const filtroAluno = document.getElementById('filtroResAluno').value.toLowerCase();
+  
+  if (filtroSim) resultados = resultados.filter(r => r.simuladoId === filtroSim);
+  if (filtroAluno) resultados = resultados.filter(r => (r.alunoNome || '').toLowerCase().includes(filtroAluno));
+  
+  resultados.sort((a, b) => new Date(b.data) - new Date(a.data));
+  
+  const container = document.getElementById('listaResultados');
+  if (resultados.length === 0) {
+    container.innerHTML = '<p class="text-center text-muted">Nenhum resultado registrado ainda.</p>';
+    hideLoading();
+    return;
+  }
+  
+  let html = '<div class="table-responsive"><table class="table-modern" style="width:100%; border-collapse: collapse;">';
+  html += '<thead style="background:#f1f5f9;"><tr><th style="padding:12px;">Aluno</th><th style="padding:12px;">Simulado</th><th style="padding:12px;">Acertos</th><th style="padding:12px;">Erros</th><th style="padding:12px;">Nota</th><th style="padding:12px;">Data</th></tr></thead><tbody>';
+  
+  resultados.forEach(r => {
+    const sim = todasSimulados.find(s => s.id === r.simuladoId);
+    const notaCor = r.nota >= 70 ? 'var(--success)' : r.nota >= 50 ? 'var(--warning)' : 'var(--danger)';
+    html += `
+      <tr style="border-bottom:1px solid #e2e8f0;">
+        <td style="padding:12px; font-weight:600;">${r.alunoNome}</td>
+        <td style="padding:12px;">${sim ? sim.nome : 'Simulado removido'}</td>
+        <td style="padding:12px;"><span class="badge bg-success">${r.acertos}</span></td>
+        <td style="padding:12px;"><span class="badge bg-danger">${r.erros}</span></td>
+        <td style="padding:12px; font-weight:700; color:${notaCor};">${r.nota}%</td>
+        <td style="padding:12px;">${new Date(r.data).toLocaleString('pt-BR')}</td>
+      </tr>
+    `;
+  });
+  html += '</tbody></table></div>';
+  
+  // Estatísticas gerais
+  const mediaGeral = resultados.reduce((sum, r) => sum + r.nota, 0) / resultados.length;
+  html = `
+    <div class="stats-grid mb-3" style="padding:0;">
+      <div class="stat-card">
+        <div class="stat-info">
+          <h6>Total de Respostas</h6>
+          <h3>${resultados.length}</h3>
+        </div>
+        <div class="stat-icon blue"><i class="fas fa-list-check"></i></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-info">
+          <h6>Média Geral</h6>
+          <h3>${mediaGeral.toFixed(1)}%</h3>
+        </div>
+        <div class="stat-icon green"><i class="fas fa-chart-line"></i></div>
+      </div>
+    </div>
+  ` + html;
+  
+  container.innerHTML = html;
+  hideLoading();
+}
+
+// ============ DASHBOARD ============
+async function carregarDashboard() {
+  showLoading();
+  const snapQ = await getDocs(collection(db, 'questoes'));
+  const snapS = await getDocs(collection(db, 'simulados'));
+  const snapR = await getDocs(collection(db, 'resultados_simulados'));
+  
+  const questoes = [];
+  snapQ.forEach(d => questoes.push(d.data()));
+  
+  document.getElementById('totalQuestoes').innerText = questoes.length;
+  document.getElementById('totalSimulados').innerText = snapS.size;
+  document.getElementById('totalRespostas').innerText = snapR.size;
+  
+  const materiasUnicas = new Set(questoes.map(q => q.materia));
+  document.getElementById('totalMaterias').innerText = materiasUnicas.size;
+  
+  // Estatísticas por matéria
+  const porMateria = {};
+  questoes.forEach(q => {
+    porMateria[q.materia] = (porMateria[q.materia] || 0) + 1;
+  });
+  
+  let html = '<div class="row">';
+  Object.keys(porMateria).sort().forEach(m => {
+    const pct = ((porMateria[m] / questoes.length) * 100).toFixed(0);
+    html += `
+      <div class="col-md-6 mb-3">
+        <div class="d-flex justify-content-between mb-1">
+          <strong>${m}</strong>
+          <span>${porMateria[m]} questões (${pct}%)</span>
+        </div>
+        <div style="background:#e2e8f0; border-radius:10px; height:10px; overflow:hidden;">
+          <div style="background: var(--gradient); width:${pct}%; height:100%;"></div>
+        </div>
+      </div>
+    `;
+  });
+  html += '</div>';
+  document.getElementById('questoesPorMateria').innerHTML = questoes.length > 0 ? html : '<p class="text-muted text-center">Nenhuma questão cadastrada.</p>';
+  
+  hideLoading();
+}
+
+// ============ INIT ============
+carregarDashboard();
+
+document.addEventListener('click', (e) => {
+  const sidebar = document.getElementById('sidebar');
+  const toggle = document.querySelector('.menu-toggle');
+  if (window.innerWidth <= 768 && sidebar.classList.contains('active') && !sidebar.contains(e.target) && e.target !== toggle) {
+    sidebar.classList.remove('active');
+  }
+});
+
+window.mostrar = mostrar;
+window.toggleSidebar = toggleSidebar;
+window.salvarQuestao = salvarQuestao;
+window.excluirQuestao = excluirQuestao;
+window.toggleSelecao = toggleSelecao;
+window.gerarSimulado = gerarSimulado;
+window.toggleAtivo = toggleAtivo;
+window.excluirSimulado = excluirSimulado;
+</script>
+</body>
+</html>
