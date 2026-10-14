@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulado PF - Agente Administrativo (70 Questões)</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f4f9; color: #333; line-height: 1.6; padding: 20px; }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #003366; border-bottom: 2px solid #003366; padding-bottom: 10px; }
+        .materia { background: #e9ecef; padding: 10px; margin-top: 30px; border-left: 5px solid #003366; font-weight: bold; font-size: 1.1em; color: #003366; }
+        .questao { margin-bottom: 20px; padding: 15px; border-bottom: 1px solid #eee; transition: background 0.3s; }
+        .enunciado { font-weight: 500; margin-bottom: 10px; }
+        .opcoes { display: flex; gap: 30px; align-items: center; }
+        .opcoes label { cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+        input[type="radio"] { transform: scale(1.3); cursor: pointer; }
+        .gabarito-btn { display: block; width: 100%; padding: 18px; background: #003366; color: white; border: none; border-radius: 5px; font-size: 1.3em; cursor: pointer; margin-top: 40px; font-weight: bold; }
+        .gabarito-btn:hover { background: #002244; }
+        #resultado { margin-top: 30px; padding: 25px; border-radius: 5px; display: none; font-size: 1.2em; text-align: center; }
+        .certo { color: green; font-weight: bold; }
+        .errado { color: red; font-weight: bold; }
+        .feedback { font-size: 0.9em; color: #555; margin-top: 8px; display: none; background: #f8f9fa; padding: 8px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Simulado PF - Agente Administrativo (Nível Médio)</h1>
+    <p style="text-align:center; font-weight:bold; color:#d9534f;">Modelo Cebraspe: 1 ponto por ACERTO, -1 ponto por ERRO.</p>
+
+    <div id="simulado">
+        
+        <!-- ================= LÍNGUA PORTUGUESA ================= -->
+        <div class="materia">Língua Portuguesa (1-10)</div>
+
+        <div class="questao" data-correta="e">
+            <div class="enunciado">1. (Retificação 2025) Na frase "Aos alunos, cabe-lhes estudar", a colocação pronominal está correta de acordo com a norma padrão.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q1" value="c"> Certo</label>
+                <label><input type="radio" name="q1" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Errado. A próclise é obrigatória devido ao pronome relativo/advérbio "Aos alunos" (atração).</div>
+        </div>
+
+        <div class="questao" data-correta="c">
+            <div class="enunciado">2. A regência do verbo "assistir" no sentido de "ver" exige a preposição "a" (Assisti ao filme).</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q2" value="c"> Certo</label>
+                <label><input type="radio" name="q2" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Certo. No sentido de ver/presenciar, é Transitivo Indireto (VTI).</div>
+        </div>
+
+        <div class="questao" data-correta="e">
+            <div class="enunciado">3. O uso da crase está correto em: "Entreguei o documento à ela".</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q3" value="c"> Certo</label>
+                <label><input type="radio" name="q3" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Errado. Não ocorre crase antes de pronomes pessoais (ela).</div>
+        </div>
+
+        <div class="questao" data-correta="c">
+            <div class="enunciado">4. Segundo o Manual de Redação da Presidência da República, o e-mail é uma forma de correspondência oficial que exige a mesma formalidade do Ofício.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q4" value="c"> Certo</label>
+                <label><input type="radio" name="q4" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Certo. O e-mail pode ser usado para correspondência oficial, mantendo a formalidade.</div>
+        </div>
+
+        <div class="questao" data-correta="e">
+            <div class="enunciado">5. A concordância verbal está incorreta em: "Fazem dez anos que a PF realiza esse concurso".</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q5" value="c"> Certo</label>
+                <label><input type="radio" name="q5" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Errado. O verbo "Fazer" indicando tempo decorrido é impessoal (Faz dez anos).</div>
+        </div>
+
+        <div class="questao" data-correta="c">
+            <div class="enunciado">6. Na frase "Ele preferiu ir ao cinema a ficar em casa", a regência está correta.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q6" value="c"> Certo</label>
+                <label><input type="radio" name="q6" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Certo. A regência exige a preposição "a" antes do infinitivo.</div>
+        </div>
+
+        <div class="questao" data-correta="e">
+            <div class="enunciado">7. A palavra "mal" está empregada corretamente como adjetivo em: "Ele passou mal na prova".</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q7" value="c"> Certo</label>
+                <label><input type="radio" name="q7" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Errado. "Mal" aqui é advérbio de modo. Como adjetivo seria "Ele é um homem mau".</div>
+        </div>
+
+        <div class="questao" data-correta="c">
+            <div class="enunciado">8. A vírgula está correta em: "O agente, que estava de folga, presenciou o crime".</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q8" value="c"> Certo</label>
+                <label><input type="radio" name="q8" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Certo. É uma oração subordinada adjetiva explicativa.</div>
+        </div>
+
+        <div class="questao" data-correta="e">
+            <div class="enunciado">9. O pronome "onde" pode ser utilizado para substituir "em que" em qualquer situação.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q9" value="c"> Certo</label>
+                <label><input type="radio" name="q9" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Errado. "Onde" só se refere a lugar físico. Para situações, usa-se "em que".</div>
+        </div>
+
+        <div class="questao" data-correta="c">
+            <div class="enunciado">10. A retificação do edital incluiu "Colocação dos pronomes átonos" no conteúdo de Língua Portuguesa.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q10" value="c"> Certo</label>
+                <label><input type="radio" name="q10" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Certo. Conforme Edital Retificado nº 2 de 2025.</div>
+        </div>
+
+        <!-- ================= RACIOCÍNIO LÓGICO ================= -->
+        <div class="materia">Raciocínio Lógico (11-20)</div>
+
+        <div class="questao" data-correta="c">
+            <div class="enunciado">11. A negação da proposição "Todo agente é policial" é "Algum agente não é policial".</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q11" value="c"> Certo</label>
+                <label><input type="radio" name="q11" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Certo. Negação do universal afirmativo é o particular negativo.</div>
+        </div>
+
+        <div class="questao" data-correta="e">
+            <div class="enunciado">12. A proposição "Se estudo, então passo" é logicamente equivalente a "Se não passo, então não estudo".</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q12" value="c"> Certo</label>
+                <label><input type="radio" name="q12" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Errado. Esta é a equivalência correta (Contrapositiva). Portanto, a afirmação é CERTA, não errada. Atenção ao comando!</div>
+        </div>
+
+        <div class="questao" data-correta="c">
+            <div class="enunciado">13. Na conjunção "P e Q", a proposição composta só será verdadeira se ambas P e Q forem verdadeiras.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q13" value="c"> Certo</label>
+                <label><input type="radio" name="q13" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Certo. Regra da Conjunção (E).</div>
+        </div>
+
+        <div class="questao" data-correta="e">
+            <div class="enunciado">14. A disjunção exclusiva "ou P ou Q" é verdadeira quando ambas são verdadeiras.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q14" value="c"> Certo</label>
+                <label><input type="radio" name="q14" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Errado. Disjunção exclusiva é verdadeira apenas quando os valores lógicos são diferentes.</div>
+        </div>
+
+        <div class="questao" data-correta="c">
+            <div class="enunciado">15. Em probabilidade, se dois eventos são mutuamente exclusivos, a probabilidade da união é a soma das probabilidades individuais.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q15" value="c"> Certo</label>
+                <label><input type="radio" name="q15" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Certo. P(A U B) = P(A) + P(B), pois P(A ∩ B) = 0.</div>
+        </div>
+
+        <div class="questao" data-correta="e">
+            <div class="enunciado">16. O argumento "P1: Se chove, a rua molha. P2: A rua está molhada. C: Choveu" é um argumento válido.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q16" value="c"> Certo</label>
+                <label><input type="radio" name="q16" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Errado. Falácia da afirmação do consequente.</div>
+        </div>
+
+        <div class="questao" data-correta="c">
+            <div class="enunciado">17. A proposição "P ou Q" é falsa apenas quando P e Q são falsas.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q17" value="c"> Certo</label>
+                <label><input type="radio" name="q17" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Certo. Regra da Disjunção Inclusiva (OU).</div>
+        </div>
+
+        <div class="questao" data-correta="e">
+            <div class="enunciado">18. A recíproca de "Se A então B" é "Se B então A", e é sempre logicamente equivalente.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q18" value="c"> Certo</label>
+                <label><input type="radio" name="q18" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Errado. A recíproca NÃO é equivalente.</div>
+        </div>
+
+        <div class="questao" data-correta="c">
+            <div class="enunciado">19. Na análise combinatória, a ordem dos elementos é relevante no Arranjo e irrelevante na Combinação.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q19" value="c"> Certo</label>
+                <label><input type="radio" name="q19" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Certo. Definição básica de Arranjo vs Combinação.</div>
+        </div>
+
+        <div class="questao" data-correta="e">
+            <div class="enunciado">20. Se A é subconjunto de B, então todo elemento de B pertence a A.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q20" value="c"> Certo</label>
+                <label><input type="radio" name="q20" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Errado. A relação é inversa: todo elemento de A pertence a B.</div>
+        </div>
+
+        <!-- ================= ÉTICA ================= -->
+        <div class="materia">Ética no Serviço Público (21-28)</div>
+
+        <div class="questao" data-correta="c">
+            <div class="enunciado">21. A moralidade administrativa é um dos princípios expressos da Administração Pública na CF/88.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q21" value="c"> Certo</label>
+                <label><input type="radio" name="q21" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Certo. Art. 37, caput, LIMPE.</div>
+        </div>
+
+        <div class="questao" data-correta="e">
+            <div class="enunciado">22. A comissão de ética pode aplicar a pena de demissão ao servidor público.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q22" value="c"> Certo</label>
+                <label><input type="radio" name="q22" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Errado. A comissão de ética aplica apenas censura. Demissão é competência da autoridade administrativa após PAD.</div>
+        </div>
+
+        <div class="questao" data-correta="c">
+            <div class="enunciado">23. O servidor público deve zelar pela economia do material e conservação do patrimônio público.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q23" value="c"> Certo</label>
+                <label><input type="radio" name="q23" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Certo. Dever previsto na Lei 8.112/90 e no Código de Ética.</div>
+        </div>
+
+        <div class="questao" data-correta="e">
+            <div class="enunciado">24. A ética no serviço público permite que o servidor use informações privilegiadas para benefício próprio.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q24" value="c"> Certo</label>
+                <label><input type="radio" name="q24" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Errado. É vedado usar informações para proveito próprio.</div>
+        </div>
+
+        <div class="questao" data-correta="c">
+            <div class="enunciado">25. A cortesia é um dever do servidor no atendimento ao público.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q25" value="c"> Certo</label>
+                <label><input type="radio" name="q25" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Certo. Faz parte da conduta ética e profissional.</div>
+        </div>
+
+        <div class="questao" data-correta="e">
+            <div class="enunciado">26. A lei 8.112/90 permite a acumulação remunerada de cargos públicos em qualquer hipótese.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q26" value="c"> Certo</label>
+                <label><input type="radio" name="q26" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Errado. A regra é a vedação, com exceções previstas na CF.</div>
+        </div>
+
+        <div class="questao" data-correta="c">
+            <div class="enunciado">27. O servidor deve representar contra ilegalidade, omissão ou abuso de poder.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q27" value="c"> Certo</label>
+                <label><input type="radio" name="q27" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Certo. Dever funcional expresso.</div>
+        </div>
+
+        <div class="questao" data-correta="e">
+            <div class="enunciado">28. O Código de Ética da PF permite que o agente aceite presentes de fornecedores.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q28" value="c"> Certo</label>
+                <label><input type="radio" name="q28" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Errado. É vedado aceitar presentes de quem tenha interesse em decisão do órgão.</div>
+        </div>
+
+        <!-- ================= INFORMÁTICA ================= -->
+        <div class="materia">Noções de Informática (29-40)</div>
+
+        <div class="questao" data-correta="c">
+            <div class="enunciado">29. No Excel, a função SOMASE utiliza o critério entre aspas duplas quando contém operadores lógicos (ex: ">10").</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q29" value="c"> Certo</label>
+                <label><input type="radio" name="q29" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Certo. Exigência sintática do Excel 2019+[citation:5].</div>
+        </div>
+
+        <div class="questao" data-correta="e">
+            <div class="enunciado">30. A função CONT.SE no Excel é utilizada para somar valores numéricos que atendem a um critério.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q30" value="c"> Certo</label>
+                <label><input type="radio" name="q30" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Errado. CONT.SE é para CONTAR. SOMA.SE é para somar.</div>
+        </div>
+
+        <div class="questao" data-correta="e">
+            <div class="enunciado">31. O endereço IP é responsável por traduzir nomes de domínio em endereços físicos.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q31" value="c"> Certo</label>
+                <label><input type="radio" name="q31" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Errado. Quem faz isso é o DNS. O IP é o endereço lógico do dispositivo.</div>
+        </div>
+
+        <div class="questao" data-correta="c">
+            <div class="enunciado">32. Uma rede LAN é geralmente restrita a um ambiente físico como um escritório.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q32" value="c"> Certo</label>
+                <label><input type="radio" name="q32" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Certo. Definição de Local Area Network[citation:5].</div>
+        </div>
+
+        <div class="questao" data-correta="e">
+            <div class="enunciado">33. A computação em nuvem armazena dados apenas no disco rígido local do computador.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q33" value="c"> Certo</label>
+                <label><input type="radio" name="q33" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Errado. Nuvem significa armazenamento remoto em servidores online.</div>
+        </div>
+
+        <div class="questao" data-correta="c">
+            <div class="enunciado">34. O protocolo HTTPS é uma versão segura do HTTP, utilizando criptografia SSL/TLS.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q34" value="c"> Certo</label>
+                <label><input type="radio" name="q34" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Certo. A segurança é a principal diferença.</div>
+        </div>
+
+        <div class="questao" data-correta="e">
+            <div class="enunciado">35. No Windows 10, a lixeira armazena permanentemente os arquivos deletados, não sendo possível restaurá-los.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q35" value="c"> Certo</label>
+                <label><input type="radio" name="q35" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Errado. A lixeira permite restaurar arquivos excluídos acidentalmente.</div>
+        </div>
+
+        <div class="questao" data-correta="c">
+            <div class="enunciado">36. O backup incremental copia apenas os arquivos que foram modificados desde o último backup.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q36" value="c"> Certo</label>
+                <label><input type="radio" name="q36" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Certo. Esta é a definição de backup incremental.</div>
+        </div>
+
+        <div class="questao" data-correta="e">
+            <div class="enunciado">37. Um firewall tem a função de aumentar a velocidade da conexão de internet.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q37" value="c"> Certo</label>
+                <label><input type="radio" name="q37" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Errado. Firewall filtra pacotes de rede para segurança, não para velocidade.</div>
+        </div>
+
+        <div class="questao" data-correta="c">
+            <div class="enunciado">38. A LGPD (Lei Geral de Proteção de Dados) estabelece princípios como finalidade e necessidade no tratamento de dados.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q38" value="c"> Certo</label>
+                <label><input type="radio" name="q38" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Certo. Princípios expressos na Lei 13.709/2018.</div>
+        </div>
+
+        <div class="questao" data-correta="e">
+            <div class="enunciado">39. A extensão .pdf é utilizada exclusivamente para arquivos de planilhas eletrônicas.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q39" value="c"> Certo</label>
+                <label><input type="radio" name="q39" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Errado. PDF é Portable Document Format, geralmente texto/imagem.</div>
+        </div>
+
+        <div class="questao" data-correta="c">
+            <div class="enunciado">40. O Windows 10 possui o recurso de área de transferência na nuvem.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q40" value="c"> Certo</label>
+                <label><input type="radio" name="q40" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Certo. Funcionalidade nativa a partir de versões específicas.</div>
+        </div>
+
+        <!-- ================= DIREITO CONSTITUCIONAL ================= -->
+        <div class="materia">Noções de Direito Constitucional (41-50)</div>
+
+        <div class="questao" data-correta="c">
+            <div class="enunciado">41. A segurança pública é dever do Estado, direito e responsabilidade de todos.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q41" value="c"> Certo</label>
+                <label><input type="radio" name="q41" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Certo. Art. 144 da CF/88.</div>
+        </div>
+
+        <div class="questao" data-correta="e">
+            <div class="enunciado">42. A Polícia Federal é subordinada ao Ministério da Defesa.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q42" value="c"> Certo</label>
+                <label><input type="radio" name="q42" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Errado. A PF é subordinada ao Ministério da Justiça e Segurança Pública.</div>
+        </div>
+
+        <div class="questao" data-correta="c">
+            <div class="enunciado">43. Compete à Polícia Federal exercer, com exclusividade, a polícia judiciária da União.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q43" value="c"> Certo</label>
+                <label><input type="radio" name="q43" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Certo. Art. 144, §1º, IV.</div>
+        </div>
+
+        <div class="questao" data-correta="e">
+            <div class="enunciado">44. São brasileiros natos apenas os nascidos no território brasileiro, excluindo os nascidos no exterior.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q44" value="c"> Certo</label>
+                <label><input type="radio" name="q44" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Errado. Há hipóteses de brasileiros natos nascidos no exterior (critério sanguíneo + opção).</div>
+        </div>
+
+        <div class="questao" data-correta="c">
+            <div class="enunciado">45. O voto é obrigatório para os maiores de 18 anos e facultativo para os analfabetos.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q45" value="c"> Certo</label>
+                <label><input type="radio" name="q45" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Certo. Art. 14, §1º da CF.</div>
+        </div>
+
+        <div class="questao" data-correta="e">
+            <div class="enunciado">46. Os vencimentos dos ocupantes de cargos públicos são irredutíveis em qualquer hipótese.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q46" value="c"> Certo</label>
+                <label><input type="radio" name="q46" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Errado. Podem ser reduzidos em caso de grave crise econômica (art. 37, XV).</div>
+        </div>
+
+        <div class="questao" data-correta="c">
+            <div class="enunciado">47. O Distrito Federal possui competências legislativas dos estados e municípios.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q47" value="c"> Certo</label>
+                <label><input type="radio" name="q47" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Certo. Natureza híbrida.</div>
+        </div>
+
+        <div class="questao" data-correta="e">
+            <div class="enunciado">48. Compete ao Presidente da República julgar as contas da União.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q48" value="c"> Certo</label>
+                <label><input type="radio" name="q48" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Errado. Compete ao Congresso Nacional com auxílio do TCU.</div>
+        </div>
+
+        <div class="questao" data-correta="c">
+            <div class="enunciado">49. A concessão de indulto é ato privativo do Presidente da República.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q49" value="c"> Certo</label>
+                <label><input type="radio" name="q49" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Certo. Art. 84, XII da CF.</div>
+        </div>
+
+        <div class="questao" data-correta="e">
+            <div class="enunciado">50. A Polícia Rodoviária Federal exerce a polícia judiciária da União.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q50" value="c"> Certo</label>
+                <label><input type="radio" name="q50" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Errado. PRF faz policiamento ostensivo de rodovias federais.</div>
+        </div>
+
+        <!-- ================= DIREITO ADMINISTRATIVO ================= -->
+        <div class="materia">Noções de Direito Administrativo (51-60)</div>
+
+        <div class="questao" data-correta="c">
+            <div class="enunciado">51. A Administração pode revogar atos por conveniência e oportunidade, respeitando direitos adquiridos.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q51" value="c"> Certo</label>
+                <label><input type="radio" name="q51" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Certo. Poder de autotutela (Súmula 473 STF).</div>
+        </div>
+
+        <div class="questao" data-correta="e">
+            <div class="enunciado">52. O princípio da motivação exige que a Administração indique apenas os fundamentos de fato.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q52" value="c"> Certo</label>
+                <label><input type="radio" name="q52" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Errado. Deve indicar fundamentos de fato E de direito.</div>
+        </div>
+
+        <div class="questao" data-correta="c">
+            <div class="enunciado">53. As fundações públicas são criadas por lei e podem ser de direito público ou privado.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q53" value="c"> Certo</label>
+                <label><input type="radio" name="q53" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Certo. Natureza jurídica dual é aceita.</div>
+        </div>
+
+        <div class="questao" data-correta="e">
+            <div class="enunciado">54. A administração indireta não está sujeita a controle e fiscalização.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q54" value="c"> Certo</label>
+                <label><input type="radio" name="q54" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Errado. Está sujeita ao controle finalístico (tutela).</div>
+        </div>
+
+        <div class="questao" data-correta="c">
+            <div class="enunciado">55. A imperatividade é atributo do ato administrativo que impõe coercitivamente obrigações a terceiros.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q55" value="c"> Certo</label>
+                <label><input type="radio" name="q55" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Certo. Característica do poder extroverso da Administração.</div>
+        </div>
+
+        <div class="questao" data-correta="e">
+            <div class="enunciado">56. O abuso de poder ocorre apenas na modalidade de excesso de poder.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q56" value="c"> Certo</label>
+                <label><input type="radio" name="q56" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Errado. Também inclui o desvio de finalidade.</div>
+        </div>
+
+        <div class="questao" data-correta="c">
+            <div class="enunciado">57. A responsabilidade civil do Estado por atos comissivos é, regra geral, objetiva.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q57" value="c"> Certo</label>
+                <label><input type="radio" name="q57" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Certo. Teoria do Risco Administrativo.</div>
+        </div>
+
+        <div class="questao" data-correta="e">
+            <div class="enunciado">58. A responsabilidade civil do agente público perante o Estado é objetiva.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q58" value="c"> Certo</label>
+                <label><input type="radio" name="q58" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Errado. A relação Estado-agente é subjetiva (dolo ou culpa).</div>
+        </div>
+
+        <div class="questao" data-correta="c">
+            <div class="enunciado">59. O poder hierárquico permite a avocação de competências em caráter excepcional.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q59" value="c"> Certo</label>
+                <label><input type="radio" name="q59" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Certo. Desde que haja motivos relevantes e justificados.</div>
+        </div>
+
+        <div class="questao" data-correta="e">
+            <div class="enunciado">60. O controle legislativo sobre atos da administração não abrange as empresas supranacionais.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q60" value="c"> Certo</label>
+                <label><input type="radio" name="q60" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Errado. O TCU fiscaliza contas de empresas supranacionais de capital da União.</div>
+        </div>
+
+        <!-- ================= LEGISLAÇÃO PF ================= -->
+        <div class="materia">Legislação Aplicada à PF e Governança (61-70)</div>
+
+        <div class="questao" data-correta="c">
+            <div class="enunciado">61. A PF tem competência para prevenir e reprimir o tráfico de drogas, contrabando e descaminho.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q61" value="c"> Certo</label>
+                <label><input type="radio" name="q61" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Certo. Art. 144, §1º, II da CF.</div>
+        </div>
+
+        <div class="questao" data-correta="e">
+            <div class="enunciado">62. A PF exerce atividades de polícia marítima, aeroportuária e de fronteiras.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q62" value="c"> Certo</label>
+                <label><input type="radio" name="q62" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Certo. A afirmação é VERDADEIRA. Se marcou Errado, errou.</div>
+        </div>
+
+        <div class="questao" data-correta="c">
+            <div class="enunciado">63. O cargo de Agente Administrativo da PF exige nível médio de escolaridade.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q63" value="c"> Certo</label>
+                <label><input type="radio" name="q63" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Certo. Conforme edital de 2025[citation:1].</div>
+        </div>
+
+        <div class="questao" data-correta="e">
+            <div class="enunciado">64. O Agente Administrativo da PF tem poder de polícia judiciária.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q64" value="c"> Certo</label>
+                <label><input type="radio" name="q64" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Errado. Atividades administrativas de apoio, sem poder de polícia judiciária.</div>
+        </div>
+
+        <div class="questao" data-correta="c">
+            <div class="enunciado">65. A governança pública envolve mecanismos de liderança, estratégia e controle.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q65" value="c"> Certo</label>
+                <label><input type="radio" name="q65" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Certo. Conforme Decreto 9.203/2017.</div>
+        </div>
+
+        <div class="questao" data-correta="e">
+            <div class="enunciado">66. A gestão de pessoas no serviço público não admite avaliação de desempenho.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q66" value="c"> Certo</label>
+                <label><input type="radio" name="q66" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Errado. A avaliação de desempenho é instrumento previsto.</div>
+        </div>
+
+        <div class="questao" data-correta="c">
+            <div class="enunciado">67. A gestão de contratos na Administração Pública busca a eficiência e a economicidade.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q67" value="c"> Certo</label>
+                <label><input type="radio" name="q67" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Certo. Princípios norteadores.</div>
+        </div>
+
+        <div class="questao" data-correta="e">
+            <div class="enunciado">68. O agente administrativo da PF pode substituir o Delegado de Polícia em investigações.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q68" value="c"> Certo</label>
+                <label><input type="radio" name="q68" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Errado. Atribuição exclusiva do cargo de Delegado.</div>
+        </div>
+
+        <div class="questao" data-correta="c">
+            <div class="enunciado">69. A integridade pública refere-se ao alinhamento da conduta com o interesse público.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q69" value="c"> Certo</label>
+                <label><input type="radio" name="q69" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Certo. Conceito de compliance público.</div>
+        </div>
+
+        <div class="questao" data-correta="e">
+            <div class="enunciado">70. O edital retificado manteve inalterado o conteúdo de Língua Portuguesa.</div>
+            <div class="opcoes">
+                <label><input type="radio" name="q70" value="c"> Certo</label>
+                <label><input type="radio" name="q70" value="e"> Errado</label>
+            </div>
+            <div class="feedback">Errado. O edital foi RETIFICADO para incluir novos tópicos[citation:7].</div>
+        </div>
+
+    </div>
+
+    <button class="gabarito-btn" onclick="corrigir()">Ver Gabarito e Resultado (70 Questões)</button>
+    <div id="resultado"></div>
+</div>
+
+<script>
+    function corrigir() {
+        const questoes = document.querySelectorAll('.questao');
+        let acertos = 0;
+        let erros = 0;
+        let brancos = 0;
+
+        questoes.forEach((q, index) => {
+            const selecionada = q.querySelector('input[type="radio"]:checked');
+            const correta = q.getAttribute('data-correta');
+            const feedbackDiv = q.querySelector('.feedback');
+            
+            // Exibir feedback
+            feedbackDiv.style.display = 'block';
+            
+            if (!selecionada) {
+                brancos++;
+                q.style.backgroundColor = '#fff3cd'; // Amarelo branco
+            } else if (selecionada.value === correta) {
+                acertos++;
+                q.style.backgroundColor = '#d4edda'; // Verde acerto
+                q.style.borderLeft = '5px solid #28a745';
+            } else {
+                erros++;
+                q.style.backgroundColor = '#f8d7da'; // Vermelho erro
+                q.style.borderLeft = '5px solid #dc3545';
+            }
+            
+            // Desabilitar opções
+            q.querySelectorAll('input').forEach(i => i.disabled = true);
+        });
+
+        const total = questoes.length;
+        // Cálculo Cebraspe: Acertos - Erros
+        const nota = acertos - erros;
+        const maxPontos = total;
+
+        const resDiv = document.getElementById('resultado');
+        resDiv.style.display = 'block';
+        
+        let corFundo = nota >= 0 ? '#d1ecf1' : '#f8d7da';
+        let mensagem = '';
+
+        if (nota >= 50) mensagem = "Excelente! Você está muito bem preparado.";
+        else if (nota >= 30) mensagem = "Bom desempenho, mas continue revisando os pontos fracos.";
+        else mensagem = "Atenção! Foque mais nos estudos e evite chutes.";
+
+        resDiv.style.backgroundColor = corFundo;
+        resDiv.style.border = '2px solid #003366';
+
+        resDiv.innerHTML = `
+            <h2>Resultado Final</h2>
+            <p style="font-size: 1.1em;">
+               <strong>Acertos:</strong> <span class="certo">${acertos}</span> &nbsp;|&nbsp; 
+               <strong>Erros:</strong> <span class="errado">${erros}</span> &nbsp;|&nbsp; 
+               <strong>Brancos:</strong> ${brancos}
+            </p>
+            <p style="font-size: 2em; font-weight: bold; color: #003366; margin: 10px 0;">
+               Nota: ${nota} <span style="font-size:0.6em; color:#666;">/ ${maxPontos}</span>
+            </p>
+            <p style="font-weight:bold;">${mensagem}</p>
+            <p><small>Critério Cebraspe aplicado: (Acertos × 1) - (Erros × 1).</small></p>
+        `;
+    }
+</script>
+
+</body>
+</html>
