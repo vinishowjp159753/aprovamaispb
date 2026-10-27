@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pratinho Feliz | Cardápio do bebê</title>
+<style>
+:root{--ink:#243247;--muted:#65758b;--cream:#fffaf2;--white:#fff;--coral:#ff8d7a;--peach:#ffe1d7;--mint:#dff5e9;--green:#28765d;--lav:#eee8ff;--yellow:#ffedb0;--line:#e9e6df;--shadow:0 16px 45px #263b5212}
+*{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font-family:ui-rounded,"SF Pro Rounded",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.5}
+button,input,select{font:inherit}button{cursor:pointer}
+header{background:linear-gradient(120deg,#dff5e9 0%,#fff0d0 55%,#ffe1d7 100%);padding:26px 18px 30px;overflow:hidden;position:relative}
+.hero{max-width:1100px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:22px}.eyebrow{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:#28765d}.hero h1{font-size:clamp(2rem,5vw,3.4rem);line-height:1.05;letter-spacing:-.04em;margin:10px 0}.hero p{max-width:570px;color:#53657a;margin:0}.hero-art{font-size:clamp(4.4rem,10vw,7rem);filter:drop-shadow(0 10px 7px #765c2420);transform:rotate(-7deg)}
+main{max-width:1100px;margin:24px auto 60px;padding:0 16px}.panel{background:var(--white);border:1px solid var(--line);border-radius:24px;padding:clamp(16px,3vw,28px);box-shadow:var(--shadow);margin-bottom:18px}
+.panel-title{display:flex;align-items:center;gap:10px;margin:0 0 6px;font-size:1.2rem}.sub{color:var(--muted);margin:0 0 18px;font-size:.94rem}
+.controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.field label{display:block;font-weight:750;font-size:.88rem;margin:0 0 7px}.field input,.field select{width:100%;min-height:48px;border:1px solid #dcdfe5;border-radius:13px;padding:10px 12px;background:#fff;color:var(--ink);outline-color:#55a88b}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.btn{border:0;border-radius:14px;padding:12px 18px;font-weight:800;transition:transform .15s,filter .15s}.btn:hover{transform:translateY(-1px);filter:brightness(.98)}.primary{background:var(--green);color:#fff}.secondary{background:var(--mint);color:#245c4a}.soft{background:#f3f1ed;color:#4c5b6c}
+.result-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}.day-label{font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;color:var(--green);font-weight:850}.result h2{font-size:clamp(1.6rem,4vw,2.3rem);margin:3px 0 5px;letter-spacing:-.03em}.result-desc{color:var(--muted);margin:0}.meal-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:20px}.meal{border:1px solid var(--line);border-radius:20px;padding:18px;background:#fffdf9}.meal.lunch{background:linear-gradient(145deg,#fff8e7,#fff)}.meal.dinner{background:linear-gradient(145deg,#eaf8f2,#fff)}.meal-top{display:flex;align-items:center;gap:10px;margin-bottom:12px}.meal-icon{width:46px;height:46px;display:grid;place-items:center;border-radius:15px;background:#fff;font-size:1.7rem}.meal h3{margin:0;font-size:1.08rem}.tag{font-size:.74rem;font-weight:800;color:#5d6b7a}.meal h4{font-size:.83rem;margin:14px 0 5px;color:#516075;text-transform:uppercase;letter-spacing:.05em}.meal ul{margin:0;padding-left:19px}.meal li{padding:2px 0}.method{font-size:.93rem;margin:0}.tip{margin-top:16px;background:#f6f1ff;border-radius:16px;padding:14px 16px;color:#514675;font-size:.92rem}.tip strong{color:#392d68}.month-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin-top:12px}.month{border:1px solid var(--line);border-radius:12px;background:#fff;padding:9px 5px;color:#536175;font-weight:750;font-size:.85rem}.month.active{background:var(--lav);border-color:#bcb0ef;color:#4c3c88}.days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:7px;margin-top:14px}.weekday{text-align:center;font-size:.74rem;font-weight:800;color:#7c8797;padding:4px 0}.day{aspect-ratio:1;border:1px solid #e8e7e2;border-radius:12px;background:#fff;color:var(--ink);font-weight:750;min-width:0}.day:hover{border-color:#75b99f}.day.selected{background:var(--green);color:#fff;border-color:var(--green);box-shadow:0 4px 12px #28765d30}.day.outside{visibility:hidden}.calendar-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.calendar-head h3{margin:0;font-size:1.12rem}.small-btn{border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 12px;font-weight:800;color:var(--ink)}
+.notice{font-size:.9rem;color:#586779}.notice strong{color:var(--ink)}footer{max-width:1100px;margin:-34px auto 32px;padding:0 16px;color:#758195;font-size:.82rem}.footer-inner{border-top:1px solid var(--line);padding-top:18px}
+@media(max-width:700px){.hero{align-items:flex-start}.hero-art{font-size:4rem}.controls{grid-template-columns:1fr}.meal-grid{grid-template-columns:1fr}.month-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.panel{border-radius:19px}.days{gap:4px}.day{border-radius:9px}.hero h1{font-size:2.3rem}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="hero">
+    <div>
+      <div class="eyebrow">🥕 Um ano de ideias gostosas</div>
+      <h1>Pratinho Feliz</h1>
+      <p>Um cardápio inspirador para planejar as refeições do seu bebê, com ingredientes variados e receitas simples para o dia a dia.</p>
+    </div>
+    <div class="hero-art" aria-hidden="true">🍲</div>
+  </div>
+</header>
+<main>
+  <section class="panel">
+    <h2 class="panel-title">🗓️ Escolha o dia do cardápio</h2>
+    <p class="sub">Selecione qualquer data do ano. O cardápio muda a cada dia e combina almoço e jantar.</p>
+    <div class="controls">
+      <div class="field"><label for="date">Data</label><input id="date" type="date"></div>
+      <div class="field"><label for="age">Idade do bebê</label><select id="age"><option value="9">9–11 meses</option><option value="12">12 meses ou mais</option><option value="6">6–8 meses</option></select></div>
+      <div class="field"><label for="focus">Preferência</label><select id="focus"><option value="ferro">Priorizar fontes de ferro</option><option value="variado">Variado e colorido</option><option value="pratico">Prático e econômico</option></select></div>
+    </div>
+    <div class="actions">
+      <button class="btn primary" id="generate">✨ Gerar cardápio</button>
+      <button class="btn secondary" id="today">Ir para hoje</button>
+      <button class="btn soft" id="print">Imprimir / salvar PDF</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="calendar-head"><h3>📆 Calendário</h3><div><button class="small-btn" id="prev" aria-label="Mês anterior">‹</button> <button class="small-btn" id="next" aria-label="Próximo mês">›</button></div></div>
+    <div class="month-grid" id="months"></div>
+    <div class="days" id="calendar" aria-label="Dias do mês"></div>
+  </section>
+
+  <section class="panel result" aria-live="polite" id="result">
+    <div class="result-head">
+      <div><div class="day-label" id="dateLabel">SEU CARDÁPIO</div><h2 id="resultTitle">Vamos montar o pratinho!</h2><p class="result-desc" id="resultDesc">Escolha uma data para ver duas sugestões de refeição.</p></div>
+      <div style="font-size:2.6rem" aria-hidden="true">🥦</div>
+    </div>
+    <div class="meal-grid" id="meals"></div>
+    <div class="tip" id="tip"><strong>💚 Dica:</strong> Ofereça a comida amassada com garfo, úmida e macia. Vá evoluindo a textura conforme o bebê aceita.</div>
+  </section>
+
+  <section class="panel">
+    <h2 class="panel-title">🌈 Como usar este cardápio</h2>
+    <p class="notice">As sugestões são exemplos para inspirar a rotina — não uma prescrição nutricional individual. Ajuste a quantidade à fome do bebê e aos alimentos já introduzidos. Varie cores, grupos alimentares e fontes de proteína ao longo da semana.</p>
+    <p class="notice"><strong>Segurança:</strong> sem mel antes de 1 ano, sem açúcar ou sal adicionado e sem temperos industrializados. Carne, peixe e ovo devem estar bem cozidos; retire todas as espinhas do peixe e os fiapos duros da macaxeira. Sirva com o bebê sentado e supervisionado. Não ofereça alimentos duros, inteiros ou redondos que possam causar engasgo.</p>
+    <p class="notice">Se o bebê tem alergias, dificuldade para engolir, restrições alimentares ou orientação específica do pediatra, adapte o cardápio com um profissional de saúde.</p>
+  </section>
+</main>
+<footer><div class="footer-inner">Feito com carinho 💛 · Pratinho Feliz · Ideias de refeições para a família</div></footer>
+<script>
+(() => {
+const $ = id => document.getElementById(id);
+const monthNames = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const weekdays = ['D','S','T','Q','Q','S','S'];
+const meals = [
+ {l:{name:'Arroz, feijão, carne e abóbora',icon:'🍛',ingredients:['Arroz bem cozido','Feijão amassado com caldo','Carne bovina moída e bem cozida','Abóbora macia'],method:'Cozinhe a carne completamente. Amasse o feijão e a abóbora com garfo e misture tudo com um pouco do caldo.'},d:{name:'Frango com batata e cenoura',icon:'🍲',ingredients:['Frango bem desfiado','Batata','Cenoura','Feijão amassado'],method:'Cozinhe até ficar bem macio. Desfie o frango finamente e amasse os legumes, deixando a preparação úmida.'}},
+ {l:{name:'Macaxeira com carne e couve',icon:'🥘',ingredients:['Macaxeira bem cozida e sem fiapos','Carne bovina macia','Couve bem cozida e picadinha','Feijão'],method:'Retire todos os fiapos duros da macaxeira. Pique a carne e a couve bem fininho e misture com o feijão amassado.'},d:{name:'Ovo com arroz e abóbora',icon:'🍳',ingredients:['Ovo completamente cozido','Arroz macio','Feijão','Abóbora cozida'],method:'Cozinhe o ovo por completo. Amasse com o arroz, o feijão e a abóbora, adicionando um pouco de água do cozimento se necessário.'}},
+ {l:{name:'Frango, arroz, feijão e brócolis',icon:'🥦',ingredients:['Frango desfiado','Arroz','Feijão','Brócolis bem macio'],method:'Cozinhe o brócolis até ficar macio. Desfie o frango e amasse os demais alimentos com garfo.'},d:{name:'Peixe com batata e abóbora',icon:'🐟',ingredients:['Peixe bem cozido e sem espinhas','Batata','Abóbora','Feijão'],method:'Cozinhe o peixe completamente e confira cuidadosamente se não há espinhas. Amasse os legumes e misture.'}},
+ {l:{name:'Carne com lentilha e arroz',icon:'🥣',ingredients:['Carne moída bem cozida','Lentilha macia','Arroz','Cenoura cozida'],method:'Cozinhe a lentilha até ficar macia. Misture à carne, ao arroz e à cenoura amassada.'},d:{name:'Creme espesso de abóbora com frango',icon:'🎃',ingredients:['Frango desfiado','Abóbora','Batata','Feijão'],method:'Cozinhe e amasse os legumes com garfo. Junte o frango finamente desfiado e o feijão, sem deixar a refeição líquida.'}},
+ {l:{name:'Carne com batata, feijão e abóbora',icon:'🥩',ingredients:['Carne bovina bem cozida','Batata','Feijão','Abóbora'],method:'Pique ou desfie a carne muito fininho. Cozinhe os legumes até ficarem macios e amasse com o feijão.'},d:{name:'Arroz com frango e abobrinha',icon:'🍚',ingredients:['Frango desfiado','Arroz','Feijão','Abobrinha cozida'],method:'Cozinhe a abobrinha até amolecer. Misture com arroz e feijão e acrescente frango finamente desfiado.'}},
+ {l:{name:'Peixe com arroz, feijão e cenoura',icon:'🐠',ingredients:['Peixe bem cozido e sem espinhas','Arroz','Feijão','Cenoura macia'],method:'Desfie o peixe com cuidado e confira se não há espinhas. Amasse a cenoura e o feijão e misture com arroz.'},d:{name:'Carne com macaxeira e abóbora',icon:'🍠',ingredients:['Carne moída bem cozida','Macaxeira sem fiapos duros','Abóbora','Feijão'],method:'Cozinhe bem a macaxeira e retire os fiapos. Amasse com a abóbora e misture a carne e o feijão.'}},
+ {l:{name:'Ovo com arroz, feijão e legumes',icon:'🥚',ingredients:['Ovo completamente cozido','Arroz','Feijão','Couve ou abóbora cozida'],method:'Cozinhe o ovo por completo e pique ou amasse. Misture aos outros alimentos bem macios.'},d:{name:'Frango com lentilha e batata',icon:'🍲',ingredients:['Frango desfiado','Lentilha bem cozida','Batata','Cenoura'],method:'Cozinhe até ficar macio. Amasse os legumes e a lentilha e misture o frango bem desfiado.'}}
+];
+const extra = [
+ ['Arroz, feijão, frango e chuchu','Carne moída com purê de abóbora'],
+ ['Peixe com batata-doce e brócolis','Lentilha com carne e cenoura'],
+ ['Frango com macaxeira e couve','Ovo bem cozido com batata e feijão'],
+ ['Carne desfiada com arroz e abobrinha','Frango com abóbora e lentilha'],
+ ['Arroz, feijão, ovo e cenoura','Peixe com batata e chuchu']
+];
+let selected = new Date(); let shownYear = selected.getFullYear(); let shownMonth = selected.getMonth();
+function iso(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+function parseDate(v){const [y,m,d]=v.split('-').map(Number);return new Date(y,m-1,d,12)}
+function renderCalendar(){
+ $('months').innerHTML=monthNames.map((m,i)=>`<button class="month ${i===shownMonth?'active':''}" data-month="${i}">${m}</button>`).join('');
+ $('months').querySelectorAll('button').forEach(b=>b.onclick=()=>{shownMonth=+b.dataset.month;renderCalendar()});
+ const first=new Date(shownYear,shownMonth,1).getDay(),count=new Date(shownYear,shownMonth+1,0).getDate();
+ $('calendar').innerHTML=weekdays.map(w=>`<div class="weekday">${w}</div>`).join('');
+ for(let i=0;i<first;i++) $('calendar').insertAdjacentHTML('beforeend','<div class="day outside"></div>');
+ for(let d=1;d<=count;d++){const date=new Date(shownYear,shownMonth,d,12);const b=document.createElement('button');b.className='day'+(iso(date)===iso(selected)?' selected':'');b.textContent=d;b.setAttribute('aria-label',`${d} de ${monthNames[shownMonth]}`);b.onclick=()=>choose(date);$('calendar').appendChild(b)}
+}
+function choose(d){selected=d;shownYear=d.getFullYear();shownMonth=d.getMonth();$('date').value=iso(d);renderCalendar();generate()}
+function foodCard(meal,label,klass){
+ return `<article class="meal ${klass}"><div class="meal-top"><div class="meal-icon">${meal.icon}</div><div><div class="tag">${label}</div><h3>${meal.name}</h3></div></div><h4>Ingredientes sugeridos</h4><ul>${meal.ingredients.map(x=>`<li>${x}</li>`).join('')}</ul><h4>Modo de preparo</h4><p class="method">${meal.method}</p></article>`;
+}
+function generate(){
+ const d=parseDate($('date').value||iso(new Date()));selected=d;shownYear=d.getFullYear();shownMonth=d.getMonth();renderCalendar();
+ const age=+$('age').value,focus=$('focus').value;
+ let idx=(Math.floor((Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())-Date.UTC(d.getFullYear(),0,1))/86400000)+Math.floor((d.getFullYear()-2024)*2))%meals.length;
+ if(idx<0)idx+=meals.length;
+ const pair=meals[idx];
+ let l={...pair.l},n={...pair.d};
+ if(focus==='ferro'&&idx!==0&&idx!==3&&idx!==4){l={...meals[0].l};n={...pair.d}}
+ if(focus==='pratico'){l={...meals[(idx+4)%meals.length].l};n={...meals[(idx+1)%meals.length].d}}
+ if(age===6){$('tip').innerHTML='<strong>💚 Atenção para 6–8 meses:</strong> ofereça textura macia e amassada, com progressão gradual. Introduza alimentos e alergênicos com cuidado e siga a orientação do pediatra. Nunca ofereça mel antes de 1 ano.'}
+ else if(age===12){$('tip').innerHTML='<strong>💚 Para 12 meses ou mais:</strong> a criança pode acompanhar gradualmente a comida da família com pouco sal, em pedaços seguros e macios, sempre sentada e supervisionada.'}
+ else {$('tip').innerHTML='<strong>💚 Dica:</strong> ofereça a comida amassada com garfo, úmida e macia. Vá evoluindo a textura conforme o bebê aceita; não precisa bater no liquidificador.'}
+ if(focus==='ferro') $('tip').innerHTML += ' Priorize carnes bem cozidas, feijão ou lentilha e ofereça fruta rica em vitamina C junto ou após a refeição.';
+ const fmt=new Intl.DateTimeFormat('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+ $('dateLabel').textContent=fmt.format(d).toLocaleUpperCase('pt-BR');
+ $('resultTitle').textContent='Seu pratinho do dia 🌟';
+ $('resultDesc').textContent=focus==='ferro'?'Sugestões com atenção especial a fontes de ferro.':'Duas ideias para variar as refeições do bebê.';
+ $('meals').innerHTML=foodCard(l,'☀️ ALMOÇO','lunch')+foodCard(n,'🌙 JANTAR','dinner');
+}
+$('date').addEventListener('change',()=>{if($('date').value)choose(parseDate($('date').value))});
+$('generate').onclick=generate;
+$('today').onclick=()=>choose(new Date());
+$('prev').onclick=()=>{shownMonth--;if(shownMonth<0){shownMonth=11;shownYear--}renderCalendar()};
+$('next').onclick=()=>{shownMonth++;if(shownMonth>11){shownMonth=0;shownYear++}renderCalendar()};
+$('print').onclick=()=>window.print();
+const now=new Date();$('date').value=iso(now);selected=now;shownYear=now.getFullYear();shownMonth=now.getMonth();renderCalendar();generate();
+})();
+</script>
+</body>
+</html>
